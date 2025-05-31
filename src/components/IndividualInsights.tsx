@@ -2,21 +2,31 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, BarChart3, Radar, Download, User } from 'lucide-react';
+import { Search, BarChart3, Radar, Download, User, ChevronDown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { useNameSearch } from '@/hooks/useNameSearch';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Badge } from '@/components/ui/badge';
 
 export const IndividualInsights: React.FC = () => {
   const [selectedRespondent, setSelectedRespondent] = useState<string>('');
+  const [selectedName, setSelectedName] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // Mock data for demonstration
-  const mockRespondents = [
-    { id: '1', name: 'John Smith', email: 'john.smith@company.com' },
-    { id: '2', name: 'Sarah Johnson', email: 'sarah.johnson@company.com' },
-    { id: '3', name: 'Michael Chen', email: 'michael.chen@company.com' },
-    { id: '4', name: 'Emily Davis', email: 'emily.davis@company.com' }
-  ];
+  const { names, isLoading, error } = useNameSearch(searchQuery);
 
   const salimaeDimensions = [
     { name: 'Strategy', score: 4.2, color: '#6366F1' },
@@ -28,6 +38,23 @@ export const IndividualInsights: React.FC = () => {
   ];
 
   const overallScore = salimaeDimensions.reduce((sum, dim) => sum + dim.score, 0) / salimaeDimensions.length;
+
+  const handleNameSelect = (nameOption: any) => {
+    setSelectedName(nameOption.name);
+    setSelectedRespondent(nameOption.id);
+    setSearchQuery(nameOption.name);
+    setIsDropdownOpen(false);
+    console.log('Selected respondent:', nameOption);
+  };
+
+  const getSourceBadgeColor = (source: string) => {
+    switch (source) {
+      case 'survey': return 'bg-blue-100 text-blue-800';
+      case 'colleague': return 'bg-green-100 text-green-800';
+      case 'woca': return 'bg-purple-100 text-purple-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -56,43 +83,81 @@ export const IndividualInsights: React.FC = () => {
             Select Respondent
           </CardTitle>
           <CardDescription>
-            Choose an individual from the survey_responses table to analyze their SALIMA results
+            Search and select an individual from survey_responses, colleague_survey_responses, or woca tables
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
             <div className="flex-1">
-              <Input
-                placeholder="Search respondents by name or email..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="mb-4"
-              />
-              <Select value={selectedRespondent} onValueChange={setSelectedRespondent}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a respondent" />
-                </SelectTrigger>
-                <SelectContent>
-                  {mockRespondents
-                    .filter(respondent => 
-                      respondent.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                      respondent.email.toLowerCase().includes(searchQuery.toLowerCase())
-                    )
-                    .map((respondent) => (
-                      <SelectItem key={respondent.id} value={respondent.id}>
-                        <div className="flex flex-col">
-                          <span className="font-medium">{respondent.name}</span>
-                          <span className="text-sm text-gray-500">{respondent.email}</span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
+              <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+                <DropdownMenuTrigger asChild>
+                  <div className="relative">
+                    <Input
+                      placeholder="Search respondents by name or email..."
+                      value={searchQuery}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        setIsDropdownOpen(true);
+                      }}
+                      onFocus={() => setIsDropdownOpen(true)}
+                      className="pr-8"
+                    />
+                    <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-full min-w-[400px] max-h-80 p-0 bg-white border shadow-lg" align="start">
+                  <Command>
+                    <CommandList>
+                      {isLoading && (
+                        <CommandEmpty>Searching...</CommandEmpty>
+                      )}
+                      {error && (
+                        <CommandEmpty className="text-red-500">Error: {error}</CommandEmpty>
+                      )}
+                      {!isLoading && !error && names.length === 0 && searchQuery.length >= 2 && (
+                        <CommandEmpty>No respondents found.</CommandEmpty>
+                      )}
+                      {!isLoading && !error && searchQuery.length < 2 && (
+                        <CommandEmpty>Type at least 2 characters to search...</CommandEmpty>
+                      )}
+                      {names.length > 0 && (
+                        <CommandGroup>
+                          {names.map((nameOption) => (
+                            <CommandItem
+                              key={nameOption.id}
+                              value={nameOption.name}
+                              onSelect={() => handleNameSelect(nameOption)}
+                              className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50"
+                            >
+                              <div className="flex flex-col">
+                                <span className="font-medium">{nameOption.name}</span>
+                                {nameOption.email && (
+                                  <span className="text-sm text-gray-500">{nameOption.email}</span>
+                                )}
+                              </div>
+                              <Badge className={getSourceBadgeColor(nameOption.source)}>
+                                {nameOption.source}
+                              </Badge>
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      )}
+                    </CommandList>
+                  </Command>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
             <Button className="self-end" disabled={!selectedRespondent}>
               Analyze Results
             </Button>
           </div>
+          {selectedName && (
+            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+              <p className="text-sm text-blue-800">
+                Selected: <span className="font-medium">{selectedName}</span>
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
