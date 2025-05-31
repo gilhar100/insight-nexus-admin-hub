@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { WocaCategoryScores } from '@/utils/wocaAnalysis';
 
@@ -77,9 +77,12 @@ export const WocaCategoryDistributionChart: React.FC<WocaCategoryDistributionCha
           />
           <Bar 
             dataKey="score" 
-            fill={(entry: any) => entry.color}
             radius={[4, 4, 0, 0]}
-          />
+          >
+            {chartData.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.color} />
+            ))}
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
     </ChartContainer>
