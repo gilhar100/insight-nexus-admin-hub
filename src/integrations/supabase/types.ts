@@ -9,60 +9,189 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      woca_responses: {
+      colleague_survey_responses: {
         Row: {
-          age: number | null
-          consent_research: boolean
+          consent_for_research: boolean | null
           created_at: string
+          dimension_a: number
+          dimension_a2: number
+          dimension_i: number
+          dimension_l: number
+          dimension_m: number
+          dimension_s: number
+          evaluator_department: string | null
+          evaluator_email: string | null
+          evaluator_name: string | null
+          evaluator_position: string | null
+          id: string
+          is_anonymous: boolean | null
+          manager_department: string | null
+          manager_name: string
+          manager_position: string | null
+          organization: string | null
+          slq_score: number
+        }
+        Insert: {
+          consent_for_research?: boolean | null
+          created_at?: string
+          dimension_a: number
+          dimension_a2: number
+          dimension_i: number
+          dimension_l: number
+          dimension_m: number
+          dimension_s: number
+          evaluator_department?: string | null
+          evaluator_email?: string | null
+          evaluator_name?: string | null
+          evaluator_position?: string | null
+          id?: string
+          is_anonymous?: boolean | null
+          manager_department?: string | null
+          manager_name: string
+          manager_position?: string | null
+          organization?: string | null
+          slq_score: number
+        }
+        Update: {
+          consent_for_research?: boolean | null
+          created_at?: string
+          dimension_a?: number
+          dimension_a2?: number
+          dimension_i?: number
+          dimension_l?: number
+          dimension_m?: number
+          dimension_s?: number
+          evaluator_department?: string | null
+          evaluator_email?: string | null
+          evaluator_name?: string | null
+          evaluator_position?: string | null
+          id?: string
+          is_anonymous?: boolean | null
+          manager_department?: string | null
+          manager_name?: string
+          manager_position?: string | null
+          organization?: string | null
+          slq_score?: number
+        }
+        Relationships: []
+      }
+      survey_responses: {
+        Row: {
+          consent_for_research: boolean | null
+          created_at: string
+          department: string | null
+          dimension_a: number
+          dimension_a2: number
+          dimension_i: number
+          dimension_l: number
+          dimension_m: number
+          dimension_s: number
+          id: string
+          is_anonymous: boolean | null
+          organization: string | null
+          position: string | null
+          slq_score: number
+          strategy: number
+          survey_type: string
+          user_email: string | null
+          user_name: string | null
+        }
+        Insert: {
+          consent_for_research?: boolean | null
+          created_at?: string
+          department?: string | null
+          dimension_a: number
+          dimension_a2: number
+          dimension_i: number
+          dimension_l: number
+          dimension_m: number
+          dimension_s?: number
+          id?: string
+          is_anonymous?: boolean | null
+          organization?: string | null
+          position?: string | null
+          slq_score: number
+          strategy: number
+          survey_type?: string
+          user_email?: string | null
+          user_name?: string | null
+        }
+        Update: {
+          consent_for_research?: boolean | null
+          created_at?: string
+          department?: string | null
+          dimension_a?: number
+          dimension_a2?: number
+          dimension_i?: number
+          dimension_l?: number
+          dimension_m?: number
+          dimension_s?: number
+          id?: string
+          is_anonymous?: boolean | null
+          organization?: string | null
+          position?: string | null
+          slq_score?: number
+          strategy?: number
+          survey_type?: string
+          user_email?: string | null
+          user_name?: string | null
+        }
+        Relationships: []
+      }
+      woca: {
+        Row: {
+          age: string | null
+          consent_research: boolean | null
+          created_at: string | null
           education: string | null
-          email: string | null
+          email: string
           experience_years: number | null
           full_name: string
           gender: string | null
           id: string
           organization: string | null
-          overall_score: number
+          overall_score: number | null
           phone: string | null
           profession: string | null
-          question_responses: Json
-          scores: Json
-          workshop_id: number
+          question_responses: Json | null
+          scores: Json | null
+          workshop_id: number | null
         }
         Insert: {
-          age?: number | null
-          consent_research?: boolean
-          created_at?: string
+          age?: string | null
+          consent_research?: boolean | null
+          created_at?: string | null
           education?: string | null
-          email?: string | null
+          email: string
           experience_years?: number | null
           full_name: string
           gender?: string | null
-          id?: string
+          id: string
           organization?: string | null
-          overall_score: number
+          overall_score?: number | null
           phone?: string | null
           profession?: string | null
-          question_responses?: Json
-          scores: Json
-          workshop_id?: number
+          question_responses?: Json | null
+          scores?: Json | null
+          workshop_id?: number | null
         }
         Update: {
-          age?: number | null
-          consent_research?: boolean
-          created_at?: string
+          age?: string | null
+          consent_research?: boolean | null
+          created_at?: string | null
           education?: string | null
-          email?: string | null
+          email?: string
           experience_years?: number | null
           full_name?: string
           gender?: string | null
           id?: string
           organization?: string | null
-          overall_score?: number
+          overall_score?: number | null
           phone?: string | null
           profession?: string | null
-          question_responses?: Json
-          scores?: Json
-          workshop_id?: number
+          question_responses?: Json | null
+          scores?: Json | null
+          workshop_id?: number | null
         }
         Relationships: []
       }
