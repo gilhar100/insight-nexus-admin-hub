@@ -88,24 +88,29 @@ export const IndividualInsights: React.FC = () => {
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
-            <div className="flex-1">
-              <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
-                <DropdownMenuTrigger asChild>
-                  <div className="relative">
-                    <Input
-                      placeholder="Search respondents by name or email..."
-                      value={searchQuery}
-                      onChange={(e) => {
-                        setSearchQuery(e.target.value);
-                        setIsDropdownOpen(true);
-                      }}
-                      onFocus={() => setIsDropdownOpen(true)}
-                      className="pr-8"
-                    />
-                    <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  </div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-full min-w-[400px] max-h-80 p-0 bg-white border shadow-lg" align="start">
+            <div className="flex-1 relative">
+              <Input
+                placeholder="Search respondents by name or email..."
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  if (e.target.value.length >= 2) {
+                    setIsDropdownOpen(true);
+                  } else {
+                    setIsDropdownOpen(false);
+                  }
+                }}
+                onFocus={() => {
+                  if (searchQuery.length >= 2) {
+                    setIsDropdownOpen(true);
+                  }
+                }}
+                className="w-full"
+              />
+              
+              {/* Dropdown Results */}
+              {isDropdownOpen && (searchQuery.length >= 2) && (
+                <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border rounded-md shadow-lg max-h-80 overflow-y-auto">
                   <Command>
                     <CommandList>
                       {isLoading && (
@@ -114,11 +119,8 @@ export const IndividualInsights: React.FC = () => {
                       {error && (
                         <CommandEmpty className="text-red-500">Error: {error}</CommandEmpty>
                       )}
-                      {!isLoading && !error && names.length === 0 && searchQuery.length >= 2 && (
+                      {!isLoading && !error && names.length === 0 && (
                         <CommandEmpty>No respondents found.</CommandEmpty>
-                      )}
-                      {!isLoading && !error && searchQuery.length < 2 && (
-                        <CommandEmpty>Type at least 2 characters to search...</CommandEmpty>
                       )}
                       {names.length > 0 && (
                         <CommandGroup>
@@ -144,8 +146,8 @@ export const IndividualInsights: React.FC = () => {
                       )}
                     </CommandList>
                   </Command>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                </div>
+              )}
             </div>
             <Button className="self-end" disabled={!selectedRespondent}>
               Analyze Results
