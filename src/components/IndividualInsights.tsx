@@ -2,49 +2,81 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Search, BarChart3, Radar, Download, User, ChevronDown } from 'lucide-react';
+import { Search, BarChart3, Download, User } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useNameSearch } from '@/hooks/useNameSearch';
+import { useRespondentData } from '@/hooks/useRespondentData';
+import { Badge } from '@/components/ui/badge';
+import { SalimaRadarChart } from '@/components/SalimaRadarChart';
+import { exportSalimaReport, exportSalimaReportCSV } from '@/utils/exportUtils';
+import { useToast } from '@/hooks/use-toast';
 import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
 
 export const IndividualInsights: React.FC = () => {
   const [selectedRespondent, setSelectedRespondent] = useState<string>('');
   const [selectedName, setSelectedName] = useState<string>('');
+  const [selectedSource, setSelectedSource] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const { names, isLoading, error } = useNameSearch(searchQuery);
-
-  const salimaeDimensions = [
-    { name: 'Strategy', score: 4.2, color: '#6366F1' },
-    { name: 'Adaptability', score: 3.8, color: '#8B5CF6' },
-    { name: 'Learning', score: 4.5, color: '#06B6D4' },
-    { name: 'Inspiration', score: 3.9, color: '#F59E0B' },
-    { name: 'Meaning', score: 4.1, color: '#10B981' },
-    { name: 'Authenticity', score: 4.3, color: '#EC4899' }
-  ];
-
-  const overallScore = salimaeDimensions.reduce((sum, dim) => sum + dim.score, 0) / salimaeDimensions.length;
+  const { data: respondentData, isLoading: isDataLoading, error: dataError, fetchRespondentData } = useRespondentData();
+  const { toast } = useToast();
 
   const handleNameSelect = (nameOption: any) => {
     setSelectedName(nameOption.name);
     setSelectedRespondent(nameOption.id);
+    setSelectedSource(nameOption.source);
     setSearchQuery(nameOption.name);
     setIsDropdownOpen(false);
     console.log('Selected respondent:', nameOption);
+  };
+
+  const handleAnalyzeResults = async () => {
+    if (!selectedRespondent || !selectedSource) {
+      toast({
+        title: "No respondent selected",
+        description: "Please select a respondent to analyze",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    await fetchRespondentData(selectedRespondent, selectedSource);
+  };
+
+  const handleExport = (format: 'json' | 'csv') => {
+    if (!respondentData) {
+      toast({
+        title: "No data to export",
+        description: "Please analyze a respondent first",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (format === 'json') {
+      exportSalimaReport(respondentData);
+    } else {
+      exportSalimaReportCSV(respondentData);
+    }
+
+    toast({
+      title: "Export successful",
+      description: `Report exported as ${format.toUpperCase()}`,
+    });
   };
 
   const getSourceBadgeColor = (source: string) => {
@@ -55,6 +87,16 @@ export const IndividualInsights: React.FC = () => {
       default: return 'bg-gray-100 text-gray-800';
     }
   };
+
+  // Prepare radar chart data
+  const radarChartData = respondentData ? [
+    { dimension: 'Strategy', score: respondentData.dimensions.strategy, color: '#6366F1' },
+    { dimension: 'Adaptability', score: respondentData.dimensions.adaptability, color: '#8B5CF6' },
+    { dimension: 'Learning', score: respondentData.dimensions.learning, color: '#06B6D4' },
+    { dimension: 'Inspiration', score: respondentData.dimensions.inspiration, color: '#F59E0B' },
+    { dimension: 'Meaning', score: respondentData.dimensions.meaning, color: '#10B981' },
+    { dimension: 'Authenticity', score: respondentData.dimensions.authenticity, color: '#EC4899' }
+  ] : [];
 
   return (
     <div className="space-y-6">
@@ -83,7 +125,7 @@ export const IndividualInsights: React.FC = () => {
             Select Respondent
           </CardTitle>
           <CardDescription>
-            Search and select an individual from survey_responses, colleague_survey_responses, or woca tables
+            Search and select an individual from survey_responses, colleague_survey_responses, or woca_responses tables
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -149,39 +191,60 @@ export const IndividualInsights: React.FC = () => {
                 </div>
               )}
             </div>
-            <Button className="self-end" disabled={!selectedRespondent}>
-              Analyze Results
+            <Button 
+              onClick={handleAnalyzeResults} 
+              disabled={!selectedRespondent || isDataLoading}
+            >
+              {isDataLoading ? 'Analyzing...' : 'Analyze Results'}
             </Button>
           </div>
           {selectedName && (
             <div className="mt-4 p-3 bg-blue-50 rounded-lg">
               <p className="text-sm text-blue-800">
                 Selected: <span className="font-medium">{selectedName}</span>
+                {selectedSource && <span className="ml-2">({selectedSource})</span>}
               </p>
+            </div>
+          )}
+          {dataError && (
+            <div className="mt-4 p-3 bg-red-50 rounded-lg">
+              <p className="text-sm text-red-800">Error: {dataError}</p>
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Results Section - Only show when respondent is selected */}
-      {selectedRespondent && (
+      {/* Results Section - Only show when respondent data is loaded */}
+      {respondentData && (
         <>
           {/* Overall Score Summary */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 <span>SALIMA Overall Score (SLQ)</span>
-                <Button variant="outline" size="sm">
-                  <Download className="h-4 w-4 mr-2" />
-                  Export Report
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Download className="h-4 w-4 mr-2" />
+                      Export Report
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => handleExport('json')}>
+                      Export as JSON
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleExport('csv')}>
+                      Export as CSV
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-center p-8">
                 <div className="text-center">
                   <div className="text-6xl font-bold text-blue-600 mb-2">
-                    {overallScore.toFixed(1)}
+                    {respondentData.overallScore.toFixed(1)}
                   </div>
                   <div className="text-lg text-gray-600">out of 5.0</div>
                   <div className="mt-4 text-sm text-gray-500">
@@ -194,26 +257,20 @@ export const IndividualInsights: React.FC = () => {
 
           {/* Dimension Scores */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Radar Chart Placeholder */}
+            {/* Radar Chart */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Radar className="h-5 w-5 mr-2" />
+                  <BarChart3 className="h-5 w-5 mr-2" />
                   Radar Chart - Six Dimensions
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-80 bg-gray-50 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
-                  <div className="text-center text-gray-500">
-                    <Radar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>Radar Chart will be implemented here</p>
-                    <p className="text-sm">Comparing all six SALIMA dimensions</p>
-                  </div>
-                </div>
+                <SalimaRadarChart data={radarChartData} />
               </CardContent>
             </Card>
 
-            {/* Bar Chart Placeholder */}
+            {/* Bar Chart */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
@@ -223,10 +280,10 @@ export const IndividualInsights: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {salimaeDimensions.map((dimension, index) => (
+                  {radarChartData.map((dimension, index) => (
                     <div key={index} className="space-y-2">
                       <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">{dimension.name}</span>
+                        <span className="text-sm font-medium">{dimension.dimension}</span>
                         <span className="text-sm text-gray-600">{dimension.score.toFixed(1)}</span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
@@ -245,30 +302,36 @@ export const IndividualInsights: React.FC = () => {
             </Card>
           </div>
 
-          {/* Insights */}
+          {/* AI-Generated Insights */}
           <Card>
             <CardHeader>
-              <CardTitle>AI-Generated Insights</CardTitle>
+              <CardTitle>Analysis Summary</CardTitle>
               <CardDescription>
-                Automatic analysis of strengths and growth areas based on individual patterns
+                Based on actual survey responses from {respondentData.source} data
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                  <h4 className="font-semibold text-green-800 mb-2">Key Strengths</h4>
+                  <h4 className="font-semibold text-green-800 mb-2">Highest Scoring Dimensions</h4>
                   <ul className="text-sm text-green-700 space-y-1">
-                    <li>• Exceptional learning orientation (4.5/5.0)</li>
-                    <li>• Strong authenticity in leadership style</li>
-                    <li>• Well-developed strategic thinking capabilities</li>
+                    {radarChartData
+                      .sort((a, b) => b.score - a.score)
+                      .slice(0, 3)
+                      .map((dim, idx) => (
+                        <li key={idx}>• {dim.dimension}: {dim.score.toFixed(1)}/5.0</li>
+                      ))}
                   </ul>
                 </div>
                 <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
-                  <h4 className="font-semibold text-amber-800 mb-2">Growth Opportunities</h4>
+                  <h4 className="font-semibold text-amber-800 mb-2">Areas for Development</h4>
                   <ul className="text-sm text-amber-700 space-y-1">
-                    <li>• Adaptability could be enhanced (3.8/5.0)</li>
-                    <li>• Consider developing inspirational leadership</li>
-                    <li>• Focus on meaning-making in complex situations</li>
+                    {radarChartData
+                      .sort((a, b) => a.score - b.score)
+                      .slice(0, 3)
+                      .map((dim, idx) => (
+                        <li key={idx}>• {dim.dimension}: {dim.score.toFixed(1)}/5.0</li>
+                      ))}
                   </ul>
                 </div>
               </div>

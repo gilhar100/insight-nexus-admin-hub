@@ -2,128 +2,116 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-interface NameOption {
+export interface NameSearchResult {
   id: string;
   name: string;
-  email: string;
+  email?: string;
   source: 'survey' | 'colleague' | 'woca';
 }
 
-export const useNameSearch = (searchQuery: string) => {
-  const [names, setNames] = useState<NameOption[]>([]);
+export const useNameSearch = (query: string) => {
+  const [names, setNames] = useState<NameSearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (searchQuery.length < 2) {
-      setNames([]);
-      return;
-    }
-
     const fetchNames = async () => {
+      if (query.length < 2) {
+        setNames([]);
+        return;
+      }
+
       setIsLoading(true);
       setError(null);
       
       try {
-        console.log('Fetching names for query:', searchQuery);
-        
-        // Fetch from survey_responses table
+        const allResults: NameSearchResult[] = [];
+
+        // Search survey_responses table
+        console.log('Fetching from survey_responses...');
         const { data: surveyData, error: surveyError } = await supabase
           .from('survey_responses')
           .select('id, user_name, user_email')
-          .not('user_name', 'is', null)
-          .not('user_email', 'is', null)
-          .or(`user_name.ilike.%${searchQuery}%,user_email.ilike.%${searchQuery}%`)
+          .or(`user_name.ilike.%${query}%,user_email.ilike.%${query}%`)
           .limit(10);
 
         if (surveyError) {
           console.error('Survey fetch error:', surveyError);
+        } else if (surveyData) {
+          surveyData.forEach(item => {
+            if (item.user_name) {
+              allResults.push({
+                id: item.id,
+                name: item.user_name,
+                email: item.user_email || undefined,
+                source: 'survey'
+              });
+            }
+          });
         }
 
-        // Fetch from colleague_survey_responses table
+        // Search colleague_survey_responses table
+        console.log('Fetching from colleague_survey_responses...');
         const { data: colleagueData, error: colleagueError } = await supabase
           .from('colleague_survey_responses')
           .select('id, manager_name, evaluator_name, evaluator_email')
-          .limit(20);
+          .or(`manager_name.ilike.%${query}%,evaluator_name.ilike.%${query}%,evaluator_email.ilike.%${query}%`)
+          .limit(10);
 
         if (colleagueError) {
           console.error('Colleague fetch error:', colleagueError);
+        } else if (colleagueData) {
+          colleagueData.forEach(item => {
+            if (item.manager_name) {
+              allResults.push({
+                id: item.id,
+                name: item.manager_name,
+                email: undefined,
+                source: 'colleague'
+              });
+            }
+            if (item.evaluator_name && item.evaluator_name !== item.manager_name) {
+              allResults.push({
+                id: `${item.id}-evaluator`,
+                name: item.evaluator_name,
+                email: item.evaluator_email || undefined,
+                source: 'colleague'
+              });
+            }
+          });
         }
 
-        // Fetch from woca table
+        // Search woca_responses table
+        console.log('Fetching from woca_responses...');
         const { data: wocaData, error: wocaError } = await supabase
-          .from('woca')
+          .from('woca_responses')
           .select('id, full_name, email')
-          .not('full_name', 'is', null)
-          .not('email', 'is', null)
-          .or(`full_name.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`)
+          .or(`full_name.ilike.%${query}%,email.ilike.%${query}%`)
           .limit(10);
 
         if (wocaError) {
           console.error('WOCA fetch error:', wocaError);
-        }
-
-        // Combine and format results
-        const allNames: NameOption[] = [];
-
-        // Add survey responses
-        if (surveyData) {
-          surveyData.forEach(item => {
-            allNames.push({
-              id: item.id,
-              name: item.user_name || '',
-              email: item.user_email || '',
-              source: 'survey'
-            });
-          });
-        }
-
-        // Add colleague responses (managers and evaluators)
-        if (colleagueData) {
-          colleagueData.forEach(item => {
-            if (item.manager_name && item.manager_name.toLowerCase().includes(searchQuery.toLowerCase())) {
-              allNames.push({
-                id: `${item.id}-manager`,
-                name: item.manager_name,
-                email: '',
-                source: 'colleague'
-              });
-            }
-            if (item.evaluator_name && item.evaluator_email && 
-                (item.evaluator_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                 item.evaluator_email.toLowerCase().includes(searchQuery.toLowerCase()))) {
-              allNames.push({
-                id: `${item.id}-evaluator`,
-                name: item.evaluator_name,
-                email: item.evaluator_email,
-                source: 'colleague'
-              });
-            }
-          });
-        }
-
-        // Add WOCA responses
-        if (wocaData) {
+        } else if (wocaData) {
           wocaData.forEach(item => {
-            allNames.push({
-              id: item.id,
-              name: item.full_name || '',
-              email: item.email || '',
-              source: 'woca'
-            });
+            if (item.full_name) {
+              allResults.push({
+                id: item.id,
+                name: item.full_name,
+                email: item.email || undefined,
+                source: 'woca'
+              });
+            }
           });
         }
 
-        // Remove duplicates based on name and email combination
-        const uniqueNames = allNames.filter((name, index, self) => 
-          index === self.findIndex(n => 
-            n.name.toLowerCase() === name.name.toLowerCase() && 
-            n.email.toLowerCase() === name.email.toLowerCase()
-          )
+        // Remove duplicates and sort
+        const uniqueResults = allResults.filter((item, index, self) => 
+          index === self.findIndex(t => t.name === item.name && t.email === item.email)
         );
 
-        console.log('Fetched names:', uniqueNames);
-        setNames(uniqueNames);
+        setNames(uniqueResults.slice(0, 20));
+        console.log('Fetched names:', uniqueResults);
+        
       } catch (err) {
         console.error('Error fetching names:', err);
         setError('Failed to fetch names');
@@ -132,9 +120,9 @@ export const useNameSearch = (searchQuery: string) => {
       }
     };
 
-    const debounceTimer = setTimeout(fetchNames, 300);
-    return () => clearTimeout(debounceTimer);
-  }, [searchQuery]);
+    const timeoutId = setTimeout(fetchNames, 300);
+    return () => clearTimeout(timeoutId);
+  }, [query]);
 
   return { names, isLoading, error };
 };
