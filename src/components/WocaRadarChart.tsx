@@ -7,36 +7,35 @@ interface WocaRadarChartProps {
   participants: Array<{
     scores: any;
     overall_score: number | null;
-    question_responses?: any;
   }>;
 }
 
 const chartConfig = {
   average: {
-    label: "ציון ממוצע",
+    label: "Average Score",
     color: "#2563eb",
   },
 };
 
 export const WocaRadarChart: React.FC<WocaRadarChartProps> = ({ participants }) => {
   // Calculate average scores for each WOCA indicator
-  const indicators = ['נכונות', 'הזדמנות', 'יכולת', 'חרדה'];
+  const indicators = ['Willingness', 'Opportunity', 'Capability', 'Anxiety'];
   
   const chartData = indicators.map(indicator => {
     const scores = participants
       .map(p => {
-        if (!p.scores && !p.question_responses) return null;
+        if (!p.scores) return null;
         // Extract relevant scores based on indicator
         // This is a simplified mapping - you may need to adjust based on your actual score structure
         switch (indicator) {
-          case 'נכונות':
-            return p.scores?.willingness || p.overall_score;
-          case 'הזדמנות':
-            return p.scores?.opportunity || p.overall_score;
-          case 'יכולת':
-            return p.scores?.capability || p.overall_score;
-          case 'חרדה':
-            return p.scores?.anxiety || p.overall_score;
+          case 'Willingness':
+            return p.scores.willingness || p.overall_score;
+          case 'Opportunity':
+            return p.scores.opportunity || p.overall_score;
+          case 'Capability':
+            return p.scores.capability || p.overall_score;
+          case 'Anxiety':
+            return p.scores.anxiety || p.overall_score;
           default:
             return p.overall_score;
         }
@@ -59,10 +58,7 @@ export const WocaRadarChart: React.FC<WocaRadarChartProps> = ({ participants }) 
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
           <PolarGrid />
-          <PolarAngleAxis 
-            dataKey="indicator" 
-            tick={{ fontSize: 12, fontFamily: 'Arial, sans-serif' }}
-          />
+          <PolarAngleAxis dataKey="indicator" />
           <PolarRadiusAxis 
             angle={90} 
             domain={[0, 5]} 
@@ -70,7 +66,7 @@ export const WocaRadarChart: React.FC<WocaRadarChartProps> = ({ participants }) 
             tickCount={6}
           />
           <Radar
-            name="WOCA ממוצע"
+            name="WOCA Average"
             dataKey="average"
             stroke="#2563eb"
             fill="#2563eb"

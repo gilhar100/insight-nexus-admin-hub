@@ -3,21 +3,16 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Users, BarChart3, Radar, Download, TrendingUp, Eye, EyeOff, FileText } from 'lucide-react';
+import { Users, BarChart3, Radar, Download, TrendingUp, Eye, EyeOff } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useWorkshopData } from '@/hooks/useWorkshopData';
 import { WorkshopDistributionChart } from '@/components/WorkshopDistributionChart';
-import { WocaCategoryRadarChart } from '@/components/WocaCategoryRadarChart';
-import { WocaCategoryDistributionChart } from '@/components/WocaCategoryDistributionChart';
-import { analyzeWorkshopWoca, ZONE_DIAGNOSIS } from '@/utils/wocaAnalysis';
+import { WocaRadarChart } from '@/components/WocaRadarChart';
 
 export const GroupWorkshopInsights: React.FC = () => {
   const [selectedWorkshopId, setSelectedWorkshopId] = useState<number | undefined>();
   const [showNames, setShowNames] = useState(false);
   const { workshopData, workshops, isLoading, error } = useWorkshopData(selectedWorkshopId);
-
-  // Perform WOCA analysis
-  const wocaAnalysis = workshopData ? analyzeWorkshopWoca(workshopData.participants) : null;
 
   // WOCA Zone classification
   const getZoneInfo = (score: number) => {
@@ -32,20 +27,12 @@ export const GroupWorkshopInsights: React.FC = () => {
   };
 
   const exportWorkshopData = () => {
-    if (!workshopData || !wocaAnalysis) return;
+    if (!workshopData) return;
 
     const exportData = {
       workshop_id: workshopData.workshop_id,
       participant_count: workshopData.participant_count,
       average_score: workshopData.average_score,
-      woca_analysis: {
-        category_scores: wocaAnalysis.categoryScores,
-        leading_category: wocaAnalysis.leadingCategory,
-        diagnosis: wocaAnalysis.diagnosis,
-        recommendations: wocaAnalysis.recommendations,
-        strengths: wocaAnalysis.strengths,
-        weaknesses: wocaAnalysis.weaknesses
-      },
       analysis_date: new Date().toISOString(),
       participants: workshopData.participants.map(p => ({
         ...p,
@@ -59,7 +46,7 @@ export const GroupWorkshopInsights: React.FC = () => {
     
     const link = document.createElement('a');
     link.href = url;
-    link.download = `woca-workshop-${workshopData.workshop_id}-analysis-${new Date().toISOString().split('T')[0]}.json`;
+    link.download = `workshop-${workshopData.workshop_id}-analysis-${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -87,8 +74,6 @@ export const GroupWorkshopInsights: React.FC = () => {
   const groupScore = workshopData?.average_score || 0;
   const zoneInfo = getZoneInfo(groupScore);
 
-  const leadingZoneInfo = wocaAnalysis ? ZONE_DIAGNOSIS[wocaAnalysis.leadingCategory] : null;
-
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -96,10 +81,10 @@ export const GroupWorkshopInsights: React.FC = () => {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
-              תובנות קבוצתיות - מודל WOCA
+              Group Workshop Insights - WOCA Model
             </h2>
             <p className="text-gray-600">
-              ניתוח דינמיקה קבוצתית ויעילות סדנה באמצעות סקר WOCA בן 36 שאלות
+              Analyze group dynamics and workshop effectiveness using the 36-question WOCA survey
             </p>
           </div>
           <div className="bg-purple-50 p-4 rounded-lg">
@@ -113,10 +98,10 @@ export const GroupWorkshopInsights: React.FC = () => {
         <CardHeader>
           <CardTitle className="flex items-center">
             <Users className="h-5 w-5 mr-2" />
-            בחירת סדנה
+            Select Workshop
           </CardTitle>
           <CardDescription>
-            בחר סדנה מטבלת woca_responses לניתוח דינמיקה קבוצתית
+            Choose a workshop from the woca_responses table to analyze group dynamics
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -124,7 +109,7 @@ export const GroupWorkshopInsights: React.FC = () => {
             <div className="flex-1">
               <Select value={selectedWorkshopId?.toString()} onValueChange={handleWorkshopSelect}>
                 <SelectTrigger>
-                  <SelectValue placeholder="בחר סדנה" />
+                  <SelectValue placeholder="Select a workshop" />
                 </SelectTrigger>
                 <SelectContent>
                   {workshops.map((workshop) => (
@@ -132,7 +117,7 @@ export const GroupWorkshopInsights: React.FC = () => {
                       <div className="flex flex-col">
                         <span className="font-medium">{workshop.name}</span>
                         <span className="text-sm text-gray-500">
-                          {workshop.participant_count} משתתפים • {new Date(workshop.date).toLocaleDateString('he-IL')}
+                          {workshop.participant_count} participants • {new Date(workshop.date).toLocaleDateString()}
                         </span>
                       </div>
                     </SelectItem>
@@ -154,133 +139,65 @@ export const GroupWorkshopInsights: React.FC = () => {
       {isLoading && (
         <Card>
           <CardContent className="p-8 text-center">
-            <div className="text-gray-500">טוען נתוני סדנה...</div>
+            <div className="text-gray-500">Loading workshop data...</div>
           </CardContent>
         </Card>
       )}
 
-      {workshopData && wocaAnalysis && !isLoading && (
+      {workshopData && !isLoading && (
         <>
-          {/* Hebrew Diagnosis Section */}
+          {/* WOCA Zone Classification */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                <span className="flex items-center">
-                  <FileText className="h-5 w-5 ml-2" />
-                  אבחון WOCA - {leadingZoneInfo?.title}
-                </span>
+                <span>WOCA Zone Classification</span>
                 <div className="flex gap-2">
                   <Button 
                     variant="outline" 
                     size="sm" 
                     onClick={() => setShowNames(!showNames)}
                   >
-                    {showNames ? <EyeOff className="h-4 w-4 ml-2" /> : <Eye className="h-4 w-4 ml-2" />}
-                    {showNames ? 'הסתר שמות' : 'הצג שמות'}
+                    {showNames ? <EyeOff className="h-4 w-4 mr-2" /> : <Eye className="h-4 w-4 mr-2" />}
+                    {showNames ? 'Hide Names' : 'Show Names'}
                   </Button>
                   <Button variant="outline" size="sm" onClick={exportWorkshopData}>
-                    <Download className="h-4 w-4 ml-2" />
-                    יצא ניתוח
+                    <Download className="h-4 w-4 mr-2" />
+                    Export Analysis
                   </Button>
                 </div>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-6">
-                <div className="text-center p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg">
-                  <div className="mb-4">
-                    <Badge 
-                      variant="secondary" 
-                      className="text-lg px-4 py-2 bg-blue-600 text-white"
-                    >
-                      {leadingZoneInfo?.title}
-                    </Badge>
-                  </div>
-                  <p className="text-gray-700 text-lg leading-relaxed max-w-3xl mx-auto" dir="rtl">
-                    {leadingZoneInfo?.description}
-                  </p>
+              <div className="text-center p-8">
+                <div className="mb-6">
+                  <Badge 
+                    variant="secondary" 
+                    className={`text-lg px-4 py-2 ${zoneInfo.color} text-white`}
+                  >
+                    {zoneInfo.name}
+                  </Badge>
                 </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <h4 className="font-semibold text-lg text-green-700">נקודות חוזק</h4>
-                    <ul className="space-y-2" dir="rtl">
-                      {wocaAnalysis.strengths.map((strength, index) => (
-                        <li key={index} className="flex items-center text-gray-700">
-                          <span className="w-2 h-2 bg-green-500 rounded-full ml-2"></span>
-                          {strength}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="space-y-4">
-                    <h4 className="font-semibold text-lg text-red-700">תחומי שיפור</h4>
-                    <ul className="space-y-2" dir="rtl">
-                      {wocaAnalysis.weaknesses.map((weakness, index) => (
-                        <li key={index} className="flex items-center text-gray-700">
-                          <span className="w-2 h-2 bg-red-500 rounded-full ml-2"></span>
-                          {weakness}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                <div className="text-4xl font-bold text-gray-900 mb-2">
+                  {groupScore.toFixed(1)}
                 </div>
-
-                <div className="space-y-4">
-                  <h4 className="font-semibold text-lg text-blue-700">המלצות לפעולה</h4>
-                  <ul className="space-y-2" dir="rtl">
-                    {wocaAnalysis.recommendations.map((recommendation, index) => (
-                      <li key={index} className="flex items-center text-gray-700">
-                        <span className="w-2 h-2 bg-blue-500 rounded-full ml-2"></span>
-                        {recommendation}
-                      </li>
-                    ))}
-                  </ul>
+                <div className="text-lg text-gray-600 mb-4">
+                  Group Average Score ({workshopData.participant_count} participants)
                 </div>
+                <p className="text-gray-500 max-w-md mx-auto">
+                  {zoneInfo.description}
+                </p>
               </div>
             </CardContent>
           </Card>
 
-          {/* Enhanced Visualizations */}
+          {/* Visualizations */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* WOCA Category Radar Chart */}
+            {/* Group Distribution Chart */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Radar className="h-5 w-5 ml-2" />
-                  מכ"ם קטגוריות WOCA
-                </CardTitle>
-                <CardDescription>השוואת ציונים בין ארבעת אזורי WOCA</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <WocaCategoryRadarChart categoryScores={wocaAnalysis.categoryScores} />
-              </CardContent>
-            </Card>
-
-            {/* WOCA Category Distribution */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <BarChart3 className="h-5 w-5 ml-2" />
-                  התפלגות קטגוריות WOCA
-                </CardTitle>
-                <CardDescription>ציונים ממוצעים לכל קטגוריה</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <WocaCategoryDistributionChart 
-                  categoryScores={wocaAnalysis.categoryScores} 
-                  participantCount={wocaAnalysis.participantCount}
-                />
-              </CardContent>
-            </Card>
-
-            {/* Overall Score Distribution */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <BarChart3 className="h-5 w-5 ml-2" />
-                  התפלגות ציונים כללית
+                  <BarChart3 className="h-5 w-5 mr-2" />
+                  Score Distribution
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -288,46 +205,16 @@ export const GroupWorkshopInsights: React.FC = () => {
               </CardContent>
             </Card>
 
-            {/* Category Scores Summary */}
+            {/* Radar Chart Comparison */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <TrendingUp className="h-5 w-5 ml-2" />
-                  סיכום ציונים לפי קטגוריה
+                  <Radar className="h-5 w-5 mr-2" />
+                  WOCA Indicators Radar
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {Object.entries(wocaAnalysis.categoryScores).map(([category, score]) => {
-                    const hebrewNames = {
-                      War: 'מלחמה',
-                      Apathy: 'אדישות', 
-                      Comfort: 'נוחות',
-                      Opportunity: 'הזדמנות'
-                    };
-                    const colors = {
-                      War: 'bg-red-500',
-                      Apathy: 'bg-yellow-500',
-                      Comfort: 'bg-blue-500', 
-                      Opportunity: 'bg-green-500'
-                    };
-                    
-                    return (
-                      <div key={category} className="flex items-center justify-between p-3 border rounded">
-                        <span className="font-medium">{hebrewNames[category as keyof typeof hebrewNames]}</span>
-                        <div className="flex items-center gap-3">
-                          <div className="w-full bg-gray-200 rounded-full h-2 min-w-[100px]">
-                            <div
-                              className={`h-2 rounded-full ${colors[category as keyof typeof colors]}`}
-                              style={{ width: `${(score / 5) * 100}%` }}
-                            />
-                          </div>
-                          <span className="font-bold text-lg min-w-[40px]">{score.toFixed(1)}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                <WocaRadarChart participants={workshopData.participants} />
               </CardContent>
             </Card>
           </div>
