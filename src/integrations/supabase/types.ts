@@ -9,132 +9,60 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      colleague_survey_responses: {
+      woca_responses: {
         Row: {
-          consent_for_research: boolean | null
+          age: number | null
+          consent_research: boolean
           created_at: string
-          dimension_a: number
-          dimension_a2: number
-          dimension_i: number
-          dimension_l: number
-          dimension_m: number
-          dimension_s: number
-          evaluator_department: string | null
-          evaluator_email: string | null
-          evaluator_name: string | null
-          evaluator_position: string | null
+          education: string | null
+          email: string | null
+          experience_years: number | null
+          full_name: string
+          gender: string | null
           id: string
-          is_anonymous: boolean | null
-          manager_department: string | null
-          manager_name: string
-          manager_position: string | null
           organization: string | null
-          slq_score: number
+          overall_score: number
+          phone: string | null
+          profession: string | null
+          question_responses: Json
+          scores: Json
+          workshop_id: number
         }
         Insert: {
-          consent_for_research?: boolean | null
+          age?: number | null
+          consent_research?: boolean
           created_at?: string
-          dimension_a: number
-          dimension_a2: number
-          dimension_i: number
-          dimension_l: number
-          dimension_m: number
-          dimension_s: number
-          evaluator_department?: string | null
-          evaluator_email?: string | null
-          evaluator_name?: string | null
-          evaluator_position?: string | null
+          education?: string | null
+          email?: string | null
+          experience_years?: number | null
+          full_name: string
+          gender?: string | null
           id?: string
-          is_anonymous?: boolean | null
-          manager_department?: string | null
-          manager_name: string
-          manager_position?: string | null
           organization?: string | null
-          slq_score: number
+          overall_score: number
+          phone?: string | null
+          profession?: string | null
+          question_responses?: Json
+          scores: Json
+          workshop_id?: number
         }
         Update: {
-          consent_for_research?: boolean | null
+          age?: number | null
+          consent_research?: boolean
           created_at?: string
-          dimension_a?: number
-          dimension_a2?: number
-          dimension_i?: number
-          dimension_l?: number
-          dimension_m?: number
-          dimension_s?: number
-          evaluator_department?: string | null
-          evaluator_email?: string | null
-          evaluator_name?: string | null
-          evaluator_position?: string | null
+          education?: string | null
+          email?: string | null
+          experience_years?: number | null
+          full_name?: string
+          gender?: string | null
           id?: string
-          is_anonymous?: boolean | null
-          manager_department?: string | null
-          manager_name?: string
-          manager_position?: string | null
           organization?: string | null
-          slq_score?: number
-        }
-        Relationships: []
-      }
-      survey_responses: {
-        Row: {
-          consent_for_research: boolean | null
-          created_at: string
-          department: string | null
-          dimension_a: number
-          dimension_a2: number
-          dimension_i: number
-          dimension_l: number
-          dimension_m: number
-          dimension_s: number
-          id: string
-          is_anonymous: boolean | null
-          organization: string | null
-          position: string | null
-          slq_score: number
-          strategy: number
-          survey_type: string
-          user_email: string | null
-          user_name: string | null
-        }
-        Insert: {
-          consent_for_research?: boolean | null
-          created_at?: string
-          department?: string | null
-          dimension_a: number
-          dimension_a2: number
-          dimension_i: number
-          dimension_l: number
-          dimension_m: number
-          dimension_s?: number
-          id?: string
-          is_anonymous?: boolean | null
-          organization?: string | null
-          position?: string | null
-          slq_score: number
-          strategy: number
-          survey_type?: string
-          user_email?: string | null
-          user_name?: string | null
-        }
-        Update: {
-          consent_for_research?: boolean | null
-          created_at?: string
-          department?: string | null
-          dimension_a?: number
-          dimension_a2?: number
-          dimension_i?: number
-          dimension_l?: number
-          dimension_m?: number
-          dimension_s?: number
-          id?: string
-          is_anonymous?: boolean | null
-          organization?: string | null
-          position?: string | null
-          slq_score?: number
-          strategy?: number
-          survey_type?: string
-          user_email?: string | null
-          user_name?: string | null
+          overall_score?: number
+          phone?: string | null
+          profession?: string | null
+          question_responses?: Json
+          scores?: Json
+          workshop_id?: number
         }
         Relationships: []
       }
