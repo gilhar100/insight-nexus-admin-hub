@@ -9,49 +9,49 @@ export interface WocaQuestionMapping {
 
 // WOCA question mapping based on the provided categorization
 export const WOCA_QUESTION_MAPPING: WocaQuestionMapping = {
-  // WAR category (all reversed questions)
-  'q1': { category: 'war', isReversed: true, text: 'פעמים רבות לא ברור לאן הארגון שואף להגיע' },
-  'q2': { category: 'war', isReversed: true, text: 'שינויים בארגון מתקבלים בקושי רב' },
-  'q3': { category: 'war', isReversed: true, text: 'העובדים נרתעים מהבעת ביקורת או הצגת חלופות' },
-  'q4': { category: 'war', isReversed: true, text: 'העובדים חשים שהמנהלים לא קשובים לצרכים שלהם' },
-  'q5': { category: 'war', isReversed: true, text: 'נהוג להסתיר בעיות כדי להימנע מעימותים' },
-  'q6': { category: 'war', isReversed: true, text: 'תהליך קבלת ההחלטות אינו כולל שיח פתוח עם עובדים' },
-  'q7': { category: 'war', isReversed: true, text: 'קיימת תחושת ניתוק בין הנהלה לעובדים' },
-  'q8': { category: 'war', isReversed: true, text: 'הארגון מתקשה להסתגל לשינויים חיצוניים' },
-  'q9': { category: 'war', isReversed: true, text: 'יש מחסור בבהירות לגבי כיווני פעולה ארגוניים' },
-
-  // OPPORTUNITY category (no reversed questions)
-  'q10': { category: 'opportunity', isReversed: false, text: 'העובדים מרגישים חופשיים לשתף רעיונות גם אם הם יוצאי דופן' },
-  'q11': { category: 'opportunity', isReversed: false, text: 'קיימת תקשורת פתוחה בגובה העיניים בין מנהלים לעובדים' },
-  'q12': { category: 'opportunity', isReversed: false, text: 'הנהלת הארגון מגדירה חזון מעורר השראה' },
+  // OPPORTUNITY category → Questions: 1, 3, 5, 10, 13, 19, 21, 24, 35
+  'q1': { category: 'opportunity', isReversed: false, text: 'העובדים מרגישים חופשיים לשתף רעיונות גם אם הם יוצאי דופן' },
+  'q3': { category: 'opportunity', isReversed: false, text: 'הנהלת הארגון מגדירה חזון מעורר השראה' },
+  'q5': { category: 'opportunity', isReversed: false, text: 'נהוג להציג את הסיפור שמאחורי ההחלטות' },
+  'q10': { category: 'opportunity', isReversed: false, text: 'קיימת תקשורת פתוחה בגובה העיניים בין מנהלים לעובדים' },
   'q13': { category: 'opportunity', isReversed: false, text: 'שיתוף פעולה בין צוותים מוביל לרעיונות חדשים' },
-  'q14': { category: 'opportunity', isReversed: false, text: 'נהוג להציג את הסיפור שמאחורי ההחלטות' },
-  'q15': { category: 'opportunity', isReversed: false, text: 'תחושת האמון בארגון גבוהה' },
-  'q16': { category: 'opportunity', isReversed: false, text: 'הארגון פועל מתוך ראייה רחבה של עתיד משתנה' },
-  'q17': { category: 'opportunity', isReversed: false, text: 'חוסר ודאות נתפסת כהזדמנות ללמידה' },
-  'q18': { category: 'opportunity', isReversed: false, text: 'נהוג לשקול מגוון של חלופות לפני קבלת החלטה' },
+  'q19': { category: 'opportunity', isReversed: false, text: 'תחושת האמון בארגון גבוהה' },
+  'q21': { category: 'opportunity', isReversed: false, text: 'הארגון פועל מתוך ראייה רחבה של עתיד משתנה' },
+  'q24': { category: 'opportunity', isReversed: false, text: 'חוסר ודאות נתפסת כהזדמנות ללמידה' },
+  'q35': { category: 'opportunity', isReversed: false, text: 'נהוג לשקול מגוון של חלופות לפני קבלת החלטה' },
 
-  // COMFORT category (mixed - some reversed)
-  'q19': { category: 'comfort', isReversed: false, text: 'בארגון קיימת מחויבות לתרומה שמעבר למטרות אישיות' },
-  'q20': { category: 'comfort', isReversed: false, text: 'קיימת תחושת משמעות רחבה בעבודת היומיום' },
-  'q21': { category: 'comfort', isReversed: true, text: 'העובדים נמנעים משיח ערכי בנוגע לעבודתם' },
-  'q22': { category: 'comfort', isReversed: true, text: 'אין מוטיבציה ליזום או להציע דרכי פעולה חדשות' },
-  'q23': { category: 'comfort', isReversed: false, text: 'לעובדים קל להביע תחושות ורעיונות אישיים' },
-  'q24': { category: 'comfort', isReversed: true, text: 'לא מקדישים זמן ללמידה ושיפור' },
-  'q25': { category: 'comfort', isReversed: false, text: 'תחושת השייכות בארגון חזקה ומחברת' },
-  'q26': { category: 'comfort', isReversed: false, text: 'הארגון מדגיש מטרות ארגוניות עם ערך חברתי' },
-  'q27': { category: 'comfort', isReversed: true, text: 'תחושת שליחות אישית אינה מקבלת ביטוי' },
+  // WAR category → Questions: 2, 4, 6, 14, 18, 22, 26, 30, 36 (all reversed)
+  'q2': { category: 'war', isReversed: true, text: 'פעמים רבות לא ברור לאן הארגון שואף להגיע' },
+  'q4': { category: 'war', isReversed: true, text: 'שינויים בארגון מתקבלים בקושי רב' },
+  'q6': { category: 'war', isReversed: true, text: 'העובדים נרתעים מהבעת ביקורת או הצגת חלופות' },
+  'q14': { category: 'war', isReversed: true, text: 'העובדים חשים שהמנהלים לא קשובים לצרכים שלהם' },
+  'q18': { category: 'war', isReversed: true, text: 'נהוג להסתיר בעיות כדי להימנע מעימותים' },
+  'q22': { category: 'war', isReversed: true, text: 'תהליך קבלת ההחלטות אינו כולל שיח פתוח עם עובדים' },
+  'q26': { category: 'war', isReversed: true, text: 'קיימת תחושת ניתוק בין הנהלה לעובדים' },
+  'q30': { category: 'war', isReversed: true, text: 'הארגון מתקשה להסתגל לשינויים חיצוניים' },
+  'q36': { category: 'war', isReversed: true, text: 'יש מחסור בבהירות לגבי כיווני פעולה ארגוניים' },
 
-  // APATHY category (mixed - some reversed)
-  'q28': { category: 'apathy', isReversed: true, text: 'לא נהוג לשתף בהצלחות או בכישלונות כדי ללמוד מהן' },
-  'q29': { category: 'apathy', isReversed: false, text: 'ההנהלה מתנהלת בשקיפות מלאה' },
-  'q30': { category: 'apathy', isReversed: false, text: 'קיימת אווירה של סקרנות וחיפוש ידע חדש' },
-  'q31': { category: 'apathy', isReversed: false, text: 'הארגון מעודד התפתחות אישית של כל עובד' },
-  'q32': { category: 'apathy', isReversed: true, text: 'לא מקיימים שיחות עומק עם העובדים על מטרותיהם' },
-  'q33': { category: 'apathy', isReversed: false, text: 'השראה היא חלק בלתי נפרד מהתרבות הארגונית' },
-  'q34': { category: 'apathy', isReversed: false, text: 'בארגון יודעים לנהל קונפליקטים באופן בונה' },
-  'q35': { category: 'apathy', isReversed: false, text: 'יש נכונות אמיתית להקשיב לדעות שונות' },
-  'q36': { category: 'apathy', isReversed: false, text: 'המנהיגים מציגים דוגמה אישית' }
+  // COMFORT category → Questions: 7, 11, 12, 16, 25, 28, 31, 33, 34
+  'q7': { category: 'comfort', isReversed: false, text: 'בארגון קיימת מחויבות לתרומה שמעבר למטרות אישיות' },
+  'q11': { category: 'comfort', isReversed: false, text: 'קיימת תחושת משמעות רחבה בעבודת היומיום' },
+  'q12': { category: 'comfort', isReversed: true, text: 'העובדים נמנעים משיח ערכי בנוגע לעבודתם' },
+  'q16': { category: 'comfort', isReversed: true, text: 'אין מוטיבציה ליזום או להציע דרכי פעולה חדשות' },
+  'q25': { category: 'comfort', isReversed: false, text: 'לעובדים קל להביע תחושות ורעיונות אישיים' },
+  'q28': { category: 'comfort', isReversed: true, text: 'לא מקדישים זמן ללמידה ושיפור' },
+  'q31': { category: 'comfort', isReversed: false, text: 'תחושת השייכות בארגון חזקה ומחברת' },
+  'q33': { category: 'comfort', isReversed: false, text: 'הארגון מדגיש מטרות ארגוניות עם ערך חברתי' },
+  'q34': { category: 'comfort', isReversed: true, text: 'תחושת שליחות אישית אינה מקבלת ביטוי' },
+
+  // APATHY category → Questions: 8, 9, 15, 17, 20, 23, 27, 29, 32
+  'q8': { category: 'apathy', isReversed: true, text: 'לא נהוג לשתף בהצלחות או בכישלונות כדי ללמוד מהן' },
+  'q9': { category: 'apathy', isReversed: false, text: 'ההנהלה מתנהלת בשקיפות מלאה' },
+  'q15': { category: 'apathy', isReversed: false, text: 'קיימת אווירה של סקרנות וחיפוש ידע חדש' },
+  'q17': { category: 'apathy', isReversed: false, text: 'הארגון מעודד התפתחות אישית של כל עובד' },
+  'q20': { category: 'apathy', isReversed: true, text: 'לא מקיימים שיחות עומק עם העובדים על מטרותיהם' },
+  'q23': { category: 'apathy', isReversed: false, text: 'השראה היא חלק בלתי נפרד מהתרבות הארגונית' },
+  'q27': { category: 'apathy', isReversed: false, text: 'בארגון יודעים לנהל קונפליקטים באופן בונה' },
+  'q29': { category: 'apathy', isReversed: false, text: 'יש נכונות אמיתית להקשיב לדעות שונות' },
+  'q32': { category: 'apathy', isReversed: false, text: 'המנהיגים מציגים דוגמה אישית' }
 };
 
 export interface WocaCategoryScores {
@@ -90,6 +90,8 @@ export const calculateWocaCategoryScores = (questionResponses: any): WocaCategor
   const categoryTotals = { war: 0, opportunity: 0, comfort: 0, apathy: 0 };
   const categoryCounts = { war: 0, opportunity: 0, comfort: 0, apathy: 0 };
 
+  console.log('Calculating WOCA scores for responses:', questionResponses);
+
   // Process each question response
   Object.entries(WOCA_QUESTION_MAPPING).forEach(([questionKey, questionInfo]) => {
     const responseKey = questionKey; // Assuming responses are stored as q1, q2, etc.
@@ -103,6 +105,8 @@ export const calculateWocaCategoryScores = (questionResponses: any): WocaCategor
       
       categoryTotals[questionInfo.category] += score;
       categoryCounts[questionInfo.category]++;
+      
+      console.log(`Question ${questionKey} (${questionInfo.category}): raw=${questionResponses[responseKey]}, processed=${score}, reversed=${questionInfo.isReversed}`);
     }
   });
 
@@ -113,6 +117,9 @@ export const calculateWocaCategoryScores = (questionResponses: any): WocaCategor
     comfort: categoryCounts.comfort > 0 ? categoryTotals.comfort / categoryCounts.comfort : 0,
     apathy: categoryCounts.apathy > 0 ? categoryTotals.apathy / categoryCounts.apathy : 0
   };
+
+  console.log('Category scores:', categoryScores);
+  console.log('Category counts:', categoryCounts);
 
   return categoryScores;
 };
@@ -131,7 +138,7 @@ export const getDominantZone = (categoryScores: WocaCategoryScores): {
   }
   
   const topCategories = categories
-    .filter(([_, score]) => score === maxScore)
+    .filter(([_, score]) => Math.abs(score - maxScore) < 0.01) // Use small epsilon for floating point comparison
     .map(([category, _]) => category);
   
   if (topCategories.length > 1) {
@@ -172,6 +179,8 @@ export const analyzeParticipantWoca = (
 export const analyzeWorkshopWoca = (participants: any[], workshopId: number): WorkshopWocaAnalysis => {
   const participantAnalyses: WocaAnalysisResult[] = [];
   
+  console.log('Analyzing workshop with participants:', participants.length);
+  
   // Analyze each participant
   participants.forEach((participant, index) => {
     const analysis = analyzeParticipantWoca(
@@ -180,6 +189,7 @@ export const analyzeWorkshopWoca = (participants: any[], workshopId: number): Wo
       participant.id
     );
     participantAnalyses.push(analysis);
+    console.log(`Participant ${index + 1} analysis:`, analysis);
   });
   
   // Calculate group averages
@@ -188,6 +198,8 @@ export const analyzeWorkshopWoca = (participants: any[], workshopId: number): Wo
     p.categoryScores.war > 0 || p.categoryScores.opportunity > 0 || 
     p.categoryScores.comfort > 0 || p.categoryScores.apathy > 0
   );
+  
+  console.log('Valid participants for group analysis:', validParticipants.length);
   
   if (validParticipants.length > 0) {
     validParticipants.forEach(participant => {
@@ -209,8 +221,12 @@ export const analyzeWorkshopWoca = (participants: any[], workshopId: number): Wo
     apathy: groupTotals.apathy
   };
   
+  console.log('Group category scores:', groupCategoryScores);
+  
   const { dominantZone: groupDominantZone, isTie: groupIsTie, tiedCategories: groupTiedCategories } = 
     getDominantZone(groupCategoryScores);
+  
+  console.log('Group dominant zone:', groupDominantZone, 'Is tie:', groupIsTie);
   
   return {
     workshopId,
