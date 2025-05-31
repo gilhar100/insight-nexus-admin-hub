@@ -3,36 +3,23 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Users, BarChart3, Radar, Download, TrendingUp, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Users, BarChart3, Radar, Download, TrendingUp, Eye, EyeOff } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useWorkshopData } from '@/hooks/useWorkshopData';
 import { WorkshopDistributionChart } from '@/components/WorkshopDistributionChart';
 import { WocaRadarChart } from '@/components/WocaRadarChart';
-import { analyzeWorkshopWoca, getZoneDescription } from '@/utils/wocaAnalysis';
-import { WOCA_ZONE_COLORS } from '@/utils/wocaColors';
 
 export const GroupWorkshopInsights: React.FC = () => {
   const [selectedWorkshopId, setSelectedWorkshopId] = useState<number | undefined>();
   const [showNames, setShowNames] = useState(false);
   const { workshopData, workshops, isLoading, error } = useWorkshopData(selectedWorkshopId);
 
-  // WOCA Zone classification using new analysis
-  const getZoneInfo = (zone: string | null) => {
-    if (!zone) return { name: 'לא זוהה', color: 'bg-gray-500', description: 'לא ניתן לזהות אזור דומיננטי' };
-    
-    const zoneDesc = getZoneDescription(zone);
-    const colorMap = {
-      opportunity: 'bg-green-500',
-      comfort: 'bg-blue-500', 
-      apathy: 'bg-yellow-500',
-      war: 'bg-red-500'
-    };
-    
-    return {
-      name: zoneDesc.name,
-      color: colorMap[zone as keyof typeof colorMap] || 'bg-gray-500',
-      description: zoneDesc.description
-    };
+  // WOCA Zone classification
+  const getZoneInfo = (score: number) => {
+    if (score >= 4.2) return { name: 'Opportunity Zone', color: 'bg-green-500', description: 'Innovation, Motivation, Inspiration' };
+    if (score >= 3.4) return { name: 'Comfort Zone', color: 'bg-blue-500', description: 'Stability, Operationality, Conservatism' };
+    if (score >= 2.6) return { name: 'Apathy Zone', color: 'bg-yellow-500', description: 'Disengagement, Disconnection, Low Clarity' };
+    return { name: 'War Zone', color: 'bg-red-500', description: 'Conflict, Survival, Fear' };
   };
 
   const handleWorkshopSelect = (value: string) => {
@@ -42,12 +29,10 @@ export const GroupWorkshopInsights: React.FC = () => {
   const exportWorkshopData = () => {
     if (!workshopData) return;
 
-    const wocaAnalysis = analyzeWorkshopWoca(workshopData.participants, workshopData.workshop_id);
-    
     const exportData = {
       workshop_id: workshopData.workshop_id,
       participant_count: workshopData.participant_count,
-      woca_analysis: wocaAnalysis,
+      average_score: workshopData.average_score,
       analysis_date: new Date().toISOString(),
       participants: workshopData.participants.map(p => ({
         ...p,
@@ -61,30 +46,33 @@ export const GroupWorkshopInsights: React.FC = () => {
     
     const link = document.createElement('a');
     link.href = url;
-    link.download = `workshop-${workshopData.workshop_id}-woca-analysis-${new Date().toISOString().split('T')[0]}.json`;
+    link.download = `workshop-${workshopData.workshop_id}-analysis-${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
 
-  // Get WOCA analysis results
-  const wocaAnalysis = workshopData ? analyzeWorkshopWoca(workshopData.participants, workshopData.workshop_id) : null;
-  const zoneInfo = wocaAnalysis ? getZoneInfo(wocaAnalysis.groupDominantZone) : null;
-
-  // Zone distribution calculation using new analysis
+  // Zone distribution calculation
   const getZoneDistribution = () => {
-    if (!wocaAnalysis) return { opportunity: 0, comfort: 0, apathy: 0, war: 0 };
+    if (!workshopData) return { opportunity: 0, comfort: 0, apathy: 0, war: 0 };
     
-    return wocaAnalysis.participants.reduce((acc, participant) => {
-      if (participant.dominantZone && !participant.isTie) {
-        acc[participant.dominantZone as keyof typeof acc]++;
-      }
+    return workshopData.participants.reduce((acc, participant) => {
+      if (participant.overall_score === null) return acc;
+      
+      const score = participant.overall_score;
+      if (score >= 4.2) acc.opportunity++;
+      else if (score >= 3.4) acc.comfort++;
+      else if (score >= 2.6) acc.apathy++;
+      else acc.war++;
+      
       return acc;
     }, { opportunity: 0, comfort: 0, apathy: 0, war: 0 });
   };
 
   const zoneDistribution = getZoneDistribution();
+  const groupScore = workshopData?.average_score || 0;
+  const zoneInfo = getZoneInfo(groupScore);
 
   return (
     <div className="space-y-6">
@@ -93,10 +81,10 @@ export const GroupWorkshopInsights: React.FC = () => {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-3xl font-bold text-gray-900 mb-2">
-              ניתוח קבוצתי - מודל WOCA
+              Group Workshop Insights - WOCA Model
             </h2>
             <p className="text-gray-600">
-              ניתוח דינמיקה קבוצתית ואפקטיביות הסדנה באמצעות 36 שאלות מודל WOCA
+              Analyze group dynamics and workshop effectiveness using the 36-question WOCA survey
             </p>
           </div>
           <div className="bg-purple-50 p-4 rounded-lg">
@@ -110,10 +98,10 @@ export const GroupWorkshopInsights: React.FC = () => {
         <CardHeader>
           <CardTitle className="flex items-center">
             <Users className="h-5 w-5 mr-2" />
-            בחירת סדנה
+            Select Workshop
           </CardTitle>
           <CardDescription>
-            בחר סדנה מטבלת woca_responses לניתוח דינמיקה קבוצתית
+            Choose a workshop from the woca_responses table to analyze group dynamics
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -121,7 +109,7 @@ export const GroupWorkshopInsights: React.FC = () => {
             <div className="flex-1">
               <Select value={selectedWorkshopId?.toString()} onValueChange={handleWorkshopSelect}>
                 <SelectTrigger>
-                  <SelectValue placeholder="בחר סדנה" />
+                  <SelectValue placeholder="Select a workshop" />
                 </SelectTrigger>
                 <SelectContent>
                   {workshops.map((workshop) => (
@@ -129,7 +117,7 @@ export const GroupWorkshopInsights: React.FC = () => {
                       <div className="flex flex-col">
                         <span className="font-medium">{workshop.name}</span>
                         <span className="text-sm text-gray-500">
-                          {workshop.participant_count} משתתפים • {new Date(workshop.date).toLocaleDateString('he-IL')}
+                          {workshop.participant_count} participants • {new Date(workshop.date).toLocaleDateString()}
                         </span>
                       </div>
                     </SelectItem>
@@ -151,18 +139,18 @@ export const GroupWorkshopInsights: React.FC = () => {
       {isLoading && (
         <Card>
           <CardContent className="p-8 text-center">
-            <div className="text-gray-500">טוען נתוני סדנה...</div>
+            <div className="text-gray-500">Loading workshop data...</div>
           </CardContent>
         </Card>
       )}
 
-      {workshopData && wocaAnalysis && !isLoading && (
+      {workshopData && !isLoading && (
         <>
           {/* WOCA Zone Classification */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
-                <span>סיווג אזור WOCA</span>
+                <span>WOCA Zone Classification</span>
                 <div className="flex gap-2">
                   <Button 
                     variant="outline" 
@@ -170,118 +158,37 @@ export const GroupWorkshopInsights: React.FC = () => {
                     onClick={() => setShowNames(!showNames)}
                   >
                     {showNames ? <EyeOff className="h-4 w-4 mr-2" /> : <Eye className="h-4 w-4 mr-2" />}
-                    {showNames ? 'הסתר שמות' : 'הצג שמות'}
+                    {showNames ? 'Hide Names' : 'Show Names'}
                   </Button>
                   <Button variant="outline" size="sm" onClick={exportWorkshopData}>
                     <Download className="h-4 w-4 mr-2" />
-                    ייצא ניתוח
+                    Export Analysis
                   </Button>
                 </div>
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-center p-8">
-                {wocaAnalysis.groupIsTie ? (
-                  <div className="mb-6">
-                    <div className="flex items-center justify-center mb-4">
-                      <AlertCircle className="h-6 w-6 text-yellow-500 mr-2" />
-                      <span className="text-lg font-semibold">תיקו בין אזורים</span>
-                    </div>
-                    <div className="flex flex-wrap justify-center gap-2">
-                      {wocaAnalysis.groupTiedCategories.map(category => {
-                        const categoryZoneInfo = getZoneInfo(category);
-                        return (
-                          <Badge 
-                            key={category}
-                            variant="secondary" 
-                            className={`text-sm px-3 py-1 ${categoryZoneInfo.color} text-white`}
-                          >
-                            {categoryZoneInfo.name}
-                          </Badge>
-                        );
-                      })}
-                    </div>
-                    <p className="text-gray-600 mt-4">
-                      לא זוהה אזור תודעה דומיננטי עקב ציונים זהים
-                    </p>
-                  </div>
-                ) : zoneInfo && (
-                  <div className="mb-6">
-                    <Badge 
-                      variant="secondary" 
-                      className={`text-lg px-4 py-2 ${zoneInfo.color} text-white`}
-                    >
-                      {zoneInfo.name}
-                    </Badge>
-                    <div className="mt-4">
-                      <p className="text-gray-600 max-w-md mx-auto">
-                        {zoneInfo.description}
-                      </p>
-                    </div>
-                  </div>
-                )}
-                
+                <div className="mb-6">
+                  <Badge 
+                    variant="secondary" 
+                    className={`text-lg px-4 py-2 ${zoneInfo.color} text-white`}
+                  >
+                    {zoneInfo.name}
+                  </Badge>
+                </div>
+                <div className="text-4xl font-bold text-gray-900 mb-2">
+                  {groupScore.toFixed(1)}
+                </div>
                 <div className="text-lg text-gray-600 mb-4">
-                  אזור תודעה ארגונית ({wocaAnalysis.participantCount} משתתפים)
+                  Group Average Score ({workshopData.participant_count} participants)
                 </div>
-                
-                {/* Category Scores Display */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold" style={{ color: WOCA_ZONE_COLORS.opportunity }}>
-                      {wocaAnalysis.groupCategoryScores.opportunity.toFixed(1)}
-                    </div>
-                    <div className="text-sm text-gray-600">הזדמנות</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold" style={{ color: WOCA_ZONE_COLORS.comfort }}>
-                      {wocaAnalysis.groupCategoryScores.comfort.toFixed(1)}
-                    </div>
-                    <div className="text-sm text-gray-600">נוחות</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold" style={{ color: WOCA_ZONE_COLORS.apathy }}>
-                      {wocaAnalysis.groupCategoryScores.apathy.toFixed(1)}
-                    </div>
-                    <div className="text-sm text-gray-600">אדישות</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold" style={{ color: WOCA_ZONE_COLORS.war }}>
-                      {wocaAnalysis.groupCategoryScores.war.toFixed(1)}
-                    </div>
-                    <div className="text-sm text-gray-600">מלחמה</div>
-                  </div>
-                </div>
+                <p className="text-gray-500 max-w-md mx-auto">
+                  {zoneInfo.description}
+                </p>
               </div>
             </CardContent>
           </Card>
-
-          {/* Hebrew Diagnosis Section */}
-          {!wocaAnalysis.groupIsTie && wocaAnalysis.groupDominantZone && (
-            <Card>
-              <CardHeader>
-                <CardTitle>אבחון ארגוני מפורט</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {(() => {
-                    const diagnosis = getZoneDescription(wocaAnalysis.groupDominantZone);
-                    return (
-                      <div>
-                        <h3 className="text-lg font-semibold mb-2">{diagnosis.name}</h3>
-                        <p className="text-gray-700 mb-3">{diagnosis.implications}</p>
-                        <div className="bg-blue-50 p-4 rounded-lg">
-                          <p className="text-sm text-blue-800">
-                            <strong>המלצה:</strong> הכיוון הרצוי הוא לקראת אזור ההזדמנות, גם אם הארגון נמצא כיום באזור הנוחות או האדישות.
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })()}
-                </div>
-              </CardContent>
-            </Card>
-          )}
 
           {/* Visualizations */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -290,7 +197,7 @@ export const GroupWorkshopInsights: React.FC = () => {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <BarChart3 className="h-5 w-5 mr-2" />
-                  התפלגות ציונים
+                  Score Distribution
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -303,7 +210,7 @@ export const GroupWorkshopInsights: React.FC = () => {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Radar className="h-5 w-5 mr-2" />
-                  מחוונים WOCA
+                  WOCA Indicators Radar
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -317,63 +224,48 @@ export const GroupWorkshopInsights: React.FC = () => {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <TrendingUp className="h-5 w-5 mr-2" />
-                סקירת משתתפים
+                Participant Overview
               </CardTitle>
               <CardDescription>
-                ציונים אישיים ודמוגרפיה {showNames ? '(שמות גלויים)' : '(אנונימי)'}
+                Individual scores and demographics {showNames ? '(Names visible)' : '(Anonymous)'}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {wocaAnalysis.participants.map((participant, index) => (
+                {workshopData.participants.map((participant, index) => (
                   <div 
-                    key={participant.participantId} 
+                    key={participant.id} 
                     className="p-4 border rounded-lg hover:shadow-md transition-shadow"
                   >
                     <div className="flex justify-between items-center mb-2">
                       <span className="font-medium text-sm">
-                        {showNames ? participant.participantName : `משתתף ${index + 1}`}
+                        {showNames ? participant.full_name : `Participant ${index + 1}`}
                       </span>
-                      {participant.isTie ? (
-                        <Badge variant="secondary">תיקו</Badge>
-                      ) : (
-                        <Badge 
-                          variant={
-                            participant.dominantZone === 'opportunity' ? "default" : 
-                            participant.dominantZone === 'war' ? "destructive" : 
-                            "secondary"
-                          }
-                        >
-                          {participant.dominantZone ? getZoneInfo(participant.dominantZone).name : 'N/A'}
-                        </Badge>
-                      )}
+                      <Badge 
+                        variant={
+                          participant.overall_score && participant.overall_score > 4.0 
+                            ? "default" 
+                            : participant.overall_score && participant.overall_score < 3.0 
+                            ? "destructive" 
+                            : "secondary"
+                        }
+                      >
+                        {participant.overall_score?.toFixed(1) || 'N/A'}
+                      </Badge>
                     </div>
-                    
-                    {/* Mini category scores */}
-                    <div className="space-y-1 text-xs">
-                      <div className="flex justify-between">
-                        <span>הזדמנות:</span>
-                        <span className="font-medium">{participant.categoryScores.opportunity.toFixed(1)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>נוחות:</span>
-                        <span className="font-medium">{participant.categoryScores.comfort.toFixed(1)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>אדישות:</span>
-                        <span className="font-medium">{participant.categoryScores.apathy.toFixed(1)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>מלחמה:</span>
-                        <span className="font-medium">{participant.categoryScores.war.toFixed(1)}</span>
-                      </div>
-                    </div>
-                    
-                    {participant.isTie && (
-                      <div className="mt-2 text-xs text-amber-600">
-                        תיקו: {participant.tiedCategories.map(cat => getZoneInfo(cat).name).join(', ')}
+                    {participant.overall_score && (
+                      <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                        <div
+                          className="h-2 rounded-full bg-blue-500 transition-all duration-500"
+                          style={{ width: `${(participant.overall_score / 5) * 100}%` }}
+                        />
                       </div>
                     )}
+                    <div className="text-xs text-gray-500 space-y-1">
+                      {participant.organization && <div>Org: {participant.organization}</div>}
+                      {participant.profession && <div>Role: {participant.profession}</div>}
+                      {participant.experience_years && <div>Experience: {participant.experience_years} years</div>}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -385,29 +277,29 @@ export const GroupWorkshopInsights: React.FC = () => {
             <Card className="bg-green-50 border-green-200">
               <CardContent className="p-4 text-center">
                 <div className="text-2xl font-bold text-green-700 mb-1">{zoneDistribution.opportunity}</div>
-                <div className="text-sm text-green-700">אזור הזדמנות</div>
-                <div className="text-xs text-gray-600">חדשנות ומחוברות</div>
+                <div className="text-sm text-green-700">Opportunity Zone</div>
+                <div className="text-xs text-gray-600">4.2-5.0</div>
               </CardContent>
             </Card>
             <Card className="bg-blue-50 border-blue-200">
               <CardContent className="p-4 text-center">
                 <div className="text-2xl font-bold text-blue-700 mb-1">{zoneDistribution.comfort}</div>
-                <div className="text-sm text-blue-700">אזור נוחות</div>
-                <div className="text-xs text-gray-600">יציבות ושמרנות</div>
+                <div className="text-sm text-blue-700">Comfort Zone</div>
+                <div className="text-xs text-gray-600">3.4-4.1</div>
               </CardContent>
             </Card>
             <Card className="bg-yellow-50 border-yellow-200">
               <CardContent className="p-4 text-center">
                 <div className="text-2xl font-bold text-yellow-700 mb-1">{zoneDistribution.apathy}</div>
-                <div className="text-sm text-yellow-700">אזור אדישות</div>
-                <div className="text-xs text-gray-600">ניתוק וחוסר מעורבות</div>
+                <div className="text-sm text-yellow-700">Apathy Zone</div>
+                <div className="text-xs text-gray-600">2.6-3.3</div>
               </CardContent>
             </Card>
             <Card className="bg-red-50 border-red-200">
               <CardContent className="p-4 text-center">
                 <div className="text-2xl font-bold text-red-700 mb-1">{zoneDistribution.war}</div>
-                <div className="text-sm text-red-700">אזור מלחמה</div>
-                <div className="text-xs text-gray-600">קונפליקט והישרדות</div>
+                <div className="text-sm text-red-700">War Zone</div>
+                <div className="text-xs text-gray-600">1.0-2.5</div>
               </CardContent>
             </Card>
           </div>

@@ -8,7 +8,6 @@ export interface WorkshopParticipant {
   email: string;
   overall_score: number | null;
   scores: any;
-  question_responses?: any; // Add this for WOCA analysis
   organization: string | null;
   profession: string | null;
   age: string | null;
@@ -94,15 +93,12 @@ export const useWorkshopData = (workshopId?: number) => {
 
         if (error) throw error;
 
-        console.log('Raw workshop data from Supabase:', data);
-
         const participants: WorkshopParticipant[] = data?.map(item => ({
           id: item.id,
           full_name: item.full_name,
           email: item.email,
           overall_score: item.overall_score,
           scores: item.scores,
-          question_responses: item.question_responses, // Make sure this is included
           organization: item.organization,
           profession: item.profession,
           age: item.age,
@@ -111,8 +107,6 @@ export const useWorkshopData = (workshopId?: number) => {
           experience_years: item.experience_years,
           created_at: item.created_at
         })) || [];
-
-        console.log('Processed participants:', participants);
 
         // Calculate average score
         const validScores = participants
