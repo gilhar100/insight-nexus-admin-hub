@@ -8,6 +8,7 @@ import { useNameSearch } from '@/hooks/useNameSearch';
 import { useRespondentData } from '@/hooks/useRespondentData';
 import { Badge } from '@/components/ui/badge';
 import { SalimaRadarChart } from '@/components/SalimaRadarChart';
+import { SalimaIntensityBar } from '@/components/SalimaIntensityBar';
 import { exportSalimaReport, exportSalimaReportCSV } from '@/utils/exportUtils';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -83,18 +84,17 @@ export const IndividualInsights: React.FC = () => {
     switch (source) {
       case 'survey': return 'bg-blue-100 text-blue-800';
       case 'colleague': return 'bg-green-100 text-green-800';
-      case 'woca': return 'bg-purple-100 text-purple-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
 
-  // Prepare radar chart data
+  // Prepare radar chart data with correct colors
   const radarChartData = respondentData ? [
-    { dimension: 'Strategy', score: respondentData.dimensions.strategy, color: '#6366F1' },
-    { dimension: 'Adaptability', score: respondentData.dimensions.adaptability, color: '#8B5CF6' },
-    { dimension: 'Learning', score: respondentData.dimensions.learning, color: '#06B6D4' },
-    { dimension: 'Inspiration', score: respondentData.dimensions.inspiration, color: '#F59E0B' },
-    { dimension: 'Meaning', score: respondentData.dimensions.meaning, color: '#10B981' },
+    { dimension: 'Strategy', score: respondentData.dimensions.strategy, color: '#3B82F6' },
+    { dimension: 'Adaptability', score: respondentData.dimensions.adaptability, color: '#F59E0B' },
+    { dimension: 'Learning', score: respondentData.dimensions.learning, color: '#10B981' },
+    { dimension: 'Inspiration', score: respondentData.dimensions.inspiration, color: '#EF4444' },
+    { dimension: 'Meaning', score: respondentData.dimensions.meaning, color: '#8B5CF6' },
     { dimension: 'Authenticity', score: respondentData.dimensions.authenticity, color: '#EC4899' }
   ] : [];
 
@@ -125,14 +125,14 @@ export const IndividualInsights: React.FC = () => {
             Select Respondent
           </CardTitle>
           <CardDescription>
-            Search and select an individual from survey_responses, colleague_survey_responses, or woca_responses tables
+            Search and select an individual from survey_responses or colleague_survey_responses tables (SALIMA data only)
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
             <div className="flex-1 relative">
               <Input
-                placeholder="Search respondents by name or email..."
+                placeholder="Search SALIMA respondents by name or email..."
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
@@ -162,7 +162,7 @@ export const IndividualInsights: React.FC = () => {
                         <CommandEmpty className="text-red-500">Error: {error}</CommandEmpty>
                       )}
                       {!isLoading && !error && names.length === 0 && (
-                        <CommandEmpty>No respondents found.</CommandEmpty>
+                        <CommandEmpty>No SALIMA respondents found.</CommandEmpty>
                       )}
                       {names.length > 0 && (
                         <CommandGroup>
@@ -270,32 +270,22 @@ export const IndividualInsights: React.FC = () => {
               </CardContent>
             </Card>
 
-            {/* Bar Chart */}
+            {/* Intensity Bars */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <BarChart3 className="h-5 w-5 mr-2" />
-                  Dimension Breakdown
+                  Dimension Intensity
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {radarChartData.map((dimension, index) => (
-                    <div key={index} className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">{dimension.dimension}</span>
-                        <span className="text-sm text-gray-600">{dimension.score.toFixed(1)}</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                          className="h-2 rounded-full transition-all duration-500"
-                          style={{
-                            backgroundColor: dimension.color,
-                            width: `${(dimension.score / 5) * 100}%`
-                          }}
-                        />
-                      </div>
-                    </div>
+                    <SalimaIntensityBar
+                      key={index}
+                      dimension={dimension.dimension}
+                      score={dimension.score}
+                    />
                   ))}
                 </div>
               </CardContent>

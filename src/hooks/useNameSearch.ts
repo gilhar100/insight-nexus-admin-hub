@@ -6,7 +6,7 @@ export interface NameSearchResult {
   id: string;
   name: string;
   email?: string;
-  source: 'survey' | 'colleague' | 'woca';
+  source: 'survey' | 'colleague';
 }
 
 export const useNameSearch = (query: string) => {
@@ -27,7 +27,7 @@ export const useNameSearch = (query: string) => {
       try {
         const allResults: NameSearchResult[] = [];
 
-        // Search survey_responses table
+        // Search survey_responses table only (SALIMA data)
         console.log('Fetching from survey_responses...');
         const { data: surveyData, error: surveyError } = await supabase
           .from('survey_responses')
@@ -76,29 +76,6 @@ export const useNameSearch = (query: string) => {
                 name: item.evaluator_name,
                 email: item.evaluator_email || undefined,
                 source: 'colleague'
-              });
-            }
-          });
-        }
-
-        // Search woca_responses table
-        console.log('Fetching from woca_responses...');
-        const { data: wocaData, error: wocaError } = await supabase
-          .from('woca_responses')
-          .select('id, full_name, email')
-          .or(`full_name.ilike.%${query}%,email.ilike.%${query}%`)
-          .limit(10);
-
-        if (wocaError) {
-          console.error('WOCA fetch error:', wocaError);
-        } else if (wocaData) {
-          wocaData.forEach(item => {
-            if (item.full_name) {
-              allResults.push({
-                id: item.id,
-                name: item.full_name,
-                email: item.email || undefined,
-                source: 'woca'
               });
             }
           });

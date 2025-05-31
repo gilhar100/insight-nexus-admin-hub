@@ -1,7 +1,8 @@
 
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { getWocaZoneColor } from '@/utils/wocaColors';
 
 interface WorkshopDistributionChartProps {
   participants: Array<{
@@ -40,8 +41,13 @@ export const WorkshopDistributionChart: React.FC<WorkshopDistributionChartProps>
     }
   });
 
-  // Filter out ranges with no participants for cleaner visualization
-  const chartData = scoreRanges.filter(range => range.count > 0);
+  // Filter out ranges with no participants and add colors
+  const chartData = scoreRanges
+    .filter(range => range.count > 0)
+    .map(range => ({
+      ...range,
+      color: getWocaZoneColor((range.min + range.max) / 2)
+    }));
 
   return (
     <ChartContainer config={chartConfig} className="h-80">
@@ -51,7 +57,11 @@ export const WorkshopDistributionChart: React.FC<WorkshopDistributionChartProps>
           <XAxis dataKey="range" />
           <YAxis />
           <ChartTooltip content={<ChartTooltipContent />} />
-          <Bar dataKey="count" fill="#2563eb" />
+          <Bar dataKey="count">
+            {chartData.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.color} />
+            ))}
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
     </ChartContainer>

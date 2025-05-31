@@ -47,7 +47,7 @@ export const useRespondentData = () => {
             email: surveyData.user_email || undefined,
             source: 'survey',
             dimensions: {
-              strategy: surveyData.dimension_s || 0,
+              strategy: surveyData.dimension_s || surveyData.strategy || 0,
               adaptability: surveyData.dimension_a2 || 0,
               learning: surveyData.dimension_l || 0,
               inspiration: surveyData.dimension_i || 0,
@@ -84,35 +84,6 @@ export const useRespondentData = () => {
             },
             overallScore: colleagueData.slq_score || 0,
             rawData: colleagueData
-          };
-        }
-      } else if (source === 'woca') {
-        const { data: wocaData, error: wocaError } = await supabase
-          .from('woca_responses')
-          .select('*')
-          .eq('id', respondentId)
-          .single();
-
-        if (wocaError) throw wocaError;
-        
-        if (wocaData) {
-          // For WOCA data, we'll need to extract dimensions from the scores JSON
-          const scores = wocaData.scores as any;
-          respondentData = {
-            id: wocaData.id,
-            name: wocaData.full_name,
-            email: wocaData.email || undefined,
-            source: 'woca',
-            dimensions: {
-              strategy: scores?.strategy || 0,
-              adaptability: scores?.adaptability || 0,
-              learning: scores?.learning || 0,
-              inspiration: scores?.inspiration || 0,
-              meaning: scores?.meaning || 0,
-              authenticity: scores?.authenticity || 0,
-            },
-            overallScore: wocaData.overall_score || 0,
-            rawData: wocaData
           };
         }
       }

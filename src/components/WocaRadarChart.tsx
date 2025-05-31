@@ -2,6 +2,7 @@
 import React from 'react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { WOCA_COLORS } from '@/utils/wocaColors';
 
 interface WocaRadarChartProps {
   participants: Array<{
@@ -19,26 +20,18 @@ const chartConfig = {
 
 export const WocaRadarChart: React.FC<WocaRadarChartProps> = ({ participants }) => {
   // Calculate average scores for each WOCA indicator
-  const indicators = ['Willingness', 'Opportunity', 'Capability', 'Anxiety'];
+  const indicators = [
+    { key: 'willingness', label: 'נכונות' },
+    { key: 'opportunity', label: 'הזדמנות' },
+    { key: 'capability', label: 'יכולת' },
+    { key: 'anxiety', label: 'חרדה' }
+  ];
   
   const chartData = indicators.map(indicator => {
     const scores = participants
       .map(p => {
         if (!p.scores) return null;
-        // Extract relevant scores based on indicator
-        // This is a simplified mapping - you may need to adjust based on your actual score structure
-        switch (indicator) {
-          case 'Willingness':
-            return p.scores.willingness || p.overall_score;
-          case 'Opportunity':
-            return p.scores.opportunity || p.overall_score;
-          case 'Capability':
-            return p.scores.capability || p.overall_score;
-          case 'Anxiety':
-            return p.scores.anxiety || p.overall_score;
-          default:
-            return p.overall_score;
-        }
+        return p.scores[indicator.key] || p.overall_score;
       })
       .filter(score => score !== null) as number[];
 
@@ -47,7 +40,7 @@ export const WocaRadarChart: React.FC<WocaRadarChartProps> = ({ participants }) 
       : 0;
 
     return {
-      indicator,
+      indicator: indicator.label,
       average: Math.round(average * 10) / 10,
       fullMark: 5
     };

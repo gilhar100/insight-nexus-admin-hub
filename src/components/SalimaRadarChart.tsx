@@ -18,11 +18,22 @@ const chartConfig = {
   },
 };
 
+// SALIMA dimension colors
+const SALIMA_COLORS = {
+  'Strategy': '#3B82F6', // Blue
+  'Learning': '#10B981', // Green
+  'Inspiration': '#EF4444', // Red
+  'Adaptability': '#F59E0B', // Orange
+  'Authenticity': '#EC4899', // Pink
+  'Meaning': '#8B5CF6' // Purple
+};
+
 export const SalimaRadarChart: React.FC<SalimaRadarChartProps> = ({ data }) => {
   const chartData = data.map(item => ({
     dimension: item.dimension,
     score: item.score,
-    fullMark: 5
+    fullMark: 5,
+    color: SALIMA_COLORS[item.dimension as keyof typeof SALIMA_COLORS] || item.color
   }));
 
   return (
