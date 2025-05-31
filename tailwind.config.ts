@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,35 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				// WOCA Zone Colors
+				opportunity: {
+					DEFAULT: '#10B981', // Green
+					light: '#D1FAE5',
+					dark: '#047857'
+				},
+				comfort: {
+					DEFAULT: '#3B82F6', // Blue
+					light: '#DBEAFE',
+					dark: '#1D4ED8'
+				},
+				apathy: {
+					DEFAULT: '#F59E0B', // Amber
+					light: '#FEF3C7',
+					dark: '#D97706'
+				},
+				war: {
+					DEFAULT: '#EF4444', // Red
+					light: '#FEE2E2',
+					dark: '#DC2626'
+				},
+				// SALIMA Dimension Colors
+				strategy: '#6366F1', // Indigo
+				adaptability: '#8B5CF6', // Violet
+				learning: '#06B6D4', // Cyan
+				inspiration: '#F59E0B', // Amber
+				meaning: '#10B981', // Emerald
+				authenticity: '#EC4899' // Pink
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,11 +113,22 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'fade-in': {
+					'0%': {
+						opacity: '0',
+						transform: 'translateY(10px)'
+					},
+					'100%': {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fade-in 0.3s ease-out'
 			}
 		}
 	},

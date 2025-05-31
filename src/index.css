@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -35,19 +36,12 @@
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
@@ -97,5 +91,60 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  /* WOCA Zone utility classes */
+  .bg-opportunity {
+    background-color: #10B981;
+  }
+  .bg-opportunity-light {
+    background-color: #D1FAE5;
+  }
+  .text-opportunity-dark {
+    color: #047857;
+  }
+  .border-opportunity {
+    border-color: #10B981;
+  }
+  
+  .bg-comfort {
+    background-color: #3B82F6;
+  }
+  .bg-comfort-light {
+    background-color: #DBEAFE;
+  }
+  .text-comfort-dark {
+    color: #1D4ED8;
+  }
+  .border-comfort {
+    border-color: #3B82F6;
+  }
+  
+  .bg-apathy {
+    background-color: #F59E0B;
+  }
+  .bg-apathy-light {
+    background-color: #FEF3C7;
+  }
+  .text-apathy-dark {
+    color: #D97706;
+  }
+  .border-apathy {
+    border-color: #F59E0B;
+  }
+  
+  .bg-war {
+    background-color: #EF4444;
+  }
+  .bg-war-light {
+    background-color: #FEE2E2;
+  }
+  .text-war-dark {
+    color: #DC2626;
+  }
+  .border-war {
+    border-color: #EF4444;
   }
 }
