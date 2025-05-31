@@ -3,12 +3,15 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Users, BarChart3, Radar, Download, TrendingUp } from 'lucide-react';
+import { Users, BarChart3, Radar, Download, TrendingUp, Eye, EyeOff } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useWorkshopData } from '@/hooks/useWorkshopData';
+import { WorkshopDistributionChart } from '@/components/WorkshopDistributionChart';
+import { WocaRadarChart } from '@/components/WocaRadarChart';
 
 export const GroupWorkshopInsights: React.FC = () => {
   const [selectedWorkshopId, setSelectedWorkshopId] = useState<number | undefined>();
+  const [showNames, setShowNames] = useState(false);
   const { workshopData, workshops, isLoading, error } = useWorkshopData(selectedWorkshopId);
 
   // WOCA Zone classification
@@ -31,7 +34,10 @@ export const GroupWorkshopInsights: React.FC = () => {
       participant_count: workshopData.participant_count,
       average_score: workshopData.average_score,
       analysis_date: new Date().toISOString(),
-      participants: workshopData.participants
+      participants: workshopData.participants.map(p => ({
+        ...p,
+        full_name: showNames ? p.full_name : `Participant ${workshopData.participants.indexOf(p) + 1}`
+      }))
     };
 
     const dataStr = JSON.stringify(exportData, null, 2);
@@ -145,10 +151,20 @@ export const GroupWorkshopInsights: React.FC = () => {
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 <span>WOCA Zone Classification</span>
-                <Button variant="outline" size="sm" onClick={exportWorkshopData}>
-                  <Download className="h-4 w-4 mr-2" />
-                  Export Analysis
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setShowNames(!showNames)}
+                  >
+                    {showNames ? <EyeOff className="h-4 w-4 mr-2" /> : <Eye className="h-4 w-4 mr-2" />}
+                    {showNames ? 'Hide Names' : 'Show Names'}
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={exportWorkshopData}>
+                    <Download className="h-4 w-4 mr-2" />
+                    Export Analysis
+                  </Button>
+                </div>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -185,13 +201,7 @@ export const GroupWorkshopInsights: React.FC = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-80 bg-gray-50 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
-                  <div className="text-center text-gray-500">
-                    <BarChart3 className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>Distribution Chart will be implemented here</p>
-                    <p className="text-sm">Showing response variation across participants</p>
-                  </div>
-                </div>
+                <WorkshopDistributionChart participants={workshopData.participants} />
               </CardContent>
             </Card>
 
@@ -204,13 +214,7 @@ export const GroupWorkshopInsights: React.FC = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-80 bg-gray-50 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
-                  <div className="text-center text-gray-500">
-                    <Radar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>Radar Chart will be implemented here</p>
-                    <p className="text-sm">Comparing WOCA indicators across group</p>
-                  </div>
-                </div>
+                <WocaRadarChart participants={workshopData.participants} />
               </CardContent>
             </Card>
           </div>
@@ -223,18 +227,20 @@ export const GroupWorkshopInsights: React.FC = () => {
                 Participant Overview
               </CardTitle>
               <CardDescription>
-                Individual scores and demographics
+                Individual scores and demographics {showNames ? '(Names visible)' : '(Anonymous)'}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {workshopData.participants.map((participant) => (
+                {workshopData.participants.map((participant, index) => (
                   <div 
                     key={participant.id} 
                     className="p-4 border rounded-lg hover:shadow-md transition-shadow"
                   >
                     <div className="flex justify-between items-center mb-2">
-                      <span className="font-medium text-sm">{participant.full_name}</span>
+                      <span className="font-medium text-sm">
+                        {showNames ? participant.full_name : `Participant ${index + 1}`}
+                      </span>
                       <Badge 
                         variant={
                           participant.overall_score && participant.overall_score > 4.0 
