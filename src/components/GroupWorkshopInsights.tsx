@@ -76,7 +76,7 @@ export const GroupWorkshopInsights: React.FC = () => {
     const link = document.createElement('a');
     link.href = url;
     const identifier = viewMode === 'workshop' 
-      ? `workshop-${dataToExported.workshop_id}` 
+      ? `workshop-${dataToExport.workshop_id}` 
       : `participant-${dataToExport.id}`;
     link.download = `woca-${identifier}-analysis-${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(link);
