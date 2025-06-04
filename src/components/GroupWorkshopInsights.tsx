@@ -1,25 +1,35 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Users, BarChart3, Radar, Download, TrendingUp, Eye, EyeOff, Maximize } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Users, BarChart3, Radar, Download, TrendingUp, Eye, EyeOff, Maximize, Search } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useWorkshopData } from '@/hooks/useWorkshopData';
+import { useWocaSearch } from '@/hooks/useWocaSearch';
 import { WorkshopDistributionChart } from '@/components/WorkshopDistributionChart';
 import { WocaRadarChart } from '@/components/WocaRadarChart';
 import { PresenterMode } from '@/components/PresenterMode';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
 
 export const GroupWorkshopInsights: React.FC = () => {
   const [selectedWorkshopId, setSelectedWorkshopId] = useState<number | undefined>();
-  const [selectedGroupId, setSelectedGroupId] = useState<string | undefined>();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedParticipant, setSelectedParticipant] = useState<any>(null);
   const [showNames, setShowNames] = useState(false);
   const [presenterMode, setPresenterMode] = useState(false);
-  const [selectionType, setSelectionType] = useState<'workshop' | 'group'>('workshop');
+  const [viewMode, setViewMode] = useState<'workshop' | 'individual'>('workshop');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   
-  const { workshopData, workshops, groups, isLoading, error } = useWorkshopData(
-    selectionType === 'workshop' ? selectedWorkshopId : undefined,
-    selectionType === 'group' ? selectedGroupId : undefined
-  );
+  const { workshopData, workshops, isLoading, error } = useWorkshopData(selectedWorkshopId);
+  const { participants: searchResults, isLoading: isSearchLoading } = useWocaSearch(searchQuery);
 
   // WOCA Zone classification
   const getZoneInfo = (score: number) => {
@@ -31,27 +41,39 @@ export const GroupWorkshopInsights: React.FC = () => {
 
   const handleWorkshopSelect = (value: string) => {
     setSelectedWorkshopId(Number(value));
-    setSelectedGroupId(undefined);
+    setSelectedParticipant(null);
+    setViewMode('workshop');
   };
 
-  const handleGroupSelect = (value: string) => {
-    setSelectedGroupId(value);
+  const handleParticipantSelect = (participant: any) => {
+    setSelectedParticipant(participant);
     setSelectedWorkshopId(undefined);
+    setViewMode('individual');
+    setSearchQuery(participant.full_name);
+    setIsDropdownOpen(false);
   };
 
   const exportWorkshopData = () => {
-    if (!workshopData) return;
+    const dataToExport = viewMode === 'workshop' ? workshopData : selectedParticipant;
+    if (!dataToExport) return;
 
     const exportData = {
-      ...(workshopData.workshop_id && { workshop_id: workshopData.workshop_id }),
-      ...(workshopData.group_id && { group_id: workshopData.group_id }),
-      participant_count: workshopData.participant_count,
-      average_score: workshopData.average_score,
-      analysis_date: new Date().toISOString(),
-      participants: workshopData.participants.map(p => ({
-        ...p,
-        full_name: showNames ? p.full_name : `Participant ${workshopData.participants.indexOf(p) + 1}`
-      }))
+      type: viewMode,
+      ...(viewMode === 'workshop' ? {
+        workshop_id: dataToExport.workshop_id,
+        participant_count: dataToExport.participant_count,
+        average_score: dataToExport.average_score,
+        participants: dataToExport.participants.map((p: any) => ({
+          ...p,
+          full_name: showNames ? p.full_name : `Participant ${dataToExport.participants.indexOf(p) + 1}`
+        }))
+      } : {
+        participant: {
+          ...dataToExport,
+          full_name: showNames ? dataToExport.full_name : 'Anonymous Participant'
+        }
+      }),
+      analysis_date: new Date().toISOString()
     };
 
     const dataStr = JSON.stringify(exportData, null, 2);
@@ -60,15 +82,17 @@ export const GroupWorkshopInsights: React.FC = () => {
     
     const link = document.createElement('a');
     link.href = url;
-    const identifier = workshopData.workshop_id ? `workshop-${workshopData.workshop_id}` : `group-${workshopData.group_id}`;
-    link.download = `${identifier}-analysis-${new Date().toISOString().split('T')[0]}.json`;
+    const identifier = viewMode === 'workshop' 
+      ? `workshop-${dataToExport.workshop_id}` 
+      : `participant-${dataToExport.id}`;
+    link.download = `woca-${identifier}-analysis-${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
 
-  // Zone distribution calculation
+  // Zone distribution calculation for workshop
   const getZoneDistribution = () => {
     if (!workshopData) return { opportunity: 0, comfort: 0, apathy: 0, war: 0 };
     
@@ -86,12 +110,15 @@ export const GroupWorkshopInsights: React.FC = () => {
   };
 
   const zoneDistribution = getZoneDistribution();
-  const groupScore = workshopData?.average_score || 0;
-  const zoneInfo = getZoneInfo(groupScore);
+  const currentData = viewMode === 'workshop' ? workshopData : selectedParticipant;
+  const currentScore = viewMode === 'workshop' 
+    ? workshopData?.average_score || 0 
+    : selectedParticipant?.overall_score || 0;
+  const zoneInfo = getZoneInfo(currentScore);
 
   const getDisplayTitle = () => {
-    if (workshopData?.workshop_id) return `Workshop ${workshopData.workshop_id}`;
-    if (workshopData?.group_id) return `Group ${workshopData.group_id}`;
+    if (viewMode === 'workshop' && workshopData) return `Workshop ${workshopData.workshop_id}`;
+    if (viewMode === 'individual' && selectedParticipant) return selectedParticipant.full_name;
     return 'WOCA Analysis';
   };
 
@@ -103,10 +130,10 @@ export const GroupWorkshopInsights: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                Group Workshop Insights - WOCA Model
+                WOCA Analysis Dashboard
               </h2>
               <p className="text-gray-600">
-                Analyze group dynamics and workshop effectiveness using the 36-question WOCA survey
+                Search by individual participant or analyze workshop groups using the 36-question WOCA survey
               </p>
             </div>
             <div className="bg-purple-50 p-4 rounded-lg">
@@ -119,76 +146,100 @@ export const GroupWorkshopInsights: React.FC = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <Users className="h-5 w-5 mr-2" />
-              Select Workshop or Group
+              <Search className="h-5 w-5 mr-2" />
+              Search & Select
             </CardTitle>
             <CardDescription>
-              Choose a workshop or group from the woca_responses table to analyze group dynamics
+              Search for individual participants or select a workshop number for group analysis
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {/* Selection Type Toggle */}
-              <div className="flex gap-2">
-                <Button 
-                  variant={selectionType === 'workshop' ? 'default' : 'outline'}
-                  onClick={() => {
-                    setSelectionType('workshop');
-                    setSelectedGroupId(undefined);
-                  }}
-                >
-                  By Workshop
-                </Button>
-                <Button 
-                  variant={selectionType === 'group' ? 'default' : 'outline'}
-                  onClick={() => {
-                    setSelectionType('group');
-                    setSelectedWorkshopId(undefined);
-                  }}
-                >
-                  By Group
-                </Button>
+              {/* Search for individuals */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Search Individual Participant</label>
+                <div className="relative">
+                  <Input
+                    placeholder="Search WOCA participants by name or email..."
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      if (e.target.value.length >= 2) {
+                        setIsDropdownOpen(true);
+                      } else {
+                        setIsDropdownOpen(false);
+                      }
+                    }}
+                    onFocus={() => {
+                      if (searchQuery.length >= 2) {
+                        setIsDropdownOpen(true);
+                      }
+                    }}
+                    className="w-full"
+                  />
+                  
+                  {/* Search Results Dropdown */}
+                  {isDropdownOpen && searchQuery.length >= 2 && (
+                    <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto">
+                      <Command>
+                        <CommandList>
+                          {isSearchLoading && (
+                            <CommandEmpty>Searching...</CommandEmpty>
+                          )}
+                          {!isSearchLoading && searchResults.length === 0 && (
+                            <CommandEmpty>No participants found.</CommandEmpty>
+                          )}
+                          {searchResults.length > 0 && (
+                            <CommandGroup>
+                              {searchResults.map((participant) => (
+                                <CommandItem
+                                  key={participant.id}
+                                  onSelect={() => handleParticipantSelect(participant)}
+                                  className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50"
+                                >
+                                  <div className="flex flex-col">
+                                    <span className="font-medium">{participant.full_name}</span>
+                                    <span className="text-sm text-gray-500">{participant.email}</span>
+                                    {participant.workshop_id && (
+                                      <span className="text-xs text-blue-600">Workshop {participant.workshop_id}</span>
+                                    )}
+                                  </div>
+                                  <Badge>
+                                    {participant.overall_score?.toFixed(1) || 'N/A'}
+                                  </Badge>
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          )}
+                        </CommandList>
+                      </Command>
+                    </div>
+                  )}
+                </div>
               </div>
 
-              {/* Selection Dropdown */}
-              <div className="flex-1">
-                {selectionType === 'workshop' ? (
-                  <Select value={selectedWorkshopId?.toString()} onValueChange={handleWorkshopSelect}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a workshop" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {workshops.map((workshop) => (
-                        <SelectItem key={workshop.id} value={workshop.id.toString()}>
-                          <div className="flex flex-col">
-                            <span className="font-medium">{workshop.name}</span>
-                            <span className="text-sm text-gray-500">
-                              {workshop.participant_count} participants • {new Date(workshop.date).toLocaleDateString()}
-                            </span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <Select value={selectedGroupId} onValueChange={handleGroupSelect}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a group" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {groups.map((group) => (
-                        <SelectItem key={group.id} value={group.id}>
-                          <div className="flex flex-col">
-                            <span className="font-medium">{group.name}</span>
-                            <span className="text-sm text-gray-500">
-                              {group.participant_count} participants • {new Date(group.date).toLocaleDateString()}
-                            </span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
+              <div className="text-center text-gray-500">OR</div>
+
+              {/* Workshop selection */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Select Workshop Number</label>
+                <Select value={selectedWorkshopId?.toString()} onValueChange={handleWorkshopSelect}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a workshop for group analysis" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {workshops.map((workshop) => (
+                      <SelectItem key={workshop.id} value={workshop.id.toString()}>
+                        <div className="flex flex-col">
+                          <span className="font-medium">Workshop {workshop.id}</span>
+                          <span className="text-sm text-gray-500">
+                            {workshop.participant_count} participants • {new Date(workshop.date).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             
@@ -209,7 +260,7 @@ export const GroupWorkshopInsights: React.FC = () => {
           </Card>
         )}
 
-        {workshopData && !isLoading && (
+        {currentData && !isLoading && (
           <>
             {/* WOCA Zone Classification */}
             <Card>
@@ -251,10 +302,13 @@ export const GroupWorkshopInsights: React.FC = () => {
                     </Badge>
                   </div>
                   <div className="text-4xl font-bold text-gray-900 mb-2">
-                    {groupScore.toFixed(1)}
+                    {currentScore.toFixed(1)}
                   </div>
                   <div className="text-lg text-gray-600 mb-4">
-                    Group Average Score ({workshopData.participant_count} participants)
+                    {viewMode === 'workshop' 
+                      ? `Group Average Score (${workshopData?.participant_count} participants)`
+                      : 'Individual Score'
+                    }
                   </div>
                   <p className="text-gray-500 max-w-md mx-auto">
                     {zoneInfo.description}
@@ -264,119 +318,109 @@ export const GroupWorkshopInsights: React.FC = () => {
             </Card>
 
             {/* Visualizations */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Group Distribution Chart */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <BarChart3 className="h-5 w-5 mr-2" />
-                    Score Distribution
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <WorkshopDistributionChart participants={workshopData.participants} />
-                </CardContent>
-              </Card>
+            {viewMode === 'workshop' && workshopData && (
+              <>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Group Distribution Chart */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center">
+                        <BarChart3 className="h-5 w-5 mr-2" />
+                        Score Distribution
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <WorkshopDistributionChart participants={workshopData.participants} />
+                    </CardContent>
+                  </Card>
 
-              {/* Radar Chart Comparison */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Radar className="h-5 w-5 mr-2" />
-                    WOCA Indicators Radar
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <WocaRadarChart participants={workshopData.participants} />
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Participant Summary */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <TrendingUp className="h-5 w-5 mr-2" />
-                  Participant Overview
-                </CardTitle>
-                <CardDescription>
-                  Individual scores and demographics {showNames ? '(Names visible)' : '(Anonymous)'}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {workshopData.participants.map((participant, index) => (
-                    <div 
-                      key={participant.id} 
-                      className="p-4 border rounded-lg hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="font-medium text-sm">
-                          {showNames ? participant.full_name : `Participant ${index + 1}`}
-                        </span>
-                        <Badge 
-                          variant={
-                            participant.overall_score && participant.overall_score > 4.0 
-                              ? "default" 
-                              : participant.overall_score && participant.overall_score < 3.0 
-                              ? "destructive" 
-                              : "secondary"
-                          }
-                        >
-                          {participant.overall_score?.toFixed(1) || 'N/A'}
-                        </Badge>
-                      </div>
-                      {participant.overall_score && (
-                        <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-                          <div
-                            className="h-2 rounded-full bg-blue-500 transition-all duration-500"
-                            style={{ width: `${(participant.overall_score / 5) * 100}%` }}
-                          />
-                        </div>
-                      )}
-                      <div className="text-xs text-gray-500 space-y-1">
-                        {participant.organization && <div>Org: {participant.organization}</div>}
-                        {participant.profession && <div>Role: {participant.profession}</div>}
-                        {participant.experience_years && <div>Experience: {participant.experience_years} years</div>}
-                        {participant.group_id && <div>Group: {participant.group_id}</div>}
-                      </div>
-                    </div>
-                  ))}
+                  {/* Radar Chart Comparison */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center">
+                        <Radar className="h-5 w-5 mr-2" />
+                        WOCA Indicators Radar
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <WocaRadarChart participants={workshopData.participants} />
+                    </CardContent>
+                  </Card>
                 </div>
-              </CardContent>
-            </Card>
 
-            {/* Zone Analysis */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card className="bg-green-50 border-green-200">
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-green-700 mb-1">{zoneDistribution.opportunity}</div>
-                  <div className="text-sm text-green-700">Opportunity Zone</div>
-                  <div className="text-xs text-gray-600">4.2-5.0</div>
+                {/* Zone Analysis */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <Card className="bg-green-50 border-green-200">
+                    <CardContent className="p-4 text-center">
+                      <div className="text-2xl font-bold text-green-700 mb-1">{zoneDistribution.opportunity}</div>
+                      <div className="text-sm text-green-700">Opportunity Zone</div>
+                      <div className="text-xs text-gray-600">4.2-5.0</div>
+                    </CardContent>
+                  </Card>
+                  <Card className="bg-blue-50 border-blue-200">
+                    <CardContent className="p-4 text-center">
+                      <div className="text-2xl font-bold text-blue-700 mb-1">{zoneDistribution.comfort}</div>
+                      <div className="text-sm text-blue-700">Comfort Zone</div>
+                      <div className="text-xs text-gray-600">3.4-4.1</div>
+                    </CardContent>
+                  </Card>
+                  <Card className="bg-yellow-50 border-yellow-200">
+                    <CardContent className="p-4 text-center">
+                      <div className="text-2xl font-bold text-yellow-700 mb-1">{zoneDistribution.apathy}</div>
+                      <div className="text-sm text-yellow-700">Apathy Zone</div>
+                      <div className="text-xs text-gray-600">2.6-3.3</div>
+                    </CardContent>
+                  </Card>
+                  <Card className="bg-red-50 border-red-200">
+                    <CardContent className="p-4 text-center">
+                      <div className="text-2xl font-bold text-red-700 mb-1">{zoneDistribution.war}</div>
+                      <div className="text-sm text-red-700">War Zone</div>
+                      <div className="text-xs text-gray-600">1.0-2.5</div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </>
+            )}
+
+            {/* Individual participant details */}
+            {viewMode === 'individual' && selectedParticipant && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <TrendingUp className="h-5 w-5 mr-2" />
+                    Participant Details
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <div><strong>Name:</strong> {showNames ? selectedParticipant.full_name : 'Anonymous'}</div>
+                      <div><strong>Email:</strong> {showNames ? selectedParticipant.email : 'Hidden'}</div>
+                      {selectedParticipant.organization && (
+                        <div><strong>Organization:</strong> {selectedParticipant.organization}</div>
+                      )}
+                      {selectedParticipant.profession && (
+                        <div><strong>Profession:</strong> {selectedParticipant.profession}</div>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      {selectedParticipant.workshop_id && (
+                        <div><strong>Workshop:</strong> {selectedParticipant.workshop_id}</div>
+                      )}
+                      {selectedParticipant.age && (
+                        <div><strong>Age:</strong> {selectedParticipant.age}</div>
+                      )}
+                      {selectedParticipant.experience_years && (
+                        <div><strong>Experience:</strong> {selectedParticipant.experience_years} years</div>
+                      )}
+                      {selectedParticipant.created_at && (
+                        <div><strong>Survey Date:</strong> {new Date(selectedParticipant.created_at).toLocaleDateString()}</div>
+                      )}
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
-              <Card className="bg-blue-50 border-blue-200">
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-blue-700 mb-1">{zoneDistribution.comfort}</div>
-                  <div className="text-sm text-blue-700">Comfort Zone</div>
-                  <div className="text-xs text-gray-600">3.4-4.1</div>
-                </CardContent>
-              </Card>
-              <Card className="bg-yellow-50 border-yellow-200">
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-yellow-700 mb-1">{zoneDistribution.apathy}</div>
-                  <div className="text-sm text-yellow-700">Apathy Zone</div>
-                  <div className="text-xs text-gray-600">2.6-3.3</div>
-                </CardContent>
-              </Card>
-              <Card className="bg-red-50 border-red-200">
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-red-700 mb-1">{zoneDistribution.war}</div>
-                  <div className="text-sm text-red-700">War Zone</div>
-                  <div className="text-xs text-gray-600">1.0-2.5</div>
-                </CardContent>
-              </Card>
-            </div>
+            )}
           </>
         )}
       </div>
@@ -386,7 +430,7 @@ export const GroupWorkshopInsights: React.FC = () => {
         isOpen={presenterMode}
         onClose={() => setPresenterMode(false)}
         type="woca"
-        data={workshopData}
+        data={currentData}
         title={getDisplayTitle()}
       />
     </>
