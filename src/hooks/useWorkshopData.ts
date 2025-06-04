@@ -42,27 +42,54 @@ export const useWorkshopData = (workshopId?: number) => {
   useEffect(() => {
     const fetchWorkshops = async () => {
       try {
-        const { data, error } = await supabase
+        // First try workshop_id, then fall back to group_id
+        const { data: workshopData, error: workshopError } = await supabase
           .from('woca_responses')
           .select('workshop_id, created_at')
           .not('workshop_id', 'is', null);
 
-        if (error) throw error;
+        const { data: groupData, error: groupError } = await supabase
+          .from('woca_responses')
+          .select('group_id, created_at')
+          .not('group_id', 'is', null);
+
+        if (workshopError && groupError) {
+          throw workshopError || groupError;
+        }
 
         // Group by workshop_id
         const workshopMap = new Map();
         
-        data?.forEach(item => {
+        // Process workshop_id data
+        workshopData?.forEach(item => {
           if (item.workshop_id) {
             if (!workshopMap.has(item.workshop_id)) {
               workshopMap.set(item.workshop_id, {
                 id: item.workshop_id,
-                name: `Workshop ${item.workshop_id}`,
+                name: `סדנה ${item.workshop_id}`,
                 participant_count: 0,
                 date: item.created_at || 'Unknown'
               });
             }
             workshopMap.get(item.workshop_id).participant_count++;
+          }
+        });
+
+        // Process group_id data (treat as workshop numbers)
+        groupData?.forEach(item => {
+          if (item.group_id) {
+            const workshopNum = parseInt(item.group_id);
+            if (!isNaN(workshopNum)) {
+              if (!workshopMap.has(workshopNum)) {
+                workshopMap.set(workshopNum, {
+                  id: workshopNum,
+                  name: `סדנה ${workshopNum}`,
+                  participant_count: 0,
+                  date: item.created_at || 'Unknown'
+                });
+              }
+              workshopMap.get(workshopNum).participant_count++;
+            }
           }
         });
 
@@ -88,14 +115,25 @@ export const useWorkshopData = (workshopId?: number) => {
       setError(null);
 
       try {
-        const { data, error } = await supabase
+        // Search both workshop_id and group_id fields
+        const { data: workshopData, error: workshopError } = await supabase
           .from('woca_responses')
           .select('*')
           .eq('workshop_id', workshopId);
 
-        if (error) throw error;
+        const { data: groupData, error: groupError } = await supabase
+          .from('woca_responses')
+          .select('*')
+          .eq('group_id', workshopId.toString());
 
-        const participants: WorkshopParticipant[] = data?.map(item => ({
+        if (workshopError && groupError) {
+          throw workshopError || groupError;
+        }
+
+        // Combine both datasets
+        const allData = [...(workshopData || []), ...(groupData || [])];
+
+        const participants: WorkshopParticipant[] = allData?.map(item => ({
           id: item.id,
           full_name: item.full_name,
           email: item.email,
@@ -108,11 +146,16 @@ export const useWorkshopData = (workshopId?: number) => {
           education: item.education,
           experience_years: item.experience_years,
           created_at: item.created_at,
-          workshop_id: item.workshop_id
+          workshop_id: item.workshop_id || parseInt(item.group_id || '0')
         })) || [];
 
+        // Remove duplicates based on email
+        const uniqueParticipants = participants.filter((participant, index, self) =>
+          index === self.findIndex(p => p.email === participant.email)
+        );
+
         // Calculate average score
-        const validScores = participants
+        const validScores = uniqueParticipants
           .map(p => p.overall_score)
           .filter(score => score !== null) as number[];
         
@@ -122,8 +165,8 @@ export const useWorkshopData = (workshopId?: number) => {
 
         setWorkshopData({
           workshop_id: workshopId,
-          participants,
-          participant_count: participants.length,
+          participants: uniqueParticipants,
+          participant_count: uniqueParticipants.length,
           average_score
         });
 

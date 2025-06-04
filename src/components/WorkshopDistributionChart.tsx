@@ -12,7 +12,7 @@ interface WorkshopDistributionChartProps {
 
 const chartConfig = {
   count: {
-    label: "Participants",
+    label: "משתתפים",
     color: "#2563eb",
   },
 };

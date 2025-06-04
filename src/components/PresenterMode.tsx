@@ -8,6 +8,7 @@ import { SalimaIntensityBar } from '@/components/SalimaIntensityBar';
 import { WocaRadarChart } from '@/components/WocaRadarChart';
 import { WorkshopDistributionChart } from '@/components/WorkshopDistributionChart';
 import { Badge } from '@/components/ui/badge';
+import { getHebrewZoneInfo } from '@/utils/wocaHebrewConstants';
 
 interface PresenterModeProps {
   isOpen: boolean;
@@ -41,7 +42,7 @@ export const PresenterMode: React.FC<PresenterModeProps> = ({
           <div>
             <h1 className="text-4xl font-bold mb-2">{title}</h1>
             <p className="text-xl opacity-90">
-              {type === 'salima' ? 'Individual Leadership Analysis' : 'Group Workshop Analysis'}
+              {type === 'salima' ? 'ניתוח מנהיגות אישי' : 'ניתוח סדנה קבוצתי'}
             </p>
           </div>
           <Button 
@@ -66,8 +67,8 @@ export const PresenterMode: React.FC<PresenterModeProps> = ({
                   <div className="text-7xl font-bold text-blue-600 mb-4">
                     {data.overallScore.toFixed(1)}
                   </div>
-                  <div className="text-2xl text-gray-600 mb-2">SALIMA Leadership Quotient (SLQ)</div>
-                  <div className="text-lg text-gray-500">out of 5.0</div>
+                  <div className="text-2xl text-gray-600 mb-2">מנת מנהיגות SALIMA (SLQ)</div>
+                  <div className="text-lg text-gray-500">מתוך 5.0</div>
                 </div>
               </CardContent>
             </Card>
@@ -77,16 +78,16 @@ export const PresenterMode: React.FC<PresenterModeProps> = ({
               {/* Radar Chart */}
               <Card className="h-96">
                 <CardHeader>
-                  <CardTitle className="text-2xl text-center">Six Leadership Dimensions</CardTitle>
+                  <CardTitle className="text-2xl text-center">שישה ממדי מנהיגות</CardTitle>
                 </CardHeader>
                 <CardContent className="h-80">
                   <SalimaRadarChart data={[
-                    { dimension: 'Strategy', score: data.dimensions.strategy, color: '#3B82F6' },
-                    { dimension: 'Learning', score: data.dimensions.learning, color: '#10B981' },
-                    { dimension: 'Inspiration', score: data.dimensions.inspiration, color: '#EF4444' },
-                    { dimension: 'Meaning', score: data.dimensions.meaning, color: '#8B5CF6' },
-                    { dimension: 'Adaptability', score: data.dimensions.adaptability, color: '#F59E0B' },
-                    { dimension: 'Authenticity', score: data.dimensions.authenticity, color: '#EC4899' }
+                    { dimension: 'אסטרטגיה', score: data.dimensions.strategy, color: '#3B82F6' },
+                    { dimension: 'למידה', score: data.dimensions.learning, color: '#10B981' },
+                    { dimension: 'השראה', score: data.dimensions.inspiration, color: '#EF4444' },
+                    { dimension: 'משמעות', score: data.dimensions.meaning, color: '#8B5CF6' },
+                    { dimension: 'הסתגלות', score: data.dimensions.adaptability, color: '#F59E0B' },
+                    { dimension: 'אותנטיות', score: data.dimensions.authenticity, color: '#EC4899' }
                   ]} />
                 </CardContent>
               </Card>
@@ -94,16 +95,16 @@ export const PresenterMode: React.FC<PresenterModeProps> = ({
               {/* Intensity Bars */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-2xl text-center">Dimension Intensity</CardTitle>
+                  <CardTitle className="text-2xl text-center">עוצמת הממדים</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {[
-                    { name: 'Strategy', score: data.dimensions.strategy },
-                    { name: 'Learning', score: data.dimensions.learning },
-                    { name: 'Inspiration', score: data.dimensions.inspiration },
-                    { name: 'Meaning', score: data.dimensions.meaning },
-                    { name: 'Adaptability', score: data.dimensions.adaptability },
-                    { name: 'Authenticity', score: data.dimensions.authenticity }
+                    { name: 'אסטרטגיה', score: data.dimensions.strategy },
+                    { name: 'למידה', score: data.dimensions.learning },
+                    { name: 'השראה', score: data.dimensions.inspiration },
+                    { name: 'משמעות', score: data.dimensions.meaning },
+                    { name: 'הסתגלות', score: data.dimensions.adaptability },
+                    { name: 'אותנטיות', score: data.dimensions.authenticity }
                   ].map((dimension, index) => (
                     <SalimaIntensityBar
                       key={index}
@@ -126,46 +127,71 @@ export const PresenterMode: React.FC<PresenterModeProps> = ({
                   <div className="mb-6">
                     <Badge 
                       variant="secondary" 
-                      className={`text-2xl px-6 py-3 ${getZoneInfo(data.average_score).color} text-white`}
+                      className={`text-2xl px-6 py-3 ${getHebrewZoneInfo(data.average_score || data.overall_score || 0).color} text-white`}
                     >
-                      {getZoneInfo(data.average_score).name}
+                      {getHebrewZoneInfo(data.average_score || data.overall_score || 0).name}
                     </Badge>
                   </div>
                   <div className="text-6xl font-bold text-gray-900 mb-4">
-                    {data.average_score.toFixed(1)}
+                    {(data.average_score || data.overall_score || 0).toFixed(1)}
                   </div>
                   <div className="text-2xl text-gray-600 mb-4">
-                    Group Average Score ({data.participant_count} participants)
+                    {data.participant_count ? 
+                      `ציון ממוצע קבוצתי (${data.participant_count} משתתפים)` : 
+                      'ציון אישי'
+                    }
                   </div>
-                  <p className="text-xl text-gray-500">
-                    {getZoneInfo(data.average_score).description}
+                  <p className="text-xl text-gray-500 mb-6">
+                    {getHebrewZoneInfo(data.average_score || data.overall_score || 0).description}
                   </p>
+                  
+                  {/* Statistical explanation for groups */}
+                  {data.participant_count && (
+                    <div className="mt-8 bg-gray-50 p-6 rounded-lg text-right">
+                      <h3 className="text-xl font-bold mb-4 text-gray-800">
+                        האזור התודעתי הדומיננטי: {getHebrewZoneInfo(data.average_score).name}
+                      </h3>
+                      <div className="space-y-4 text-gray-700">
+                        <p className="text-lg leading-relaxed">
+                          {getHebrewZoneInfo(data.average_score).explanation}
+                        </p>
+                        <div className="border-t pt-4">
+                          <h4 className="font-semibold mb-2">המלצות לפעולה:</h4>
+                          <p className="leading-relaxed">
+                            {getHebrewZoneInfo(data.average_score).recommendations}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
 
-            {/* Visualizations */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Distribution Chart */}
-              <Card className="h-96">
-                <CardHeader>
-                  <CardTitle className="text-2xl text-center">Score Distribution</CardTitle>
-                </CardHeader>
-                <CardContent className="h-80">
-                  <WorkshopDistributionChart participants={data.participants} />
-                </CardContent>
-              </Card>
+            {/* Visualizations for groups */}
+            {data.participants && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Distribution Chart */}
+                <Card className="h-96">
+                  <CardHeader>
+                    <CardTitle className="text-2xl text-center">התפלגות ציונים</CardTitle>
+                  </CardHeader>
+                  <CardContent className="h-80">
+                    <WorkshopDistributionChart participants={data.participants} />
+                  </CardContent>
+                </Card>
 
-              {/* WOCA Radar */}
-              <Card className="h-96">
-                <CardHeader>
-                  <CardTitle className="text-2xl text-center">WOCA Indicators</CardTitle>
-                </CardHeader>
-                <CardContent className="h-80">
-                  <WocaRadarChart participants={data.participants} />
-                </CardContent>
-              </Card>
-            </div>
+                {/* WOCA Radar */}
+                <Card className="h-96">
+                  <CardHeader>
+                    <CardTitle className="text-2xl text-center">מדדי WOCA</CardTitle>
+                  </CardHeader>
+                  <CardContent className="h-80">
+                    <WocaRadarChart participants={data.participants} />
+                  </CardContent>
+                </Card>
+              </div>
+            )}
           </div>
         )}
       </div>

@@ -2,7 +2,7 @@
 import React from 'react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { WOCA_COLORS } from '@/utils/wocaColors';
+import { WOCA_INDICATORS_HEBREW } from '@/utils/wocaHebrewConstants';
 
 interface WocaRadarChartProps {
   participants: Array<{
@@ -13,7 +13,7 @@ interface WocaRadarChartProps {
 
 const chartConfig = {
   average: {
-    label: "Average Score",
+    label: "ציון ממוצע",
     color: "#2563eb",
   },
 };
@@ -21,10 +21,10 @@ const chartConfig = {
 export const WocaRadarChart: React.FC<WocaRadarChartProps> = ({ participants }) => {
   // Calculate average scores for each WOCA indicator
   const indicators = [
-    { key: 'willingness', label: 'נכונות' },
-    { key: 'opportunity', label: 'הזדמנות' },
-    { key: 'capability', label: 'יכולת' },
-    { key: 'anxiety', label: 'חרדה' }
+    { key: 'willingness', label: WOCA_INDICATORS_HEBREW.willingness },
+    { key: 'opportunity', label: WOCA_INDICATORS_HEBREW.opportunity },
+    { key: 'capability', label: WOCA_INDICATORS_HEBREW.capability },
+    { key: 'anxiety', label: WOCA_INDICATORS_HEBREW.anxiety }
   ];
   
   const chartData = indicators.map(indicator => {
@@ -59,7 +59,7 @@ export const WocaRadarChart: React.FC<WocaRadarChartProps> = ({ participants }) 
             tickCount={6}
           />
           <Radar
-            name="WOCA Average"
+            name="ממוצע WOCA"
             dataKey="average"
             stroke="#2563eb"
             fill="#2563eb"

@@ -11,6 +11,7 @@ import { useWocaSearch } from '@/hooks/useWocaSearch';
 import { WorkshopDistributionChart } from '@/components/WorkshopDistributionChart';
 import { WocaRadarChart } from '@/components/WocaRadarChart';
 import { PresenterMode } from '@/components/PresenterMode';
+import { getHebrewZoneInfo, CHART_LABELS_HEBREW } from '@/utils/wocaHebrewConstants';
 import {
   Command,
   CommandEmpty,
@@ -30,14 +31,6 @@ export const GroupWorkshopInsights: React.FC = () => {
   
   const { workshopData, workshops, isLoading, error } = useWorkshopData(selectedWorkshopId);
   const { participants: searchResults, isLoading: isSearchLoading } = useWocaSearch(searchQuery);
-
-  // WOCA Zone classification
-  const getZoneInfo = (score: number) => {
-    if (score >= 4.2) return { name: 'Opportunity Zone', color: 'bg-green-500', description: 'Innovation, Motivation, Inspiration' };
-    if (score >= 3.4) return { name: 'Comfort Zone', color: 'bg-blue-500', description: 'Stability, Operationality, Conservatism' };
-    if (score >= 2.6) return { name: 'Apathy Zone', color: 'bg-yellow-500', description: 'Disengagement, Disconnection, Low Clarity' };
-    return { name: 'War Zone', color: 'bg-red-500', description: 'Conflict, Survival, Fear' };
-  };
 
   const handleWorkshopSelect = (value: string) => {
     setSelectedWorkshopId(Number(value));
@@ -83,7 +76,7 @@ export const GroupWorkshopInsights: React.FC = () => {
     const link = document.createElement('a');
     link.href = url;
     const identifier = viewMode === 'workshop' 
-      ? `workshop-${dataToExport.workshop_id}` 
+      ? `workshop-${dataToExported.workshop_id}` 
       : `participant-${dataToExport.id}`;
     link.download = `woca-${identifier}-analysis-${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(link);
@@ -114,12 +107,12 @@ export const GroupWorkshopInsights: React.FC = () => {
   const currentScore = viewMode === 'workshop' 
     ? workshopData?.average_score || 0 
     : selectedParticipant?.overall_score || 0;
-  const zoneInfo = getZoneInfo(currentScore);
+  const zoneInfo = getHebrewZoneInfo(currentScore);
 
   const getDisplayTitle = () => {
-    if (viewMode === 'workshop' && workshopData) return `Workshop ${workshopData.workshop_id}`;
+    if (viewMode === 'workshop' && workshopData) return `סדנה ${workshopData.workshop_id}`;
     if (viewMode === 'individual' && selectedParticipant) return selectedParticipant.full_name;
-    return 'WOCA Analysis';
+    return 'ניתוח WOCA';
   };
 
   return (
@@ -130,10 +123,10 @@ export const GroupWorkshopInsights: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                WOCA Analysis Dashboard
+                לוח בקרה לניתוח WOCA
               </h2>
               <p className="text-gray-600">
-                Search by individual participant or analyze workshop groups using the 36-question WOCA survey
+                חפשו לפי משתתף בודד או נתחו קבוצות סדנה באמצעות שאלון 36 השאלות של WOCA
               </p>
             </div>
             <div className="bg-purple-50 p-4 rounded-lg">
@@ -147,20 +140,20 @@ export const GroupWorkshopInsights: React.FC = () => {
           <CardHeader>
             <CardTitle className="flex items-center">
               <Search className="h-5 w-5 mr-2" />
-              Search & Select
+              חיפוש ובחירה
             </CardTitle>
             <CardDescription>
-              Search for individual participants or select a workshop number for group analysis
+              חפשו משתתפים בודדים או בחרו מספר סדנה לניתוח קבוצתי
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {/* Search for individuals */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">Search Individual Participant</label>
+                <label className="text-sm font-medium">חיפוש משתתף בודד</label>
                 <div className="relative">
                   <Input
-                    placeholder="Search WOCA participants by name or email..."
+                    placeholder="חפשו משתתפי WOCA לפי שם או אימייל..."
                     value={searchQuery}
                     onChange={(e) => {
                       setSearchQuery(e.target.value);
@@ -184,10 +177,10 @@ export const GroupWorkshopInsights: React.FC = () => {
                       <Command>
                         <CommandList>
                           {isSearchLoading && (
-                            <CommandEmpty>Searching...</CommandEmpty>
+                            <CommandEmpty>מחפש...</CommandEmpty>
                           )}
                           {!isSearchLoading && searchResults.length === 0 && (
-                            <CommandEmpty>No participants found.</CommandEmpty>
+                            <CommandEmpty>לא נמצאו משתתפים.</CommandEmpty>
                           )}
                           {searchResults.length > 0 && (
                             <CommandGroup>
@@ -201,11 +194,11 @@ export const GroupWorkshopInsights: React.FC = () => {
                                     <span className="font-medium">{participant.full_name}</span>
                                     <span className="text-sm text-gray-500">{participant.email}</span>
                                     {participant.workshop_id && (
-                                      <span className="text-xs text-blue-600">Workshop {participant.workshop_id}</span>
+                                      <span className="text-xs text-blue-600">סדנה {participant.workshop_id}</span>
                                     )}
                                   </div>
                                   <Badge>
-                                    {participant.overall_score?.toFixed(1) || 'N/A'}
+                                    {participant.overall_score?.toFixed(1) || 'לא זמין'}
                                   </Badge>
                                 </CommandItem>
                               ))}
@@ -218,22 +211,22 @@ export const GroupWorkshopInsights: React.FC = () => {
                 </div>
               </div>
 
-              <div className="text-center text-gray-500">OR</div>
+              <div className="text-center text-gray-500">או</div>
 
               {/* Workshop selection */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">Select Workshop Number</label>
+                <label className="text-sm font-medium">בחירת מספר סדנה</label>
                 <Select value={selectedWorkshopId?.toString()} onValueChange={handleWorkshopSelect}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a workshop for group analysis" />
+                    <SelectValue placeholder="בחרו סדנה לניתוח קבוצתי" />
                   </SelectTrigger>
                   <SelectContent>
                     {workshops.map((workshop) => (
                       <SelectItem key={workshop.id} value={workshop.id.toString()}>
                         <div className="flex flex-col">
-                          <span className="font-medium">Workshop {workshop.id}</span>
+                          <span className="font-medium">סדנה {workshop.id}</span>
                           <span className="text-sm text-gray-500">
-                            {workshop.participant_count} participants • {new Date(workshop.date).toLocaleDateString()}
+                            {workshop.participant_count} משתתפים • {new Date(workshop.date).toLocaleDateString('he-IL')}
                           </span>
                         </div>
                       </SelectItem>
@@ -255,7 +248,7 @@ export const GroupWorkshopInsights: React.FC = () => {
         {isLoading && (
           <Card>
             <CardContent className="p-8 text-center">
-              <div className="text-gray-500">Loading data...</div>
+              <div className="text-gray-500">טוען נתונים...</div>
             </CardContent>
           </Card>
         )}
@@ -266,7 +259,7 @@ export const GroupWorkshopInsights: React.FC = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
-                  <span>WOCA Zone Classification</span>
+                  <span>סיווג אזור תודעתי WOCA</span>
                   <div className="flex gap-2">
                     <Button 
                       variant="outline" 
@@ -274,7 +267,7 @@ export const GroupWorkshopInsights: React.FC = () => {
                       onClick={() => setPresenterMode(true)}
                     >
                       <Maximize className="h-4 w-4 mr-2" />
-                      Presenter Mode
+                      מצב מציג
                     </Button>
                     <Button 
                       variant="outline" 
@@ -282,11 +275,11 @@ export const GroupWorkshopInsights: React.FC = () => {
                       onClick={() => setShowNames(!showNames)}
                     >
                       {showNames ? <EyeOff className="h-4 w-4 mr-2" /> : <Eye className="h-4 w-4 mr-2" />}
-                      {showNames ? 'Hide Names' : 'Show Names'}
+                      {showNames ? 'הסתר שמות' : 'הצג שמות'}
                     </Button>
                     <Button variant="outline" size="sm" onClick={exportWorkshopData}>
                       <Download className="h-4 w-4 mr-2" />
-                      Export Analysis
+                      יצא ניתוח
                     </Button>
                   </div>
                 </CardTitle>
@@ -306,8 +299,8 @@ export const GroupWorkshopInsights: React.FC = () => {
                   </div>
                   <div className="text-lg text-gray-600 mb-4">
                     {viewMode === 'workshop' 
-                      ? `Group Average Score (${workshopData?.participant_count} participants)`
-                      : 'Individual Score'
+                      ? `ציון ממוצע קבוצתי (${workshopData?.participant_count} משתתפים)`
+                      : 'ציון אישי'
                     }
                   </div>
                   <p className="text-gray-500 max-w-md mx-auto">
@@ -326,7 +319,7 @@ export const GroupWorkshopInsights: React.FC = () => {
                     <CardHeader>
                       <CardTitle className="flex items-center">
                         <BarChart3 className="h-5 w-5 mr-2" />
-                        Score Distribution
+                        {CHART_LABELS_HEBREW.scoreDistribution}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -339,7 +332,7 @@ export const GroupWorkshopInsights: React.FC = () => {
                     <CardHeader>
                       <CardTitle className="flex items-center">
                         <Radar className="h-5 w-5 mr-2" />
-                        WOCA Indicators Radar
+                        {CHART_LABELS_HEBREW.wocaIndicators}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -353,28 +346,28 @@ export const GroupWorkshopInsights: React.FC = () => {
                   <Card className="bg-green-50 border-green-200">
                     <CardContent className="p-4 text-center">
                       <div className="text-2xl font-bold text-green-700 mb-1">{zoneDistribution.opportunity}</div>
-                      <div className="text-sm text-green-700">Opportunity Zone</div>
+                      <div className="text-sm text-green-700">אזור הזדמנות</div>
                       <div className="text-xs text-gray-600">4.2-5.0</div>
                     </CardContent>
                   </Card>
                   <Card className="bg-blue-50 border-blue-200">
                     <CardContent className="p-4 text-center">
                       <div className="text-2xl font-bold text-blue-700 mb-1">{zoneDistribution.comfort}</div>
-                      <div className="text-sm text-blue-700">Comfort Zone</div>
+                      <div className="text-sm text-blue-700">אזור נוחות</div>
                       <div className="text-xs text-gray-600">3.4-4.1</div>
                     </CardContent>
                   </Card>
                   <Card className="bg-yellow-50 border-yellow-200">
                     <CardContent className="p-4 text-center">
                       <div className="text-2xl font-bold text-yellow-700 mb-1">{zoneDistribution.apathy}</div>
-                      <div className="text-sm text-yellow-700">Apathy Zone</div>
+                      <div className="text-sm text-yellow-700">אזור אדישות</div>
                       <div className="text-xs text-gray-600">2.6-3.3</div>
                     </CardContent>
                   </Card>
                   <Card className="bg-red-50 border-red-200">
                     <CardContent className="p-4 text-center">
                       <div className="text-2xl font-bold text-red-700 mb-1">{zoneDistribution.war}</div>
-                      <div className="text-sm text-red-700">War Zone</div>
+                      <div className="text-sm text-red-700">אזור מלחמה</div>
                       <div className="text-xs text-gray-600">1.0-2.5</div>
                     </CardContent>
                   </Card>
@@ -388,33 +381,33 @@ export const GroupWorkshopInsights: React.FC = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <TrendingUp className="h-5 w-5 mr-2" />
-                    Participant Details
+                    פרטי משתתף
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <div><strong>Name:</strong> {showNames ? selectedParticipant.full_name : 'Anonymous'}</div>
-                      <div><strong>Email:</strong> {showNames ? selectedParticipant.email : 'Hidden'}</div>
+                      <div><strong>שם:</strong> {showNames ? selectedParticipant.full_name : 'אנונימי'}</div>
+                      <div><strong>אימייל:</strong> {showNames ? selectedParticipant.email : 'מוסתר'}</div>
                       {selectedParticipant.organization && (
-                        <div><strong>Organization:</strong> {selectedParticipant.organization}</div>
+                        <div><strong>ארגון:</strong> {selectedParticipant.organization}</div>
                       )}
                       {selectedParticipant.profession && (
-                        <div><strong>Profession:</strong> {selectedParticipant.profession}</div>
+                        <div><strong>מקצוע:</strong> {selectedParticipant.profession}</div>
                       )}
                     </div>
                     <div className="space-y-2">
                       {selectedParticipant.workshop_id && (
-                        <div><strong>Workshop:</strong> {selectedParticipant.workshop_id}</div>
+                        <div><strong>סדנה:</strong> {selectedParticipant.workshop_id}</div>
                       )}
                       {selectedParticipant.age && (
-                        <div><strong>Age:</strong> {selectedParticipant.age}</div>
+                        <div><strong>גיל:</strong> {selectedParticipant.age}</div>
                       )}
                       {selectedParticipant.experience_years && (
-                        <div><strong>Experience:</strong> {selectedParticipant.experience_years} years</div>
+                        <div><strong>ניסיון:</strong> {selectedParticipant.experience_years} שנים</div>
                       )}
                       {selectedParticipant.created_at && (
-                        <div><strong>Survey Date:</strong> {new Date(selectedParticipant.created_at).toLocaleDateString()}</div>
+                        <div><strong>תאריך סקר:</strong> {new Date(selectedParticipant.created_at).toLocaleDateString('he-IL')}</div>
                       )}
                     </div>
                   </div>
