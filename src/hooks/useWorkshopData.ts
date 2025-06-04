@@ -15,10 +15,12 @@ export interface WorkshopParticipant {
   education: string | null;
   experience_years: number | null;
   created_at: string | null;
+  group_id: string | null;
 }
 
 export interface WorkshopData {
-  workshop_id: number;
+  workshop_id?: number;
+  group_id?: string;
   participants: WorkshopParticipant[];
   participant_count: number;
   average_score: number;
@@ -31,25 +33,35 @@ export interface Workshop {
   date: string;
 }
 
-export const useWorkshopData = (workshopId?: number) => {
+export interface Group {
+  id: string;
+  name: string;
+  participant_count: number;
+  date: string;
+}
+
+export const useWorkshopData = (workshopId?: number, groupId?: string) => {
   const [workshopData, setWorkshopData] = useState<WorkshopData | null>(null);
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
+  const [groups, setGroups] = useState<Group[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch all workshops for the dropdown
+  // Fetch all workshops and groups for the dropdown
   useEffect(() => {
-    const fetchWorkshops = async () => {
+    const fetchWorkshopsAndGroups = async () => {
       try {
         const { data, error } = await supabase
           .from('woca_responses')
-          .select('workshop_id, created_at')
+          .select('workshop_id, group_id, created_at')
           .not('workshop_id', 'is', null);
 
         if (error) throw error;
 
-        // Group by workshop_id and create workshop list
+        // Group by workshop_id
         const workshopMap = new Map();
+        const groupMap = new Map();
+        
         data?.forEach(item => {
           if (item.workshop_id) {
             if (!workshopMap.has(item.workshop_id)) {
@@ -62,34 +74,54 @@ export const useWorkshopData = (workshopId?: number) => {
             }
             workshopMap.get(item.workshop_id).participant_count++;
           }
+
+          if (item.group_id) {
+            if (!groupMap.has(item.group_id)) {
+              groupMap.set(item.group_id, {
+                id: item.group_id,
+                name: `Group ${item.group_id}`,
+                participant_count: 0,
+                date: item.created_at || 'Unknown'
+              });
+            }
+            groupMap.get(item.group_id).participant_count++;
+          }
         });
 
         setWorkshops(Array.from(workshopMap.values()));
+        setGroups(Array.from(groupMap.values()));
       } catch (err) {
-        console.error('Error fetching workshops:', err);
-        setError('Failed to fetch workshops');
+        console.error('Error fetching workshops and groups:', err);
+        setError('Failed to fetch workshops and groups');
       }
     };
 
-    fetchWorkshops();
+    fetchWorkshopsAndGroups();
   }, []);
 
-  // Fetch specific workshop data when workshopId changes
+  // Fetch specific workshop or group data when workshopId or groupId changes
   useEffect(() => {
-    if (!workshopId) {
+    if (!workshopId && !groupId) {
       setWorkshopData(null);
       return;
     }
 
-    const fetchWorkshopData = async () => {
+    const fetchData = async () => {
       setIsLoading(true);
       setError(null);
 
       try {
-        const { data, error } = await supabase
-          .from('woca_responses')
-          .select('*')
-          .eq('workshop_id', workshopId);
+        let query = supabase.from('woca_responses').select('*');
+        
+        if (workshopId) {
+          query = query.eq('workshop_id', workshopId);
+        }
+        
+        if (groupId) {
+          query = query.eq('group_id', groupId);
+        }
+
+        const { data, error } = await query;
 
         if (error) throw error;
 
@@ -105,7 +137,8 @@ export const useWorkshopData = (workshopId?: number) => {
           gender: item.gender,
           education: item.education,
           experience_years: item.experience_years,
-          created_at: item.created_at
+          created_at: item.created_at,
+          group_id: item.group_id
         })) || [];
 
         // Calculate average score
@@ -119,21 +152,22 @@ export const useWorkshopData = (workshopId?: number) => {
 
         setWorkshopData({
           workshop_id: workshopId,
+          group_id: groupId,
           participants,
           participant_count: participants.length,
           average_score
         });
 
       } catch (err) {
-        console.error('Error fetching workshop data:', err);
-        setError('Failed to fetch workshop data');
+        console.error('Error fetching data:', err);
+        setError('Failed to fetch data');
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchWorkshopData();
-  }, [workshopId]);
+    fetchData();
+  }, [workshopId, groupId]);
 
-  return { workshopData, workshops, isLoading, error };
+  return { workshopData, workshops, groups, isLoading, error };
 };

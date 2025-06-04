@@ -148,6 +148,7 @@ export type Database = {
           experience_years: number | null
           full_name: string
           gender: string | null
+          group_id: string | null
           id: string
           organization: string | null
           overall_score: number | null
@@ -166,6 +167,7 @@ export type Database = {
           experience_years?: number | null
           full_name: string
           gender?: string | null
+          group_id?: string | null
           id: string
           organization?: string | null
           overall_score?: number | null
@@ -184,6 +186,7 @@ export type Database = {
           experience_years?: number | null
           full_name?: string
           gender?: string | null
+          group_id?: string | null
           id?: string
           organization?: string | null
           overall_score?: number | null

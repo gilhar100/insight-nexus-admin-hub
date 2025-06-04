@@ -1,18 +1,25 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Users, BarChart3, Radar, Download, TrendingUp, Eye, EyeOff } from 'lucide-react';
+import { Users, BarChart3, Radar, Download, TrendingUp, Eye, EyeOff, Maximize } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useWorkshopData } from '@/hooks/useWorkshopData';
 import { WorkshopDistributionChart } from '@/components/WorkshopDistributionChart';
 import { WocaRadarChart } from '@/components/WocaRadarChart';
+import { PresenterMode } from '@/components/PresenterMode';
 
 export const GroupWorkshopInsights: React.FC = () => {
   const [selectedWorkshopId, setSelectedWorkshopId] = useState<number | undefined>();
+  const [selectedGroupId, setSelectedGroupId] = useState<string | undefined>();
   const [showNames, setShowNames] = useState(false);
-  const { workshopData, workshops, isLoading, error } = useWorkshopData(selectedWorkshopId);
+  const [presenterMode, setPresenterMode] = useState(false);
+  const [selectionType, setSelectionType] = useState<'workshop' | 'group'>('workshop');
+  
+  const { workshopData, workshops, groups, isLoading, error } = useWorkshopData(
+    selectionType === 'workshop' ? selectedWorkshopId : undefined,
+    selectionType === 'group' ? selectedGroupId : undefined
+  );
 
   // WOCA Zone classification
   const getZoneInfo = (score: number) => {
@@ -24,13 +31,20 @@ export const GroupWorkshopInsights: React.FC = () => {
 
   const handleWorkshopSelect = (value: string) => {
     setSelectedWorkshopId(Number(value));
+    setSelectedGroupId(undefined);
+  };
+
+  const handleGroupSelect = (value: string) => {
+    setSelectedGroupId(value);
+    setSelectedWorkshopId(undefined);
   };
 
   const exportWorkshopData = () => {
     if (!workshopData) return;
 
     const exportData = {
-      workshop_id: workshopData.workshop_id,
+      ...(workshopData.workshop_id && { workshop_id: workshopData.workshop_id }),
+      ...(workshopData.group_id && { group_id: workshopData.group_id }),
       participant_count: workshopData.participant_count,
       average_score: workshopData.average_score,
       analysis_date: new Date().toISOString(),
@@ -46,7 +60,8 @@ export const GroupWorkshopInsights: React.FC = () => {
     
     const link = document.createElement('a');
     link.href = url;
-    link.download = `workshop-${workshopData.workshop_id}-analysis-${new Date().toISOString().split('T')[0]}.json`;
+    const identifier = workshopData.workshop_id ? `workshop-${workshopData.workshop_id}` : `group-${workshopData.group_id}`;
+    link.download = `${identifier}-analysis-${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -74,237 +89,306 @@ export const GroupWorkshopInsights: React.FC = () => {
   const groupScore = workshopData?.average_score || 0;
   const zoneInfo = getZoneInfo(groupScore);
 
+  const getDisplayTitle = () => {
+    if (workshopData?.workshop_id) return `Workshop ${workshopData.workshop_id}`;
+    if (workshopData?.group_id) return `Group ${workshopData.group_id}`;
+    return 'WOCA Analysis';
+  };
+
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="bg-white rounded-lg shadow-sm border p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
-              Group Workshop Insights - WOCA Model
-            </h2>
-            <p className="text-gray-600">
-              Analyze group dynamics and workshop effectiveness using the 36-question WOCA survey
-            </p>
-          </div>
-          <div className="bg-purple-50 p-4 rounded-lg">
-            <Users className="h-8 w-8 text-purple-600" />
+    <>
+      <div className="space-y-6">
+        {/* Page Header */}
+        <div className="bg-white rounded-lg shadow-sm border p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                Group Workshop Insights - WOCA Model
+              </h2>
+              <p className="text-gray-600">
+                Analyze group dynamics and workshop effectiveness using the 36-question WOCA survey
+              </p>
+            </div>
+            <div className="bg-purple-50 p-4 rounded-lg">
+              <Users className="h-8 w-8 text-purple-600" />
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Workshop Selection */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Users className="h-5 w-5 mr-2" />
-            Select Workshop
-          </CardTitle>
-          <CardDescription>
-            Choose a workshop from the woca_responses table to analyze group dynamics
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <Select value={selectedWorkshopId?.toString()} onValueChange={handleWorkshopSelect}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a workshop" />
-                </SelectTrigger>
-                <SelectContent>
-                  {workshops.map((workshop) => (
-                    <SelectItem key={workshop.id} value={workshop.id.toString()}>
-                      <div className="flex flex-col">
-                        <span className="font-medium">{workshop.name}</span>
-                        <span className="text-sm text-gray-500">
-                          {workshop.participant_count} participants • {new Date(workshop.date).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          
-          {error && (
-            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
-              <p className="text-red-600 text-sm">{error}</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Results Section - Only show when workshop is selected */}
-      {isLoading && (
+        {/* Selection */}
         <Card>
-          <CardContent className="p-8 text-center">
-            <div className="text-gray-500">Loading workshop data...</div>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Users className="h-5 w-5 mr-2" />
+              Select Workshop or Group
+            </CardTitle>
+            <CardDescription>
+              Choose a workshop or group from the woca_responses table to analyze group dynamics
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {/* Selection Type Toggle */}
+              <div className="flex gap-2">
+                <Button 
+                  variant={selectionType === 'workshop' ? 'default' : 'outline'}
+                  onClick={() => {
+                    setSelectionType('workshop');
+                    setSelectedGroupId(undefined);
+                  }}
+                >
+                  By Workshop
+                </Button>
+                <Button 
+                  variant={selectionType === 'group' ? 'default' : 'outline'}
+                  onClick={() => {
+                    setSelectionType('group');
+                    setSelectedWorkshopId(undefined);
+                  }}
+                >
+                  By Group
+                </Button>
+              </div>
+
+              {/* Selection Dropdown */}
+              <div className="flex-1">
+                {selectionType === 'workshop' ? (
+                  <Select value={selectedWorkshopId?.toString()} onValueChange={handleWorkshopSelect}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a workshop" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {workshops.map((workshop) => (
+                        <SelectItem key={workshop.id} value={workshop.id.toString()}>
+                          <div className="flex flex-col">
+                            <span className="font-medium">{workshop.name}</span>
+                            <span className="text-sm text-gray-500">
+                              {workshop.participant_count} participants • {new Date(workshop.date).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Select value={selectedGroupId} onValueChange={handleGroupSelect}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a group" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {groups.map((group) => (
+                        <SelectItem key={group.id} value={group.id}>
+                          <div className="flex flex-col">
+                            <span className="font-medium">{group.name}</span>
+                            <span className="text-sm text-gray-500">
+                              {group.participant_count} participants • {new Date(group.date).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
+            </div>
+            
+            {error && (
+              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
+                <p className="text-red-600 text-sm">{error}</p>
+              </div>
+            )}
           </CardContent>
         </Card>
-      )}
 
-      {workshopData && !isLoading && (
-        <>
-          {/* WOCA Zone Classification */}
+        {/* Results Section */}
+        {isLoading && (
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>WOCA Zone Classification</span>
-                <div className="flex gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => setShowNames(!showNames)}
-                  >
-                    {showNames ? <EyeOff className="h-4 w-4 mr-2" /> : <Eye className="h-4 w-4 mr-2" />}
-                    {showNames ? 'Hide Names' : 'Show Names'}
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={exportWorkshopData}>
-                    <Download className="h-4 w-4 mr-2" />
-                    Export Analysis
-                  </Button>
-                </div>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center p-8">
-                <div className="mb-6">
-                  <Badge 
-                    variant="secondary" 
-                    className={`text-lg px-4 py-2 ${zoneInfo.color} text-white`}
-                  >
-                    {zoneInfo.name}
-                  </Badge>
-                </div>
-                <div className="text-4xl font-bold text-gray-900 mb-2">
-                  {groupScore.toFixed(1)}
-                </div>
-                <div className="text-lg text-gray-600 mb-4">
-                  Group Average Score ({workshopData.participant_count} participants)
-                </div>
-                <p className="text-gray-500 max-w-md mx-auto">
-                  {zoneInfo.description}
-                </p>
-              </div>
+            <CardContent className="p-8 text-center">
+              <div className="text-gray-500">Loading data...</div>
             </CardContent>
           </Card>
+        )}
 
-          {/* Visualizations */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Group Distribution Chart */}
+        {workshopData && !isLoading && (
+          <>
+            {/* WOCA Zone Classification */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <BarChart3 className="h-5 w-5 mr-2" />
-                  Score Distribution
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <WorkshopDistributionChart participants={workshopData.participants} />
-              </CardContent>
-            </Card>
-
-            {/* Radar Chart Comparison */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Radar className="h-5 w-5 mr-2" />
-                  WOCA Indicators Radar
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <WocaRadarChart participants={workshopData.participants} />
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Participant Summary */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <TrendingUp className="h-5 w-5 mr-2" />
-                Participant Overview
-              </CardTitle>
-              <CardDescription>
-                Individual scores and demographics {showNames ? '(Names visible)' : '(Anonymous)'}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {workshopData.participants.map((participant, index) => (
-                  <div 
-                    key={participant.id} 
-                    className="p-4 border rounded-lg hover:shadow-md transition-shadow"
-                  >
-                    <div className="flex justify-between items-center mb-2">
-                      <span className="font-medium text-sm">
-                        {showNames ? participant.full_name : `Participant ${index + 1}`}
-                      </span>
-                      <Badge 
-                        variant={
-                          participant.overall_score && participant.overall_score > 4.0 
-                            ? "default" 
-                            : participant.overall_score && participant.overall_score < 3.0 
-                            ? "destructive" 
-                            : "secondary"
-                        }
-                      >
-                        {participant.overall_score?.toFixed(1) || 'N/A'}
-                      </Badge>
-                    </div>
-                    {participant.overall_score && (
-                      <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-                        <div
-                          className="h-2 rounded-full bg-blue-500 transition-all duration-500"
-                          style={{ width: `${(participant.overall_score / 5) * 100}%` }}
-                        />
-                      </div>
-                    )}
-                    <div className="text-xs text-gray-500 space-y-1">
-                      {participant.organization && <div>Org: {participant.organization}</div>}
-                      {participant.profession && <div>Role: {participant.profession}</div>}
-                      {participant.experience_years && <div>Experience: {participant.experience_years} years</div>}
-                    </div>
+                <CardTitle className="flex items-center justify-between">
+                  <span>WOCA Zone Classification</span>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setPresenterMode(true)}
+                    >
+                      <Maximize className="h-4 w-4 mr-2" />
+                      Presenter Mode
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setShowNames(!showNames)}
+                    >
+                      {showNames ? <EyeOff className="h-4 w-4 mr-2" /> : <Eye className="h-4 w-4 mr-2" />}
+                      {showNames ? 'Hide Names' : 'Show Names'}
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={exportWorkshopData}>
+                      <Download className="h-4 w-4 mr-2" />
+                      Export Analysis
+                    </Button>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center p-8">
+                  <div className="mb-6">
+                    <Badge 
+                      variant="secondary" 
+                      className={`text-lg px-4 py-2 ${zoneInfo.color} text-white`}
+                    >
+                      {zoneInfo.name}
+                    </Badge>
+                  </div>
+                  <div className="text-4xl font-bold text-gray-900 mb-2">
+                    {groupScore.toFixed(1)}
+                  </div>
+                  <div className="text-lg text-gray-600 mb-4">
+                    Group Average Score ({workshopData.participant_count} participants)
+                  </div>
+                  <p className="text-gray-500 max-w-md mx-auto">
+                    {zoneInfo.description}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
 
-          {/* Zone Analysis */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card className="bg-green-50 border-green-200">
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-green-700 mb-1">{zoneDistribution.opportunity}</div>
-                <div className="text-sm text-green-700">Opportunity Zone</div>
-                <div className="text-xs text-gray-600">4.2-5.0</div>
+            {/* Visualizations */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Group Distribution Chart */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <BarChart3 className="h-5 w-5 mr-2" />
+                    Score Distribution
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <WorkshopDistributionChart participants={workshopData.participants} />
+                </CardContent>
+              </Card>
+
+              {/* Radar Chart Comparison */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Radar className="h-5 w-5 mr-2" />
+                    WOCA Indicators Radar
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <WocaRadarChart participants={workshopData.participants} />
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Participant Summary */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <TrendingUp className="h-5 w-5 mr-2" />
+                  Participant Overview
+                </CardTitle>
+                <CardDescription>
+                  Individual scores and demographics {showNames ? '(Names visible)' : '(Anonymous)'}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {workshopData.participants.map((participant, index) => (
+                    <div 
+                      key={participant.id} 
+                      className="p-4 border rounded-lg hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="font-medium text-sm">
+                          {showNames ? participant.full_name : `Participant ${index + 1}`}
+                        </span>
+                        <Badge 
+                          variant={
+                            participant.overall_score && participant.overall_score > 4.0 
+                              ? "default" 
+                              : participant.overall_score && participant.overall_score < 3.0 
+                              ? "destructive" 
+                              : "secondary"
+                          }
+                        >
+                          {participant.overall_score?.toFixed(1) || 'N/A'}
+                        </Badge>
+                      </div>
+                      {participant.overall_score && (
+                        <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                          <div
+                            className="h-2 rounded-full bg-blue-500 transition-all duration-500"
+                            style={{ width: `${(participant.overall_score / 5) * 100}%` }}
+                          />
+                        </div>
+                      )}
+                      <div className="text-xs text-gray-500 space-y-1">
+                        {participant.organization && <div>Org: {participant.organization}</div>}
+                        {participant.profession && <div>Role: {participant.profession}</div>}
+                        {participant.experience_years && <div>Experience: {participant.experience_years} years</div>}
+                        {participant.group_id && <div>Group: {participant.group_id}</div>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
-            <Card className="bg-blue-50 border-blue-200">
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-blue-700 mb-1">{zoneDistribution.comfort}</div>
-                <div className="text-sm text-blue-700">Comfort Zone</div>
-                <div className="text-xs text-gray-600">3.4-4.1</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-yellow-50 border-yellow-200">
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-yellow-700 mb-1">{zoneDistribution.apathy}</div>
-                <div className="text-sm text-yellow-700">Apathy Zone</div>
-                <div className="text-xs text-gray-600">2.6-3.3</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-red-50 border-red-200">
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-red-700 mb-1">{zoneDistribution.war}</div>
-                <div className="text-sm text-red-700">War Zone</div>
-                <div className="text-xs text-gray-600">1.0-2.5</div>
-              </CardContent>
-            </Card>
-          </div>
-        </>
-      )}
-    </div>
+
+            {/* Zone Analysis */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Card className="bg-green-50 border-green-200">
+                <CardContent className="p-4 text-center">
+                  <div className="text-2xl font-bold text-green-700 mb-1">{zoneDistribution.opportunity}</div>
+                  <div className="text-sm text-green-700">Opportunity Zone</div>
+                  <div className="text-xs text-gray-600">4.2-5.0</div>
+                </CardContent>
+              </Card>
+              <Card className="bg-blue-50 border-blue-200">
+                <CardContent className="p-4 text-center">
+                  <div className="text-2xl font-bold text-blue-700 mb-1">{zoneDistribution.comfort}</div>
+                  <div className="text-sm text-blue-700">Comfort Zone</div>
+                  <div className="text-xs text-gray-600">3.4-4.1</div>
+                </CardContent>
+              </Card>
+              <Card className="bg-yellow-50 border-yellow-200">
+                <CardContent className="p-4 text-center">
+                  <div className="text-2xl font-bold text-yellow-700 mb-1">{zoneDistribution.apathy}</div>
+                  <div className="text-sm text-yellow-700">Apathy Zone</div>
+                  <div className="text-xs text-gray-600">2.6-3.3</div>
+                </CardContent>
+              </Card>
+              <Card className="bg-red-50 border-red-200">
+                <CardContent className="p-4 text-center">
+                  <div className="text-2xl font-bold text-red-700 mb-1">{zoneDistribution.war}</div>
+                  <div className="text-sm text-red-700">War Zone</div>
+                  <div className="text-xs text-gray-600">1.0-2.5</div>
+                </CardContent>
+              </Card>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Presenter Mode */}
+      <PresenterMode 
+        isOpen={presenterMode}
+        onClose={() => setPresenterMode(false)}
+        type="woca"
+        data={workshopData}
+        title={getDisplayTitle()}
+      />
+    </>
   );
 };
