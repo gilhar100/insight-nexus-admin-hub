@@ -4,14 +4,12 @@ import { PresenterMode } from '@/components/PresenterMode';
 import { PageHeader } from '@/components/workshop/PageHeader';
 import { SearchAndSelection } from '@/components/workshop/SearchAndSelection';
 import { ZoneClassification } from '@/components/workshop/ZoneClassification';
-import { VisualizationsGrid } from '@/components/workshop/VisualizationsGrid';
-import { ZoneAnalysisGrid } from '@/components/workshop/ZoneAnalysisGrid';
+import { WocaAnalyticsDashboard } from '@/components/workshop/WocaAnalyticsDashboard';
 import { IndividualDetails } from '@/components/workshop/IndividualDetails';
-import { WorkshopParameters } from '@/components/workshop/WorkshopParameters';
 import { LoadingState } from '@/components/workshop/LoadingState';
 import { useWorkshopInsights } from '@/hooks/useWorkshopInsights';
 import { exportWorkshopData } from '@/utils/workshopExport';
-import { getCurrentZoneInfo, getDisplayTitle, getZoneDistribution } from '@/utils/workshopZoneInfo';
+import { getCurrentZoneInfo, getDisplayTitle } from '@/utils/workshopZoneInfo';
 
 export const GroupWorkshopInsights: React.FC = () => {
   const {
@@ -31,7 +29,6 @@ export const GroupWorkshopInsights: React.FC = () => {
     setPresenterMode
   } = useWorkshopInsights();
 
-  const zoneDistribution = getZoneDistribution(workshopData);
   const currentData = viewMode === 'workshop' ? workshopData : selectedParticipant;
   const zoneInfo = getCurrentZoneInfo(viewMode, workshopData, selectedParticipant);
 
@@ -67,21 +64,12 @@ export const GroupWorkshopInsights: React.FC = () => {
               onExport={handleExport}
             />
 
-            <WorkshopParameters
+            {/* New Comprehensive Analytics Dashboard */}
+            <WocaAnalyticsDashboard
               viewMode={viewMode}
               workshopData={workshopData}
               selectedParticipant={selectedParticipant}
             />
-
-            {viewMode === 'workshop' && workshopData && (
-              <>
-                <VisualizationsGrid workshopData={workshopData} />
-                <ZoneAnalysisGrid 
-                  zoneDistribution={zoneDistribution} 
-                  workshopData={workshopData} 
-                />
-              </>
-            )}
 
             {viewMode === 'individual' && selectedParticipant && (
               <IndividualDetails 
