@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -85,29 +84,38 @@ export const GroupWorkshopInsights: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
-  // Zone distribution calculation for workshop
+  // Zone distribution calculation for workshop using new method
   const getZoneDistribution = () => {
-    if (!workshopData) return { opportunity: 0, comfort: 0, apathy: 0, war: 0 };
-    
-    return workshopData.participants.reduce((acc, participant) => {
-      if (participant.overall_score === null) return acc;
-      
-      const score = participant.overall_score;
-      if (score >= 4.2) acc.opportunity++;
-      else if (score >= 3.4) acc.comfort++;
-      else if (score >= 2.6) acc.apathy++;
-      else acc.war++;
-      
-      return acc;
-    }, { opportunity: 0, comfort: 0, apathy: 0, war: 0 });
+    if (!workshopData) return {};
+    return workshopData.zone_distribution;
   };
 
   const zoneDistribution = getZoneDistribution();
   const currentData = viewMode === 'workshop' ? workshopData : selectedParticipant;
+  
+  // For workshop view, use dominant zone; for individual, calculate from their WOCA scores
+  const getCurrentZoneInfo = () => {
+    if (viewMode === 'workshop' && workshopData) {
+      return {
+        name: workshopData.dominant_zone,
+        color: `bg-[${workshopData.dominant_zone_color}]`,
+        description: `האזור התודעתי הדומיננטי של הקבוצה`
+      };
+    }
+    if (viewMode === 'individual' && selectedParticipant) {
+      return {
+        name: selectedParticipant.woca_zone || 'לא זמין',
+        color: `bg-[${selectedParticipant.woca_zone_color || '#666666'}]`,
+        description: 'אזור תודעתי אישי'
+      };
+    }
+    return { name: 'לא זמין', color: 'bg-gray-500', description: 'לא זמין' };
+  };
+
+  const zoneInfo = getCurrentZoneInfo();
   const currentScore = viewMode === 'workshop' 
     ? workshopData?.average_score || 0 
     : selectedParticipant?.overall_score || 0;
-  const zoneInfo = getHebrewZoneInfo(currentScore);
 
   const getDisplayTitle = () => {
     if (viewMode === 'workshop' && workshopData) return `סדנה ${workshopData.workshop_id}`;
@@ -294,15 +302,29 @@ export const GroupWorkshopInsights: React.FC = () => {
                       {zoneInfo.name}
                     </Badge>
                   </div>
-                  <div className="text-4xl font-bold text-gray-900 mb-2">
-                    {currentScore.toFixed(1)}
-                  </div>
-                  <div className="text-lg text-gray-600 mb-4">
-                    {viewMode === 'workshop' 
-                      ? `ציון ממוצע קבוצתי (${workshopData?.participant_count} משתתפים)`
-                      : 'ציון אישי'
-                    }
-                  </div>
+                  {viewMode === 'workshop' && workshopData && (
+                    <>
+                      <div className="text-2xl font-bold text-gray-900 mb-2">
+                        האזור התודעתי הדומיננטי
+                      </div>
+                      <div className="text-lg text-gray-600 mb-4">
+                        מבוסס על הפרמטר עם הציון הממוצע הגבוה ביותר
+                      </div>
+                      <div className="text-lg text-gray-600 mb-4">
+                        {workshopData.participant_count} משתתפים
+                      </div>
+                    </>
+                  )}
+                  {viewMode === 'individual' && selectedParticipant && (
+                    <>
+                      <div className="text-2xl font-bold text-gray-900 mb-2">
+                        {zoneInfo.name}
+                      </div>
+                      <div className="text-lg text-gray-600 mb-4">
+                        אזור תודעתי אישי
+                      </div>
+                    </>
+                  )}
                   <p className="text-gray-500 max-w-md mx-auto">
                     {zoneInfo.description}
                   </p>
@@ -319,7 +341,7 @@ export const GroupWorkshopInsights: React.FC = () => {
                     <CardHeader>
                       <CardTitle className="flex items-center">
                         <BarChart3 className="h-5 w-5 mr-2" />
-                        {CHART_LABELS_HEBREW.scoreDistribution}
+                        התפלגות אזורים תודעתיים
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -332,7 +354,7 @@ export const GroupWorkshopInsights: React.FC = () => {
                     <CardHeader>
                       <CardTitle className="flex items-center">
                         <Radar className="h-5 w-5 mr-2" />
-                        {CHART_LABELS_HEBREW.wocaIndicators}
+                        פרמטרי WOCA
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -342,35 +364,27 @@ export const GroupWorkshopInsights: React.FC = () => {
                 </div>
 
                 {/* Zone Analysis */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <Card className="bg-green-50 border-green-200">
-                    <CardContent className="p-4 text-center">
-                      <div className="text-2xl font-bold text-green-700 mb-1">{zoneDistribution.opportunity}</div>
-                      <div className="text-sm text-green-700">אזור הזדמנות</div>
-                      <div className="text-xs text-gray-600">4.2-5.0</div>
-                    </CardContent>
-                  </Card>
-                  <Card className="bg-blue-50 border-blue-200">
-                    <CardContent className="p-4 text-center">
-                      <div className="text-2xl font-bold text-blue-700 mb-1">{zoneDistribution.comfort}</div>
-                      <div className="text-sm text-blue-700">אזור נוחות</div>
-                      <div className="text-xs text-gray-600">3.4-4.1</div>
-                    </CardContent>
-                  </Card>
-                  <Card className="bg-yellow-50 border-yellow-200">
-                    <CardContent className="p-4 text-center">
-                      <div className="text-2xl font-bold text-yellow-700 mb-1">{zoneDistribution.apathy}</div>
-                      <div className="text-sm text-yellow-700">אזור אדישות</div>
-                      <div className="text-xs text-gray-600">2.6-3.3</div>
-                    </CardContent>
-                  </Card>
-                  <Card className="bg-red-50 border-red-200">
-                    <CardContent className="p-4 text-center">
-                      <div className="text-2xl font-bold text-red-700 mb-1">{zoneDistribution.war}</div>
-                      <div className="text-sm text-red-700">אזור מלחמה</div>
-                      <div className="text-xs text-gray-600">1.0-2.5</div>
-                    </CardContent>
-                  </Card>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {Object.entries(zoneDistribution).map(([zone, count]) => {
+                    const participant = workshopData.participants.find(p => p.woca_zone === zone);
+                    const color = participant?.woca_zone_color || '#666666';
+                    
+                    return (
+                      <Card key={zone} className="border-2" style={{ borderColor: color }}>
+                        <CardContent className="p-4 text-center">
+                          <div className="text-2xl font-bold mb-1" style={{ color }}>
+                            {count}
+                          </div>
+                          <div className="text-sm font-medium" style={{ color }}>
+                            {zone}
+                          </div>
+                          <div className="text-xs text-gray-600 mt-1">
+                            {Math.round((count / workshopData.participant_count) * 100)}%
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
                 </div>
               </>
             )}

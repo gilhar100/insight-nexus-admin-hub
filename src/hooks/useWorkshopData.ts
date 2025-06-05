@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { calculateWocaScores, determineWocaZone, WocaScores } from '@/utils/wocaScoring';
 
 export interface WorkshopParticipant {
   id: string;
@@ -8,6 +9,9 @@ export interface WorkshopParticipant {
   email: string;
   overall_score: number | null;
   scores: any;
+  woca_scores: WocaScores;
+  woca_zone: string;
+  woca_zone_color: string;
   organization: string | null;
   profession: string | null;
   age: string | null;
@@ -23,6 +27,9 @@ export interface WorkshopData {
   participants: WorkshopParticipant[];
   participant_count: number;
   average_score: number;
+  zone_distribution: Record<string, number>;
+  dominant_zone: string;
+  dominant_zone_color: string;
 }
 
 export interface Workshop {
@@ -133,28 +140,51 @@ export const useWorkshopData = (workshopId?: number) => {
         // Combine both datasets
         const allData = [...(workshopData || []), ...(groupData || [])];
 
-        const participants: WorkshopParticipant[] = allData?.map(item => ({
-          id: item.id,
-          full_name: item.full_name,
-          email: item.email,
-          overall_score: item.overall_score,
-          scores: item.scores,
-          organization: item.organization,
-          profession: item.profession,
-          age: item.age,
-          gender: item.gender,
-          education: item.education,
-          experience_years: item.experience_years,
-          created_at: item.created_at,
-          workshop_id: item.workshop_id || parseInt(item.group_id || '0')
-        })) || [];
+        const participants: WorkshopParticipant[] = allData?.map(item => {
+          // Calculate WOCA scores using new method
+          const wocaScores = calculateWocaScores(item.question_responses);
+          const zoneResult = determineWocaZone(wocaScores);
+
+          return {
+            id: item.id,
+            full_name: item.full_name,
+            email: item.email,
+            overall_score: item.overall_score,
+            scores: item.scores,
+            woca_scores: wocaScores,
+            woca_zone: zoneResult.zone,
+            woca_zone_color: zoneResult.color,
+            organization: item.organization,
+            profession: item.profession,
+            age: item.age,
+            gender: item.gender,
+            education: item.education,
+            experience_years: item.experience_years,
+            created_at: item.created_at,
+            workshop_id: item.workshop_id || parseInt(item.group_id || '0')
+          };
+        }) || [];
 
         // Remove duplicates based on email
         const uniqueParticipants = participants.filter((participant, index, self) =>
           index === self.findIndex(p => p.email === participant.email)
         );
 
-        // Calculate average score
+        // Calculate zone distribution
+        const zoneDistribution: Record<string, number> = {};
+        uniqueParticipants.forEach(participant => {
+          const zone = participant.woca_zone;
+          zoneDistribution[zone] = (zoneDistribution[zone] || 0) + 1;
+        });
+
+        // Find dominant zone
+        const dominantZoneEntry = Object.entries(zoneDistribution)
+          .reduce((max, current) => current[1] > max[1] ? current : max, ['', 0]);
+        
+        const dominantZone = dominantZoneEntry[0] || 'לא זמין';
+        const dominantZoneColor = uniqueParticipants.find(p => p.woca_zone === dominantZone)?.woca_zone_color || '#666666';
+
+        // Calculate average score (fallback for existing functionality)
         const validScores = uniqueParticipants
           .map(p => p.overall_score)
           .filter(score => score !== null) as number[];
@@ -167,7 +197,10 @@ export const useWorkshopData = (workshopId?: number) => {
           workshop_id: workshopId,
           participants: uniqueParticipants,
           participant_count: uniqueParticipants.length,
-          average_score
+          average_score,
+          zone_distribution: zoneDistribution,
+          dominant_zone: dominantZone,
+          dominant_zone_color: dominantZoneColor
         });
 
       } catch (err) {
