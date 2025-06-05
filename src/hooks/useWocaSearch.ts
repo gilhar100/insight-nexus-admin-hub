@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { calculateWocaScores, determineWocaZone } from '@/utils/wocaScoring';
 
 export interface WocaParticipant {
   id: string;
@@ -8,7 +9,9 @@ export interface WocaParticipant {
   email: string;
   workshop_id: number | null;
   overall_score: number | null;
-  scores: any;
+  woca_scores: any;
+  woca_zone: string;
+  woca_zone_color: string;
   organization: string | null;
   profession: string | null;
   age: string | null;
@@ -42,21 +45,29 @@ export const useWocaSearch = (searchQuery: string) => {
 
         if (error) throw error;
 
-        const mappedParticipants: WocaParticipant[] = data?.map(item => ({
-          id: item.id,
-          full_name: item.full_name,
-          email: item.email,
-          workshop_id: item.workshop_id,
-          overall_score: item.overall_score,
-          scores: item.scores,
-          organization: item.organization,
-          profession: item.profession,
-          age: item.age,
-          gender: item.gender,
-          education: item.education,
-          experience_years: item.experience_years,
-          created_at: item.created_at
-        })) || [];
+        const mappedParticipants: WocaParticipant[] = data?.map(item => {
+          // Calculate WOCA scores and zone for search results
+          const wocaScores = calculateWocaScores(item.question_responses);
+          const zoneResult = determineWocaZone(wocaScores);
+
+          return {
+            id: item.id,
+            full_name: item.full_name,
+            email: item.email,
+            workshop_id: item.workshop_id,
+            overall_score: item.overall_score,
+            woca_scores: wocaScores,
+            woca_zone: zoneResult.zone,
+            woca_zone_color: zoneResult.color,
+            organization: item.organization,
+            profession: item.profession,
+            age: item.age,
+            gender: item.gender,
+            education: item.education,
+            experience_years: item.experience_years,
+            created_at: item.created_at
+          };
+        }) || [];
 
         setParticipants(mappedParticipants);
       } catch (err) {

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { calculateWocaScores, determineWocaZone, WocaScores } from '@/utils/wocaScoring';
@@ -8,7 +7,6 @@ export interface WorkshopParticipant {
   full_name: string;
   email: string;
   overall_score: number | null;
-  scores: any;
   woca_scores: WocaScores;
   woca_zone: string;
   woca_zone_color: string;
@@ -155,7 +153,6 @@ export const useWorkshopData = (workshopId?: number) => {
             full_name: item.full_name,
             email: item.email,
             overall_score: item.overall_score,
-            scores: item.scores,
             woca_scores: wocaScores,
             woca_zone: zoneResult.zone,
             woca_zone_color: zoneResult.color,
