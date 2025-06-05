@@ -81,13 +81,32 @@ export const reverseScore = (score: number): number => {
   return 6 - score;
 };
 
-// Calculate WOCA parameter scores from question responses (limited to q1-q36)
+// Calculate WOCA parameter scores from question responses
 export const calculateWocaScores = (questionResponses: any): WocaScores => {
   console.log('🔍 Calculating WOCA scores for:', questionResponses);
   
   // Handle null/undefined question responses
-  if (!questionResponses || typeof questionResponses !== 'object') {
+  if (!questionResponses) {
     console.log('❌ No valid question responses found');
+    return { war: 0, opportunity: 0, comfort: 0, apathy: 0 };
+  }
+
+  // Handle different data formats
+  let responses: Record<string, number> = {};
+  
+  if (Array.isArray(questionResponses)) {
+    // Convert array format to object format
+    questionResponses.forEach((item: any) => {
+      if (item.questionId && item.score) {
+        responses[`q${item.questionId}`] = item.score;
+      }
+    });
+    console.log('📝 Converted array format to object format:', responses);
+  } else if (typeof questionResponses === 'object') {
+    // Direct object format
+    responses = questionResponses;
+  } else {
+    console.log('❌ Invalid question responses format');
     return { war: 0, opportunity: 0, comfort: 0, apathy: 0 };
   }
 
@@ -103,7 +122,7 @@ export const calculateWocaScores = (questionResponses: any): WocaScores => {
     // Process normal scoring questions (only q1-q36)
     mapping.normal.forEach(questionNum => {
       if (questionNum <= 36) { // Limit to 36 questions
-        const response = questionResponses[`q${questionNum}`];
+        const response = responses[`q${questionNum}`];
         if (response && typeof response === 'number' && response >= 1 && response <= 5) {
           totalScore += response;
           questionCount++;
@@ -115,7 +134,7 @@ export const calculateWocaScores = (questionResponses: any): WocaScores => {
     // Process reverse scoring questions (only q1-q36)
     mapping.reverse.forEach(questionNum => {
       if (questionNum <= 36) { // Limit to 36 questions
-        const response = questionResponses[`q${questionNum}`];
+        const response = responses[`q${questionNum}`];
         if (response && typeof response === 'number' && response >= 1 && response <= 5) {
           const reversedScore = reverseScore(response);
           totalScore += reversedScore;

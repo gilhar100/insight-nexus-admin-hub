@@ -5,16 +5,45 @@ import { WorkshopParticipant, WorkshopData } from '@/types/workshop';
 export const processWorkshopParticipants = (rawData: any[]): WorkshopParticipant[] => {
   console.log('🔄 Processing workshop participants:', rawData.length, 'participants');
   
-  // Log the first response to check question_responses field
+  // Log the first response to check data structure
   if (rawData.length > 0) {
-    console.log('📝 Sample question_responses structure:', rawData[0].question_responses);
+    console.log('📝 Sample participant data structure:', {
+      question_responses: rawData[0].question_responses,
+      q1: rawData[0].q1,
+      q2: rawData[0].q2,
+      hasDirectQuestions: !!(rawData[0].q1 || rawData[0].q2 || rawData[0].q3)
+    });
   }
 
   const participants: WorkshopParticipant[] = rawData?.map((item, index) => {
     console.log(`👤 Processing participant ${index + 1}:`, item.full_name);
     
-    // Calculate WOCA scores using the corrected method from wocaScoring.ts
-    const wocaScores = calculateWocaScores(item.question_responses);
+    // Try to get responses from different possible fields
+    let questionResponses = null;
+    
+    // First check if we have question_responses field
+    if (item.question_responses && (Array.isArray(item.question_responses) || typeof item.question_responses === 'object')) {
+      questionResponses = item.question_responses;
+      console.log('📝 Using question_responses field:', questionResponses);
+    } 
+    // Fall back to direct question fields (q1, q2, etc.)
+    else {
+      const directResponses: Record<string, number> = {};
+      for (let i = 1; i <= 36; i++) {
+        const questionKey = `q${i}`;
+        if (item[questionKey] && typeof item[questionKey] === 'number') {
+          directResponses[questionKey] = item[questionKey];
+        }
+      }
+      
+      if (Object.keys(directResponses).length > 0) {
+        questionResponses = directResponses;
+        console.log('📝 Using direct question fields:', directResponses);
+      }
+    }
+
+    // Calculate WOCA scores using the corrected method
+    const wocaScores = calculateWocaScores(questionResponses);
     const zoneResult = determineWocaZone(wocaScores);
 
     console.log(`✅ Participant ${item.full_name} - Zone: ${zoneResult.zone}, Scores:`, wocaScores);
