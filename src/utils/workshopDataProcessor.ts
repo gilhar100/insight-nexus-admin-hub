@@ -1,5 +1,5 @@
 
-import { calculateWocaScores, determineWocaZone } from '@/utils/wocaScoring';
+import { calculateWocaScores, determineWocaZone, calculateGroupZone } from '@/utils/wocaScoring';
 import { WorkshopParticipant, WorkshopData } from '@/types/workshop';
 
 export const processWorkshopParticipants = (rawData: any[]): WorkshopParticipant[] => {
@@ -60,14 +60,10 @@ export const calculateWorkshopMetrics = (participants: WorkshopParticipant[], wo
 
   console.log('📊 Final zone distribution:', zoneDistribution);
 
-  // Find dominant zone based on highest count
-  const dominantZoneEntry = Object.entries(zoneDistribution)
-    .reduce((max, current) => current[1] > max[1] ? current : max, ['לא זמין', 0]);
-  
-  const dominantZone = dominantZoneEntry[0];
-  const dominantZoneColor = participants.find(p => p.woca_zone === dominantZone)?.woca_zone_color || '#666666';
+  // Calculate group zone using the new logic
+  const groupZoneResult = calculateGroupZone(participants);
 
-  console.log('🏆 Workshop dominant zone:', dominantZone, 'with', dominantZoneEntry[1], 'participants');
+  console.log('🏆 Workshop group zone:', groupZoneResult.zone, 'with description:', groupZoneResult.description);
 
   // Calculate average score (fallback for existing functionality)
   const validScores = participants
@@ -84,8 +80,9 @@ export const calculateWorkshopMetrics = (participants: WorkshopParticipant[], wo
     participant_count: participants.length,
     average_score,
     zone_distribution: zoneDistribution,
-    dominant_zone: dominantZone,
-    dominant_zone_color: dominantZoneColor
+    dominant_zone: groupZoneResult.zone,
+    dominant_zone_color: groupZoneResult.color,
+    group_zone_result: groupZoneResult
   };
 
   console.log('🎯 Final workshop data:', result);

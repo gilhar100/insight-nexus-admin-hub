@@ -1,5 +1,5 @@
 
-import { WocaScores } from '@/utils/wocaScoring';
+import { WocaScores, WocaZoneResult } from '@/utils/wocaScoring';
 
 export interface WorkshopParticipant {
   id: string;
@@ -27,6 +27,7 @@ export interface WorkshopData {
   zone_distribution: Record<string, number>;
   dominant_zone: string;
   dominant_zone_color: string;
+  group_zone_result?: WocaZoneResult;
 }
 
 export interface Workshop {

@@ -38,7 +38,7 @@ export const ZoneClassification: React.FC<ZoneClassificationProps> = ({
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={onPresenterMode}>
               <Maximize className="h-4 w-4 mr-2" />
-              מצב מציג
+              מצג מציג
             </Button>
             <Button variant="outline" size="sm" onClick={onToggleNames}>
               {showNames ? <EyeOff className="h-4 w-4 mr-2" /> : <Eye className="h-4 w-4 mr-2" />}
@@ -56,7 +56,8 @@ export const ZoneClassification: React.FC<ZoneClassificationProps> = ({
           <div className="mb-6">
             <Badge 
               variant="secondary" 
-              className={`text-lg px-4 py-2 ${zoneInfo.color} text-white`}
+              className={`text-lg px-4 py-2 text-white`}
+              style={{ backgroundColor: zoneInfo.color }}
             >
               {zoneInfo.name}
             </Badge>
@@ -64,10 +65,10 @@ export const ZoneClassification: React.FC<ZoneClassificationProps> = ({
           {viewMode === 'workshop' && workshopData && (
             <>
               <div className="text-2xl font-bold text-gray-900 mb-2">
-                האזור התודעתי הדומיננטי
+                {workshopData.group_zone_result?.description || 'האזור התודעתי הדומיננטי'}
               </div>
               <div className="text-lg text-gray-600 mb-4">
-                מבוסס על הפרמטר עם הציון הממוצע הגבוה ביותר
+                מבוסס על הציון הממוצע הגבוה ביותר בקבוצה
               </div>
               <div className="text-lg text-gray-600 mb-4">
                 {workshopData.participant_count} משתתפים
