@@ -139,9 +139,14 @@ export const useWorkshopData = (workshopId?: number) => {
 
         // Combine both datasets
         const allData = [...(workshopData || []), ...(groupData || [])];
+        
+        // Log the first response to check question_responses field
+        if (allData.length > 0) {
+          console.log('Sample question_responses:', allData[0].question_responses);
+        }
 
         const participants: WorkshopParticipant[] = allData?.map(item => {
-          // Calculate WOCA scores using new method
+          // Calculate WOCA scores using the method from wocaScoring.ts
           const wocaScores = calculateWocaScores(item.question_responses);
           const zoneResult = determineWocaZone(wocaScores);
 

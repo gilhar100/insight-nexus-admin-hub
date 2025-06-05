@@ -22,6 +22,8 @@ const chartConfig = {
 };
 
 export const WocaRadarChart: React.FC<WocaRadarChartProps> = ({ participants }) => {
+  console.log('Radar Chart participants:', participants);
+  
   // Calculate average scores for each WOCA parameter
   const parameters = [
     { key: 'war', label: 'מלחמה' },
@@ -31,10 +33,12 @@ export const WocaRadarChart: React.FC<WocaRadarChartProps> = ({ participants }) 
   ];
   
   const chartData = parameters.map(parameter => {
+    // Extract scores for this parameter, filtering out invalid values
     const scores = participants
       .map(p => p.woca_scores?.[parameter.key as keyof typeof p.woca_scores])
       .filter(score => score !== null && score !== undefined && score > 0) as number[];
 
+    // Calculate average if we have valid scores, otherwise default to 0
     const average = scores.length > 0 
       ? scores.reduce((sum, score) => sum + score, 0) / scores.length 
       : 0;
@@ -45,6 +49,8 @@ export const WocaRadarChart: React.FC<WocaRadarChartProps> = ({ participants }) 
       fullMark: 5
     };
   });
+
+  console.log('Radar chart data:', chartData);
 
   // Don't render if no valid data
   if (chartData.every(item => item.average === 0)) {

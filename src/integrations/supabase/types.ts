@@ -155,7 +155,6 @@ export type Database = {
           phone: string | null
           profession: string | null
           question_responses: Json | null
-          scores: Json | null
           workshop_id: number | null
         }
         Insert: {
@@ -174,7 +173,6 @@ export type Database = {
           phone?: string | null
           profession?: string | null
           question_responses?: Json | null
-          scores?: Json | null
           workshop_id?: number | null
         }
         Update: {
@@ -193,7 +191,6 @@ export type Database = {
           phone?: string | null
           profession?: string | null
           question_responses?: Json | null
-          scores?: Json | null
           workshop_id?: number | null
         }
         Relationships: []

@@ -75,6 +75,7 @@ export const reverseScore = (score: number): number => {
 
 // Calculate WOCA parameter scores from question responses
 export const calculateWocaScores = (questionResponses: any): WocaScores => {
+  // Handle null/undefined question responses
   if (!questionResponses || typeof questionResponses !== 'object') {
     return { war: 0, opportunity: 0, comfort: 0, apathy: 0 };
   }
@@ -99,12 +100,13 @@ export const calculateWocaScores = (questionResponses: any): WocaScores => {
     mapping.reverse.forEach(questionNum => {
       const response = questionResponses[`q${questionNum}`];
       if (response && typeof response === 'number') {
+        // Apply reverse scoring
         totalScore += reverseScore(response);
         questionCount++;
       }
     });
 
-    // Calculate average for this parameter
+    // Calculate average for this parameter only if questions were answered
     scores[parameter as keyof WocaScores] = questionCount > 0 ? totalScore / questionCount : 0;
   });
 

@@ -18,6 +18,8 @@ const chartConfig = {
 };
 
 export const WorkshopDistributionChart: React.FC<WorkshopDistributionChartProps> = ({ participants }) => {
+  console.log('Distribution Chart participants:', participants);
+  
   // Count participants by zone
   const zoneDistribution: Record<string, { count: number; color: string }> = {};
   
@@ -43,6 +45,8 @@ export const WorkshopDistributionChart: React.FC<WorkshopDistributionChartProps>
       percentage: Math.round((data.count / participants.length) * 100)
     }))
     .sort((a, b) => b.count - a.count);
+
+  console.log('Chart data:', chartData);
 
   // Don't render if no data
   if (chartData.length === 0) {
