@@ -96,18 +96,35 @@ export const calculateWocaScores = (questionResponses: any): WocaScores => {
   let responses: Record<string, number> = {};
   
   if (Array.isArray(questionResponses)) {
-    // Convert array format to object format
+    // Convert array format to object format, using rawScore when available
     questionResponses.forEach((item: any) => {
-      if (item.questionId && item.score) {
-        responses[`q${item.questionId}`] = item.score;
+      if (item.questionId) {
+        // Use rawScore if available (original 1-5 response), otherwise use score
+        const rawValue = item.rawScore || item.score;
+        if (rawValue && typeof rawValue === 'number' && rawValue >= 1 && rawValue <= 5) {
+          responses[`q${item.questionId}`] = rawValue;
+        }
       }
     });
-    console.log('📝 Converted array format to object format:', responses);
+    console.log('📝 Converted array format to object format using raw scores:', responses);
   } else if (typeof questionResponses === 'object') {
-    // Direct object format
-    responses = questionResponses;
+    // Direct object format - ensure values are within 1-5 range
+    Object.keys(questionResponses).forEach(key => {
+      const value = questionResponses[key];
+      if (typeof value === 'number' && value >= 1 && value <= 5) {
+        responses[key] = value;
+      }
+    });
+    console.log('📝 Using direct object format (filtered to 1-5 range):', responses);
   } else {
     console.log('❌ Invalid question responses format');
+    return { war: 0, opportunity: 0, comfort: 0, apathy: 0 };
+  }
+
+  // Validate that we have responses in the correct range
+  const validResponses = Object.values(responses).filter(val => val >= 1 && val <= 5);
+  if (validResponses.length === 0) {
+    console.log('❌ No valid responses found in 1-5 range');
     return { war: 0, opportunity: 0, comfort: 0, apathy: 0 };
   }
 
@@ -146,9 +163,22 @@ export const calculateWocaScores = (questionResponses: any): WocaScores => {
     scores[parameter as keyof WocaScores] = average;
     
     console.log(`✅ ${parameter}: ${totalScore}/${questionCount} = ${average.toFixed(3)}`);
+    
+    // Validation check - average should be between 1-5
+    if (average > 5) {
+      console.error(`🚨 ERROR: ${parameter} average ${average} exceeds maximum of 5!`);
+    }
   });
 
   console.log('🎯 Final scores:', scores);
+  
+  // Final validation - all scores should be between 0-5
+  Object.entries(scores).forEach(([key, value]) => {
+    if (value > 5) {
+      console.error(`🚨 CRITICAL ERROR: ${key} score ${value} exceeds maximum of 5!`);
+    }
+  });
+  
   return scores;
 };
 
