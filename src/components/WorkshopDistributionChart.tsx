@@ -34,22 +34,44 @@ export const WorkshopDistributionChart: React.FC<WorkshopDistributionChartProps>
     }
   });
 
-  // Convert to chart data
-  const chartData = Object.entries(zoneDistribution).map(([zone, data]) => ({
-    zone,
-    count: data.count,
-    color: data.color
-  }));
+  // Convert to chart data and sort by count
+  const chartData = Object.entries(zoneDistribution)
+    .map(([zone, data]) => ({
+      zone,
+      count: data.count,
+      color: data.color,
+      percentage: Math.round((data.count / participants.length) * 100)
+    }))
+    .sort((a, b) => b.count - a.count);
+
+  // Don't render if no data
+  if (chartData.length === 0) {
+    return (
+      <div className="h-80 flex items-center justify-center text-gray-500">
+        אין נתונים להצגה
+      </div>
+    );
+  }
 
   return (
     <ChartContainer config={chartConfig} className="h-80">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="zone" />
-          <YAxis />
-          <ChartTooltip content={<ChartTooltipContent />} />
-          <Bar dataKey="count">
+          <XAxis 
+            dataKey="zone" 
+            className="text-xs"
+            tick={{ fontSize: 12 }}
+          />
+          <YAxis tick={{ fontSize: 12 }} />
+          <ChartTooltip 
+            content={<ChartTooltipContent />}
+            formatter={(value: any, name: any, props: any) => [
+              `${value} משתתפים (${props.payload.percentage}%)`,
+              'כמות'
+            ]}
+          />
+          <Bar dataKey="count" radius={[4, 4, 0, 0]}>
             {chartData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.color} />
             ))}

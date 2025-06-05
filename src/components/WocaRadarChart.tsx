@@ -33,7 +33,7 @@ export const WocaRadarChart: React.FC<WocaRadarChartProps> = ({ participants }) 
   const chartData = parameters.map(parameter => {
     const scores = participants
       .map(p => p.woca_scores?.[parameter.key as keyof typeof p.woca_scores])
-      .filter(score => score !== null && score !== undefined) as number[];
+      .filter(score => score !== null && score !== undefined && score > 0) as number[];
 
     const average = scores.length > 0 
       ? scores.reduce((sum, score) => sum + score, 0) / scores.length 
@@ -41,17 +41,26 @@ export const WocaRadarChart: React.FC<WocaRadarChartProps> = ({ participants }) 
 
     return {
       parameter: parameter.label,
-      average: Math.round(average * 10) / 10,
+      average: Math.round(average * 100) / 100,
       fullMark: 5
     };
   });
+
+  // Don't render if no valid data
+  if (chartData.every(item => item.average === 0)) {
+    return (
+      <div className="h-80 flex items-center justify-center text-gray-500">
+        אין נתונים להצגה
+      </div>
+    );
+  }
 
   return (
     <ChartContainer config={chartConfig} className="h-80">
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
           <PolarGrid />
-          <PolarAngleAxis dataKey="parameter" />
+          <PolarAngleAxis dataKey="parameter" className="text-sm" />
           <PolarRadiusAxis 
             angle={90} 
             domain={[0, 5]} 
@@ -66,7 +75,10 @@ export const WocaRadarChart: React.FC<WocaRadarChartProps> = ({ participants }) 
             fillOpacity={0.1}
             strokeWidth={2}
           />
-          <ChartTooltip content={<ChartTooltipContent />} />
+          <ChartTooltip 
+            content={<ChartTooltipContent />}
+            formatter={(value: any) => [value?.toFixed(2), 'ציון ממוצע']}
+          />
         </RadarChart>
       </ResponsiveContainer>
     </ChartContainer>

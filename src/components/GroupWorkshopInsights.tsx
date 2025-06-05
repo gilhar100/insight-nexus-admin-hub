@@ -18,6 +18,7 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
+import { WocaParameterDisplay } from '@/components/WocaParameterDisplay';
 
 export const GroupWorkshopInsights: React.FC = () => {
   const [selectedWorkshopId, setSelectedWorkshopId] = useState<number | undefined>();
@@ -332,6 +333,28 @@ export const GroupWorkshopInsights: React.FC = () => {
               </CardContent>
             </Card>
 
+            {/* WOCA Parameters Display */}
+            {viewMode === 'workshop' && workshopData && (
+              <WocaParameterDisplay 
+                scores={{
+                  war: workshopData.participants.reduce((sum, p) => sum + (p.woca_scores?.war || 0), 0) / workshopData.participants.length,
+                  opportunity: workshopData.participants.reduce((sum, p) => sum + (p.woca_scores?.opportunity || 0), 0) / workshopData.participants.length,
+                  comfort: workshopData.participants.reduce((sum, p) => sum + (p.woca_scores?.comfort || 0), 0) / workshopData.participants.length,
+                  apathy: workshopData.participants.reduce((sum, p) => sum + (p.woca_scores?.apathy || 0), 0) / workshopData.participants.length
+                }}
+                dominantZone={workshopData.dominant_zone}
+                title="פרמטרי WOCA - ממוצע קבוצתי"
+              />
+            )}
+
+            {viewMode === 'individual' && selectedParticipant && (
+              <WocaParameterDisplay 
+                scores={selectedParticipant.woca_scores}
+                dominantZone={selectedParticipant.woca_zone}
+                title="פרמטרי WOCA - ניתוח אישי"
+              />
+            )}
+
             {/* Visualizations */}
             {viewMode === 'workshop' && workshopData && (
               <>
@@ -354,7 +377,7 @@ export const GroupWorkshopInsights: React.FC = () => {
                     <CardHeader>
                       <CardTitle className="flex items-center">
                         <Radar className="h-5 w-5 mr-2" />
-                        פרמטרי WOCA
+                        פרמטרי WOCA - ממוצע
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
