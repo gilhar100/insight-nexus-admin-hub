@@ -18,7 +18,7 @@ export interface WocaZoneResult {
   recommendations?: string;
 }
 
-// Question mappings for each WOCA parameter
+// Question mappings for each WOCA parameter (limited to 36 questions)
 export const WOCA_QUESTION_MAPPING = {
   war: {
     normal: [1, 5, 9, 13, 17, 21, 25, 29, 33], // Questions scored normally
@@ -81,7 +81,7 @@ export const reverseScore = (score: number): number => {
   return 6 - score;
 };
 
-// Calculate WOCA parameter scores from question responses
+// Calculate WOCA parameter scores from question responses (limited to q1-q36)
 export const calculateWocaScores = (questionResponses: any): WocaScores => {
   console.log('🔍 Calculating WOCA scores for:', questionResponses);
   
@@ -100,24 +100,28 @@ export const calculateWocaScores = (questionResponses: any): WocaScores => {
 
     console.log(`📊 Processing ${parameter} parameter...`);
 
-    // Process normal scoring questions
+    // Process normal scoring questions (only q1-q36)
     mapping.normal.forEach(questionNum => {
-      const response = questionResponses[`q${questionNum}`];
-      if (response && typeof response === 'number' && response >= 1 && response <= 5) {
-        totalScore += response;
-        questionCount++;
-        console.log(`  Normal Q${questionNum}: ${response}`);
+      if (questionNum <= 36) { // Limit to 36 questions
+        const response = questionResponses[`q${questionNum}`];
+        if (response && typeof response === 'number' && response >= 1 && response <= 5) {
+          totalScore += response;
+          questionCount++;
+          console.log(`  Normal Q${questionNum}: ${response}`);
+        }
       }
     });
 
-    // Process reverse scoring questions
+    // Process reverse scoring questions (only q1-q36)
     mapping.reverse.forEach(questionNum => {
-      const response = questionResponses[`q${questionNum}`];
-      if (response && typeof response === 'number' && response >= 1 && response <= 5) {
-        const reversedScore = reverseScore(response);
-        totalScore += reversedScore;
-        questionCount++;
-        console.log(`  Reverse Q${questionNum}: ${response} → ${reversedScore}`);
+      if (questionNum <= 36) { // Limit to 36 questions
+        const response = questionResponses[`q${questionNum}`];
+        if (response && typeof response === 'number' && response >= 1 && response <= 5) {
+          const reversedScore = reverseScore(response);
+          totalScore += reversedScore;
+          questionCount++;
+          console.log(`  Reverse Q${questionNum}: ${response} → ${reversedScore}`);
+        }
       }
     });
 
@@ -160,10 +164,10 @@ export const determineWocaZone = (scores: WocaScores): WocaZoneResult => {
     description = `אזור תודעתי דומיננטי: ${zoneName}`;
   } else if (dominantParameters.length === 2) {
     zoneName = zoneNames.join('/');
-    description = `הנבדק נמצא בשני אזורי תודעה: ${zoneNames[0]} ו-${zoneNames[1]}`;
+    description = `המשתתף נמצא בשני אזורי תודעה: ${zoneNames[0]} ו-${zoneNames[1]}`;
   } else {
     zoneName = zoneNames.join('/');
-    description = `הנבדק נמצא במספר אזורי תודעה: ${zoneNames.join(', ')}`;
+    description = `המשתתף נמצא במספר אזורי תודעה: ${zoneNames.join(', ')}`;
   }
 
   const primaryColor = dominantParameters[0].color;
