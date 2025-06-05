@@ -18,23 +18,24 @@ export interface WocaZoneResult {
   recommendations?: string;
 }
 
-// Question mappings for each WOCA parameter (limited to 36 questions)
+// Corrected Question mappings for each WOCA parameter (36 questions total)
+// Each question should map to exactly one parameter
 export const WOCA_QUESTION_MAPPING = {
   war: {
-    normal: [1, 5, 9, 13, 17, 21, 25, 29, 33], // Questions scored normally
-    reverse: [2, 6, 10, 14, 18, 22, 26, 30, 34] // Questions scored in reverse
+    normal: [2, 9, 10, 15, 19, 21, 25, 28, 32], // Questions scored normally for War
+    reverse: [] // No reverse scoring for War in these questions
   },
   opportunity: {
-    normal: [3, 7, 11, 15, 19, 23, 27, 31, 35],
-    reverse: [4, 8, 12, 16, 20, 24, 28, 32, 36]
+    normal: [4, 11, 14, 17, 22, 27, 29, 35], // Questions scored normally for Opportunity  
+    reverse: [3, 7] // Questions that are reverse scored for Opportunity
   },
   comfort: {
-    normal: [2, 6, 10, 14, 18, 22, 26, 30, 34],
-    reverse: [1, 5, 9, 13, 17, 21, 25, 29, 33]
+    normal: [18, 24, 30, 31, 36], // Questions scored normally for Comfort
+    reverse: [5, 13, 20] // Questions that are reverse scored for Comfort
   },
   apathy: {
-    normal: [4, 8, 12, 16, 20, 24, 28, 32, 36],
-    reverse: [3, 7, 11, 15, 19, 23, 27, 31, 35]
+    normal: [12, 23, 26, 33, 34], // Questions scored normally for Apathy
+    reverse: [1, 6, 8, 16] // Questions that are reverse scored for Apathy
   }
 };
 
@@ -119,28 +120,24 @@ export const calculateWocaScores = (questionResponses: any): WocaScores => {
 
     console.log(`📊 Processing ${parameter} parameter...`);
 
-    // Process normal scoring questions (only q1-q36)
+    // Process normal scoring questions
     mapping.normal.forEach(questionNum => {
-      if (questionNum <= 36) { // Limit to 36 questions
-        const response = responses[`q${questionNum}`];
-        if (response && typeof response === 'number' && response >= 1 && response <= 5) {
-          totalScore += response;
-          questionCount++;
-          console.log(`  Normal Q${questionNum}: ${response}`);
-        }
+      const response = responses[`q${questionNum}`];
+      if (response && typeof response === 'number' && response >= 1 && response <= 5) {
+        totalScore += response;
+        questionCount++;
+        console.log(`  Normal Q${questionNum}: ${response}`);
       }
     });
 
-    // Process reverse scoring questions (only q1-q36)
+    // Process reverse scoring questions
     mapping.reverse.forEach(questionNum => {
-      if (questionNum <= 36) { // Limit to 36 questions
-        const response = responses[`q${questionNum}`];
-        if (response && typeof response === 'number' && response >= 1 && response <= 5) {
-          const reversedScore = reverseScore(response);
-          totalScore += reversedScore;
-          questionCount++;
-          console.log(`  Reverse Q${questionNum}: ${response} → ${reversedScore}`);
-        }
+      const response = responses[`q${questionNum}`];
+      if (response && typeof response === 'number' && response >= 1 && response <= 5) {
+        const reversedScore = reverseScore(response);
+        totalScore += reversedScore;
+        questionCount++;
+        console.log(`  Reverse Q${questionNum}: ${response} → ${reversedScore}`);
       }
     });
 
