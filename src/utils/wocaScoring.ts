@@ -75,8 +75,11 @@ export const reverseScore = (score: number): number => {
 
 // Calculate WOCA parameter scores from question responses
 export const calculateWocaScores = (questionResponses: any): WocaScores => {
+  console.log('🔍 Calculating WOCA scores for:', questionResponses);
+  
   // Handle null/undefined question responses
   if (!questionResponses || typeof questionResponses !== 'object') {
+    console.log('❌ No valid question responses found');
     return { war: 0, opportunity: 0, comfort: 0, apathy: 0 };
   }
 
@@ -87,34 +90,44 @@ export const calculateWocaScores = (questionResponses: any): WocaScores => {
     let totalScore = 0;
     let questionCount = 0;
 
+    console.log(`📊 Processing ${parameter} parameter...`);
+
     // Process normal scoring questions
     mapping.normal.forEach(questionNum => {
       const response = questionResponses[`q${questionNum}`];
-      if (response && typeof response === 'number') {
+      if (response && typeof response === 'number' && response >= 1 && response <= 5) {
         totalScore += response;
         questionCount++;
+        console.log(`  Normal Q${questionNum}: ${response}`);
       }
     });
 
     // Process reverse scoring questions
     mapping.reverse.forEach(questionNum => {
       const response = questionResponses[`q${questionNum}`];
-      if (response && typeof response === 'number') {
-        // Apply reverse scoring
-        totalScore += reverseScore(response);
+      if (response && typeof response === 'number' && response >= 1 && response <= 5) {
+        const reversedScore = reverseScore(response);
+        totalScore += reversedScore;
         questionCount++;
+        console.log(`  Reverse Q${questionNum}: ${response} → ${reversedScore}`);
       }
     });
 
     // Calculate average for this parameter only if questions were answered
-    scores[parameter as keyof WocaScores] = questionCount > 0 ? totalScore / questionCount : 0;
+    const average = questionCount > 0 ? totalScore / questionCount : 0;
+    scores[parameter as keyof WocaScores] = average;
+    
+    console.log(`✅ ${parameter}: ${totalScore}/${questionCount} = ${average.toFixed(3)}`);
   });
 
+  console.log('🎯 Final scores:', scores);
   return scores;
 };
 
 // Determine WOCA zone based on highest parameter average
 export const determineWocaZone = (scores: WocaScores): WocaZoneResult => {
+  console.log('🎯 Determining WOCA zone from scores:', scores);
+  
   const parameterScores = [
     { name: 'מלחמה', key: 'war', score: scores.war, color: '#EF4444' },
     { name: 'הזדמנות', key: 'opportunity', score: scores.opportunity, color: '#10B981' },
@@ -122,9 +135,12 @@ export const determineWocaZone = (scores: WocaScores): WocaZoneResult => {
     { name: 'אדישות', key: 'apathy', score: scores.apathy, color: '#F59E0B' }
   ];
 
-  // Find the highest score(s)
+  // Find the highest score(s) - use a small tolerance for floating point comparison
   const maxScore = Math.max(...parameterScores.map(p => p.score));
-  const dominantParameters = parameterScores.filter(p => Math.abs(p.score - maxScore) < 0.01);
+  const dominantParameters = parameterScores.filter(p => Math.abs(p.score - maxScore) < 0.001);
+
+  console.log('📈 Max score:', maxScore);
+  console.log('🏆 Dominant parameters:', dominantParameters.map(p => `${p.name}: ${p.score.toFixed(3)}`));
 
   // Create zone name and description
   const zoneNames = dominantParameters.map(p => p.name);
@@ -166,7 +182,7 @@ export const determineWocaZone = (scores: WocaScores): WocaZoneResult => {
     recommendations = 'נדרש ניתוח מעמיק יותר לקביעת אסטרטגיית התערבות מתאימה.';
   }
 
-  return {
+  const result = {
     zone: zoneName,
     zones: zoneNames,
     score: maxScore,
@@ -175,4 +191,7 @@ export const determineWocaZone = (scores: WocaScores): WocaZoneResult => {
     explanation,
     recommendations
   };
+
+  console.log('🏁 Final zone result:', result);
+  return result;
 };
