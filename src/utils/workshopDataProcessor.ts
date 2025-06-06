@@ -5,21 +5,31 @@ import { WorkshopParticipant, WorkshopData } from '@/types/workshop';
 export const processWorkshopParticipants = (rawData: any[]): WorkshopParticipant[] => {
   console.log('🔄 Processing workshop participants:', rawData.length, 'total responses');
   
-  // Log the first response to check data structure
+  // Log the data structure for debugging
   if (rawData.length > 0) {
-    console.log('📝 Sample participant data structure:', {
+    console.log('📝 Sample response data structure:', {
       id: rawData[0].id,
       full_name: rawData[0].full_name,
       email: rawData[0].email,
       survey_type: rawData[0].survey_type,
       group_id: rawData[0].group_id,
       hasPreCalculatedScores: !!(rawData[0].war_score || rawData[0].opportunity_score || rawData[0].comfort_score || rawData[0].apathy_score),
-      hasQuestionColumns: !!(rawData[0].q1 || rawData[0].q2 || rawData[0].q3)
+      hasQuestionColumns: !!(rawData[0].q1 || rawData[0].q2 || rawData[0].q3),
+      sampleScores: {
+        war: rawData[0].war_score,
+        opportunity: rawData[0].opportunity_score,
+        comfort: rawData[0].comfort_score,
+        apathy: rawData[0].apathy_score
+      }
     });
   }
 
   const participants: WorkshopParticipant[] = rawData?.map((item, index) => {
-    console.log(`👤 Processing participant ${index + 1}:`, item.full_name || item.email || `ID: ${item.id}`);
+    console.log(`👤 Processing participant ${index + 1}:`, {
+      name: item.full_name || item.email || `ID: ${item.id}`,
+      group_id: item.group_id,
+      email: item.email
+    });
     
     // Calculate WOCA scores using the method that handles both database columns and question responses
     const wocaScores = calculateWocaScoresFromDatabase(item);
@@ -52,26 +62,43 @@ export const processWorkshopParticipants = (rawData: any[]): WorkshopParticipant
   );
 
   console.log('🎯 Processed unique participants for group analysis:', uniqueParticipants.length, 'from', rawData.length, 'total responses');
+  
+  // Log each unique participant's scores for verification
+  uniqueParticipants.forEach((p, i) => {
+    console.log(`📊 Unique participant ${i + 1} (${p.full_name}):`, p.woca_scores);
+  });
+  
   return uniqueParticipants;
 };
 
 export const calculateWorkshopMetrics = (participants: WorkshopParticipant[], workshopId: number): WorkshopData => {
   console.log('📊 Calculating workshop metrics for GROUP', workshopId, 'with', participants.length, 'unique participants');
   
-  // Calculate zone distribution across ALL participants
+  // Verify we have valid participants with scores
+  const participantsWithScores = participants.filter(p => p.woca_scores && 
+    (p.woca_scores.war > 0 || p.woca_scores.opportunity > 0 || p.woca_scores.comfort > 0 || p.woca_scores.apathy > 0)
+  );
+  
+  console.log('📈 Participants with valid WOCA scores:', participantsWithScores.length);
+  
+  if (participantsWithScores.length === 0) {
+    console.warn('⚠️ No participants with valid WOCA scores found');
+  }
+  
+  // Calculate zone distribution across ALL participants with scores
   const zoneDistribution: Record<string, number> = {};
-  participants.forEach(participant => {
+  participantsWithScores.forEach(participant => {
     const zone = participant.woca_zone;
     zoneDistribution[zone] = (zoneDistribution[zone] || 0) + 1;
-    console.log(`📈 Zone count update: ${zone} = ${zoneDistribution[zone]}`);
+    console.log(`📈 Zone count update: ${zone} = ${zoneDistribution[zone]} (participant: ${participant.full_name})`);
   });
 
   console.log('📊 Final group zone distribution:', zoneDistribution);
 
-  // Calculate group zone using ALL participants
-  const groupZoneResult = calculateGroupZone(participants);
+  // Calculate group zone using ALL participants with scores
+  const groupZoneResult = calculateGroupZone(participantsWithScores);
 
-  console.log('🏆 Workshop group zone result:', groupZoneResult.zone, 'based on', participants.length, 'participants');
+  console.log('🏆 Workshop group zone result:', groupZoneResult.zone, 'based on', participantsWithScores.length, 'participants with scores');
 
   // Calculate average score across all participants (fallback for existing functionality)
   const validScores = participants
@@ -82,32 +109,34 @@ export const calculateWorkshopMetrics = (participants: WorkshopParticipant[], wo
     ? validScores.reduce((sum, score) => sum + score, 0) / validScores.length
     : 0;
 
-  // Calculate group average WOCA scores for additional insights
+  // Calculate group average WOCA scores for additional insights using participants with scores
   const groupWocaAverages = {
-    war: participants.reduce((sum, p) => sum + (p.woca_scores?.war || 0), 0) / participants.length,
-    opportunity: participants.reduce((sum, p) => sum + (p.woca_scores?.opportunity || 0), 0) / participants.length,
-    comfort: participants.reduce((sum, p) => sum + (p.woca_scores?.comfort || 0), 0) / participants.length,
-    apathy: participants.reduce((sum, p) => sum + (p.woca_scores?.apathy || 0), 0) / participants.length
+    war: participantsWithScores.reduce((sum, p) => sum + (p.woca_scores?.war || 0), 0) / Math.max(participantsWithScores.length, 1),
+    opportunity: participantsWithScores.reduce((sum, p) => sum + (p.woca_scores?.opportunity || 0), 0) / Math.max(participantsWithScores.length, 1),
+    comfort: participantsWithScores.reduce((sum, p) => sum + (p.woca_scores?.comfort || 0), 0) / Math.max(participantsWithScores.length, 1),
+    apathy: participantsWithScores.reduce((sum, p) => sum + (p.woca_scores?.apathy || 0), 0) / Math.max(participantsWithScores.length, 1)
   };
 
-  console.log('📈 Group WOCA averages:', groupWocaAverages);
+  console.log('📈 Group WOCA averages calculated from', participantsWithScores.length, 'participants:', groupWocaAverages);
 
   const result = {
     workshop_id: workshopId,
-    participants,
+    participants: participants, // Keep all participants
     participant_count: participants.length,
     average_score,
     zone_distribution: zoneDistribution,
     dominant_zone: groupZoneResult.zone,
     dominant_zone_color: groupZoneResult.color,
     group_zone_result: groupZoneResult,
-    group_woca_averages: groupWocaAverages // Add this for additional group insights
+    group_woca_averages: groupWocaAverages
   };
 
   console.log('🎯 Final workshop data for group', workshopId, ':', {
-    participant_count: result.participant_count,
+    total_participants: result.participant_count,
+    participants_with_scores: participantsWithScores.length,
     dominant_zone: result.dominant_zone,
-    zone_distribution: result.zone_distribution
+    zone_distribution: result.zone_distribution,
+    group_averages: result.group_woca_averages
   });
   
   return result;
