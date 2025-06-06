@@ -9,6 +9,8 @@ export const useWorkshopsList = () => {
 
   useEffect(() => {
     const fetchWorkshops = async () => {
+      console.log('🏢 Starting workshop list fetch...');
+      
       try {
         // First try workshop_id, then fall back to group_id
         const { data: workshopData, error: workshopError } = await supabase
@@ -20,6 +22,13 @@ export const useWorkshopsList = () => {
           .from('woca_responses')
           .select('group_id, created_at')
           .not('group_id', 'is', null);
+
+        console.log('🏢 Workshop data query results:', {
+          workshopData: workshopData?.length || 0,
+          groupData: groupData?.length || 0,
+          workshopError,
+          groupError
+        });
 
         if (workshopError && groupError) {
           throw workshopError || groupError;
@@ -63,9 +72,15 @@ export const useWorkshopsList = () => {
           }
         });
 
-        setWorkshops(Array.from(workshopMap.values()));
+        const workshopsList = Array.from(workshopMap.values());
+        console.log('🏢 Final workshops list:', {
+          count: workshopsList.length,
+          workshops: workshopsList.map(w => ({ id: w.id, participant_count: w.participant_count }))
+        });
+        
+        setWorkshops(workshopsList);
       } catch (err) {
-        console.error('Error fetching workshops:', err);
+        console.error('🏢 Error fetching workshops:', err);
         setError('Failed to fetch workshops');
       }
     };

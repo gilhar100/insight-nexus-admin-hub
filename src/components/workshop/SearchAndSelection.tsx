@@ -32,12 +32,24 @@ export const SearchAndSelection: React.FC<SearchAndSelectionProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   
+  console.log('🎯 SearchAndSelection render:', {
+    workshopsCount: workshops.length,
+    selectedWorkshopId,
+    workshops: workshops.map(w => ({ id: w.id, participant_count: w.participant_count }))
+  });
+  
   const { participants: searchResults, isLoading: isSearchLoading } = useWocaSearch(searchQuery);
 
   const handleParticipantSelect = (participant: any) => {
+    console.log('🎯 SearchAndSelection handleParticipantSelect:', participant);
     onParticipantSelect(participant);
     setSearchQuery(participant.full_name);
     setIsDropdownOpen(false);
+  };
+
+  const handleWorkshopSelectLocal = (value: string) => {
+    console.log('🎯 SearchAndSelection handleWorkshopSelectLocal called with:', value);
+    onWorkshopSelect(value);
   };
 
   return (
@@ -121,21 +133,24 @@ export const SearchAndSelection: React.FC<SearchAndSelectionProps> = ({
           {/* Workshop selection */}
           <div className="space-y-2">
             <label className="text-sm font-medium">בחירת מספר סדנה</label>
-            <Select value={selectedWorkshopId?.toString()} onValueChange={onWorkshopSelect}>
+            <Select value={selectedWorkshopId?.toString()} onValueChange={handleWorkshopSelectLocal}>
               <SelectTrigger>
                 <SelectValue placeholder="בחרו סדנה לניתוח קבוצתי" />
               </SelectTrigger>
               <SelectContent>
-                {workshops.map((workshop) => (
-                  <SelectItem key={workshop.id} value={workshop.id.toString()}>
-                    <div className="flex flex-col">
-                      <span className="font-medium">סדנה {workshop.id}</span>
-                      <span className="text-sm text-gray-500">
-                        {workshop.participant_count} משתתפים • {new Date(workshop.date).toLocaleDateString('he-IL')}
-                      </span>
-                    </div>
-                  </SelectItem>
-                ))}
+                {workshops.map((workshop) => {
+                  console.log('🎯 Rendering workshop option:', workshop);
+                  return (
+                    <SelectItem key={workshop.id} value={workshop.id.toString()}>
+                      <div className="flex flex-col">
+                        <span className="font-medium">סדנה {workshop.id}</span>
+                        <span className="text-sm text-gray-500">
+                          {workshop.participant_count} משתתפים • {new Date(workshop.date).toLocaleDateString('he-IL')}
+                        </span>
+                      </div>
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
           </div>
