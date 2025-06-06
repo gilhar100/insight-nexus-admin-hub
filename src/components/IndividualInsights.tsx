@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Search, BarChart3, Download, User, Maximize } from 'lucide-react';
+import { Search, BarChart3, Download, User } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useNameSearch } from '@/hooks/useNameSearch';
 import { useRespondentData } from '@/hooks/useRespondentData';
@@ -11,7 +11,6 @@ import { SalimaRadarChart } from '@/components/SalimaRadarChart';
 import { SalimaIntensityBar } from '@/components/SalimaIntensityBar';
 import { exportSalimaReport, exportSalimaReportCSV } from '@/utils/exportUtils';
 import { useToast } from '@/hooks/use-toast';
-import { PresenterMode } from '@/components/PresenterMode';
 import {
   Command,
   CommandEmpty,
@@ -32,7 +31,6 @@ export const IndividualInsights: React.FC = () => {
   const [selectedSource, setSelectedSource] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [presenterMode, setPresenterMode] = useState(false);
 
   const { names, isLoading, error } = useNameSearch(searchQuery);
   const { data: respondentData, isLoading: isDataLoading, error: dataError, fetchRespondentData } = useRespondentData();
@@ -101,257 +99,236 @@ export const IndividualInsights: React.FC = () => {
   ] : [];
 
   return (
-    <>
-      <div className="space-y-6">
-        {/* Page Header */}
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                Individual Insights - SALIMA Model
-              </h2>
-              <p className="text-gray-600">
-                Analyze individual responses to the 90-question SALIMA survey across six key dimensions
-              </p>
-            </div>
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <User className="h-8 w-8 text-blue-600" />
-            </div>
+    <div className="space-y-6">
+      {/* Page Header */}
+      <div className="bg-white rounded-lg shadow-sm border p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              Individual Insights - SALIMA Model
+            </h2>
+            <p className="text-gray-600">
+              Analyze individual responses to the 90-question SALIMA survey across six key dimensions
+            </p>
+          </div>
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <User className="h-8 w-8 text-blue-600" />
           </div>
         </div>
+      </div>
 
-        {/* Respondent Selection */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Search className="h-5 w-5 mr-2" />
-              Select Respondent
-            </CardTitle>
-            <CardDescription>
-              Search and select an individual from survey_responses or colleague_survey_responses tables (SALIMA data only)
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex gap-4">
-              <div className="flex-1 relative">
-                <Input
-                  placeholder="Search SALIMA respondents by name or email..."
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    if (e.target.value.length >= 2) {
-                      setIsDropdownOpen(true);
-                    } else {
-                      setIsDropdownOpen(false);
-                    }
-                  }}
-                  onFocus={() => {
-                    if (searchQuery.length >= 2) {
-                      setIsDropdownOpen(true);
-                    }
-                  }}
-                  className="w-full"
-                />
-                
-                {/* Dropdown Results */}
-                {isDropdownOpen && (searchQuery.length >= 2) && (
-                  <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border rounded-md shadow-lg max-h-80 overflow-y-auto">
-                    <Command>
-                      <CommandList>
-                        {isLoading && (
-                          <CommandEmpty>Searching...</CommandEmpty>
-                        )}
-                        {error && (
-                          <CommandEmpty className="text-red-500">Error: {error}</CommandEmpty>
-                        )}
-                        {!isLoading && !error && names.length === 0 && (
-                          <CommandEmpty>No SALIMA respondents found.</CommandEmpty>
-                        )}
-                        {names.length > 0 && (
-                          <CommandGroup>
-                            {names.map((nameOption) => (
-                              <CommandItem
-                                key={nameOption.id}
-                                value={nameOption.name}
-                                onSelect={() => handleNameSelect(nameOption)}
-                                className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50"
-                              >
-                                <div className="flex flex-col">
-                                  <span className="font-medium">{nameOption.name}</span>
-                                  {nameOption.email && (
-                                    <span className="text-sm text-gray-500">{nameOption.email}</span>
-                                  )}
-                                </div>
-                                <Badge className={getSourceBadgeColor(nameOption.source)}>
-                                  {nameOption.source}
-                                </Badge>
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        )}
-                      </CommandList>
-                    </Command>
-                  </div>
-                )}
-              </div>
-              <Button 
-                onClick={handleAnalyzeResults} 
-                disabled={!selectedRespondent || isDataLoading}
-              >
-                {isDataLoading ? 'Analyzing...' : 'Analyze Results'}
-              </Button>
+      {/* Respondent Selection */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Search className="h-5 w-5 mr-2" />
+            Select Respondent
+          </CardTitle>
+          <CardDescription>
+            Search and select an individual from survey_responses or colleague_survey_responses tables (SALIMA data only)
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-4">
+            <div className="flex-1 relative">
+              <Input
+                placeholder="Search SALIMA respondents by name or email..."
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  if (e.target.value.length >= 2) {
+                    setIsDropdownOpen(true);
+                  } else {
+                    setIsDropdownOpen(false);
+                  }
+                }}
+                onFocus={() => {
+                  if (searchQuery.length >= 2) {
+                    setIsDropdownOpen(true);
+                  }
+                }}
+                className="w-full"
+              />
+              
+              {/* Dropdown Results */}
+              {isDropdownOpen && (searchQuery.length >= 2) && (
+                <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border rounded-md shadow-lg max-h-80 overflow-y-auto">
+                  <Command>
+                    <CommandList>
+                      {isLoading && (
+                        <CommandEmpty>Searching...</CommandEmpty>
+                      )}
+                      {error && (
+                        <CommandEmpty className="text-red-500">Error: {error}</CommandEmpty>
+                      )}
+                      {!isLoading && !error && names.length === 0 && (
+                        <CommandEmpty>No SALIMA respondents found.</CommandEmpty>
+                      )}
+                      {names.length > 0 && (
+                        <CommandGroup>
+                          {names.map((nameOption) => (
+                            <CommandItem
+                              key={nameOption.id}
+                              value={nameOption.name}
+                              onSelect={() => handleNameSelect(nameOption)}
+                              className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50"
+                            >
+                              <div className="flex flex-col">
+                                <span className="font-medium">{nameOption.name}</span>
+                                {nameOption.email && (
+                                  <span className="text-sm text-gray-500">{nameOption.email}</span>
+                                )}
+                              </div>
+                              <Badge className={getSourceBadgeColor(nameOption.source)}>
+                                {nameOption.source}
+                              </Badge>
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      )}
+                    </CommandList>
+                  </Command>
+                </div>
+              )}
             </div>
-            {selectedName && (
-              <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                <p className="text-sm text-blue-800">
-                  Selected: <span className="font-medium">{selectedName}</span>
-                  {selectedSource && <span className="ml-2">({selectedSource})</span>}
-                </p>
-              </div>
-            )}
-            {dataError && (
-              <div className="mt-4 p-3 bg-red-50 rounded-lg">
-                <p className="text-sm text-red-800">Error: {dataError}</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+            <Button 
+              onClick={handleAnalyzeResults} 
+              disabled={!selectedRespondent || isDataLoading}
+            >
+              {isDataLoading ? 'Analyzing...' : 'Analyze Results'}
+            </Button>
+          </div>
+          {selectedName && (
+            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+              <p className="text-sm text-blue-800">
+                Selected: <span className="font-medium">{selectedName}</span>
+                {selectedSource && <span className="ml-2">({selectedSource})</span>}
+              </p>
+            </div>
+          )}
+          {dataError && (
+            <div className="mt-4 p-3 bg-red-50 rounded-lg">
+              <p className="text-sm text-red-800">Error: {dataError}</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
-        {/* Results Section - Only show when respondent data is loaded */}
-        {respondentData && (
-          <>
-            {/* Overall Score Summary */}
+      {/* Results Section - Only show when respondent data is loaded */}
+      {respondentData && (
+        <>
+          {/* Overall Score Summary */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span>SALIMA Overall Score (SLQ)</span>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Download className="h-4 w-4 mr-2" />
+                      Export Report
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => handleExport('json')}>
+                      Export as JSON
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleExport('csv')}>
+                      Export as CSV
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-center p-8">
+                <div className="text-center">
+                  <div className="text-6xl font-bold text-blue-600 mb-2">
+                    {respondentData.overallScore.toFixed(1)}
+                  </div>
+                  <div className="text-lg text-gray-600">out of 5.0</div>
+                  <div className="mt-4 text-sm text-gray-500">
+                    Average across all six SALIMA dimensions
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Dimension Scores */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Radar Chart */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>SALIMA Overall Score (SLQ)</span>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={() => setPresenterMode(true)}
-                    >
-                      <Maximize className="h-4 w-4 mr-2" />
-                      Presenter Mode
-                    </Button>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm">
-                          <Download className="h-4 w-4 mr-2" />
-                          Export Report
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem onClick={() => handleExport('json')}>
-                          Export as JSON
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleExport('csv')}>
-                          Export as CSV
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
+                <CardTitle className="flex items-center">
+                  <BarChart3 className="h-5 w-5 mr-2" />
+                  Radar Chart - Six Dimensions
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex items-center justify-center p-8">
-                  <div className="text-center">
-                    <div className="text-6xl font-bold text-blue-600 mb-2">
-                      {respondentData.overallScore.toFixed(1)}
-                    </div>
-                    <div className="text-lg text-gray-600">out of 5.0</div>
-                    <div className="mt-4 text-sm text-gray-500">
-                      Average across all six SALIMA dimensions
-                    </div>
-                  </div>
-                </div>
+                <SalimaRadarChart data={radarChartData} />
               </CardContent>
             </Card>
 
-            {/* Dimension Scores */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Radar Chart */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <BarChart3 className="h-5 w-5 mr-2" />
-                    Radar Chart - Six Dimensions
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <SalimaRadarChart data={radarChartData} />
-                </CardContent>
-              </Card>
-
-              {/* Intensity Bars */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <BarChart3 className="h-5 w-5 mr-2" />
-                    Dimension Intensity
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {radarChartData.map((dimension, index) => (
-                      <SalimaIntensityBar
-                        key={index}
-                        dimension={dimension.dimension}
-                        score={dimension.score}
-                      />
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* AI-Generated Insights */}
+            {/* Intensity Bars */}
             <Card>
               <CardHeader>
-                <CardTitle>Analysis Summary</CardTitle>
-                <CardDescription>
-                  Based on actual survey responses from {respondentData.source} data
-                </CardDescription>
+                <CardTitle className="flex items-center">
+                  <BarChart3 className="h-5 w-5 mr-2" />
+                  Dimension Intensity
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                    <h4 className="font-semibold text-green-800 mb-2">Highest Scoring Dimensions</h4>
-                    <ul className="text-sm text-green-700 space-y-1">
-                      {radarChartData
-                        .sort((a, b) => b.score - a.score)
-                        .slice(0, 3)
-                        .map((dim, idx) => (
-                          <li key={idx}>• {dim.dimension}: {dim.score.toFixed(1)}/5.0</li>
-                        ))}
-                    </ul>
-                  </div>
-                  <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
-                    <h4 className="font-semibold text-amber-800 mb-2">Areas for Development</h4>
-                    <ul className="text-sm text-amber-700 space-y-1">
-                      {radarChartData
-                        .sort((a, b) => a.score - b.score)
-                        .slice(0, 3)
-                        .map((dim, idx) => (
-                          <li key={idx}>• {dim.dimension}: {dim.score.toFixed(1)}/5.0</li>
-                        ))}
-                    </ul>
-                  </div>
+                <div className="space-y-4">
+                  {radarChartData.map((dimension, index) => (
+                    <SalimaIntensityBar
+                      key={index}
+                      dimension={dimension.dimension}
+                      score={dimension.score}
+                    />
+                  ))}
                 </div>
               </CardContent>
             </Card>
-          </>
-        )}
-      </div>
+          </div>
 
-      {/* Presenter Mode */}
-      <PresenterMode 
-        isOpen={presenterMode}
-        onClose={() => setPresenterMode(false)}
-        type="salima"
-        data={respondentData}
-        title={selectedName || 'SALIMA Analysis'}
-      />
-    </>
+          {/* AI-Generated Insights */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Analysis Summary</CardTitle>
+              <CardDescription>
+                Based on actual survey responses from {respondentData.source} data
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                  <h4 className="font-semibold text-green-800 mb-2">Highest Scoring Dimensions</h4>
+                  <ul className="text-sm text-green-700 space-y-1">
+                    {radarChartData
+                      .sort((a, b) => b.score - a.score)
+                      .slice(0, 3)
+                      .map((dim, idx) => (
+                        <li key={idx}>• {dim.dimension}: {dim.score.toFixed(1)}/5.0</li>
+                      ))}
+                  </ul>
+                </div>
+                <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
+                  <h4 className="font-semibold text-amber-800 mb-2">Areas for Development</h4>
+                  <ul className="text-sm text-amber-700 space-y-1">
+                    {radarChartData
+                      .sort((a, b) => a.score - b.score)
+                      .slice(0, 3)
+                      .map((dim, idx) => (
+                        <li key={idx}>• {dim.dimension}: {dim.score.toFixed(1)}/5.0</li>
+                      ))}
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </>
+      )}
+    </div>
   );
 };
