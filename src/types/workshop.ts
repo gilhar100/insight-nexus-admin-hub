@@ -28,6 +28,7 @@ export interface WorkshopData {
   dominant_zone: string;
   dominant_zone_color: string;
   group_zone_result?: WocaZoneResult;
+  group_woca_averages: WocaScores;
 }
 
 export interface Workshop {
