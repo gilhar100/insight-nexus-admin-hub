@@ -1,5 +1,5 @@
 
-// WOCA scoring utilities with reverse scoring and zone assignment based on highest parameter average
+// WOCA scoring utilities with correct question mapping and proper data handling
 
 export interface WocaScores {
   war: number;
@@ -18,24 +18,24 @@ export interface WocaZoneResult {
   recommendations?: string;
 }
 
-// Corrected Question mappings for each WOCA parameter (36 questions total)
-// Each question should map to exactly one parameter
+// CORRECTED Question mappings for each WOCA parameter (36 questions total)
+// Based on the actual WOCA methodology - each question maps to exactly one parameter
 export const WOCA_QUESTION_MAPPING = {
   war: {
-    normal: [2, 9, 10, 15, 19, 21, 25, 28, 32], // Questions scored normally for War
-    reverse: [] // No reverse scoring for War in these questions
+    normal: [2, 9, 10, 15, 19, 21, 25, 28, 32], // War zone questions
+    reverse: [] // No reverse scoring for War
   },
   opportunity: {
-    normal: [4, 11, 14, 17, 22, 27, 29, 35], // Questions scored normally for Opportunity  
-    reverse: [3, 7] // Questions that are reverse scored for Opportunity
+    normal: [4, 11, 14, 17, 22, 27, 29, 35], // Opportunity zone questions (normal scoring)
+    reverse: [3, 7] // Opportunity zone questions (reverse scoring)
   },
   comfort: {
-    normal: [18, 24, 30, 31, 36], // Questions scored normally for Comfort
-    reverse: [5, 13, 20] // Questions that are reverse scored for Comfort
+    normal: [18, 24, 30, 31, 36], // Comfort zone questions (normal scoring)
+    reverse: [5, 13, 20] // Comfort zone questions (reverse scoring)
   },
   apathy: {
-    normal: [12, 23, 26, 33, 34], // Questions scored normally for Apathy
-    reverse: [1, 6, 8, 16] // Questions that are reverse scored for Apathy
+    normal: [12, 23, 26, 33, 34], // Apathy zone questions (normal scoring)
+    reverse: [1, 6, 8, 16] // Apathy zone questions (reverse scoring)
   }
 };
 
@@ -71,12 +71,6 @@ export const WOCA_ZONE_EXPLANATIONS = {
   }
 };
 
-// Ideal zone explanation
-export const IDEAL_ZONE_EXPLANATION = {
-  title: 'למה אזור ההזדמנות הוא האידיאל?',
-  content: 'אזור ההזדמנות מייצג את המצב התודעתי האופטימלי עבור ארגונים. במצב זה, חברי הצוות מרגישים בטוחים לבטא דעות, לקחת סיכונים מחושבים ולחדש. קיים שיח פתוח ובונה שמאפשר צמיחה אישית וארגונית, ויצירת סביבת עבודה בריאה ופרודוקטיבית.'
-};
-
 // Reverse score transformation: 1→5, 2→4, 3→3, 4→2, 5→1
 export const reverseScore = (score: number): number => {
   return 6 - score;
@@ -96,29 +90,26 @@ export const calculateWocaScores = (questionResponses: any): WocaScores => {
   let responses: Record<string, number> = {};
   
   if (Array.isArray(questionResponses)) {
-    // Convert array format to object format, using rawScore when available
+    // Convert array format to object format
     questionResponses.forEach((item: any) => {
-      if (item.questionId) {
-        // Use rawScore if available (original 1-5 response), otherwise use score
-        const rawValue = item.rawScore || item.score;
-        if (rawValue && typeof rawValue === 'number' && rawValue >= 1 && rawValue <= 5) {
-          responses[`q${item.questionId}`] = rawValue;
-        }
+      if (item.questionId && typeof item.score === 'number' && item.score >= 1 && item.score <= 5) {
+        responses[`q${item.questionId}`] = item.score;
       }
     });
-    console.log('📝 Converted array format to object format using raw scores:', responses);
+    console.log('📝 Converted array format to object format:', responses);
   } else if (typeof questionResponses === 'object') {
-    // Direct object format - ensure values are within 1-5 range
+    // Check if using direct column names (q1, q2, etc.) from database
     Object.keys(questionResponses).forEach(key => {
       const value = questionResponses[key];
       if (typeof value === 'number' && value >= 1 && value <= 5) {
-        responses[key] = value;
+        if (key.startsWith('q') || /^\d+$/.test(key)) {
+          // Handle both q1 format and just number format
+          const questionKey = key.startsWith('q') ? key : `q${key}`;
+          responses[questionKey] = value;
+        }
       }
     });
     console.log('📝 Using direct object format (filtered to 1-5 range):', responses);
-  } else {
-    console.log('❌ Invalid question responses format');
-    return { war: 0, opportunity: 0, comfort: 0, apathy: 0 };
   }
 
   // Validate that we have responses in the correct range
@@ -160,26 +151,38 @@ export const calculateWocaScores = (questionResponses: any): WocaScores => {
 
     // Calculate average for this parameter only if questions were answered
     const average = questionCount > 0 ? totalScore / questionCount : 0;
-    scores[parameter as keyof WocaScores] = average;
+    scores[parameter as keyof WocaScores] = Math.round(average * 100) / 100; // Round to 2 decimal places
     
     console.log(`✅ ${parameter}: ${totalScore}/${questionCount} = ${average.toFixed(3)}`);
-    
-    // Validation check - average should be between 1-5
-    if (average > 5) {
-      console.error(`🚨 ERROR: ${parameter} average ${average} exceeds maximum of 5!`);
-    }
   });
 
   console.log('🎯 Final scores:', scores);
-  
-  // Final validation - all scores should be between 0-5
-  Object.entries(scores).forEach(([key, value]) => {
-    if (value > 5) {
-      console.error(`🚨 CRITICAL ERROR: ${key} score ${value} exceeds maximum of 5!`);
-    }
-  });
-  
   return scores;
+};
+
+// Calculate scores directly from database columns (when available)
+export const calculateWocaScoresFromDatabase = (responseRow: any): WocaScores => {
+  console.log('🔍 Calculating WOCA scores from database row:', responseRow);
+  
+  // If we have pre-calculated scores in the database, use them
+  if (responseRow.war_score !== null && responseRow.war_score !== undefined &&
+      responseRow.opportunity_score !== null && responseRow.opportunity_score !== undefined &&
+      responseRow.comfort_score !== null && responseRow.comfort_score !== undefined &&
+      responseRow.apathy_score !== null && responseRow.apathy_score !== undefined) {
+    
+    const scores = {
+      war: Number(responseRow.war_score),
+      opportunity: Number(responseRow.opportunity_score),
+      comfort: Number(responseRow.comfort_score),
+      apathy: Number(responseRow.apathy_score)
+    };
+    
+    console.log('✅ Using pre-calculated database scores:', scores);
+    return scores;
+  }
+  
+  // Fall back to calculating from individual question responses
+  return calculateWocaScores(responseRow);
 };
 
 // Determine WOCA zone based on highest parameter average with proper tie handling

@@ -7,6 +7,7 @@ import { WocaZoneComparisonChart } from '@/components/WocaZoneComparisonChart';
 import { WocaDistributionChart } from '@/components/WocaDistributionChart';
 import { WocaZoneStatistics } from '@/components/WocaZoneStatistics';
 import { WocaRadarChart } from '@/components/WocaRadarChart';
+import { WocaGroupStatistics } from '@/components/WocaGroupStatistics';
 
 interface WocaAnalyticsDashboardProps {
   viewMode: 'workshop' | 'individual';
@@ -67,31 +68,42 @@ export const WocaAnalyticsDashboard: React.FC<WocaAnalyticsDashboardProps> = ({
   }
 
   if (viewMode === 'workshop' && workshopData) {
-    // Calculate group average scores
-    const groupScores = {
-      war: workshopData.participants.reduce((sum: number, p: any) => sum + (p.woca_scores?.war || 0), 0) / workshopData.participants.length,
-      opportunity: workshopData.participants.reduce((sum: number, p: any) => sum + (p.woca_scores?.opportunity || 0), 0) / workshopData.participants.length,
-      comfort: workshopData.participants.reduce((sum: number, p: any) => sum + (p.woca_scores?.comfort || 0), 0) / workshopData.participants.length,
-      apathy: workshopData.participants.reduce((sum: number, p: any) => sum + (p.woca_scores?.apathy || 0), 0) / workshopData.participants.length
-    };
-
-    return (
-      <div className="space-y-6">
-        {/* Group Zone Comparison Chart */}
+    // Check if we have sufficient data
+    if (workshopData.participant_count < 3) {
+      return (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <BarChart3 className="h-5 w-5 mr-2" />
-              השוואת ציוני אזורי תודעה - ממוצע קבוצתי
+              <Users className="h-5 w-5 mr-2" />
+              סטטיסטיקות קבוצתיות
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <WocaZoneComparisonChart 
-              scores={groupScores}
-              title={`ממוצע קבוצתי - ${workshopData.participant_count} משתתפים`}
-            />
+            <div className="text-center p-8">
+              <div className="text-gray-500 mb-4">
+                <Users className="h-12 w-12 mx-auto mb-2" />
+              </div>
+              <div className="text-lg text-gray-600 mb-2">
+                אין מספיק תגובות עדיין לחישוב תובנות ברמת הקבוצה
+              </div>
+              <div className="text-sm text-gray-500">
+                נדרשות לפחות 3 תגובות לניתוח קבוצתי אמין
+              </div>
+              <div className="mt-4">
+                <Badge variant="secondary">
+                  {workshopData.participant_count} תגובות קיימות
+                </Badge>
+              </div>
+            </div>
           </CardContent>
         </Card>
+      );
+    }
+
+    return (
+      <div className="space-y-6">
+        {/* Group Statistics - This is the main fix */}
+        <WocaGroupStatistics workshopData={workshopData} />
 
         {/* Distribution Visualizations */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -124,50 +136,6 @@ export const WocaAnalyticsDashboard: React.FC<WocaAnalyticsDashboardProps> = ({
           </CardHeader>
           <CardContent>
             <WocaRadarChart participants={workshopData.participants} />
-          </CardContent>
-        </Card>
-
-        {/* Group Zone Assignment Summary */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Users className="h-5 w-5 mr-2" />
-              סיכום אזור תודעתי קבוצתי
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center p-6">
-              <Badge 
-                variant="secondary" 
-                className="text-lg px-4 py-2 text-white mb-4"
-                style={{ backgroundColor: workshopData.dominant_zone_color }}
-              >
-                {workshopData.dominant_zone}
-              </Badge>
-              <div className="text-lg text-gray-600 mb-2">
-                {workshopData.group_zone_result?.description || 'האזור התודעתי הדומיננטי בקבוצה'}
-              </div>
-              <div className="text-sm text-gray-500">
-                מבוסס על ממוצע ציוני הקבוצה ב-{workshopData.participant_count} משתתפים
-              </div>
-              
-              {workshopData.group_zone_result?.explanation && (
-                <div className="mt-4 p-4 bg-blue-50 rounded-lg text-right">
-                  <p className="text-blue-800 text-sm">
-                    {workshopData.group_zone_result.explanation}
-                  </p>
-                </div>
-              )}
-              
-              {workshopData.group_zone_result?.recommendations && (
-                <div className="mt-4 p-4 bg-green-50 rounded-lg text-right">
-                  <h4 className="font-semibold text-green-800 mb-2">המלצות:</h4>
-                  <p className="text-green-700 text-sm">
-                    {workshopData.group_zone_result.recommendations}
-                  </p>
-                </div>
-              )}
-            </div>
           </CardContent>
         </Card>
       </div>

@@ -25,26 +25,40 @@ export const useWorkshopData = (workshopId?: number) => {
       setError(null);
 
       try {
-        // Search both workshop_id and group_id fields
-        const { data: workshopData, error: workshopError } = await supabase
+        console.log('🔍 Fetching WOCA data for group_id:', workshopId);
+        
+        // Query for WOCA responses with the specified group_id
+        const { data: wocaData, error: wocaError } = await supabase
           .from('woca_responses')
           .select('*')
-          .eq('workshop_id', workshopId);
+          .eq('group_id', workshopId)
+          .eq('survey_type', 'WOCA');
 
-        const { data: groupData, error: groupError } = await supabase
-          .from('woca_responses')
-          .select('*')
-          .eq('group_id', workshopId.toString());
-
-        if (workshopError && groupError) {
-          throw workshopError || groupError;
+        if (wocaError) {
+          console.error('❌ Error fetching WOCA data:', wocaError);
+          throw wocaError;
         }
 
-        // Combine both datasets
-        const allData = [...(workshopData || []), ...(groupData || [])];
+        console.log('📊 Fetched WOCA responses:', wocaData?.length || 0, 'records');
+
+        if (!wocaData || wocaData.length === 0) {
+          console.log('⚠️ No WOCA data found for group_id:', workshopId);
+          setWorkshopData(null);
+          return;
+        }
+
+        // Check if we have enough responses for reliable group insights
+        if (wocaData.length < 3) {
+          console.log('⚠️ Insufficient responses for group analysis:', wocaData.length);
+          setError('אין מספיק תגובות עדיין לחישוב תובנות ברמת הקבוצה.');
+          setWorkshopData(null);
+          return;
+        }
         
         // Process participants using utility function
-        const uniqueParticipants = processWorkshopParticipants(allData);
+        const uniqueParticipants = processWorkshopParticipants(wocaData);
+        
+        console.log('📈 Processed participants for group analysis:', uniqueParticipants.length);
         
         // Calculate workshop metrics using utility function
         const processedWorkshopData = calculateWorkshopMetrics(uniqueParticipants, workshopId);
@@ -53,7 +67,7 @@ export const useWorkshopData = (workshopId?: number) => {
 
       } catch (err) {
         console.error('Error fetching data:', err);
-        setError('Failed to fetch data');
+        setError('שגיאה בטעינת הנתונים');
       } finally {
         setIsLoading(false);
       }

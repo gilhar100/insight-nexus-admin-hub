@@ -1,5 +1,5 @@
 
-import { calculateWocaScores, determineWocaZone, calculateGroupZone } from '@/utils/wocaScoring';
+import { calculateWocaScoresFromDatabase, determineWocaZone, calculateGroupZone } from '@/utils/wocaScoring';
 import { WorkshopParticipant, WorkshopData } from '@/types/workshop';
 
 export const processWorkshopParticipants = (rawData: any[]): WorkshopParticipant[] => {
@@ -8,50 +8,29 @@ export const processWorkshopParticipants = (rawData: any[]): WorkshopParticipant
   // Log the first response to check data structure
   if (rawData.length > 0) {
     console.log('📝 Sample participant data structure:', {
-      question_responses: rawData[0].question_responses,
-      q1: rawData[0].q1,
-      q2: rawData[0].q2,
-      hasDirectQuestions: !!(rawData[0].q1 || rawData[0].q2 || rawData[0].q3)
+      id: rawData[0].id,
+      full_name: rawData[0].full_name,
+      email: rawData[0].email,
+      survey_type: rawData[0].survey_type,
+      hasPreCalculatedScores: !!(rawData[0].war_score || rawData[0].opportunity_score || rawData[0].comfort_score || rawData[0].apathy_score),
+      hasQuestionColumns: !!(rawData[0].q1 || rawData[0].q2 || rawData[0].q3),
+      hasJsonResponses: !!rawData[0].question_responses
     });
   }
 
   const participants: WorkshopParticipant[] = rawData?.map((item, index) => {
-    console.log(`👤 Processing participant ${index + 1}:`, item.full_name);
+    console.log(`👤 Processing participant ${index + 1}:`, item.full_name || item.email);
     
-    // Try to get responses from different possible fields
-    let questionResponses = null;
-    
-    // First check if we have question_responses field
-    if (item.question_responses && (Array.isArray(item.question_responses) || typeof item.question_responses === 'object')) {
-      questionResponses = item.question_responses;
-      console.log('📝 Using question_responses field:', questionResponses);
-    } 
-    // Fall back to direct question fields (q1, q2, etc.)
-    else {
-      const directResponses: Record<string, number> = {};
-      for (let i = 1; i <= 36; i++) {
-        const questionKey = `q${i}`;
-        if (item[questionKey] && typeof item[questionKey] === 'number') {
-          directResponses[questionKey] = item[questionKey];
-        }
-      }
-      
-      if (Object.keys(directResponses).length > 0) {
-        questionResponses = directResponses;
-        console.log('📝 Using direct question fields:', directResponses);
-      }
-    }
-
-    // Calculate WOCA scores using the corrected method
-    const wocaScores = calculateWocaScores(questionResponses);
+    // Calculate WOCA scores using the improved method that handles database columns
+    const wocaScores = calculateWocaScoresFromDatabase(item);
     const zoneResult = determineWocaZone(wocaScores);
 
-    console.log(`✅ Participant ${item.full_name} - Zone: ${zoneResult.zone}, Scores:`, wocaScores);
+    console.log(`✅ Participant ${item.full_name || item.email} - Zone: ${zoneResult.zone}, Scores:`, wocaScores);
 
     return {
       id: item.id,
-      full_name: item.full_name,
-      email: item.email,
+      full_name: item.full_name || 'משתתף אנונימי',
+      email: item.email || `participant_${item.id}@unknown.com`,
       overall_score: item.overall_score,
       woca_scores: wocaScores,
       woca_zone: zoneResult.zone,
