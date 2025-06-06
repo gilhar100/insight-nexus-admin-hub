@@ -1,10 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Download, EyeOff, Eye, Maximize } from 'lucide-react';
-
 interface ZoneClassificationProps {
   zoneInfo: {
     name: string;
@@ -19,7 +17,6 @@ interface ZoneClassificationProps {
   onPresenterMode: () => void;
   onExport: () => void;
 }
-
 export const ZoneClassification: React.FC<ZoneClassificationProps> = ({
   zoneInfo,
   viewMode,
@@ -30,8 +27,7 @@ export const ZoneClassification: React.FC<ZoneClassificationProps> = ({
   onPresenterMode,
   onExport
 }) => {
-  return (
-    <Card>
+  return <Card>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>סיווג אזור תודעתי WOCA</span>
@@ -54,42 +50,29 @@ export const ZoneClassification: React.FC<ZoneClassificationProps> = ({
       <CardContent>
         <div className="text-center p-8">
           <div className="mb-6">
-            <Badge 
-              variant="secondary" 
-              className={`text-lg px-4 py-2 text-white`}
-              style={{ backgroundColor: zoneInfo.color }}
-            >
+            <Badge variant="secondary" className={`text-lg px-4 py-2 text-white`} style={{
+            backgroundColor: zoneInfo.color
+          }}>
               {zoneInfo.name}
             </Badge>
           </div>
-          {viewMode === 'workshop' && workshopData && (
-            <>
+          {viewMode === 'workshop' && workshopData && <>
               <div className="text-2xl font-bold text-gray-900 mb-2">
                 {workshopData.group_zone_result?.description || 'האזור התודעתי הדומיננטי'}
               </div>
-              <div className="text-lg text-gray-600 mb-4">
-                מבוסס על הציון הממוצע הגבוה ביותר בקבוצה
-              </div>
-              <div className="text-lg text-gray-600 mb-4">
-                {workshopData.participant_count} משתתפים
-              </div>
-            </>
-          )}
-          {viewMode === 'individual' && selectedParticipant && (
-            <>
+              
+              
+            </>}
+          {viewMode === 'individual' && selectedParticipant && <>
               <div className="text-2xl font-bold text-gray-900 mb-2">
                 {zoneInfo.name}
               </div>
               <div className="text-lg text-gray-600 mb-4">
                 אזור תודעתי אישי
               </div>
-            </>
-          )}
-          <p className="text-gray-500 max-w-md mx-auto">
-            {zoneInfo.description}
-          </p>
+            </>}
+          
         </div>
       </CardContent>
-    </Card>
-  );
+    </Card>;
 };
