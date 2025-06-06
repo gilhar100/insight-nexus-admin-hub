@@ -1,3 +1,4 @@
+
 // WOCA scoring utilities with correct question mapping and proper data handling
 
 export interface WocaScores {
@@ -81,9 +82,9 @@ export const reverseScore = (score: number): number => {
   return 6 - score;
 };
 
-// Calculate WOCA parameter scores from question responses
+// Calculate WOCA parameter scores from question responses (q1-q36)
 export const calculateWocaScores = (questionResponses: any): WocaScores => {
-  console.log('🔍 Calculating WOCA scores for:', questionResponses);
+  console.log('🔍 Calculating WOCA scores from q1-q36 for:', questionResponses?.id || 'unknown participant');
   
   // Handle null/undefined question responses
   if (!questionResponses) {
@@ -91,36 +92,23 @@ export const calculateWocaScores = (questionResponses: any): WocaScores => {
     return { war: 0, opportunity: 0, comfort: 0, apathy: 0 };
   }
 
-  // Handle different data formats
-  let responses: Record<string, number> = {};
+  // Extract q1-q36 values directly from the database row
+  const responses: Record<string, number> = {};
   
-  if (Array.isArray(questionResponses)) {
-    // Convert array format to object format
-    questionResponses.forEach((item: any) => {
-      if (item.questionId && typeof item.score === 'number' && item.score >= 1 && item.score <= 5) {
-        responses[`q${item.questionId}`] = item.score;
-      }
-    });
-    console.log('📝 Converted array format to object format:', responses);
-  } else if (typeof questionResponses === 'object') {
-    // Check if using direct column names (q1, q2, etc.) from database
-    Object.keys(questionResponses).forEach(key => {
-      const value = questionResponses[key];
-      if (typeof value === 'number' && value >= 1 && value <= 5) {
-        if (key.startsWith('q') || /^\d+$/.test(key)) {
-          // Handle both q1 format and just number format
-          const questionKey = key.startsWith('q') ? key : `q${key}`;
-          responses[questionKey] = value;
-        }
-      }
-    });
-    console.log('📝 Using direct object format (filtered to 1-5 range):', responses);
+  for (let i = 1; i <= 36; i++) {
+    const questionKey = `q${i}`;
+    const value = questionResponses[questionKey];
+    if (typeof value === 'number' && value >= 1 && value <= 5) {
+      responses[questionKey] = value;
+    }
   }
+
+  console.log('📝 Valid question responses found:', Object.keys(responses).length, 'out of 36');
 
   // Validate that we have responses in the correct range
   const validResponses = Object.values(responses).filter(val => val >= 1 && val <= 5);
-  if (validResponses.length === 0) {
-    console.log('❌ No valid responses found in 1-5 range');
+  if (validResponses.length < 30) { // Require at least 30 valid responses
+    console.log('❌ Insufficient valid responses found:', validResponses.length, '< 30 required');
     return { war: 0, opportunity: 0, comfort: 0, apathy: 0 };
   }
 
@@ -161,34 +149,8 @@ export const calculateWocaScores = (questionResponses: any): WocaScores => {
     console.log(`✅ ${parameter}: ${totalScore}/${questionCount} = ${average.toFixed(3)}`);
   });
 
-  console.log('🎯 Final scores:', scores);
+  console.log('🎯 Final calculated scores:', scores);
   return scores;
-};
-
-// Calculate scores directly from database columns (when available)
-export const calculateWocaScoresFromDatabase = (responseRow: any): WocaScores => {
-  console.log('🔍 Calculating WOCA scores from database row:', responseRow);
-  
-  // Use ONLY the pre-calculated scores in the database columns
-  if (responseRow.war_score !== null && responseRow.war_score !== undefined &&
-      responseRow.opportunity_score !== null && responseRow.opportunity_score !== undefined &&
-      responseRow.comfort_score !== null && responseRow.comfort_score !== undefined &&
-      responseRow.apathy_score !== null && responseRow.apathy_score !== undefined) {
-    
-    const scores = {
-      war: Number(responseRow.war_score),
-      opportunity: Number(responseRow.opportunity_score),
-      comfort: Number(responseRow.comfort_score),
-      apathy: Number(responseRow.apathy_score)
-    };
-    
-    console.log('✅ Using pre-calculated database scores:', scores);
-    return scores;
-  }
-  
-  // Fallback: calculate from individual question responses only if no pre-calculated scores
-  console.log('⚠️ No pre-calculated scores found, falling back to question calculation');
-  return calculateWocaScores(responseRow);
 };
 
 // Determine WOCA zone based on highest parameter average with proper tie handling

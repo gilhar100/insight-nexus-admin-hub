@@ -1,9 +1,9 @@
 
-import { calculateWocaScoresFromDatabase, determineWocaZone, calculateGroupZone } from '@/utils/wocaScoring';
+import { calculateWocaScores, determineWocaZone, calculateGroupZone } from '@/utils/wocaScoring';
 import { WorkshopParticipant, WorkshopData } from '@/types/workshop';
 
 export const processWorkshopParticipants = (rawData: any[]): WorkshopParticipant[] => {
-  console.log('🔄 Processing workshop participants:', rawData.length, 'total responses');
+  console.log('🔄 Processing workshop participants from q1-q36 data:', rawData.length, 'total responses');
   
   // Log the data structure for debugging
   if (rawData.length > 0) {
@@ -13,12 +13,10 @@ export const processWorkshopParticipants = (rawData: any[]): WorkshopParticipant
       email: rawData[0].email,
       survey_type: rawData[0].survey_type,
       group_id: rawData[0].group_id,
-      hasPreCalculatedScores: !!(rawData[0].war_score || rawData[0].opportunity_score || rawData[0].comfort_score || rawData[0].apathy_score),
-      sampleScores: {
-        war: rawData[0].war_score,
-        opportunity: rawData[0].opportunity_score,
-        comfort: rawData[0].comfort_score,
-        apathy: rawData[0].apathy_score
+      sampleQuestions: {
+        q1: rawData[0].q1,
+        q2: rawData[0].q2,
+        q3: rawData[0].q3
       }
     });
   }
@@ -30,8 +28,8 @@ export const processWorkshopParticipants = (rawData: any[]): WorkshopParticipant
       email: item.email
     });
     
-    // Calculate WOCA scores using the pre-calculated database columns ONLY
-    const wocaScores = calculateWocaScoresFromDatabase(item);
+    // Calculate WOCA scores from q1-q36 question responses
+    const wocaScores = calculateWocaScores(item);
     const zoneResult = determineWocaZone(wocaScores);
 
     console.log(`✅ Participant ${item.full_name || item.email || item.id} - Zone: ${zoneResult.zone}, Scores:`, wocaScores);
@@ -108,7 +106,7 @@ export const calculateWorkshopMetrics = (participants: WorkshopParticipant[], wo
     ? validScores.reduce((sum, score) => sum + score, 0) / validScores.length
     : 0;
 
-  // Calculate group average WOCA scores using ONLY the stored score columns
+  // Calculate group average WOCA scores
   const groupWocaAverages = {
     war: participantsWithScores.reduce((sum, p) => sum + (p.woca_scores?.war || 0), 0) / Math.max(participantsWithScores.length, 1),
     opportunity: participantsWithScores.reduce((sum, p) => sum + (p.woca_scores?.opportunity || 0), 0) / Math.max(participantsWithScores.length, 1),
