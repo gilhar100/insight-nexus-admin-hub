@@ -107,16 +107,18 @@ export const processWorkshopParticipants = (rawData: any[]): WorkshopParticipant
 export const calculateWorkshopMetrics = (participants: WorkshopParticipant[], workshopId: number): WorkshopData => {
   console.log('📊 ⚠️ CRITICAL: Calculating workshop metrics for GROUP', workshopId, 'with', participants.length, 'participants');
   
-  // ⚠️ FIX: Accept ALL participants regardless of score validity for the count
-  // The minimum threshold check should be based on total participants, not just those with perfect scores
+  // ⚠️ FIXED: Use total participant count for threshold check - this is the key fix
+  const totalParticipantCount = participants.length;
+  const meetsThreshold = totalParticipantCount >= 3;
+  
   console.log('📈 ⚠️ CRITICAL: Participant count validation:', {
-    totalParticipants: participants.length,
+    totalParticipants: totalParticipantCount,
     minimumRequired: 3,
-    meetsThreshold: participants.length >= 3,
-    shouldShowGroupAnalytics: participants.length >= 3
+    meetsThreshold: meetsThreshold,
+    shouldShowGroupAnalytics: meetsThreshold
   });
   
-  // Calculate scores only for participants with some valid data
+  // Calculate scores using participants with some valid data (for calculations only)
   const participantsWithSomeScores = participants.filter(p => {
     const hasAnyValidScore = p.woca_scores && 
       Object.values(p.woca_scores).some(score => score > 0);
@@ -131,9 +133,9 @@ export const calculateWorkshopMetrics = (participants: WorkshopParticipant[], wo
   });
   
   console.log('📈 ⚠️ CRITICAL: Score validation summary:', {
-    totalParticipants: participants.length,
+    totalParticipants: totalParticipantCount,
     participantsWithSomeScores: participantsWithSomeScores.length,
-    willProceedWithGroupAnalysis: participants.length >= 3, // Changed logic here!
+    willProceedWithGroupAnalysis: meetsThreshold,
     participantDetails: participantsWithSomeScores.map(p => ({
       name: p.full_name,
       scores: p.woca_scores,
@@ -191,7 +193,7 @@ export const calculateWorkshopMetrics = (participants: WorkshopParticipant[], wo
   const result = {
     workshop_id: workshopId,
     participants: participants, // Keep all participants
-    participant_count: participants.length, // ⚠️ CRITICAL: Count ALL participants
+    participant_count: totalParticipantCount, // ⚠️ CRITICAL: Count ALL participants 
     average_score,
     zone_distribution: zoneDistribution,
     dominant_zone: groupZoneResult.zone,
@@ -206,8 +208,8 @@ export const calculateWorkshopMetrics = (participants: WorkshopParticipant[], wo
     dominant_zone: result.dominant_zone,
     zone_distribution: result.zone_distribution,
     group_averages: result.group_woca_averages,
-    MEETS_MINIMUM_THRESHOLD: result.participant_count >= 3,
-    SHOULD_SHOW_ANALYTICS: result.participant_count >= 3
+    MEETS_MINIMUM_THRESHOLD: meetsThreshold,
+    SHOULD_SHOW_ANALYTICS: meetsThreshold
   });
   
   return result;

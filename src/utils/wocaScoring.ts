@@ -1,4 +1,3 @@
-
 // WOCA scoring utilities with correct question mapping and proper data handling
 
 export interface WocaScores {
@@ -105,10 +104,10 @@ export const calculateWocaScores = (questionResponses: any): WocaScores => {
 
   console.log('📝 Valid question responses found:', Object.keys(responses).length, 'out of 36');
 
-  // Validate that we have responses in the correct range
+  // ⚠️ RELAXED: Require at least 20 valid responses instead of 30 for more flexibility
   const validResponses = Object.values(responses).filter(val => val >= 1 && val <= 5);
-  if (validResponses.length < 30) { // Require at least 30 valid responses
-    console.log('❌ Insufficient valid responses found:', validResponses.length, '< 30 required');
+  if (validResponses.length < 20) {
+    console.log('❌ Insufficient valid responses found:', validResponses.length, '< 20 required');
     return { war: 0, opportunity: 0, comfort: 0, apathy: 0 };
   }
 
