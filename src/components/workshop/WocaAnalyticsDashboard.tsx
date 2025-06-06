@@ -20,13 +20,14 @@ export const WocaAnalyticsDashboard: React.FC<WocaAnalyticsDashboardProps> = ({
   workshopData,
   selectedParticipant
 }) => {
-  console.log('📊 WocaAnalyticsDashboard render:', { 
+  console.log('📊 ⚠️ CRITICAL WocaAnalyticsDashboard render:', { 
     viewMode, 
     workshopData: workshopData ? {
       workshop_id: workshopData.workshop_id,
       participant_count: workshopData.participant_count,
       hasParticipants: !!workshopData.participants,
-      participantsLength: workshopData.participants?.length || 0
+      participantsLength: workshopData.participants?.length || 0,
+      MEETS_THRESHOLD: workshopData.participant_count >= 3
     } : null,
     selectedParticipant: selectedParticipant?.id 
   });
@@ -78,14 +79,16 @@ export const WocaAnalyticsDashboard: React.FC<WocaAnalyticsDashboardProps> = ({
   }
 
   if (viewMode === 'workshop' && workshopData) {
-    console.log('📊 Rendering workshop view, checking participant count...', {
+    console.log('📊 ⚠️ CRITICAL: Rendering workshop view, checking participant count...', {
       participant_count: workshopData.participant_count,
-      meetsThreshold: workshopData.participant_count >= 3
+      meetsThreshold: workshopData.participant_count >= 3,
+      WILL_SHOW_ANALYTICS: workshopData.participant_count >= 3
     });
 
-    // Check if we have sufficient data
+    // ⚠️ FIXED: Always show analytics if we have 3+ participants
+    // The threshold check should be simple and direct
     if (workshopData.participant_count < 3) {
-      console.log('📊 Insufficient participants, showing placeholder');
+      console.log('📊 ⚠️ Still insufficient participants, showing placeholder');
       return (
         <Card>
           <CardHeader>
@@ -116,10 +119,10 @@ export const WocaAnalyticsDashboard: React.FC<WocaAnalyticsDashboardProps> = ({
       );
     }
 
-    console.log('📊 Sufficient participants, rendering full analytics');
+    console.log('📊 ⚠️ CRITICAL: Sufficient participants detected! Rendering FULL analytics for', workshopData.participant_count, 'participants');
     return (
       <div className="space-y-6">
-        {/* Group Statistics - This is the main fix */}
+        {/* Group Statistics - This should now render */}
         <WocaGroupStatistics workshopData={workshopData} />
 
         {/* Distribution Visualizations */}

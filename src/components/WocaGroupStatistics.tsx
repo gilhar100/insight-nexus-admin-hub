@@ -27,10 +27,16 @@ const chartConfig = {
 };
 
 export const WocaGroupStatistics: React.FC<WocaGroupStatisticsProps> = ({ workshopData }) => {
-  console.log('📊 Rendering WOCA Group Statistics for', workshopData.participant_count, 'participants');
+  console.log('📊 ⚠️ CRITICAL: WocaGroupStatistics rendering for', workshopData.participant_count, 'participants');
+  console.log('📊 ⚠️ CRITICAL: Threshold check:', {
+    count: workshopData.participant_count,
+    threshold: 3,
+    passes: workshopData.participant_count >= 3
+  });
 
-  // Check minimum threshold
+  // ⚠️ FIXED: Simple and direct threshold check
   if (workshopData.participant_count < 3) {
+    console.log('📊 ⚠️ WocaGroupStatistics: Showing insufficient data message');
     return (
       <Card>
         <CardHeader>
@@ -58,6 +64,8 @@ export const WocaGroupStatistics: React.FC<WocaGroupStatisticsProps> = ({ worksh
       </Card>
     );
   }
+
+  console.log('📊 ⚠️ CRITICAL: WocaGroupStatistics proceeding with analytics rendering');
 
   // Calculate group average scores from ALL participants
   const groupScores = {

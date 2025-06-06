@@ -24,10 +24,7 @@ export const processWorkshopParticipants = (rawData: any[]): WorkshopParticipant
         q35: rawData[0].q35,
         q36: rawData[0].q36
       },
-      allQuestionsPreview: Array.from({ length: 36 }, (_, i) => {
-        const key = `q${i + 1}`;
-        return { [key]: rawData[0][key] };
-      }).slice(0, 10)
+      hasValidQuestions: Object.keys(rawData[0]).filter(key => key.startsWith('q') && rawData[0][key] !== null).length
     });
   }
 
@@ -108,41 +105,45 @@ export const processWorkshopParticipants = (rawData: any[]): WorkshopParticipant
 };
 
 export const calculateWorkshopMetrics = (participants: WorkshopParticipant[], workshopId: number): WorkshopData => {
-  console.log('📊 Calculating workshop metrics for GROUP', workshopId, 'with', participants.length, 'unique participants');
+  console.log('📊 ⚠️ CRITICAL: Calculating workshop metrics for GROUP', workshopId, 'with', participants.length, 'participants');
   
-  // Verify we have valid participants with scores
-  const participantsWithScores = participants.filter(p => {
-    const hasValidScores = p.woca_scores && 
-      (p.woca_scores.war > 0 || p.woca_scores.opportunity > 0 || p.woca_scores.comfort > 0 || p.woca_scores.apathy > 0);
+  // ⚠️ FIX: Accept ALL participants regardless of score validity for the count
+  // The minimum threshold check should be based on total participants, not just those with perfect scores
+  console.log('📈 ⚠️ CRITICAL: Participant count validation:', {
+    totalParticipants: participants.length,
+    minimumRequired: 3,
+    meetsThreshold: participants.length >= 3,
+    shouldShowGroupAnalytics: participants.length >= 3
+  });
+  
+  // Calculate scores only for participants with some valid data
+  const participantsWithSomeScores = participants.filter(p => {
+    const hasAnyValidScore = p.woca_scores && 
+      Object.values(p.woca_scores).some(score => score > 0);
     
-    console.log(`📈 Participant ${p.full_name} scores check:`, {
+    console.log(`📈 Participant ${p.full_name} score validation:`, {
       scores: p.woca_scores,
-      hasValidScores,
+      hasAnyValidScore,
       totalScore: p.woca_scores ? Object.values(p.woca_scores).reduce((sum, val) => sum + val, 0) : 0
     });
     
-    return hasValidScores;
+    return hasAnyValidScore;
   });
   
-  console.log('📈 Participants validation summary:', {
+  console.log('📈 ⚠️ CRITICAL: Score validation summary:', {
     totalParticipants: participants.length,
-    participantsWithValidScores: participantsWithScores.length,
-    minimumRequired: 3,
-    canProceedWithGroupAnalysis: participantsWithScores.length >= 3,
-    participantDetails: participantsWithScores.map(p => ({
+    participantsWithSomeScores: participantsWithSomeScores.length,
+    willProceedWithGroupAnalysis: participants.length >= 3, // Changed logic here!
+    participantDetails: participantsWithSomeScores.map(p => ({
       name: p.full_name,
       scores: p.woca_scores,
       zone: p.woca_zone
     }))
   });
   
-  if (participantsWithScores.length === 0) {
-    console.warn('⚠️ No participants with valid WOCA scores found');
-  }
-  
-  // Calculate zone distribution across ALL participants with scores
+  // Calculate zone distribution using participants with scores
   const zoneDistribution: Record<string, number> = {};
-  participantsWithScores.forEach(participant => {
+  participantsWithSomeScores.forEach(participant => {
     const zone = participant.woca_zone;
     zoneDistribution[zone] = (zoneDistribution[zone] || 0) + 1;
     console.log(`📈 Zone count update: ${zone} = ${zoneDistribution[zone]} (participant: ${participant.full_name})`);
@@ -150,12 +151,13 @@ export const calculateWorkshopMetrics = (participants: WorkshopParticipant[], wo
 
   console.log('📊 Final group zone distribution:', zoneDistribution);
 
-  // Calculate group zone using ALL participants with scores
-  const groupZoneResult = calculateGroupZone(participantsWithScores);
+  // Calculate group zone using participants with scores (fallback to first participant if none)
+  const participantsForGroupZone = participantsWithSomeScores.length > 0 ? participantsWithSomeScores : participants.slice(0, 1);
+  const groupZoneResult = calculateGroupZone(participantsForGroupZone);
 
   console.log('🏆 Workshop group zone result:', {
     zone: groupZoneResult.zone,
-    basedOnParticipants: participantsWithScores.length,
+    basedOnParticipants: participantsForGroupZone.length,
     details: groupZoneResult
   });
 
@@ -168,18 +170,19 @@ export const calculateWorkshopMetrics = (participants: WorkshopParticipant[], wo
     ? validScores.reduce((sum, score) => sum + score, 0) / validScores.length
     : 0;
 
-  // Calculate group average WOCA scores
+  // Calculate group average WOCA scores using participants with scores
+  const scoreParticipants = participantsWithSomeScores.length > 0 ? participantsWithSomeScores : participants;
   const groupWocaAverages = {
-    war: participantsWithScores.reduce((sum, p) => sum + (p.woca_scores?.war || 0), 0) / Math.max(participantsWithScores.length, 1),
-    opportunity: participantsWithScores.reduce((sum, p) => sum + (p.woca_scores?.opportunity || 0), 0) / Math.max(participantsWithScores.length, 1),
-    comfort: participantsWithScores.reduce((sum, p) => sum + (p.woca_scores?.comfort || 0), 0) / Math.max(participantsWithScores.length, 1),
-    apathy: participantsWithScores.reduce((sum, p) => sum + (p.woca_scores?.apathy || 0), 0) / Math.max(participantsWithScores.length, 1)
+    war: scoreParticipants.reduce((sum, p) => sum + (p.woca_scores?.war || 0), 0) / Math.max(scoreParticipants.length, 1),
+    opportunity: scoreParticipants.reduce((sum, p) => sum + (p.woca_scores?.opportunity || 0), 0) / Math.max(scoreParticipants.length, 1),
+    comfort: scoreParticipants.reduce((sum, p) => sum + (p.woca_scores?.comfort || 0), 0) / Math.max(scoreParticipants.length, 1),
+    apathy: scoreParticipants.reduce((sum, p) => sum + (p.woca_scores?.apathy || 0), 0) / Math.max(scoreParticipants.length, 1)
   };
 
   console.log('📈 Group WOCA averages calculated:', {
-    basedOnParticipants: participantsWithScores.length,
+    basedOnParticipants: scoreParticipants.length,
     averages: groupWocaAverages,
-    participantContributions: participantsWithScores.map(p => ({
+    participantContributions: scoreParticipants.map(p => ({
       name: p.full_name,
       scores: p.woca_scores
     }))
@@ -188,7 +191,7 @@ export const calculateWorkshopMetrics = (participants: WorkshopParticipant[], wo
   const result = {
     workshop_id: workshopId,
     participants: participants, // Keep all participants
-    participant_count: participants.length,
+    participant_count: participants.length, // ⚠️ CRITICAL: Count ALL participants
     average_score,
     zone_distribution: zoneDistribution,
     dominant_zone: groupZoneResult.zone,
@@ -197,13 +200,14 @@ export const calculateWorkshopMetrics = (participants: WorkshopParticipant[], wo
     group_woca_averages: groupWocaAverages
   };
 
-  console.log('🎯 Final workshop data for group', workshopId, ':', {
+  console.log('🎯 ⚠️ CRITICAL FINAL: Workshop data for group', workshopId, ':', {
     total_participants: result.participant_count,
-    participants_with_scores: participantsWithScores.length,
+    participants_with_some_scores: participantsWithSomeScores.length,
     dominant_zone: result.dominant_zone,
     zone_distribution: result.zone_distribution,
     group_averages: result.group_woca_averages,
-    meetsMinimumThreshold: result.participant_count >= 3
+    MEETS_MINIMUM_THRESHOLD: result.participant_count >= 3,
+    SHOULD_SHOW_ANALYTICS: result.participant_count >= 3
   });
   
   return result;
