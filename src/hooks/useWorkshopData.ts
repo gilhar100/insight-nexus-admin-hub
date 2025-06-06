@@ -25,13 +25,13 @@ export const useWorkshopData = (workshopId?: number) => {
       setError(null);
 
       try {
-        console.log('🔍 Fetching ALL WOCA responses for group_id:', workshopId);
+        console.log('🔍 Fetching ALL WOCA responses for group_id:', workshopId, 'Type:', typeof workshopId);
         
-        // Query for ALL WOCA responses with the specified group_id (REMOVED LIMIT completely)
+        // Query for ALL WOCA responses with the specified group_id as INTEGER
         const { data: wocaData, error: wocaError } = await supabase
           .from('woca_responses')
           .select('*')
-          .eq('group_id', workshopId)
+          .eq('group_id', workshopId) // group_id is treated as integer
           .eq('survey_type', 'WOCA')
           .order('created_at', { ascending: true }); // Order by creation time
 
@@ -45,20 +45,45 @@ export const useWorkshopData = (workshopId?: number) => {
 
         if (!wocaData || wocaData.length === 0) {
           console.log('⚠️ No WOCA data found for group_id:', workshopId);
-          setError('לא נמצאו נתוני WOCA עבור קבוצה זו.');
+          setError(`לא נמצאו נתוני WOCA עבור קבוצה ${workshopId}.`);
+          setWorkshopData(null);
+          return;
+        }
+
+        // Filter responses that have valid WOCA scores (not null)
+        const responsesWithScores = wocaData.filter(response => {
+          const hasValidScores = 
+            response.war_score !== null || 
+            response.opportunity_score !== null || 
+            response.comfort_score !== null || 
+            response.apathy_score !== null;
+          
+          console.log(`👤 Response ${response.id} - Valid scores:`, hasValidScores, {
+            war: response.war_score,
+            opportunity: response.opportunity_score,
+            comfort: response.comfort_score,
+            apathy: response.apathy_score
+          });
+          
+          return hasValidScores;
+        });
+
+        console.log('📈 Responses with valid WOCA scores:', responsesWithScores.length, 'out of', wocaData.length);
+
+        if (responsesWithScores.length === 0) {
+          console.log('⚠️ No responses with valid WOCA scores found for group_id:', workshopId);
+          setError(`לא נמצאו תגובות עם ציוני WOCA תקינים עבור קבוצה ${workshopId}.`);
           setWorkshopData(null);
           return;
         }
 
         // Log each response for debugging
-        wocaData.forEach((response, index) => {
-          console.log(`👤 Response ${index + 1}:`, {
+        responsesWithScores.forEach((response, index) => {
+          console.log(`👤 Valid Response ${index + 1}:`, {
             id: response.id,
             full_name: response.full_name,
             email: response.email,
             group_id: response.group_id,
-            has_scores: !!(response.war_score || response.opportunity_score || response.comfort_score || response.apathy_score),
-            has_questions: !!(response.q1 || response.q2 || response.q3),
             war_score: response.war_score,
             opportunity_score: response.opportunity_score,
             comfort_score: response.comfort_score,
@@ -66,20 +91,12 @@ export const useWorkshopData = (workshopId?: number) => {
           });
         });
 
-        // Check if we have enough responses for reliable group insights
-        if (wocaData.length < 3) {
-          console.log('⚠️ Insufficient responses for group analysis:', wocaData.length);
-          setError(`נמצאו רק ${wocaData.length} תגובות. נדרשות לפחות 3 תגובות לניתוח קבוצתי אמין.`);
-          setWorkshopData(null);
-          return;
-        }
+        // Process ALL participants with valid scores for group analysis
+        const uniqueParticipants = processWorkshopParticipants(responsesWithScores);
         
-        // Process ALL participants for group analysis
-        const uniqueParticipants = processWorkshopParticipants(wocaData);
+        console.log('📈 Processing participants with valid scores:', uniqueParticipants.length, 'unique participants from', responsesWithScores.length, 'valid responses');
         
-        console.log('📈 Processing ALL participants for group analysis:', uniqueParticipants.length, 'unique participants from', wocaData.length, 'total responses');
-        
-        // Calculate workshop metrics using ALL participants
+        // Calculate workshop metrics using participants with valid scores
         const processedWorkshopData = calculateWorkshopMetrics(uniqueParticipants, workshopId);
         
         console.log('🎯 Final workshop data summary:', {

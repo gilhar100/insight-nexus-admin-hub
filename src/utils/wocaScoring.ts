@@ -169,7 +169,7 @@ export const calculateWocaScores = (questionResponses: any): WocaScores => {
 export const calculateWocaScoresFromDatabase = (responseRow: any): WocaScores => {
   console.log('🔍 Calculating WOCA scores from database row:', responseRow);
   
-  // If we have pre-calculated scores in the database, use them
+  // Use ONLY the pre-calculated scores in the database columns
   if (responseRow.war_score !== null && responseRow.war_score !== undefined &&
       responseRow.opportunity_score !== null && responseRow.opportunity_score !== undefined &&
       responseRow.comfort_score !== null && responseRow.comfort_score !== undefined &&
@@ -186,7 +186,8 @@ export const calculateWocaScoresFromDatabase = (responseRow: any): WocaScores =>
     return scores;
   }
   
-  // Fall back to calculating from individual question responses
+  // Fallback: calculate from individual question responses only if no pre-calculated scores
+  console.log('⚠️ No pre-calculated scores found, falling back to question calculation');
   return calculateWocaScores(responseRow);
 };
 

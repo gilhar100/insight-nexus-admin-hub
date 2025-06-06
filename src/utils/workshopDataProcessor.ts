@@ -14,7 +14,6 @@ export const processWorkshopParticipants = (rawData: any[]): WorkshopParticipant
       survey_type: rawData[0].survey_type,
       group_id: rawData[0].group_id,
       hasPreCalculatedScores: !!(rawData[0].war_score || rawData[0].opportunity_score || rawData[0].comfort_score || rawData[0].apathy_score),
-      hasQuestionColumns: !!(rawData[0].q1 || rawData[0].q2 || rawData[0].q3),
       sampleScores: {
         war: rawData[0].war_score,
         opportunity: rawData[0].opportunity_score,
@@ -31,7 +30,7 @@ export const processWorkshopParticipants = (rawData: any[]): WorkshopParticipant
       email: item.email
     });
     
-    // Calculate WOCA scores using the method that handles both database columns and question responses
+    // Calculate WOCA scores using the pre-calculated database columns ONLY
     const wocaScores = calculateWocaScoresFromDatabase(item);
     const zoneResult = determineWocaZone(wocaScores);
 
@@ -109,7 +108,7 @@ export const calculateWorkshopMetrics = (participants: WorkshopParticipant[], wo
     ? validScores.reduce((sum, score) => sum + score, 0) / validScores.length
     : 0;
 
-  // Calculate group average WOCA scores for additional insights using participants with scores
+  // Calculate group average WOCA scores using ONLY the stored score columns
   const groupWocaAverages = {
     war: participantsWithScores.reduce((sum, p) => sum + (p.woca_scores?.war || 0), 0) / Math.max(participantsWithScores.length, 1),
     opportunity: participantsWithScores.reduce((sum, p) => sum + (p.woca_scores?.opportunity || 0), 0) / Math.max(participantsWithScores.length, 1),
@@ -117,7 +116,7 @@ export const calculateWorkshopMetrics = (participants: WorkshopParticipant[], wo
     apathy: participantsWithScores.reduce((sum, p) => sum + (p.woca_scores?.apathy || 0), 0) / Math.max(participantsWithScores.length, 1)
   };
 
-  console.log('📈 Group WOCA averages calculated from', participantsWithScores.length, 'participants:', groupWocaAverages);
+  console.log('📈 Group WOCA averages calculated from', participantsWithScores.length, 'participants with valid scores:', groupWocaAverages);
 
   const result = {
     workshop_id: workshopId,
