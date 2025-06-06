@@ -59,8 +59,11 @@ export const useWorkshopData = (workshopId?: number) => {
           throw wocaError;
         }
 
-        console.log('📊 Fetched WOCA responses:', wocaData?.length || 0, 'records for group', workshopId);
-        console.log('📝 Raw WOCA data sample:', wocaData?.[0]);
+        console.log('📊 Raw WOCA query results:', {
+          totalResults: wocaData?.length || 0,
+          groupId: workshopId,
+          sampleData: wocaData?.[0]
+        });
 
         if (!wocaData || wocaData.length === 0) {
           console.log('⚠️ No WOCA data found for group_id:', workshopId);
@@ -68,6 +71,24 @@ export const useWorkshopData = (workshopId?: number) => {
           setWorkshopData(null);
           return;
         }
+
+        // Log all raw responses for debugging
+        console.log('📝 All WOCA responses found:', wocaData.map(response => ({
+          id: response.id,
+          full_name: response.full_name,
+          email: response.email,
+          group_id: response.group_id,
+          survey_type: response.survey_type,
+          hasQ1: response.q1 !== null && response.q1 !== undefined,
+          hasQ36: response.q36 !== null && response.q36 !== undefined,
+          sampleQuestions: {
+            q1: response.q1,
+            q2: response.q2,
+            q3: response.q3,
+            q35: response.q35,
+            q36: response.q36
+          }
+        })));
 
         // Filter responses that have valid question responses (q1-q36)
         const responsesWithValidQuestions = wocaData.filter(response => {
@@ -78,40 +99,66 @@ export const useWorkshopData = (workshopId?: number) => {
             return typeof value === 'number' && value >= 1 && value <= 5;
           });
           
-          console.log(`👤 Response ${response.id} - Valid questions:`, validQuestions.length, 'out of 36');
+          console.log(`👤 Response ${response.id} (${response.full_name || response.email}):`, {
+            validQuestions: validQuestions.length,
+            outOf: 36,
+            isValid: validQuestions.length >= 30,
+            sampleValidQuestions: validQuestions.slice(0, 5),
+            allQuestionValues: questionKeys.map(key => ({
+              [key]: response[key as keyof typeof response]
+            })).slice(0, 5)
+          });
           
           // Require at least 30 valid responses (allowing some missing)
           return validQuestions.length >= 30;
         });
 
-        console.log('📈 Responses with valid question data:', responsesWithValidQuestions.length, 'out of', wocaData.length);
+        console.log('📈 Validation results:', {
+          totalResponses: wocaData.length,
+          responsesWithValidQuestions: responsesWithValidQuestions.length,
+          validationThreshold: 30,
+          minimumForGroupAnalysis: 3
+        });
 
         if (responsesWithValidQuestions.length === 0) {
           console.log('⚠️ No responses with valid question data found for group_id:', workshopId);
+          console.log('🔍 Detailed validation breakdown:');
+          
+          wocaData.forEach((response, index) => {
+            const questionKeys = Array.from({ length: 36 }, (_, i) => `q${i + 1}`);
+            const validQuestions = questionKeys.filter(key => {
+              const value = response[key as keyof typeof response];
+              return typeof value === 'number' && value >= 1 && value <= 5;
+            });
+            const invalidQuestions = questionKeys.filter(key => {
+              const value = response[key as keyof typeof response];
+              return !(typeof value === 'number' && value >= 1 && value <= 5);
+            });
+            
+            console.log(`  Response ${index + 1} (${response.full_name || response.email}):`, {
+              validCount: validQuestions.length,
+              invalidCount: invalidQuestions.length,
+              firstFewValid: validQuestions.slice(0, 3),
+              firstFewInvalid: invalidQuestions.slice(0, 3).map(key => ({
+                [key]: response[key as keyof typeof response]
+              }))
+            });
+          });
+          
           setError(`לא נמצאו תגובות עם נתוני שאלות תקינים עבור קבוצה ${workshopId}.`);
           setWorkshopData(null);
           return;
         }
 
-        // Log each response for debugging
-        responsesWithValidQuestions.forEach((response, index) => {
-          console.log(`👤 Valid Response ${index + 1}:`, {
-            id: response.id,
-            full_name: response.full_name,
-            email: response.email,
-            group_id: response.group_id,
-            sample_questions: {
-              q1: response.q1,
-              q2: response.q2,
-              q3: response.q3
-            }
-          });
-        });
-
         // Process participants using question responses
         const uniqueParticipants = processWorkshopParticipants(responsesWithValidQuestions);
         
-        console.log('📈 Processing participants from question responses:', uniqueParticipants.length, 'unique participants from', responsesWithValidQuestions.length, 'valid responses');
+        console.log('🎯 Participants processing results:', {
+          validResponsesIn: responsesWithValidQuestions.length,
+          uniqueParticipantsOut: uniqueParticipants.length,
+          groupAnalysisThreshold: 3,
+          canProceedWithGroupAnalysis: uniqueParticipants.length >= 3
+        });
         
         // Calculate workshop metrics 
         const processedWorkshopData = calculateWorkshopMetrics(uniqueParticipants, workshopId);
@@ -121,7 +168,8 @@ export const useWorkshopData = (workshopId?: number) => {
           participant_count: processedWorkshopData.participant_count,
           dominant_zone: processedWorkshopData.dominant_zone,
           zone_distribution: processedWorkshopData.zone_distribution,
-          group_woca_averages: processedWorkshopData.group_woca_averages
+          group_woca_averages: processedWorkshopData.group_woca_averages,
+          meetsMinimumThreshold: processedWorkshopData.participant_count >= 3
         });
         
         setWorkshopData(processedWorkshopData);
