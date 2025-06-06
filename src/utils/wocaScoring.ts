@@ -1,4 +1,3 @@
-
 // WOCA scoring utilities with correct question mapping and proper data handling
 
 export interface WocaScores {
@@ -69,6 +68,12 @@ export const WOCA_ZONE_EXPLANATIONS = {
     description: 'מצב של ניתוק, חוסר מוטיבציה, ותחושת חוסר משמעות. העובדים פועלים מתוך אינרציה, ללא תחושת שייכות או חיבור למטרות הארגון.',
     color: '#F59E0B'
   }
+};
+
+// Add the missing IDEAL_ZONE_EXPLANATION export
+export const IDEAL_ZONE_EXPLANATION = {
+  title: 'האזור האידיאלי - אזור ההזדמנות',
+  content: 'אזור ההזדמנות הוא המצב התודעתי הרצוי בארגון. במצב זה קיים שיח פתוח וכן, נכונות ללמידה וחדשנות, אמון הדדי בין חברי הצוות, וחזון משותף המניע את כולם קדימה. זהו האזור שבו הארגון משגשג ומתפתח.'
 };
 
 // Reverse score transformation: 1→5, 2→4, 3→3, 4→2, 5→1
