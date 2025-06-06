@@ -8,7 +8,7 @@ export interface WorkshopParticipant {
   email: string;
   overall_score: number | null;
   scores: any;
-  question_responses?: any; // Add this for WOCA analysis
+  question_responses?: any;
   organization: string | null;
   profession: string | null;
   age: string | null;
@@ -16,6 +16,43 @@ export interface WorkshopParticipant {
   education: string | null;
   experience_years: number | null;
   created_at: string | null;
+  // Add the individual question fields
+  q1?: number | null;
+  q2?: number | null;
+  q3?: number | null;
+  q4?: number | null;
+  q5?: number | null;
+  q6?: number | null;
+  q7?: number | null;
+  q8?: number | null;
+  q9?: number | null;
+  q10?: number | null;
+  q11?: number | null;
+  q12?: number | null;
+  q13?: number | null;
+  q14?: number | null;
+  q15?: number | null;
+  q16?: number | null;
+  q17?: number | null;
+  q18?: number | null;
+  q19?: number | null;
+  q20?: number | null;
+  q21?: number | null;
+  q22?: number | null;
+  q23?: number | null;
+  q24?: number | null;
+  q25?: number | null;
+  q26?: number | null;
+  q27?: number | null;
+  q28?: number | null;
+  q29?: number | null;
+  q30?: number | null;
+  q31?: number | null;
+  q32?: number | null;
+  q33?: number | null;
+  q34?: number | null;
+  q35?: number | null;
+  q36?: number | null;
 }
 
 export interface WorkshopData {
@@ -32,42 +69,59 @@ export interface Workshop {
   date: string;
 }
 
-export const useWorkshopData = (workshopId?: number) => {
+// Helper function to convert individual question columns to question_responses object
+const convertToQuestionResponses = (participant: any): any => {
+  const questionResponses: any = {};
+  for (let i = 1; i <= 36; i++) {
+    const qKey = `q${i}`;
+    if (participant[qKey] !== null && participant[qKey] !== undefined) {
+      questionResponses[qKey] = participant[qKey];
+    }
+  }
+  return questionResponses;
+};
+
+export const useWorkshopData = (groupId?: number) => {
   const [workshopData, setWorkshopData] = useState<WorkshopData | null>(null);
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch all workshops for the dropdown
+  // Fetch all groups for the dropdown (treating group_id as workshop_id)
   useEffect(() => {
     const fetchWorkshops = async () => {
       try {
+        console.log('🔄 Fetching workshops/groups...');
         const { data, error } = await supabase
           .from('woca_responses')
-          .select('workshop_id, created_at')
-          .not('workshop_id', 'is', null);
+          .select('group_id, created_at')
+          .not('group_id', 'is', null);
 
         if (error) throw error;
 
-        // Group by workshop_id and create workshop list
+        console.log('📥 Raw groups data:', data);
+
+        // Group by group_id and create workshop list
         const workshopMap = new Map();
         data?.forEach(item => {
-          if (item.workshop_id) {
-            if (!workshopMap.has(item.workshop_id)) {
-              workshopMap.set(item.workshop_id, {
-                id: item.workshop_id,
-                name: `Workshop ${item.workshop_id}`,
+          if (item.group_id) {
+            if (!workshopMap.has(item.group_id)) {
+              workshopMap.set(item.group_id, {
+                id: item.group_id,
+                name: `סדנה ${item.group_id}`,
                 participant_count: 0,
                 date: item.created_at || 'Unknown'
               });
             }
-            workshopMap.get(item.workshop_id).participant_count++;
+            workshopMap.get(item.group_id).participant_count++;
           }
         });
 
-        setWorkshops(Array.from(workshopMap.values()));
+        const workshopsList = Array.from(workshopMap.values());
+        console.log('🏢 Processed workshops:', workshopsList);
+        setWorkshops(workshopsList);
       } catch (err) {
-        console.error('Error fetching workshops:', err);
+        console.error('❌ Error fetching workshops:', err);
         setError('Failed to fetch workshops');
       }
     };
@@ -75,9 +129,9 @@ export const useWorkshopData = (workshopId?: number) => {
     fetchWorkshops();
   }, []);
 
-  // Fetch specific workshop data when workshopId changes
+  // Fetch specific group data when groupId changes
   useEffect(() => {
-    if (!workshopId) {
+    if (!groupId) {
       setWorkshopData(null);
       return;
     }
@@ -87,51 +141,88 @@ export const useWorkshopData = (workshopId?: number) => {
       setError(null);
 
       try {
+        console.log('🔄 Fetching data for group ID:', groupId);
         const { data, error } = await supabase
           .from('woca_responses')
           .select('*')
-          .eq('workshop_id', workshopId);
+          .eq('group_id', groupId);
 
         if (error) throw error;
 
-        console.log('Raw workshop data from Supabase:', data);
+        console.log('📥 Raw group data from Supabase:', data);
 
-        const participants: WorkshopParticipant[] = data?.map(item => ({
-          id: item.id,
-          full_name: item.full_name,
-          email: item.email,
-          overall_score: item.overall_score,
-          scores: item.scores,
-          question_responses: item.question_responses, // Make sure this is included
-          organization: item.organization,
-          profession: item.profession,
-          age: item.age,
-          gender: item.gender,
-          education: item.education,
-          experience_years: item.experience_years,
-          created_at: item.created_at
-        })) || [];
+        const participants: WorkshopParticipant[] = data?.map(item => {
+          // Convert individual question columns to question_responses format
+          const questionResponses = convertToQuestionResponses(item);
+          
+          return {
+            id: item.id,
+            full_name: item.full_name,
+            email: item.email,
+            overall_score: item.overall_score,
+            scores: item.scores || {},
+            question_responses: questionResponses,
+            organization: item.organization,
+            profession: item.profession,
+            age: item.age,
+            gender: item.gender,
+            education: item.education,
+            experience_years: item.experience_years,
+            created_at: item.created_at,
+            // Include individual question fields
+            q1: item.q1,
+            q2: item.q2,
+            q3: item.q3,
+            q4: item.q4,
+            q5: item.q5,
+            q6: item.q6,
+            q7: item.q7,
+            q8: item.q8,
+            q9: item.q9,
+            q10: item.q10,
+            q11: item.q11,
+            q12: item.q12,
+            q13: item.q13,
+            q14: item.q14,
+            q15: item.q15,
+            q16: item.q16,
+            q17: item.q17,
+            q18: item.q18,
+            q19: item.q19,
+            q20: item.q20,
+            q21: item.q21,
+            q22: item.q22,
+            q23: item.q23,
+            q24: item.q24,
+            q25: item.q25,
+            q26: item.q26,
+            q27: item.q27,
+            q28: item.q28,
+            q29: item.q29,
+            q30: item.q30,
+            q31: item.q31,
+            q32: item.q32,
+            q33: item.q33,
+            q34: item.q34,
+            q35: item.q35,
+            q36: item.q36
+          };
+        }) || [];
 
-        console.log('Processed participants:', participants);
+        console.log('✅ Processed participants with question_responses:', participants);
 
-        // Calculate average score
-        const validScores = participants
-          .map(p => p.overall_score)
-          .filter(score => score !== null) as number[];
-        
-        const average_score = validScores.length > 0 
-          ? validScores.reduce((sum, score) => sum + score, 0) / validScores.length
-          : 0;
+        // Calculate average score (we'll compute this from the WOCA analysis)
+        const average_score = 0; // Will be calculated by WOCA analysis
 
         setWorkshopData({
-          workshop_id: workshopId,
+          workshop_id: groupId,
           participants,
           participant_count: participants.length,
           average_score
         });
 
       } catch (err) {
-        console.error('Error fetching workshop data:', err);
+        console.error('❌ Error fetching workshop data:', err);
         setError('Failed to fetch workshop data');
       } finally {
         setIsLoading(false);
@@ -139,7 +230,7 @@ export const useWorkshopData = (workshopId?: number) => {
     };
 
     fetchWorkshopData();
-  }, [workshopId]);
+  }, [groupId]);
 
   return { workshopData, workshops, isLoading, error };
 };

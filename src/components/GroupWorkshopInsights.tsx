@@ -12,9 +12,21 @@ import { analyzeWorkshopWoca, getZoneDescription } from '@/utils/wocaAnalysis';
 import { WOCA_ZONE_COLORS } from '@/utils/wocaColors';
 
 export const GroupWorkshopInsights: React.FC = () => {
-  const [selectedWorkshopId, setSelectedWorkshopId] = useState<number | undefined>();
+  const [selectedGroupId, setSelectedGroupId] = useState<number | undefined>();
   const [showNames, setShowNames] = useState(false);
-  const { workshopData, workshops, isLoading, error } = useWorkshopData(selectedWorkshopId);
+  const { workshopData, workshops, isLoading, error } = useWorkshopData(selectedGroupId);
+
+  console.log('🏠 GroupWorkshopInsights render:', {
+    selectedGroupId,
+    isLoading,
+    error,
+    hasWorkshopData: !!workshopData,
+    workshopsCount: workshops.length,
+    workshopData: workshopData ? {
+      participantCount: workshopData.participant_count,
+      firstParticipant: workshopData.participants[0]
+    } : null
+  });
 
   // WOCA Zone classification using new analysis
   const getZoneInfo = (zone: string | null) => {
@@ -35,8 +47,10 @@ export const GroupWorkshopInsights: React.FC = () => {
     };
   };
 
-  const handleWorkshopSelect = (value: string) => {
-    setSelectedWorkshopId(Number(value));
+  const handleGroupSelect = (value: string) => {
+    const groupId = Number(value);
+    console.log('🎯 Group selected:', groupId);
+    setSelectedGroupId(groupId);
   };
 
   const exportWorkshopData = () => {
@@ -45,7 +59,7 @@ export const GroupWorkshopInsights: React.FC = () => {
     const wocaAnalysis = analyzeWorkshopWoca(workshopData.participants, workshopData.workshop_id);
     
     const exportData = {
-      workshop_id: workshopData.workshop_id,
+      group_id: workshopData.workshop_id,
       participant_count: workshopData.participant_count,
       woca_analysis: wocaAnalysis,
       analysis_date: new Date().toISOString(),
@@ -61,7 +75,7 @@ export const GroupWorkshopInsights: React.FC = () => {
     
     const link = document.createElement('a');
     link.href = url;
-    link.download = `workshop-${workshopData.workshop_id}-woca-analysis-${new Date().toISOString().split('T')[0]}.json`;
+    link.download = `group-${workshopData.workshop_id}-woca-analysis-${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -71,6 +85,8 @@ export const GroupWorkshopInsights: React.FC = () => {
   // Get WOCA analysis results
   const wocaAnalysis = workshopData ? analyzeWorkshopWoca(workshopData.participants, workshopData.workshop_id) : null;
   const zoneInfo = wocaAnalysis ? getZoneInfo(wocaAnalysis.groupDominantZone) : null;
+
+  console.log('🔍 WOCA Analysis results:', wocaAnalysis);
 
   // Zone distribution calculation using new analysis
   const getZoneDistribution = () => {
@@ -96,7 +112,7 @@ export const GroupWorkshopInsights: React.FC = () => {
               ניתוח קבוצתי - מודל WOCA
             </h2>
             <p className="text-gray-600">
-              ניתוח דינמיקה קבוצתית ואפקטיביות הסדנה באמצעות 36 שאלות מודל WOCA
+              ניתוח דינמיקה קבוצתי ואפקטיביות הסדנה באמצעות 36 שאלות מודל WOCA
             </p>
           </div>
           <div className="bg-purple-50 p-4 rounded-lg">
@@ -105,23 +121,23 @@ export const GroupWorkshopInsights: React.FC = () => {
         </div>
       </div>
 
-      {/* Workshop Selection */}
+      {/* Group Selection */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
             <Users className="h-5 w-5 mr-2" />
-            בחירת סדנה
+            בחירת קבוצה
           </CardTitle>
           <CardDescription>
-            בחר סדנה מטבלת woca_responses לניתוח דינמיקה קבוצתית
+            בחר קבוצה מטבלת woca_responses לניתוח דינמיקה קבוצתית
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
             <div className="flex-1">
-              <Select value={selectedWorkshopId?.toString()} onValueChange={handleWorkshopSelect}>
+              <Select value={selectedGroupId?.toString()} onValueChange={handleGroupSelect}>
                 <SelectTrigger>
-                  <SelectValue placeholder="בחר סדנה" />
+                  <SelectValue placeholder="בחר קבוצה" />
                 </SelectTrigger>
                 <SelectContent>
                   {workshops.map((workshop) => (
@@ -147,11 +163,11 @@ export const GroupWorkshopInsights: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Results Section - Only show when workshop is selected */}
+      {/* Results Section - Only show when group is selected */}
       {isLoading && (
         <Card>
           <CardContent className="p-8 text-center">
-            <div className="text-gray-500">טוען נתוני סדנה...</div>
+            <div className="text-gray-500">טוען נתוני קבוצה...</div>
           </CardContent>
         </Card>
       )}
