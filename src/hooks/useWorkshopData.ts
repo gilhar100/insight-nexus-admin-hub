@@ -25,9 +25,9 @@ export const useWorkshopData = (workshopId?: number) => {
       setError(null);
 
       try {
-        console.log('🔍 Fetching WOCA data for group_id:', workshopId);
+        console.log('🔍 Fetching ALL WOCA responses for group_id:', workshopId);
         
-        // Query for WOCA responses with the specified group_id
+        // Query for ALL WOCA responses with the specified group_id (no LIMIT)
         const { data: wocaData, error: wocaError } = await supabase
           .from('woca_responses')
           .select('*')
@@ -39,7 +39,7 @@ export const useWorkshopData = (workshopId?: number) => {
           throw wocaError;
         }
 
-        console.log('📊 Fetched WOCA responses:', wocaData?.length || 0, 'records');
+        console.log('📊 Fetched ALL WOCA responses:', wocaData?.length || 0, 'records for group', workshopId);
 
         if (!wocaData || wocaData.length === 0) {
           console.log('⚠️ No WOCA data found for group_id:', workshopId);
@@ -50,17 +50,17 @@ export const useWorkshopData = (workshopId?: number) => {
         // Check if we have enough responses for reliable group insights
         if (wocaData.length < 3) {
           console.log('⚠️ Insufficient responses for group analysis:', wocaData.length);
-          setError('אין מספיק תגובות עדיין לחישוב תובנות ברמת הקבוצה.');
+          setError('אין מספיק נתונים להצגת תובנות קבוצתיות.');
           setWorkshopData(null);
           return;
         }
         
-        // Process participants using utility function
+        // Process ALL participants for group analysis
         const uniqueParticipants = processWorkshopParticipants(wocaData);
         
-        console.log('📈 Processed participants for group analysis:', uniqueParticipants.length);
+        console.log('📈 Processing ALL participants for group analysis:', uniqueParticipants.length);
         
-        // Calculate workshop metrics using utility function
+        // Calculate workshop metrics using ALL participants
         const processedWorkshopData = calculateWorkshopMetrics(uniqueParticipants, workshopId);
         
         setWorkshopData(processedWorkshopData);
