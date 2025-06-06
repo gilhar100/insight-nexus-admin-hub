@@ -25,38 +25,40 @@ export const useWorkshopsList = () => {
           throw workshopError || groupError;
         }
 
-        // Group by workshop_id
-        const workshopMap = new Map();
+        // Group by workshop_id - using string keys for the Map
+        const workshopMap = new Map<string, Workshop>();
         
         // Process workshop_id data
         workshopData?.forEach(item => {
           if (item.workshop_id) {
-            if (!workshopMap.has(item.workshop_id)) {
-              workshopMap.set(item.workshop_id, {
+            const workshopKey = String(item.workshop_id);
+            if (!workshopMap.has(workshopKey)) {
+              workshopMap.set(workshopKey, {
                 id: item.workshop_id,
                 name: `סדנה ${item.workshop_id}`,
                 participant_count: 0,
                 date: item.created_at || 'Unknown'
               });
             }
-            workshopMap.get(item.workshop_id).participant_count++;
+            workshopMap.get(workshopKey)!.participant_count++;
           }
         });
 
         // Process group_id data (treat as workshop numbers)
         groupData?.forEach(item => {
           if (item.group_id) {
-            const workshopNum = parseInt(item.group_id);
+            const workshopNum = parseInt(String(item.group_id));
             if (!isNaN(workshopNum)) {
-              if (!workshopMap.has(workshopNum)) {
-                workshopMap.set(workshopNum, {
+              const workshopKey = String(workshopNum);
+              if (!workshopMap.has(workshopKey)) {
+                workshopMap.set(workshopKey, {
                   id: workshopNum,
                   name: `סדנה ${workshopNum}`,
                   participant_count: 0,
                   date: item.created_at || 'Unknown'
                 });
               }
-              workshopMap.get(workshopNum).participant_count++;
+              workshopMap.get(workshopKey)!.participant_count++;
             }
           }
         });
