@@ -20,6 +20,7 @@ export const useWorkshopInsights = () => {
   const handleWorkshopSelect = (value: string) => {
     const workshopId = Number(value);
     console.log('🎯 handleWorkshopSelect called with:', { value, workshopId, type: typeof workshopId });
+    console.log('🎯 Setting workshop state...');
     setSelectedWorkshopId(workshopId);
     setSelectedParticipant(null);
     setViewMode('workshop');
@@ -35,6 +36,19 @@ export const useWorkshopInsights = () => {
 
   const toggleNames = () => setShowNames(!showNames);
   const togglePresenterMode = () => setPresenterMode(!presenterMode);
+
+  console.log('🎯 useWorkshopInsights returning:', {
+    selectedWorkshopId,
+    workshopData: workshopData ? {
+      workshop_id: workshopData.workshop_id,
+      participant_count: workshopData.participant_count,
+      participants: workshopData.participants?.length || 0
+    } : null,
+    workshops: workshops?.length || 0,
+    isLoading,
+    error,
+    viewMode
+  });
 
   return {
     selectedWorkshopId,

@@ -29,6 +29,19 @@ export const GroupWorkshopInsights: React.FC = () => {
     setPresenterMode
   } = useWorkshopInsights();
 
+  console.log('🏠 GroupWorkshopInsights render:', {
+    selectedWorkshopId,
+    viewMode,
+    isLoading,
+    error,
+    hasWorkshopData: !!workshopData,
+    workshopsCount: workshops?.length || 0,
+    workshopData: workshopData ? {
+      workshop_id: workshopData.workshop_id,
+      participant_count: workshopData.participant_count
+    } : null
+  });
+
   const currentData = viewMode === 'workshop' ? workshopData : selectedParticipant;
   const zoneInfo = getCurrentZoneInfo(viewMode, workshopData, selectedParticipant);
 
@@ -64,7 +77,7 @@ export const GroupWorkshopInsights: React.FC = () => {
               onExport={handleExport}
             />
 
-            {/* New Comprehensive Analytics Dashboard */}
+            {/* Comprehensive Analytics Dashboard */}
             <WocaAnalyticsDashboard
               viewMode={viewMode}
               workshopData={workshopData}

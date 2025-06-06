@@ -20,9 +20,19 @@ export const WocaAnalyticsDashboard: React.FC<WocaAnalyticsDashboardProps> = ({
   workshopData,
   selectedParticipant
 }) => {
-  console.log('📊 Rendering WOCA Analytics Dashboard:', { viewMode, workshopData, selectedParticipant });
+  console.log('📊 WocaAnalyticsDashboard render:', { 
+    viewMode, 
+    workshopData: workshopData ? {
+      workshop_id: workshopData.workshop_id,
+      participant_count: workshopData.participant_count,
+      hasParticipants: !!workshopData.participants,
+      participantsLength: workshopData.participants?.length || 0
+    } : null,
+    selectedParticipant: selectedParticipant?.id 
+  });
 
   if (viewMode === 'individual' && selectedParticipant?.woca_scores) {
+    console.log('📊 Rendering individual view for participant:', selectedParticipant.id);
     return (
       <div className="space-y-6">
         {/* Individual Zone Comparison */}
@@ -68,8 +78,14 @@ export const WocaAnalyticsDashboard: React.FC<WocaAnalyticsDashboardProps> = ({
   }
 
   if (viewMode === 'workshop' && workshopData) {
+    console.log('📊 Rendering workshop view, checking participant count...', {
+      participant_count: workshopData.participant_count,
+      meetsThreshold: workshopData.participant_count >= 3
+    });
+
     // Check if we have sufficient data
     if (workshopData.participant_count < 3) {
+      console.log('📊 Insufficient participants, showing placeholder');
       return (
         <Card>
           <CardHeader>
@@ -100,6 +116,7 @@ export const WocaAnalyticsDashboard: React.FC<WocaAnalyticsDashboardProps> = ({
       );
     }
 
+    console.log('📊 Sufficient participants, rendering full analytics');
     return (
       <div className="space-y-6">
         {/* Group Statistics - This is the main fix */}
@@ -142,5 +159,6 @@ export const WocaAnalyticsDashboard: React.FC<WocaAnalyticsDashboardProps> = ({
     );
   }
 
+  console.log('📊 No data to render, returning null');
   return null;
 };

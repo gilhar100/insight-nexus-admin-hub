@@ -13,14 +13,18 @@ export const useWorkshopData = (workshopId?: number) => {
   // Use the separate workshops list hook
   const { workshops, error: workshopsError } = useWorkshopsList();
 
+  console.log('🔄 useWorkshopData called with workshopId:', workshopId);
+
   // Fetch specific workshop data when workshopId changes
   useEffect(() => {
     if (!workshopId) {
+      console.log('🔄 No workshopId provided, clearing data');
       setWorkshopData(null);
       return;
     }
 
     const fetchData = async () => {
+      console.log('🔄 Starting fetchData for workshopId:', workshopId);
       setIsLoading(true);
       setError(null);
 
@@ -54,6 +58,12 @@ export const useWorkshopData = (workshopId?: number) => {
           .eq('survey_type', 'WOCA')
           .order('created_at', { ascending: true });
 
+        console.log('📊 Supabase query completed:', {
+          error: wocaError,
+          dataLength: wocaData?.length || 0,
+          queryParams: { group_id: workshopId, survey_type: 'WOCA' }
+        });
+
         if (wocaError) {
           console.error('❌ Error fetching WOCA data:', wocaError);
           throw wocaError;
@@ -62,7 +72,13 @@ export const useWorkshopData = (workshopId?: number) => {
         console.log('📊 Raw WOCA query results:', {
           totalResults: wocaData?.length || 0,
           groupId: workshopId,
-          sampleData: wocaData?.[0]
+          sampleData: wocaData?.[0] ? {
+            id: wocaData[0].id,
+            full_name: wocaData[0].full_name,
+            group_id: wocaData[0].group_id,
+            hasQ1: wocaData[0].q1 !== null,
+            hasQ36: wocaData[0].q36 !== null
+          } : 'No data'
         });
 
         if (!wocaData || wocaData.length === 0) {
@@ -90,77 +106,19 @@ export const useWorkshopData = (workshopId?: number) => {
           }
         })));
 
-        // Filter responses that have valid question responses (q1-q36)
-        const responsesWithValidQuestions = wocaData.filter(response => {
-          // Check if at least some questions have valid responses (1-5)
-          const questionKeys = Array.from({ length: 36 }, (_, i) => `q${i + 1}`);
-          const validQuestions = questionKeys.filter(key => {
-            const value = response[key as keyof typeof response];
-            return typeof value === 'number' && value >= 1 && value <= 5;
-          });
-          
-          console.log(`👤 Response ${response.id} (${response.full_name || response.email}):`, {
-            validQuestions: validQuestions.length,
-            outOf: 36,
-            isValid: validQuestions.length >= 30,
-            sampleValidQuestions: validQuestions.slice(0, 5),
-            allQuestionValues: questionKeys.map(key => ({
-              [key]: response[key as keyof typeof response]
-            })).slice(0, 5)
-          });
-          
-          // Require at least 30 valid responses (allowing some missing)
-          return validQuestions.length >= 30;
-        });
-
-        console.log('📈 Validation results:', {
-          totalResponses: wocaData.length,
-          responsesWithValidQuestions: responsesWithValidQuestions.length,
-          validationThreshold: 30,
-          minimumForGroupAnalysis: 3
-        });
-
-        if (responsesWithValidQuestions.length === 0) {
-          console.log('⚠️ No responses with valid question data found for group_id:', workshopId);
-          console.log('🔍 Detailed validation breakdown:');
-          
-          wocaData.forEach((response, index) => {
-            const questionKeys = Array.from({ length: 36 }, (_, i) => `q${i + 1}`);
-            const validQuestions = questionKeys.filter(key => {
-              const value = response[key as keyof typeof response];
-              return typeof value === 'number' && value >= 1 && value <= 5;
-            });
-            const invalidQuestions = questionKeys.filter(key => {
-              const value = response[key as keyof typeof response];
-              return !(typeof value === 'number' && value >= 1 && value <= 5);
-            });
-            
-            console.log(`  Response ${index + 1} (${response.full_name || response.email}):`, {
-              validCount: validQuestions.length,
-              invalidCount: invalidQuestions.length,
-              firstFewValid: validQuestions.slice(0, 3),
-              firstFewInvalid: invalidQuestions.slice(0, 3).map(key => ({
-                [key]: response[key as keyof typeof response]
-              }))
-            });
-          });
-          
-          setError(`לא נמצאו תגובות עם נתוני שאלות תקינים עבור קבוצה ${workshopId}.`);
-          setWorkshopData(null);
-          return;
-        }
-
         // Process participants using question responses
-        const uniqueParticipants = processWorkshopParticipants(responsesWithValidQuestions);
+        console.log('🔄 Processing participants...');
+        const uniqueParticipants = processWorkshopParticipants(wocaData);
         
         console.log('🎯 Participants processing results:', {
-          validResponsesIn: responsesWithValidQuestions.length,
+          rawResponsesIn: wocaData.length,
           uniqueParticipantsOut: uniqueParticipants.length,
           groupAnalysisThreshold: 3,
           canProceedWithGroupAnalysis: uniqueParticipants.length >= 3
         });
         
         // Calculate workshop metrics 
+        console.log('🔄 Calculating workshop metrics...');
         const processedWorkshopData = calculateWorkshopMetrics(uniqueParticipants, workshopId);
         
         console.log('🎯 Final workshop data summary:', {
@@ -184,6 +142,16 @@ export const useWorkshopData = (workshopId?: number) => {
 
     fetchData();
   }, [workshopId]);
+
+  console.log('🔄 useWorkshopData returning:', {
+    workshopData: workshopData ? {
+      workshop_id: workshopData.workshop_id,
+      participant_count: workshopData.participant_count
+    } : null,
+    workshops: workshops?.length || 0,
+    isLoading,
+    error: error || workshopsError
+  });
 
   return { 
     workshopData, 
