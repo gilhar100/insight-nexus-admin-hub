@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -147,4 +146,39 @@
   .border-war {
     border-color: #EF4444;
   }
+}
+
+/* Presenter Mode Styles */
+.presenter-mode {
+  @apply text-center;
+}
+
+.presenter-mode h1,
+.presenter-mode h2,
+.presenter-mode h3 {
+  @apply text-center;
+}
+
+.presenter-mode .grid {
+  @apply justify-center;
+}
+
+.presenter-mode .flex {
+  @apply justify-center;
+}
+
+.presenter-mode .card {
+  @apply shadow-lg;
+}
+
+.presenter-mode .text-lg {
+  @apply text-xl;
+}
+
+.presenter-mode .text-base {
+  @apply text-lg;
+}
+
+.presenter-mode .text-sm {
+  @apply text-base;
 }

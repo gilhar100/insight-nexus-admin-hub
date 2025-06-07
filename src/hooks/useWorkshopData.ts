@@ -7,7 +7,6 @@ export interface WorkshopParticipant {
   full_name: string;
   email: string;
   overall_score: number | null;
-  scores: any;
   question_responses?: any;
   organization: string | null;
   profession: string | null;
@@ -160,7 +159,6 @@ export const useWorkshopData = (groupId?: number) => {
             full_name: item.full_name,
             email: item.email,
             overall_score: item.overall_score,
-            scores: item.scores || {},
             question_responses: questionResponses,
             organization: item.organization,
             profession: item.profession,
