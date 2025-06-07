@@ -147,6 +147,25 @@
   .border-war {
     border-color: #EF4444;
   }
+
+  /* Hebrew RTL improvements */
+  [dir="rtl"] {
+    text-align: right;
+  }
+  
+  [dir="rtl"] .grid {
+    direction: rtl;
+  }
+  
+  [dir="rtl"] input {
+    text-align: right;
+    direction: rtl;
+  }
+  
+  [dir="rtl"] select {
+    text-align: right;
+    direction: rtl;
+  }
 }
 
 /* Presenter Mode Styles */
