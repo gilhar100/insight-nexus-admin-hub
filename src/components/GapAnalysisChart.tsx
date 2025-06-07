@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { WOCA_ZONE_COLORS } from '@/utils/wocaColors';
 
 interface GapAnalysisChartProps {
@@ -77,11 +77,10 @@ export const GapAnalysisChart: React.FC<GapAnalysisChartProps> = ({
         <Tooltip content={<CustomTooltip />} />
         <Bar 
           dataKey="score" 
-          fill={(entry) => entry.color}
           radius={[4, 4, 0, 0]}
         >
           {data.map((entry, index) => (
-            <Bar key={`bar-${index}`} fill={entry.color} />
+            <Cell key={`cell-${index}`} fill={entry.color} />
           ))}
         </Bar>
       </BarChart>

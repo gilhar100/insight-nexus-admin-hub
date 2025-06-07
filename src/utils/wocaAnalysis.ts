@@ -77,6 +77,12 @@ export interface WorkshopWocaAnalysis {
   groupTiedCategories: string[];
   participants: WocaAnalysisResult[];
   participantCount: number;
+  zoneDistribution: {
+    opportunity: number;
+    comfort: number;
+    apathy: number;
+    war: number;
+  };
 }
 
 // Reverse score a value (1->5, 2->4, 3->3, 4->2, 5->1)
@@ -226,6 +232,20 @@ export const analyzeWorkshopWoca = (participants: any[], workshopId: number): Wo
     getDominantZone(groupCategoryScores);
   
   console.log('Group dominant zone:', groupDominantZone, 'Is tie:', groupIsTie);
+
+  // Calculate zone distribution (how many participants fall into each zone)
+  const zoneDistribution = {
+    opportunity: 0,
+    comfort: 0,
+    apathy: 0,
+    war: 0
+  };
+
+  participantAnalyses.forEach(participant => {
+    if (participant.dominantZone) {
+      zoneDistribution[participant.dominantZone as keyof typeof zoneDistribution]++;
+    }
+  });
   
   return {
     workshopId,
@@ -234,7 +254,8 @@ export const analyzeWorkshopWoca = (participants: any[], workshopId: number): Wo
     groupIsTie,
     groupTiedCategories,
     participants: participantAnalyses,
-    participantCount: participants.length
+    participantCount: participants.length,
+    zoneDistribution
   };
 };
 

@@ -142,7 +142,8 @@ export const IndividualSearch: React.FC = () => {
                   className="inline-block px-6 py-3 rounded-lg text-white font-bold text-xl"
                   style={{ backgroundColor: WOCA_ZONE_COLORS[dominantZone as keyof typeof WOCA_ZONE_COLORS] }}
                 >
-                  {(individualData.analysis.zoneScores[dominantZone] * 20).toFixed(1)}%
+                  {individualData.analysis.zoneScores[dominantZone] ? 
+                    (Number(individualData.analysis.zoneScores[dominantZone]) * 20).toFixed(1) : '0.0'}%
                 </div>
               </div>
               
@@ -155,7 +156,7 @@ export const IndividualSearch: React.FC = () => {
                       className="text-2xl font-bold"
                       style={{ color: WOCA_ZONE_COLORS[zone as keyof typeof WOCA_ZONE_COLORS] }}
                     >
-                      {(score * 20).toFixed(1)}%
+                      {(Number(score) * 20).toFixed(1)}%
                     </div>
                   </div>
                 ))}
