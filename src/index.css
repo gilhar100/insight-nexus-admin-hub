@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -150,35 +151,38 @@
 
 /* Presenter Mode Styles */
 .presenter-mode {
-  @apply text-center;
+  text-align: center;
 }
 
 .presenter-mode h1,
 .presenter-mode h2,
 .presenter-mode h3 {
-  @apply text-center;
+  text-align: center;
 }
 
 .presenter-mode .grid {
-  @apply justify-center;
+  justify-content: center;
 }
 
 .presenter-mode .flex {
-  @apply justify-center;
+  justify-content: center;
 }
 
 .presenter-mode .card {
-  @apply shadow-lg;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
 .presenter-mode .text-lg {
-  @apply text-xl;
+  font-size: 1.25rem;
+  line-height: 1.75rem;
 }
 
 .presenter-mode .text-base {
-  @apply text-lg;
+  font-size: 1.125rem;
+  line-height: 1.75rem;
 }
 
 .presenter-mode .text-sm {
-  @apply text-base;
+  font-size: 1rem;
+  line-height: 1.5rem;
 }
