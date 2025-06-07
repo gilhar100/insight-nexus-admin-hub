@@ -127,7 +127,7 @@ export const GroupWorkshopInsights: React.FC = () => {
                   className="inline-block px-8 py-4 rounded-lg text-white font-bold text-3xl"
                   style={{ backgroundColor: WOCA_ZONE_COLORS[dominantZone as keyof typeof WOCA_ZONE_COLORS] }}
                 >
-                  {(wocaAnalysis.groupCategoryScores[dominantZone] * 20).toFixed(1)}%
+                  {(wocaAnalysis.groupCategoryScores[dominantZone as keyof typeof wocaAnalysis.groupCategoryScores] * 20).toFixed(1)}%
                 </div>
                 <p className="mt-2 text-gray-600">
                   {workshopData.participant_count} משתתפים בסדנה
@@ -182,8 +182,6 @@ export const GroupWorkshopInsights: React.FC = () => {
               </CardContent>
             </Card>
           </div>
-
-          {/* REMOVED "תובנות עיקריות" SECTION */}
         </>
       )}
     </div>

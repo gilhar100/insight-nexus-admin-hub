@@ -166,7 +166,7 @@ export const ParticipantSearch: React.FC = () => {
                   style={{ backgroundColor: WOCA_ZONE_COLORS[dominantZone as keyof typeof WOCA_ZONE_COLORS] }}
                 >
                   {selectedParticipant.analysis.zoneScores[dominantZone] ? 
-                    (Number(selectedParticipant.analysis.zoneScores[dominantZone]) * 20).toFixed(1) : '0.0'}%
+                    (selectedParticipant.analysis.zoneScores[dominantZone] * 20).toFixed(1) : '0.0'}%
                 </div>
               </div>
               
@@ -179,7 +179,7 @@ export const ParticipantSearch: React.FC = () => {
                       className="text-2xl font-bold"
                       style={{ color: WOCA_ZONE_COLORS[zone as keyof typeof WOCA_ZONE_COLORS] }}
                     >
-                      {(Number(score) * 20).toFixed(1)}%
+                      {(score * 20).toFixed(1)}%
                     </div>
                   </div>
                 ))}

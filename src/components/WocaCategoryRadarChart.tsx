@@ -45,9 +45,9 @@ export const WocaCategoryRadarChart: React.FC<WocaCategoryRadarChartProps> = ({ 
   ];
 
   return (
-    <ChartContainer config={chartConfig} className="h-96 w-full">
+    <ChartContainer config={chartConfig} className="h-[500px] w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <RadarChart data={chartData} margin={{ top: 40, right: 40, bottom: 40, left: 40 }}>
+        <RadarChart data={chartData} margin={{ top: 60, right: 60, bottom: 60, left: 60 }}>
           <PolarGrid />
           <PolarAngleAxis dataKey="category" />
           <PolarRadiusAxis 

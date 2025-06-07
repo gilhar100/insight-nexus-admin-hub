@@ -55,27 +55,23 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({
     return null;
   };
 
-  // Custom label positioning to avoid overlaps
-  const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, value, name }: any) => {
-    if (percent < 0.05) return null; // Don't show labels for very small segments
+  const CustomLegend = ({ payload }: any) => {
+    if (!payload) return null;
     
-    const RADIAN = Math.PI / 180;
-    const radius = innerRadius + (outerRadius - innerRadius) * 1.4; // Position outside the pie
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
     return (
-      <text 
-        x={x} 
-        y={y} 
-        fill="#333" 
-        textAnchor={x > cx ? 'start' : 'end'} 
-        dominantBaseline="central"
-        fontSize="12"
-        fontWeight="bold"
-      >
-        {`${name}: ${value} (${(percent * 100).toFixed(1)}%)`}
-      </text>
+      <div className="flex justify-center mt-4">
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          {payload.map((entry: any, index: number) => (
+            <div key={index} className="flex items-center text-right" dir="rtl">
+              <div 
+                className="w-3 h-3 rounded mr-2"
+                style={{ backgroundColor: entry.color }}
+              />
+              <span>{entry.value}: {data.find(d => d.name === entry.value)?.value} ({((data.find(d => d.name === entry.value)?.value || 0) / total * 100).toFixed(1)}%)</span>
+            </div>
+          ))}
+        </div>
+      </div>
     );
   };
 
@@ -85,18 +81,17 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({
         <Pie
           data={data}
           cx="50%"
-          cy="50%"
-          outerRadius={100}
-          innerRadius={40}
+          cy="45%"
+          outerRadius={80}
+          innerRadius={30}
           dataKey="value"
-          labelLine={false}
-          label={renderCustomLabel}
         >
           {data.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={entry.color} />
           ))}
         </Pie>
         <Tooltip content={<CustomTooltip />} />
+        <Legend content={<CustomLegend />} />
       </PieChart>
     </ResponsiveContainer>
   );
