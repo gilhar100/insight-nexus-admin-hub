@@ -55,18 +55,42 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({
     return null;
   };
 
+  // Custom label positioning to avoid overlaps
+  const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, value, name }: any) => {
+    if (percent < 0.05) return null; // Don't show labels for very small segments
+    
+    const RADIAN = Math.PI / 180;
+    const radius = innerRadius + (outerRadius - innerRadius) * 1.4; // Position outside the pie
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+    return (
+      <text 
+        x={x} 
+        y={y} 
+        fill="#333" 
+        textAnchor={x > cx ? 'start' : 'end'} 
+        dominantBaseline="central"
+        fontSize="12"
+        fontWeight="bold"
+      >
+        {`${name}: ${value} (${(percent * 100).toFixed(1)}%)`}
+      </text>
+    );
+  };
+
   return (
-    <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="100%" height={350}>
       <PieChart>
         <Pie
           data={data}
           cx="50%"
           cy="50%"
-          outerRadius={80}
+          outerRadius={100}
+          innerRadius={40}
           dataKey="value"
-          label={({ name, value, percent }) => 
-            `${name}: ${value} (${(percent * 100).toFixed(1)}%)`
-          }
+          labelLine={false}
+          label={renderCustomLabel}
         >
           {data.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={entry.color} />

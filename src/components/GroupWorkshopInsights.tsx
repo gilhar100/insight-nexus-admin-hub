@@ -10,7 +10,7 @@ import { ZoneDistributionChart } from '@/components/ZoneDistributionChart';
 import { GapAnalysisChart } from '@/components/GapAnalysisChart';
 import { PresenterMode } from '@/components/PresenterMode';
 import { ZoneDescription } from '@/components/ZoneDescription';
-import { IndividualSearch } from '@/components/IndividualSearch';
+import { ParticipantSearch } from '@/components/ParticipantSearch';
 import { analyzeWorkshopWoca } from '@/utils/wocaAnalysis';
 import { WOCA_ZONE_COLORS } from '@/utils/wocaColors';
 
@@ -108,15 +108,13 @@ export const GroupWorkshopInsights: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Individual Search */}
-      {selectedWorkshop && (
-        <IndividualSearch />
-      )}
+      {/* Individual Search - separate from group insights */}
+      <ParticipantSearch />
 
       {/* Group Analysis Results */}
       {workshopData && wocaAnalysis && (
         <>
-          {/* Group Summary */}
+          {/* Group Summary - REMOVED PERCENTAGE */}
           <Card>
             <CardHeader>
               <CardTitle className="text-center text-2xl">
@@ -143,7 +141,7 @@ export const GroupWorkshopInsights: React.FC = () => {
 
           {/* Charts Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Zone Distribution Chart */}
+            {/* Zone Distribution Chart - FIXED OVERLAPPING TEXT */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center justify-center text-right">
@@ -156,7 +154,7 @@ export const GroupWorkshopInsights: React.FC = () => {
               </CardContent>
             </Card>
 
-            {/* Gap Analysis Chart */}
+            {/* Gap Analysis Chart - FIXED DELTA CALCULATIONS */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center justify-center text-right">
@@ -169,7 +167,7 @@ export const GroupWorkshopInsights: React.FC = () => {
               </CardContent>
             </Card>
 
-            {/* Radar Chart */}
+            {/* Radar Chart - ENLARGED AND CENTERED */}
             <Card className="lg:col-span-2">
               <CardHeader>
                 <CardTitle className="flex items-center justify-center text-right">
@@ -177,44 +175,15 @@ export const GroupWorkshopInsights: React.FC = () => {
                   תרשים רדאר - ציונים ממוצעים לפי אזור
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <WocaRadarChart participants={workshopData.participants} />
+              <CardContent className="flex justify-center">
+                <div className="w-full max-w-4xl">
+                  <WocaRadarChart participants={workshopData.participants} />
+                </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Summary Insights */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-right">תובנות מרכזיות</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                  <h4 className="font-semibold text-green-800 mb-2 text-right">אזורים חזקים</h4>
-                  <ul className="text-sm text-green-700 space-y-1 text-right">
-                    {Object.entries(wocaAnalysis.groupCategoryScores)
-                      .sort(([,a], [,b]) => b - a)
-                      .slice(0, 2)
-                      .map(([zone, score], idx) => (
-                        <li key={idx}>• {getZoneNameInHebrew(zone)}: {(score * 20).toFixed(1)}%</li>
-                      ))}
-                  </ul>
-                </div>
-                <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
-                  <h4 className="font-semibold text-amber-800 mb-2 text-right">אזורים לפיתוח</h4>
-                  <ul className="text-sm text-amber-700 space-y-1 text-right">
-                    {Object.entries(wocaAnalysis.groupCategoryScores)
-                      .sort(([,a], [,b]) => a - b)
-                      .slice(0, 2)
-                      .map(([zone, score], idx) => (
-                        <li key={idx}>• {getZoneNameInHebrew(zone)}: {(score * 20).toFixed(1)}%</li>
-                      ))}
-                  </ul>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {/* REMOVED "תובנות עיקריות" SECTION */}
         </>
       )}
     </div>
