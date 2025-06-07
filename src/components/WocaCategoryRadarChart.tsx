@@ -45,15 +45,15 @@ export const WocaCategoryRadarChart: React.FC<WocaCategoryRadarChartProps> = ({ 
   ];
 
   return (
-    <ChartContainer config={chartConfig} className="h-[500px] w-full">
+    <ChartContainer config={chartConfig} className="h-80">
       <ResponsiveContainer width="100%" height="100%">
-        <RadarChart data={chartData} margin={{ top: 60, right: 60, bottom: 60, left: 60 }}>
+        <RadarChart data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
           <PolarGrid />
           <PolarAngleAxis dataKey="category" />
           <PolarRadiusAxis 
             angle={90} 
             domain={[0, 5]} 
-            tick={{ fontSize: 12 }}
+            tick={{ fontSize: 10 }}
             tickCount={6}
           />
           <Radar
@@ -62,7 +62,7 @@ export const WocaCategoryRadarChart: React.FC<WocaCategoryRadarChartProps> = ({ 
             stroke="#2563eb"
             fill="#2563eb"
             fillOpacity={0.1}
-            strokeWidth={3}
+            strokeWidth={2}
           />
           <ChartTooltip content={<ChartTooltipContent />} />
         </RadarChart>
