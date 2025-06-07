@@ -19,10 +19,15 @@ export const GroupWorkshopInsights: React.FC = () => {
   const [isPresenterMode, setIsPresenterMode] = useState(false);
   const { workshopData, workshops, isLoading, error } = useWorkshopData(selectedWorkshop);
 
-  // Analyze WOCA data if we have participants
-  const wocaAnalysis = workshopData?.participants.length 
-    ? analyzeWorkshopWoca(workshopData.participants, selectedWorkshop || 1)
-    : null;
+  // Analyze WOCA data if we have participants - add error handling
+  let wocaAnalysis = null;
+  try {
+    if (workshopData?.participants.length) {
+      wocaAnalysis = analyzeWorkshopWoca(workshopData.participants, selectedWorkshop || 1);
+    }
+  } catch (analysisError) {
+    console.error('Error analyzing WOCA data:', analysisError);
+  }
 
   const getDominantZone = () => {
     if (!wocaAnalysis) return 'opportunity';
@@ -114,7 +119,7 @@ export const GroupWorkshopInsights: React.FC = () => {
       {/* Group Analysis Results */}
       {workshopData && wocaAnalysis && (
         <>
-          {/* Group Summary - REMOVED PERCENTAGE */}
+          {/* Group Summary */}
           <Card>
             <CardHeader>
               <CardTitle className="text-center text-2xl">
@@ -127,7 +132,7 @@ export const GroupWorkshopInsights: React.FC = () => {
                   className="inline-block px-8 py-4 rounded-lg text-white font-bold text-3xl"
                   style={{ backgroundColor: WOCA_ZONE_COLORS[dominantZone as keyof typeof WOCA_ZONE_COLORS] }}
                 >
-                  {(wocaAnalysis.groupCategoryScores[dominantZone as keyof typeof wocaAnalysis.groupCategoryScores] * 20).toFixed(1)}%
+                  {(Number(wocaAnalysis.groupCategoryScores[dominantZone as keyof typeof wocaAnalysis.groupCategoryScores]) * 20).toFixed(1)}%
                 </div>
                 <p className="mt-2 text-gray-600">
                   {workshopData.participant_count} משתתפים בסדנה
@@ -141,7 +146,7 @@ export const GroupWorkshopInsights: React.FC = () => {
 
           {/* Charts Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Zone Distribution Chart - FIXED OVERLAPPING TEXT */}
+            {/* Zone Distribution Chart */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center justify-center text-right">
@@ -154,7 +159,7 @@ export const GroupWorkshopInsights: React.FC = () => {
               </CardContent>
             </Card>
 
-            {/* Gap Analysis Chart - FIXED DELTA CALCULATIONS */}
+            {/* Gap Analysis Chart */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center justify-center text-right">
@@ -167,7 +172,7 @@ export const GroupWorkshopInsights: React.FC = () => {
               </CardContent>
             </Card>
 
-            {/* Radar Chart - ENLARGED AND CENTERED */}
+            {/* Radar Chart */}
             <Card className="lg:col-span-2">
               <CardHeader>
                 <CardTitle className="flex items-center justify-center text-right">

@@ -1,4 +1,3 @@
-
 export interface WocaQuestionMapping {
   [key: string]: {
     category: 'war' | 'opportunity' | 'comfort' | 'apathy';
@@ -98,23 +97,29 @@ export const calculateWocaCategoryScores = (questionResponses: any): WocaCategor
 
   console.log('Calculating WOCA scores for responses:', questionResponses);
 
-  // Process each question response
-  Object.entries(WOCA_QUESTION_MAPPING).forEach(([questionKey, questionInfo]) => {
-    const responseKey = questionKey; // Assuming responses are stored as q1, q2, etc.
-    let score = questionResponses[responseKey];
-    
-    if (score !== null && score !== undefined && !isNaN(score)) {
-      // Apply reverse scoring if needed
-      if (questionInfo.isReversed) {
-        score = reverseScore(score);
+  // Process each question response with error handling
+  try {
+    Object.entries(WOCA_QUESTION_MAPPING).forEach(([questionKey, questionInfo]) => {
+      const responseKey = questionKey;
+      let score = questionResponses?.[responseKey];
+      
+      if (score !== null && score !== undefined && !isNaN(Number(score))) {
+        score = Number(score);
+        
+        // Apply reverse scoring if needed
+        if (questionInfo.isReversed) {
+          score = reverseScore(score);
+        }
+        
+        categoryTotals[questionInfo.category] += score;
+        categoryCounts[questionInfo.category]++;
+        
+        console.log(`Question ${questionKey} (${questionInfo.category}): raw=${questionResponses[responseKey]}, processed=${score}, reversed=${questionInfo.isReversed}`);
       }
-      
-      categoryTotals[questionInfo.category] += score;
-      categoryCounts[questionInfo.category]++;
-      
-      console.log(`Question ${questionKey} (${questionInfo.category}): raw=${questionResponses[responseKey]}, processed=${score}, reversed=${questionInfo.isReversed}`);
-    }
-  });
+    });
+  } catch (error) {
+    console.error('Error processing question responses:', error);
+  }
 
   // Calculate averages for each category
   const categoryScores: WocaCategoryScores = {
@@ -168,17 +173,30 @@ export const analyzeParticipantWoca = (
   participantName: string,
   participantId: string
 ): WocaAnalysisResult => {
-  const categoryScores = calculateWocaCategoryScores(participant.question_responses || {});
-  const { dominantZone, isTie, tiedCategories } = getDominantZone(categoryScores);
-  
-  return {
-    categoryScores,
-    dominantZone,
-    isTie,
-    tiedCategories,
-    participantName,
-    participantId
-  };
+  try {
+    const questionResponses = participant?.question_responses || {};
+    const categoryScores = calculateWocaCategoryScores(questionResponses);
+    const { dominantZone, isTie, tiedCategories } = getDominantZone(categoryScores);
+    
+    return {
+      categoryScores,
+      dominantZone,
+      isTie,
+      tiedCategories,
+      participantName,
+      participantId
+    };
+  } catch (error) {
+    console.error('Error analyzing participant WOCA:', error, participant);
+    return {
+      categoryScores: { war: 0, opportunity: 0, comfort: 0, apathy: 0 },
+      dominantZone: null,
+      isTie: false,
+      tiedCategories: [],
+      participantName,
+      participantId
+    };
+  }
 };
 
 // Analyze entire workshop
@@ -187,15 +205,33 @@ export const analyzeWorkshopWoca = (participants: any[], workshopId: number): Wo
   
   console.log('Analyzing workshop with participants:', participants.length);
   
-  // Analyze each participant
+  if (!participants || !Array.isArray(participants)) {
+    console.error('Invalid participants data:', participants);
+    return {
+      workshopId,
+      groupCategoryScores: { war: 0, opportunity: 0, comfort: 0, apathy: 0 },
+      groupDominantZone: 'opportunity',
+      groupIsTie: false,
+      groupTiedCategories: [],
+      participants: [],
+      participantCount: 0,
+      zoneDistribution: { opportunity: 0, comfort: 0, apathy: 0, war: 0 }
+    };
+  }
+  
+  // Analyze each participant with error handling
   participants.forEach((participant, index) => {
-    const analysis = analyzeParticipantWoca(
-      participant,
-      participant.full_name || `Participant ${index + 1}`,
-      participant.id
-    );
-    participantAnalyses.push(analysis);
-    console.log(`Participant ${index + 1} analysis:`, analysis);
+    try {
+      const analysis = analyzeParticipantWoca(
+        participant,
+        participant.full_name || `Participant ${index + 1}`,
+        participant.id
+      );
+      participantAnalyses.push(analysis);
+      console.log(`Participant ${index + 1} analysis:`, analysis);
+    } catch (error) {
+      console.error(`Error analyzing participant ${index + 1}:`, error);
+    }
   });
   
   // Calculate group averages
@@ -209,10 +245,10 @@ export const analyzeWorkshopWoca = (participants: any[], workshopId: number): Wo
   
   if (validParticipants.length > 0) {
     validParticipants.forEach(participant => {
-      groupTotals.war += participant.categoryScores.war;
-      groupTotals.opportunity += participant.categoryScores.opportunity;
-      groupTotals.comfort += participant.categoryScores.comfort;
-      groupTotals.apathy += participant.categoryScores.apathy;
+      groupTotals.war += participant.categoryScores.war || 0;
+      groupTotals.opportunity += participant.categoryScores.opportunity || 0;
+      groupTotals.comfort += participant.categoryScores.comfort || 0;
+      groupTotals.apathy += participant.categoryScores.apathy || 0;
     });
     
     Object.keys(groupTotals).forEach(key => {
@@ -221,10 +257,10 @@ export const analyzeWorkshopWoca = (participants: any[], workshopId: number): Wo
   }
   
   const groupCategoryScores: WocaCategoryScores = {
-    war: groupTotals.war,
-    opportunity: groupTotals.opportunity,
-    comfort: groupTotals.comfort,
-    apathy: groupTotals.apathy
+    war: groupTotals.war || 0,
+    opportunity: groupTotals.opportunity || 0,
+    comfort: groupTotals.comfort || 0,
+    apathy: groupTotals.apathy || 0
   };
   
   console.log('Group category scores:', groupCategoryScores);
@@ -243,7 +279,7 @@ export const analyzeWorkshopWoca = (participants: any[], workshopId: number): Wo
   };
 
   participantAnalyses.forEach(participant => {
-    if (participant.dominantZone) {
+    if (participant.dominantZone && zoneDistribution.hasOwnProperty(participant.dominantZone)) {
       zoneDistribution[participant.dominantZone as keyof typeof zoneDistribution]++;
     }
   });
@@ -251,7 +287,7 @@ export const analyzeWorkshopWoca = (participants: any[], workshopId: number): Wo
   return {
     workshopId,
     groupCategoryScores,
-    groupDominantZone,
+    groupDominantZone: groupDominantZone || 'opportunity',
     groupIsTie,
     groupTiedCategories,
     participants: participantAnalyses,
