@@ -1,6 +1,6 @@
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell, PieChart, Pie, Tooltip, Legend } from 'recharts';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell, Tooltip, Legend, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from 'recharts';
+import { ChartContainer } from '@/components/ui/chart';
 import { WOCA_ZONE_COLORS } from '@/utils/wocaColors';
 
 interface GapAnalysisChartProps {
@@ -13,124 +13,60 @@ interface GapAnalysisChartProps {
 }
 
 export const GapAnalysisChart: React.FC<GapAnalysisChartProps> = ({ categoryScores }) => {
-  const opportunityScore = categoryScores?.opportunity ?? 0;
-  const comfortScore = categoryScores?.comfort ?? 0;
-  const apathyScore = categoryScores?.apathy ?? 0;
-  const warScore = categoryScores?.war ?? 0;
+  const { opportunity = 0, comfort = 0, apathy = 0, war = 0 } = categoryScores;
 
-  const barData = [
-    {
-      name: 'מלחמה',
-      delta: parseFloat((warScore - opportunityScore).toFixed(2)),
-      color: WOCA_ZONE_COLORS.war
-    },
-    {
-      name: 'אדישות',
-      delta: parseFloat((apathyScore - opportunityScore).toFixed(2)),
-      color: WOCA_ZONE_COLORS.apathy
-    },
-    {
-      name: 'נוחות',
-      delta: parseFloat((comfortScore - opportunityScore).toFixed(2)),
-      color: WOCA_ZONE_COLORS.comfort
-    },
-    {
-      name: 'הזדמנות',
-      delta: 0,
-      color: WOCA_ZONE_COLORS.opportunity
-    }
+  const gapData = [
+    { name: 'הזדמנות', value: opportunity, color: WOCA_ZONE_COLORS.opportunity },
+    { name: 'נוחות', value: comfort, color: WOCA_ZONE_COLORS.comfort },
+    { name: 'אדישות', value: apathy, color: WOCA_ZONE_COLORS.apathy },
+    { name: 'מלחמה', value: war, color: WOCA_ZONE_COLORS.war },
   ];
 
-  const pieData = [
-    {
-      name: 'הזדמנות',
-      value: opportunityScore,
-      color: WOCA_ZONE_COLORS.opportunity
-    },
-    {
-      name: 'נוחות',
-      value: comfortScore,
-      color: WOCA_ZONE_COLORS.comfort
-    },
-    {
-      name: 'אדישות',
-      value: apathyScore,
-      color: WOCA_ZONE_COLORS.apathy
-    },
-    {
-      name: 'מלחמה',
-      value: warScore,
-      color: WOCA_ZONE_COLORS.war
-    }
+  const radarData = [
+    { dimension: 'Opportunity', value: opportunity },
+    { dimension: 'Comfort', value: comfort },
+    { dimension: 'Apathy', value: apathy },
+    { dimension: 'War', value: war },
   ];
-
-  const chartConfig = {
-    delta: {
-      label: "פער מהזדמנות",
-    }
-  };
 
   return (
-    <div className="w-full p-4 mb-8">
-      <div className="max-w-4xl mx-auto space-y-12">
-        <ChartContainer config={chartConfig} className="h-[320px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart 
-              data={barData} 
-              margin={{ top: 20, right: 30, left: 30, bottom: 30 }}
-              layout="vertical"
-              barCategoryGap={20}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis 
-                type="number"
-                tick={{ fontSize: 12 }} 
-                domain={[dataMin => Math.min(dataMin, -1), dataMax => Math.max(dataMax, 1)]}
-              />
-              <YAxis 
-                type="category"
-                dataKey="name" 
-                tick={{ fontSize: 14 }} 
-                width={100} 
-              />
-              <ChartTooltip 
-                content={<ChartTooltipContent />} 
-                formatter={(value: number, name: string) => [
-                  value.toFixed(2), 
-                  name === 'delta' ? 'פער מהזדמנות' : name
-                ]} 
-              />
-              <Bar dataKey="delta" radius={[0, 4, 4, 0]}>
-                {barData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartContainer>
+    <div className="w-full px-4 py-6 space-y-12">
+      {/* New Gap Analysis Bar Chart */}
+      <div className="max-w-3xl mx-auto">
+        <h3 className="text-xl font-semibold mb-4 text-center">השוואת ציונים לפי אזורים</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart
+            data={gapData}
+            layout="vertical"
+            margin={{ top: 20, right: 30, left: 60, bottom: 10 }}
+            barCategoryGap={24}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis type="number" domain={[0, 5]} tick={{ fontSize: 12 }} />
+            <YAxis type="category" dataKey="name" tick={{ fontSize: 14 }} width={100} />
+            <Tooltip formatter={(value: number) => value.toFixed(2)} />
+            <Legend />
+            <Bar dataKey="value" radius={[0, 6, 6, 0]}>
+              {gapData.map((entry, index) => (
+                <Cell key={`bar-cell-${index}`} fill={entry.color} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
 
-        <div className="w-full h-[350px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={pieData}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                outerRadius={120}
-                fill="#8884d8"
-                label={({ name }) => name}
-              >
-                {pieData.map((entry, index) => (
-                  <Cell key={`cell-pie-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip formatter={(value: number) => value.toFixed(2)} />
-              <Legend layout="horizontal" align="center" verticalAlign="bottom" />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
+      {/* Centered and Enlarged Radar Chart */}
+      <div className="max-w-4xl mx-auto">
+        <h3 className="text-xl font-semibold mb-4 text-center">מפת ציונים רדיאלית</h3>
+        <ResponsiveContainer width="100%" height={500}>
+          <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
+            <PolarGrid />
+            <PolarAngleAxis dataKey="dimension" tick={{ fontSize: 14 }} />
+            <PolarRadiusAxis angle={30} domain={[0, 5]} tick={{ fontSize: 12 }} />
+            <Radar name="Score" dataKey="value" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
+            <Tooltip formatter={(value: number) => value.toFixed(2)} />
+          </RadarChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );
