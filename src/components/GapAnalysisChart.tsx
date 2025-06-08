@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell, PieChart, Pie, Tooltip, Legend } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { WOCA_ZONE_COLORS } from '@/utils/wocaColors';
 
@@ -18,7 +18,7 @@ export const GapAnalysisChart: React.FC<GapAnalysisChartProps> = ({ categoryScor
   const apathyScore = categoryScores?.apathy ?? 0;
   const warScore = categoryScores?.war ?? 0;
 
-  const data = [
+  const barData = [
     {
       name: 'מלחמה',
       delta: parseFloat((warScore - opportunityScore).toFixed(2)),
@@ -39,7 +39,30 @@ export const GapAnalysisChart: React.FC<GapAnalysisChartProps> = ({ categoryScor
       delta: 0,
       color: WOCA_ZONE_COLORS.opportunity
     }
-  ].sort((a, b) => b.delta - a.delta); // Sort descending for better visual comparison
+  ];
+
+  const pieData = [
+    {
+      name: 'הזדמנות',
+      value: opportunityScore,
+      color: WOCA_ZONE_COLORS.opportunity
+    },
+    {
+      name: 'נוחות',
+      value: comfortScore,
+      color: WOCA_ZONE_COLORS.comfort
+    },
+    {
+      name: 'אדישות',
+      value: apathyScore,
+      color: WOCA_ZONE_COLORS.apathy
+    },
+    {
+      name: 'מלחמה',
+      value: warScore,
+      color: WOCA_ZONE_COLORS.war
+    }
+  ];
 
   const chartConfig = {
     delta: {
@@ -48,14 +71,15 @@ export const GapAnalysisChart: React.FC<GapAnalysisChartProps> = ({ categoryScor
   };
 
   return (
-    <div className="w-full overflow-x-auto p-4 mb-8">
-      <div className="min-w-[700px] max-w-4xl mx-auto">
-        <ChartContainer config={chartConfig} className="h-[400px] w-full">
+    <div className="w-full p-4 mb-8">
+      <div className="max-w-4xl mx-auto space-y-12">
+        <ChartContainer config={chartConfig} className="h-[320px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart 
-              data={data} 
+              data={barData} 
               margin={{ top: 20, right: 30, left: 30, bottom: 30 }}
               layout="vertical"
+              barCategoryGap={20}
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis 
@@ -77,13 +101,36 @@ export const GapAnalysisChart: React.FC<GapAnalysisChartProps> = ({ categoryScor
                 ]} 
               />
               <Bar dataKey="delta" radius={[0, 4, 4, 0]}>
-                {data.map((entry, index) => (
+                {barData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Bar>
             </BarChart>
           </ResponsiveContainer>
         </ChartContainer>
+
+        <div className="w-full h-[350px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={pieData}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={120}
+                fill="#8884d8"
+                label={({ name }) => name}
+              >
+                {pieData.map((entry, index) => (
+                  <Cell key={`cell-pie-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip formatter={(value: number) => value.toFixed(2)} />
+              <Legend layout="horizontal" align="center" verticalAlign="bottom" />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );
