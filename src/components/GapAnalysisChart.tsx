@@ -47,36 +47,43 @@ export const GapAnalysisChart: React.FC<GapAnalysisChartProps> = ({ categoryScor
   };
 
   return (
-    <ChartContainer config={chartConfig} className="h-[300px]">
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis 
-            dataKey="name" 
-            tick={{ fontSize: 12 }}
-            interval={0}
-          />
-          <YAxis 
-            tick={{ fontSize: 12 }}
-            domain={['dataMin - 0.5', 'dataMax + 0.5']}
-          />
-          <ChartTooltip 
-            content={<ChartTooltipContent />}
-            formatter={(value: number, name: string) => [
-              value.toFixed(2), 
-              name === 'delta' ? 'פער מהזדמנות' : name
-            ]}
-          />
-          <Bar 
-            dataKey="delta" 
-            radius={[4, 4, 0, 0]}
-          >
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} />
-            ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
-    </ChartContainer>
+    <div className="w-full overflow-x-auto p-4 mb-8">
+      <div className="min-w-[700px] max-w-4xl mx-auto">
+        <ChartContainer config={chartConfig} className="h-[400px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart 
+              data={data} 
+              margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis 
+                dataKey="name" 
+                tick={{ fontSize: 14 }}
+                interval={0}
+              />
+              <YAxis 
+                tick={{ fontSize: 12 }}
+                domain={['dataMin - 0.5', 'dataMax + 0.5']}
+              />
+              <ChartTooltip 
+                content={<ChartTooltipContent />}
+                formatter={(value: number, name: string) => [
+                  value.toFixed(2), 
+                  name === 'delta' ? 'פער מהזדמנות' : name
+                ]}
+              />
+              <Bar 
+                dataKey="delta" 
+                radius={[4, 4, 0, 0]}
+              >
+                {data.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+      </div>
+    </div>
   );
 };

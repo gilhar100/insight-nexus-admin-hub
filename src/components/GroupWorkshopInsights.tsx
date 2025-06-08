@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -323,57 +322,59 @@ export const GroupWorkshopInsights: React.FC = () => {
             <ZoneDescription zone={wocaAnalysis.groupDominantZone} isPresenterMode={isPresenterMode} />
           )}
 
-          {/* Visualizations */}
-          {!isPresenterMode && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Gap Analysis Chart */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <BarChart3 className="h-5 w-5 mr-2" />
-                    ניתוח פערים
-                  </CardTitle>
+          {/* Visualizations - Show in both normal and presenter mode */}
+          <div className={`grid grid-cols-1 ${isPresenterMode ? 'gap-12' : 'lg:grid-cols-2 gap-6'}`}>
+            {/* Gap Analysis Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle className={`flex items-center ${isPresenterMode ? 'text-2xl' : ''}`}>
+                  <BarChart3 className="h-5 w-5 mr-2" />
+                  ניתוח פערים
+                </CardTitle>
+                {!isPresenterMode && (
                   <CardDescription>
                     פערים יחסית לאזור ההזדמנות
                   </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <GapAnalysisChart categoryScores={wocaAnalysis.groupCategoryScores} />
-                </CardContent>
-              </Card>
+                )}
+              </CardHeader>
+              <CardContent>
+                <GapAnalysisChart categoryScores={wocaAnalysis.groupCategoryScores} />
+              </CardContent>
+            </Card>
 
-              {/* Zone Distribution Pie Chart */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <PieChart className="h-5 w-5 mr-2" />
-                    התפלגות משתתפים לפי אזורים
-                  </CardTitle>
+            {/* Zone Distribution Pie Chart */}
+            <Card>
+              <CardHeader>
+                <CardTitle className={`flex items-center ${isPresenterMode ? 'text-2xl' : ''}`}>
+                  <PieChart className="h-5 w-5 mr-2" />
+                  התפלגות משתתפים לפי אזורים
+                </CardTitle>
+                {!isPresenterMode && (
                   <CardDescription>
                     מספר משתתפים בכל אזור WOCA
                   </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ZoneDistributionChart zoneDistribution={zoneDistribution} />
-                </CardContent>
-              </Card>
+                )}
+              </CardHeader>
+              <CardContent>
+                <ZoneDistributionChart zoneDistribution={zoneDistribution} />
+              </CardContent>
+            </Card>
 
-              {/* Radar Chart Comparison */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Radar className="h-5 w-5 mr-2" />
-                    מחוונים WOCA
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <WocaRadarChart participants={workshopData.participants} />
-                </CardContent>
-              </Card>
-            </div>
-          )}
+            {/* Radar Chart Comparison */}
+            <Card className={isPresenterMode ? 'lg:col-span-2' : ''}>
+              <CardHeader>
+                <CardTitle className={`flex items-center ${isPresenterMode ? 'text-2xl' : ''}`}>
+                  <Radar className="h-5 w-5 mr-2" />
+                  מחוונים WOCA
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <WocaRadarChart participants={workshopData.participants} />
+              </CardContent>
+            </Card>
+          </div>
 
-          {/* Participant Summary */}
+          {/* Participant Summary - Only in normal mode */}
           {!isPresenterMode && (
             <Card>
               <CardHeader>
@@ -440,7 +441,7 @@ export const GroupWorkshopInsights: React.FC = () => {
             </Card>
           )}
 
-          {/* Zone Analysis */}
+          {/* Zone Analysis - Only in normal mode */}
           {!isPresenterMode && (
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Card className="bg-green-50 border-green-200">

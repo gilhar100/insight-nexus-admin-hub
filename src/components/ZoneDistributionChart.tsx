@@ -59,7 +59,7 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
         fill="black"
         textAnchor={x > cx ? 'start' : 'end'}
         dominantBaseline="central"
-        fontSize={12}
+        fontSize={14}
         fontWeight="500"
       >
         {`${name}: ${value} (${percentage}%)`}
@@ -68,31 +68,35 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
   };
 
   return (
-    <ChartContainer config={chartConfig} className="h-[400px]">
-      <ResponsiveContainer width="100%" height="100%">
-        <PieChart>
-          <Pie
-            data={data}
-            cx="50%"
-            cy="50%"
-            labelLine={false}
-            label={renderCustomLabel}
-            outerRadius={80}
-            fill="#8884d8"
-            dataKey="value"
-          >
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} />
-            ))}
-          </Pie>
-          <Tooltip 
-            formatter={(value: number, name: string) => [
-              `${value} משתתפים (${((value / total) * 100).toFixed(1)}%)`,
-              name
-            ]}
-          />
-        </PieChart>
-      </ResponsiveContainer>
-    </ChartContainer>
+    <div className="flex justify-center items-center w-full p-4">
+      <div className="max-w-2xl w-full mx-auto">
+        <ChartContainer config={chartConfig} className="h-[500px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={data}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={renderCustomLabel}
+                outerRadius={120}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {data.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip 
+                formatter={(value: number, name: string) => [
+                  `${value} משתתפים (${((value / total) * 100).toFixed(1)}%)`,
+                  name
+                ]}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+      </div>
+    </div>
   );
 };

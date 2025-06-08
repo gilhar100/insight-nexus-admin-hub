@@ -45,28 +45,32 @@ export const WocaCategoryRadarChart: React.FC<WocaCategoryRadarChartProps> = ({ 
   ];
 
   return (
-    <ChartContainer config={chartConfig} className="h-80">
-      <ResponsiveContainer width="100%" height="100%">
-        <RadarChart data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-          <PolarGrid />
-          <PolarAngleAxis dataKey="category" />
-          <PolarRadiusAxis 
-            angle={90} 
-            domain={[0, 5]} 
-            tick={{ fontSize: 10 }}
-            tickCount={6}
-          />
-          <Radar
-            name="ציון WOCA"
-            dataKey="score"
-            stroke="#2563eb"
-            fill="#2563eb"
-            fillOpacity={0.1}
-            strokeWidth={2}
-          />
-          <ChartTooltip content={<ChartTooltipContent />} />
-        </RadarChart>
-      </ResponsiveContainer>
-    </ChartContainer>
+    <div className="flex justify-center items-center w-full p-8">
+      <div className="max-w-2xl w-full mx-auto">
+        <ChartContainer config={chartConfig} className="h-[500px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <RadarChart data={chartData} margin={{ top: 40, right: 40, bottom: 40, left: 40 }}>
+              <PolarGrid />
+              <PolarAngleAxis dataKey="category" tick={{ fontSize: 14 }} />
+              <PolarRadiusAxis 
+                angle={90} 
+                domain={[0, 5]} 
+                tick={{ fontSize: 12 }}
+                tickCount={6}
+              />
+              <Radar
+                name="ציון WOCA"
+                dataKey="score"
+                stroke="#2563eb"
+                fill="#2563eb"
+                fillOpacity={0.1}
+                strokeWidth={3}
+              />
+              <ChartTooltip content={<ChartTooltipContent />} />
+            </RadarChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+      </div>
+    </div>
   );
 };
