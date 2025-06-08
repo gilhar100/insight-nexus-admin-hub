@@ -15,22 +15,22 @@ interface GapAnalysisChartProps {
 
 export const GapAnalysisChart: React.FC<GapAnalysisChartProps> = ({ categoryScores }) => {
   // Calculate deltas from opportunity (baseline)
-  const opportunityScore = categoryScores.opportunity;
+  const opportunityScore = categoryScores.opportunity || 0;
   
   const data = [
     {
       name: 'מלחמה',
-      delta: categoryScores.war - opportunityScore,
+      delta: Number((categoryScores.war - opportunityScore).toFixed(2)),
       color: WOCA_ZONE_COLORS.war
     },
     {
       name: 'אדישות',
-      delta: categoryScores.apathy - opportunityScore,
+      delta: Number((categoryScores.apathy - opportunityScore).toFixed(2)),
       color: WOCA_ZONE_COLORS.apathy
     },
     {
       name: 'נוחות',
-      delta: categoryScores.comfort - opportunityScore,
+      delta: Number((categoryScores.comfort - opportunityScore).toFixed(2)),
       color: WOCA_ZONE_COLORS.comfort
     },
     {

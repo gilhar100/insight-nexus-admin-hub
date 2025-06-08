@@ -24,6 +24,8 @@ export const useManagerSearch = (query: string) => {
       setError(null);
       
       try {
+        console.log('Searching for managers with query:', query);
+        
         const { data, error } = await supabase
           .from('survey_responses')
           .select('id, user_name, user_email')
@@ -31,7 +33,12 @@ export const useManagerSearch = (query: string) => {
           .not('user_name', 'is', null)
           .limit(10);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Search error:', error);
+          throw error;
+        }
+
+        console.log('Search results:', data);
 
         const managersData = data?.map(item => ({
           id: item.id,

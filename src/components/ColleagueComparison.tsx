@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -36,7 +35,7 @@ export const ColleagueComparison: React.FC = () => {
   };
 
   const handleAnalyzeResults = async () => {
-    if (!selectedManager) {
+    if (!selectedManager || !selectedName) {
       toast({
         title: "לא נבחר מנהל/ת",
         description: "יש לבחור מנהל/ת לניתוח",
@@ -45,6 +44,7 @@ export const ColleagueComparison: React.FC = () => {
       return;
     }
 
+    console.log('Analyzing results for:', { selectedManager, selectedName });
     await fetchComparisonData(selectedManager, selectedName);
   };
 

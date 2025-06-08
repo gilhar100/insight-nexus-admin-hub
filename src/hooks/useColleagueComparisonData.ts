@@ -51,6 +51,8 @@ export const useColleagueComparisonData = () => {
     setError(null);
     
     try {
+      console.log('Fetching data for manager:', { managerId, managerName });
+      
       // Fetch manager's self-report
       const { data: selfData, error: selfError } = await supabase
         .from('survey_responses')
@@ -58,7 +60,12 @@ export const useColleagueComparisonData = () => {
         .eq('id', managerId)
         .single();
 
-      if (selfError) throw selfError;
+      if (selfError) {
+        console.error('Self report error:', selfError);
+        throw selfError;
+      }
+
+      console.log('Self report data:', selfData);
 
       // Fetch colleague evaluations for this manager
       const { data: colleagueData, error: colleagueError } = await supabase
@@ -66,31 +73,40 @@ export const useColleagueComparisonData = () => {
         .select('*')
         .eq('manager_name', managerName);
 
-      if (colleagueError) throw colleagueError;
+      if (colleagueError) {
+        console.error('Colleague data error:', colleagueError);
+        throw colleagueError;
+      }
+
+      console.log('Colleague data:', colleagueData);
 
       if (!selfData) {
         throw new Error('Manager data not found');
       }
 
       const selfReport = {
-        strategy: selfData.dimension_s || 0,
-        adaptability: selfData.dimension_a2 || 0,
-        learning: selfData.dimension_l || 0,
-        inspiration: selfData.dimension_i || 0,
-        meaning: selfData.dimension_m || 0,
-        authenticity: selfData.dimension_a || 0,
+        strategy: Number(selfData.dimension_s) || 0,
+        adaptability: Number(selfData.dimension_a2) || 0,
+        learning: Number(selfData.dimension_l) || 0,
+        inspiration: Number(selfData.dimension_i) || 0,
+        meaning: Number(selfData.dimension_m) || 0,
+        authenticity: Number(selfData.dimension_a) || 0,
       };
+
+      console.log('Processed self report:', selfReport);
 
       const colleagueResponses = colleagueData?.map(item => ({
         id: item.id,
         evaluatorName: item.evaluator_name || undefined,
-        strategy: item.dimension_s || 0,
-        adaptability: item.dimension_a2 || 0,
-        learning: item.dimension_l || 0,
-        inspiration: item.dimension_i || 0,
-        meaning: item.dimension_m || 0,
-        authenticity: item.dimension_a || 0,
+        strategy: Number(item.dimension_s) || 0,
+        adaptability: Number(item.dimension_a2) || 0,
+        learning: Number(item.dimension_l) || 0,
+        inspiration: Number(item.dimension_i) || 0,
+        meaning: Number(item.dimension_m) || 0,
+        authenticity: Number(item.dimension_a) || 0,
       })) || [];
+
+      console.log('Processed colleague responses:', colleagueResponses);
 
       // Calculate colleague averages
       const colleagueAverages = {
@@ -111,15 +127,19 @@ export const useColleagueComparisonData = () => {
         colleagueAverages.authenticity = colleagueResponses.reduce((sum, r) => sum + r.authenticity, 0) / colleagueResponses.length;
       }
 
+      console.log('Colleague averages:', colleagueAverages);
+
       // Calculate True Scores (Colleague Avg - Self Report)
       const trueScores = {
-        strategy: colleagueAverages.strategy - selfReport.strategy,
-        adaptability: colleagueAverages.adaptability - selfReport.adaptability,
-        learning: colleagueAverages.learning - selfReport.learning,
-        inspiration: colleagueAverages.inspiration - selfReport.inspiration,
-        meaning: colleagueAverages.meaning - selfReport.meaning,
-        authenticity: colleagueAverages.authenticity - selfReport.authenticity,
+        strategy: Number((colleagueAverages.strategy - selfReport.strategy).toFixed(2)),
+        adaptability: Number((colleagueAverages.adaptability - selfReport.adaptability).toFixed(2)),
+        learning: Number((colleagueAverages.learning - selfReport.learning).toFixed(2)),
+        inspiration: Number((colleagueAverages.inspiration - selfReport.inspiration).toFixed(2)),
+        meaning: Number((colleagueAverages.meaning - selfReport.meaning).toFixed(2)),
+        authenticity: Number((colleagueAverages.authenticity - selfReport.authenticity).toFixed(2)),
       };
+
+      console.log('True scores:', trueScores);
 
       const comparisonData: ColleagueComparisonData = {
         managerId,
