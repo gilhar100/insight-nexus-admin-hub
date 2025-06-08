@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
@@ -14,31 +13,33 @@ interface GapAnalysisChartProps {
 }
 
 export const GapAnalysisChart: React.FC<GapAnalysisChartProps> = ({ categoryScores }) => {
-  // Calculate deltas from opportunity (baseline)
-  const opportunityScore = categoryScores.opportunity || 0;
-  
+  const opportunityScore = categoryScores?.opportunity ?? 0;
+  const comfortScore = categoryScores?.comfort ?? 0;
+  const apathyScore = categoryScores?.apathy ?? 0;
+  const warScore = categoryScores?.war ?? 0;
+
   const data = [
     {
       name: 'מלחמה',
-      delta: Number((categoryScores.war - opportunityScore).toFixed(2)),
+      delta: parseFloat((warScore - opportunityScore).toFixed(2)),
       color: WOCA_ZONE_COLORS.war
     },
     {
       name: 'אדישות',
-      delta: Number((categoryScores.apathy - opportunityScore).toFixed(2)),
+      delta: parseFloat((apathyScore - opportunityScore).toFixed(2)),
       color: WOCA_ZONE_COLORS.apathy
     },
     {
       name: 'נוחות',
-      delta: Number((categoryScores.comfort - opportunityScore).toFixed(2)),
+      delta: parseFloat((comfortScore - opportunityScore).toFixed(2)),
       color: WOCA_ZONE_COLORS.comfort
     },
     {
       name: 'הזדמנות',
-      delta: 0, // baseline
+      delta: 0,
       color: WOCA_ZONE_COLORS.opportunity
     }
-  ].sort((a, b) => a.delta - b.delta); // Sort by delta size (largest negative first)
+  ].sort((a, b) => b.delta - a.delta); // Sort descending for better visual comparison
 
   const chartConfig = {
     delta: {
@@ -53,29 +54,29 @@ export const GapAnalysisChart: React.FC<GapAnalysisChartProps> = ({ categoryScor
           <ResponsiveContainer width="100%" height="100%">
             <BarChart 
               data={data} 
-              margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+              margin={{ top: 20, right: 30, left: 30, bottom: 30 }}
+              layout="vertical"
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis 
-                dataKey="name" 
-                tick={{ fontSize: 14 }}
-                interval={0}
+                type="number"
+                tick={{ fontSize: 12 }} 
+                domain={[dataMin => Math.min(dataMin, -1), dataMax => Math.max(dataMax, 1)]}
               />
               <YAxis 
-                tick={{ fontSize: 12 }}
-                domain={['dataMin - 0.5', 'dataMax + 0.5']}
+                type="category"
+                dataKey="name" 
+                tick={{ fontSize: 14 }} 
+                width={100} 
               />
               <ChartTooltip 
-                content={<ChartTooltipContent />}
+                content={<ChartTooltipContent />} 
                 formatter={(value: number, name: string) => [
                   value.toFixed(2), 
                   name === 'delta' ? 'פער מהזדמנות' : name
-                ]}
+                ]} 
               />
-              <Bar 
-                dataKey="delta" 
-                radius={[4, 4, 0, 0]}
-              >
+              <Bar dataKey="delta" radius={[0, 4, 4, 0]}>
                 {data.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
