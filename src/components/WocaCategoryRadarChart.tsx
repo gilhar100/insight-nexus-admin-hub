@@ -45,8 +45,8 @@ export const WocaCategoryRadarChart: React.FC<WocaCategoryRadarChartProps> = ({ 
   ];
 
   return (
-    <div className="flex justify-center items-center w-full p-8">
-      <div className="max-w-2xl w-full mx-auto">
+    <div className="w-full flex justify-center">
+      <div className="w-full max-w-7xl px-4">
         <ChartContainer config={chartConfig} className="h-[500px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <RadarChart data={chartData} margin={{ top: 40, right: 40, bottom: 40, left: 40 }}>

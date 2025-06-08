@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { useManagerSearch } from '@/hooks/useManagerSearch';
 import { useColleagueComparisonData } from '@/hooks/useColleagueComparisonData';
 import { useToast } from '@/hooks/use-toast';
+import { ComparisonChart } from '@/components/ComparisonChart';
 import {
   Command,
   CommandEmpty,
@@ -48,7 +49,7 @@ export const ColleagueComparison: React.FC = () => {
 
   const renderTrueScore = () => {
     const self = comparisonData?.selfReport || {};
-    const colleagues = comparisonData?.colleagueAverage || {};
+    const colleagues = comparisonData?.colleagueAverages || {};
     const dimensions = Object.keys(self);
 
     return (
