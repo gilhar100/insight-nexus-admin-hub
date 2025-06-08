@@ -5,8 +5,6 @@ import { Search, BarChart3, UserCheck } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useManagerSearch } from '@/hooks/useManagerSearch';
 import { useColleagueComparisonData } from '@/hooks/useColleagueComparisonData';
-import { ComparisonChart } from '@/components/ComparisonChart';
-import { TrueScoreDisplay } from '@/components/TrueScoreDisplay';
 import { useToast } from '@/hooks/use-toast';
 import {
   Command,
@@ -48,18 +46,37 @@ export const ColleagueComparison: React.FC = () => {
     await fetchComparisonData(selectedManager, selectedName);
   };
 
+  const renderTrueScore = () => {
+    const self = comparisonData?.selfReport || {};
+    const colleagues = comparisonData?.colleagueAverage || {};
+    const dimensions = Object.keys(self);
+
+    return (
+      <div className="grid grid-cols-2 gap-4 text-right">
+        {dimensions.map((dim) => {
+          const selfScore = self[dim] ?? 0;
+          const collScore = colleagues[dim] ?? 0;
+          const diff = collScore - selfScore;
+          return (
+            <div key={dim} className="p-3 border rounded-lg bg-gray-50">
+              <div className="font-medium">ממד {dim}</div>
+              <div>ציון עצמי: {selfScore.toFixed(2)}</div>
+              <div>ממוצע קולגות: {collScore.toFixed(2)}</div>
+              <div className="text-blue-700 font-bold">ציון אמת: {diff.toFixed(2)}</div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6" dir="rtl">
-      {/* Page Header */}
       <div className="bg-white rounded-lg shadow-sm border p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
-              השוואת קולגות - מודל SALIMA
-            </h2>
-            <p className="text-gray-600">
-              השוואה בין הערכה עצמית של מנהלים להערכת קולגות על פני שישה מימדי SALIMA
-            </p>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">השוואת קולגות - מודל SALIMA</h2>
+            <p className="text-gray-600">השוואה בין הערכה עצמית של מנהלים להערכת קולגות על פני שישה מימדי SALIMA</p>
           </div>
           <div className="bg-blue-50 p-4 rounded-lg">
             <UserCheck className="h-8 w-8 text-blue-600" />
@@ -67,7 +84,6 @@ export const ColleagueComparison: React.FC = () => {
         </div>
       </div>
 
-      {/* Manager Selection */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
@@ -86,34 +102,21 @@ export const ColleagueComparison: React.FC = () => {
                 value={searchQuery}
                 onChange={(e) => {
                   setSearchQuery(e.target.value);
-                  if (e.target.value.length >= 2) {
-                    setIsDropdownOpen(true);
-                  } else {
-                    setIsDropdownOpen(false);
-                  }
+                  setIsDropdownOpen(e.target.value.length >= 2);
                 }}
                 onFocus={() => {
-                  if (searchQuery.length >= 2) {
-                    setIsDropdownOpen(true);
-                  }
+                  if (searchQuery.length >= 2) setIsDropdownOpen(true);
                 }}
                 className="w-full text-right"
               />
-              
-              {/* Dropdown Results */}
+
               {isDropdownOpen && (searchQuery.length >= 2) && (
                 <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border rounded-md shadow-lg max-h-80 overflow-y-auto">
                   <Command>
                     <CommandList>
-                      {isLoading && (
-                        <CommandEmpty>מחפש...</CommandEmpty>
-                      )}
-                      {error && (
-                        <CommandEmpty className="text-red-500">שגיאה: {error}</CommandEmpty>
-                      )}
-                      {!isLoading && !error && managers.length === 0 && (
-                        <CommandEmpty>לא נמצאו מנהלים.</CommandEmpty>
-                      )}
+                      {isLoading && <CommandEmpty>מחפש...</CommandEmpty>}
+                      {error && <CommandEmpty className="text-red-500">שגיאה: {error}</CommandEmpty>}
+                      {!isLoading && !error && managers.length === 0 && <CommandEmpty>לא נמצאו מנהלים.</CommandEmpty>}
                       {managers.length > 0 && (
                         <CommandGroup>
                           {managers.map((manager) => (
@@ -125,9 +128,7 @@ export const ColleagueComparison: React.FC = () => {
                             >
                               <div className="flex flex-col text-right">
                                 <span className="font-medium">{manager.name}</span>
-                                {manager.email && (
-                                  <span className="text-sm text-gray-500">{manager.email}</span>
-                                )}
+                                {manager.email && <span className="text-sm text-gray-500">{manager.email}</span>}
                               </div>
                             </CommandItem>
                           ))}
@@ -138,10 +139,7 @@ export const ColleagueComparison: React.FC = () => {
                 </div>
               )}
             </div>
-            <Button 
-              onClick={handleAnalyzeResults} 
-              disabled={!selectedManager || isDataLoading}
-            >
+            <Button onClick={handleAnalyzeResults} disabled={!selectedManager || isDataLoading}>
               {isDataLoading ? 'מנתח...' : 'נתח השוואה'}
             </Button>
           </div>
@@ -160,10 +158,8 @@ export const ColleagueComparison: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Results Section */}
       {comparisonData && (
         <>
-          {/* Comparison Chart */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center">
@@ -172,11 +168,14 @@ export const ColleagueComparison: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ComparisonChart data={comparisonData} />
+              <div className="overflow-x-auto">
+                <div className="min-w-[600px]">
+                  <ComparisonChart data={comparisonData} />
+                </div>
+              </div>
             </CardContent>
           </Card>
 
-          {/* True Score Display */}
           <Card>
             <CardHeader>
               <CardTitle>ציון אמת (True Score) - הפרש בין הערכות</CardTitle>
@@ -185,13 +184,12 @@ export const ColleagueComparison: React.FC = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <TrueScoreDisplay data={comparisonData} />
+              {renderTrueScore()}
             </CardContent>
           </Card>
         </>
       )}
 
-      {/* No Data Message */}
       {comparisonData && comparisonData.colleagueResponses.length === 0 && (
         <Card>
           <CardContent className="p-8 text-center">
