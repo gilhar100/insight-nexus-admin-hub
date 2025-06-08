@@ -36,23 +36,7 @@ export const GapAnalysisChart: React.FC<GapAnalysisChartProps> = ({ categoryScor
 
   return (
     <div className="w-full px-4 py-6 space-y-12">
-      {/* Centered Radar Chart at the top */}
-      <div className="w-full flex justify-center">
-        <div className="w-full max-w-4xl">
-          <h3 className="text-xl font-semibold mb-4 text-center">מפת ציונים רדיאלית</h3>
-          <ResponsiveContainer width="100%" height={500}>
-            <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
-              <PolarGrid />
-              <PolarAngleAxis dataKey="dimension" tick={{ fontSize: 14 }} />
-              <PolarRadiusAxis angle={30} domain={[0, 5]} tick={{ fontSize: 12 }} />
-              <Radar name="Score" dataKey="value" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
-              <Tooltip formatter={(value: number) => value.toFixed(2)} />
-            </RadarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* Enhanced Gap Analysis Bar Chart */}
+      {/* Enhanced Gap Analysis Bar Chart without X-axis numbers */}
       <div className="max-w-3xl mx-auto">
         <h3 className="text-xl font-semibold mb-4 text-center">השוואת ציונים לפי אזורים</h3>
         <ResponsiveContainer width="100%" height={300}>
@@ -66,7 +50,9 @@ export const GapAnalysisChart: React.FC<GapAnalysisChartProps> = ({ categoryScor
             <XAxis
               type="number"
               domain={[min - buffer, max + buffer]}
-              tick={false} axisLine={false}
+              tick={false}
+              axisLine={false}
+              tickLine={false}
             />
             <YAxis type="category" dataKey="name" tick={{ fontSize: 14 }} width={100} />
             <Tooltip formatter={(value: number) => value.toFixed(2)} />
@@ -78,6 +64,22 @@ export const GapAnalysisChart: React.FC<GapAnalysisChartProps> = ({ categoryScor
             </Bar>
           </BarChart>
         </ResponsiveContainer>
+      </div>
+
+      {/* Centered Radar Chart */}
+      <div className="w-full flex justify-center">
+        <div className="w-full max-w-4xl">
+          <h3 className="text-xl font-semibold mb-4 text-center">מפת ציונים רדיאלית</h3>
+          <ResponsiveContainer width="100%" height={500}>
+            <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
+              <PolarGrid />
+              <PolarAngleAxis dataKey="dimension" tick={{ fontSize: 14 }} />
+              <PolarRadiusAxis angle={30} domain={[0, 5]} tick={{ fontSize: 12 }} />
+              <Radar name="Score" dataKey="value" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
+              <Tooltip formatter={(value: number) => value.toFixed(2)} />
+            </RadarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );
