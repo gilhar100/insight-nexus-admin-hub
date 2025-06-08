@@ -29,9 +29,15 @@ export const GapAnalysisChart: React.FC<GapAnalysisChartProps> = ({ categoryScor
     { dimension: 'מלחמה', value: war },
   ];
 
+  // Dynamic domain scaling to exaggerate visual difference without altering data
+  const values = [opportunity, comfort, apathy, war];
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const buffer = (max - min) * 0.5 || 0.5;
+
   return (
     <div className="w-full px-4 py-6 space-y-12">
-      {/* Clean and clear Gap Analysis Bar Chart */}
+      {/* Enhanced Gap Analysis Bar Chart */}
       <div className="max-w-3xl mx-auto">
         <h3 className="text-xl font-semibold mb-4 text-center">השוואת ציונים לפי אזורים</h3>
         <ResponsiveContainer width="100%" height={300}>
@@ -39,10 +45,14 @@ export const GapAnalysisChart: React.FC<GapAnalysisChartProps> = ({ categoryScor
             data={barData}
             layout="vertical"
             margin={{ top: 20, right: 30, left: 60, bottom: 10 }}
-            barCategoryGap={24}
+            barCategoryGap={30}
           >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis type="number" domain={[0, 5]} tick={{ fontSize: 12 }} />
+            <XAxis
+              type="number"
+              domain={[min - buffer, max + buffer]}
+              tick={{ fontSize: 12 }}
+            />
             <YAxis type="category" dataKey="name" tick={{ fontSize: 14 }} width={100} />
             <Tooltip formatter={(value: number) => value.toFixed(2)} />
             <Legend />
