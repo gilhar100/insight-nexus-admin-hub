@@ -81,8 +81,8 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({ participants }) => {
   };
 
   return (
-    <ChartContainer config={chartConfig} className="h-[500px]">
-      <div className="w-full h-full p-4 overflow-auto">
+    <ChartContainer config={chartConfig} className="w-full">
+      <div className="w-full p-4">
         <div className="grid grid-cols-1 gap-6">
           {Object.entries(groupedData).map(([category, questions]) => (
             <div key={category} className="space-y-2">
@@ -92,7 +92,7 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({ participants }) => {
               >
                 {getCategoryLabel(category)}
               </h4>
-              <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-9 gap-2">
+              <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-9 gap-2">
                 {questions.map((question) => (
                   <div
                     key={question.question}

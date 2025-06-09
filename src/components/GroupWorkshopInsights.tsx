@@ -1,9 +1,8 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Users, BarChart3, Radar, Download, TrendingUp, Eye, EyeOff, AlertCircle, PieChart, LayoutGrid } from 'lucide-react';
+import { Users, BarChart3, Radar, Download, TrendingUp, Eye, EyeOff, AlertCircle, Lightbulb } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useWorkshopData } from '@/hooks/useWorkshopData';
 import { WocaRadarChart } from '@/components/WocaRadarChart';
@@ -13,8 +12,6 @@ import { PresenterMode } from '@/components/PresenterMode';
 import { ZoneDescription } from '@/components/ZoneDescription';
 import { ParticipantSearch } from '@/components/ParticipantSearch';
 import { GapAnalysisChart } from '@/components/GapAnalysisChart';
-import { ZoneDistributionChart } from '@/components/ZoneDistributionChart';
-import { StackedBarChart } from '@/components/StackedBarChart';
 import { HeatmapChart } from '@/components/HeatmapChart';
 
 export const GroupWorkshopInsights: React.FC = () => {
@@ -326,13 +323,13 @@ export const GroupWorkshopInsights: React.FC = () => {
           )}
 
           {/* Visualizations - Show in both normal and presenter mode */}
-          <div className={`grid grid-cols-1 ${isPresenterMode ? 'gap-12' : 'lg:grid-cols-2 gap-6'}`}>
-            {/* Gap Analysis Chart */}
-            <Card>
+          <div className={`grid grid-cols-1 ${isPresenterMode ? 'gap-12' : 'gap-6'}`}>
+            {/* Gap Analysis Chart - Full Width */}
+            <Card className="lg:col-span-2">
               <CardHeader>
                 <CardTitle className={`flex items-center ${isPresenterMode ? 'text-2xl' : ''}`}>
                   <BarChart3 className="h-5 w-5 mr-2" />
-                  ניתוח פערים
+                  השוואת ציונים לפי אזורים
                 </CardTitle>
                 {!isPresenterMode && (
                   <CardDescription>
@@ -342,42 +339,6 @@ export const GroupWorkshopInsights: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <GapAnalysisChart categoryScores={wocaAnalysis.groupCategoryScores} />
-              </CardContent>
-            </Card>
-
-            {/* Zone Distribution Pie Chart */}
-            <Card>
-              <CardHeader>
-                <CardTitle className={`flex items-center ${isPresenterMode ? 'text-2xl' : ''}`}>
-                  <PieChart className="h-5 w-5 mr-2" />
-                  התפלגות משתתפים לפי אזורים
-                </CardTitle>
-                {!isPresenterMode && (
-                  <CardDescription>
-                    מספר משתתפים בכל אזור WOCA
-                  </CardDescription>
-                )}
-              </CardHeader>
-              <CardContent>
-                <ZoneDistributionChart zoneDistribution={zoneDistribution} />
-              </CardContent>
-            </Card>
-
-            {/* Stacked Bar Chart - New */}
-            <Card className="lg:col-span-2">
-              <CardHeader>
-                <CardTitle className={`flex items-center ${isPresenterMode ? 'text-2xl' : ''}`}>
-                  <LayoutGrid className="h-5 w-5 mr-2" />
-                  פרופיל משתתפים לפי ציונים יחסיים
-                </CardTitle>
-                {!isPresenterMode && (
-                  <CardDescription>
-                    ציונים לכל אזור עבור כל משתתף
-                  </CardDescription>
-                )}
-              </CardHeader>
-              <CardContent>
-                <StackedBarChart participants={workshopData.participants} />
               </CardContent>
             </Card>
 
@@ -394,7 +355,7 @@ export const GroupWorkshopInsights: React.FC = () => {
               </CardContent>
             </Card>
 
-            {/* Heatmap Chart - New */}
+            {/* Heatmap Chart - Full Width */}
             <Card className="lg:col-span-2">
               <CardHeader>
                 <CardTitle className={`flex items-center ${isPresenterMode ? 'text-2xl' : ''}`}>
@@ -412,6 +373,28 @@ export const GroupWorkshopInsights: React.FC = () => {
               </CardContent>
             </Card>
           </div>
+
+          {/* Why Move to Opportunity Zone Section */}
+          <Card className={`${isPresenterMode ? 'border-2 border-green-200 bg-green-50' : 'bg-green-50'}`}>
+            <CardContent className={isPresenterMode ? 'p-8' : 'p-6'}>
+              <div className={`text-center ${isPresenterMode ? 'space-y-6' : 'space-y-4'}`}>
+                <h3 className={`${isPresenterMode ? 'text-2xl' : 'text-lg'} font-bold mb-4 text-green-800 flex items-center justify-center`}>
+                  <Lightbulb className="h-6 w-6 mr-2" />
+                  מדוע כדאי לנוע לאזור ההזדמנות
+                </h3>
+                <div className={`${isPresenterMode ? 'text-lg' : 'text-base'} leading-relaxed text-green-700 text-right`}>
+                  <p className="mb-4">
+                    <strong>מדוע אזור ההזדמנות הוא אידיאלי?</strong>
+                  </p>
+                  <p>
+                    אזור ההזדמנות מייצג איזון נדיר בין יוזמה לאחריות, בין יצירתיות לבקרה, ובין הישגיות לשיתוף פעולה. 
+                    זהו המרחב שבו הארגון מסוגל ליזום שינוי, לנהל קונפליקטים באופן בונה, ולנוע לעבר עתיד משמעותי ובר־קיימא. 
+                    תרבות ארגונית המתבססת על ערכים אלו אינה רק אפקטיבית יותר – היא גם עמידה, חדשנית ובעלת השפעה חיובית על עובדיה ועל סביבתה.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Participant Summary - Only in normal mode */}
           {!isPresenterMode && (
