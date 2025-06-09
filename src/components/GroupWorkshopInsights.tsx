@@ -1,8 +1,9 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Users, BarChart3, Radar, Download, TrendingUp, Eye, EyeOff, AlertCircle, Lightbulb } from 'lucide-react';
+import { Users, BarChart3, Radar, Download, TrendingUp, Eye, EyeOff, AlertCircle, Lightbulb, PieChart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useWorkshopData } from '@/hooks/useWorkshopData';
 import { WocaRadarChart } from '@/components/WocaRadarChart';
@@ -13,6 +14,7 @@ import { ZoneDescription } from '@/components/ZoneDescription';
 import { ParticipantSearch } from '@/components/ParticipantSearch';
 import { GapAnalysisChart } from '@/components/GapAnalysisChart';
 import { HeatmapChart } from '@/components/HeatmapChart';
+import { ZoneDistributionChart } from '@/components/ZoneDistributionChart';
 
 export const GroupWorkshopInsights: React.FC = () => {
   const [selectedGroupId, setSelectedGroupId] = useState<number | undefined>();
@@ -99,6 +101,20 @@ export const GroupWorkshopInsights: React.FC = () => {
 
   // Check if we have enough data for analysis
   const hasMinimumData = workshopData && workshopData.participants.length >= 3;
+
+  // Calculate zone distribution for pie chart
+  const getZoneDistribution = () => {
+    if (!wocaAnalysis) return { opportunity: 0, comfort: 0, apathy: 0, war: 0 };
+    
+    const distribution = { opportunity: 0, comfort: 0, apathy: 0, war: 0 };
+    wocaAnalysis.participants.forEach(participant => {
+      if (participant.dominantZone && !participant.isTie) {
+        distribution[participant.dominantZone as keyof typeof distribution]++;
+      }
+    });
+    
+    return distribution;
+  };
 
   const renderContent = () => (
     <div className={`space-y-6 ${isPresenterMode ? 'presenter-mode' : ''}`} dir="rtl">
@@ -194,29 +210,31 @@ export const GroupWorkshopInsights: React.FC = () => {
       {/* Results Section - Only show when group is selected and has minimum data */}
       {workshopData && wocaAnalysis && hasMinimumData && (
         <>
-          {/* WOCA Zone Classification */}
-          <Card>
-            <CardHeader>
-              <CardTitle className={`flex items-center justify-between ${isPresenterMode ? 'text-3xl' : ''}`}>
-                <span>סיווג אזור WOCA</span>
-                {!isPresenterMode && (
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => setShowNames(!showNames)}>
-                      {showNames ? <EyeOff className="h-4 w-4 ml-2" /> : <Eye className="h-4 w-4 ml-2" />}
-                      {showNames ? 'הסתר שמות' : 'הצג שמות'}
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={exportWorkshopData}>
-                      <Download className="h-4 w-4 ml-2" />
-                      ייצא ניתוח
-                    </Button>
-                  </div>
-                )}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className={`text-center ${isPresenterMode ? 'p-12' : 'p-8'}`}>
+          {/* 1. WOCA Zone Description Section */}
+          <Card className={`${isPresenterMode ? 'border-2 border-green-200' : ''}`}>
+            <CardContent className={isPresenterMode ? 'p-12' : 'p-8'}>
+              <div className="text-center space-y-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className={`text-3xl font-bold text-green-800 text-center flex-1 ${isPresenterMode ? 'text-4xl' : ''}`}>
+                    <Lightbulb className="h-8 w-8 ml-2 inline" />
+                    סיווג אזור WOCA
+                  </h3>
+                  {!isPresenterMode && (
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" onClick={() => setShowNames(!showNames)}>
+                        {showNames ? <EyeOff className="h-4 w-4 ml-2" /> : <Eye className="h-4 w-4 ml-2" />}
+                        {showNames ? 'הסתר שמות' : 'הצג שמות'}
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={exportWorkshopData}>
+                        <Download className="h-4 w-4 ml-2" />
+                        ייצא ניתוח
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
                 {wocaAnalysis.groupIsTie ? (
-                  <div className="mb-6">
+                  <div className="bg-green-50 p-6 rounded-lg">
                     <div className="flex items-center justify-center mb-4">
                       <AlertCircle className="h-6 w-6 text-yellow-500 ml-2" />
                       <span className={`font-semibold ${isPresenterMode ? 'text-2xl' : 'text-lg'}`}>תיקו בין אזורים</span>
@@ -235,24 +253,24 @@ export const GroupWorkshopInsights: React.FC = () => {
                         );
                       })}
                     </div>
-                    <p className={`text-gray-600 mt-4 ${isPresenterMode ? 'text-xl' : ''}`}>
+                    <p className={`text-gray-600 mt-4 text-lg leading-relaxed text-right ${isPresenterMode ? 'text-xl' : ''}`}>
                       לא זוהה אזור תודעה דומיננטי עקב ציונים זהים
                     </p>
                   </div>
                 ) : zoneInfo && (
-                  <div className="mb-6">
+                  <div className="bg-green-50 p-6 rounded-lg">
                     <Badge 
                       variant="secondary" 
-                      className={`px-4 py-2 ${zoneInfo.color} text-white ${isPresenterMode ? 'text-2xl' : 'text-lg'}`}
+                      className={`px-4 py-2 ${zoneInfo.color} text-white mb-4 ${isPresenterMode ? 'text-2xl' : 'text-lg'}`}
                     >
                       {zoneInfo.name}
                     </Badge>
-                    <div className={`mt-4 ${isPresenterMode ? 'text-2xl' : 'text-lg'} text-gray-600 mb-4`}>
+                    <div className={`${isPresenterMode ? 'text-2xl' : 'text-lg'} text-gray-600 mb-6`}>
                       אזור תודעה ארגונית ({wocaAnalysis.participantCount} משתתפים)
                     </div>
                     
                     {/* Category Scores Display */}
-                    <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 ${isPresenterMode ? 'gap-8' : ''}`}>
+                    <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 ${isPresenterMode ? 'gap-8' : ''}`}>
                       <div className="text-center">
                         <div 
                           className={`font-bold ${isPresenterMode ? 'text-4xl' : 'text-2xl'}`} 
@@ -290,43 +308,20 @@ export const GroupWorkshopInsights: React.FC = () => {
                         <div className={`text-gray-600 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>מלחמה</div>
                       </div>
                     </div>
+
+                    <div className={`text-lg leading-relaxed text-green-700 text-right px-4 mt-6 ${isPresenterMode ? 'text-xl' : ''}`}>
+                      {zoneInfo.description}
+                    </div>
                   </div>
                 )}
               </div>
             </CardContent>
           </Card>
 
-          {/* Zone Description */}
-          {!wocaAnalysis.groupIsTie && wocaAnalysis.groupDominantZone && (
-            <ZoneDescription zone={wocaAnalysis.groupDominantZone} isPresenterMode={isPresenterMode} />
-          )}
-
-          {/* Visualizations */}
+          {/* 2. Charts Row - Radar + Pie Side-by-Side */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Gap Analysis Chart - Full Width */}
-            <Card className="lg:col-span-2">
-              <CardHeader>
-                <CardTitle className={`flex items-center text-right ${isPresenterMode ? 'text-2xl' : ''}`}>
-                  <BarChart3 className="h-5 w-5 ml-2" />
-                  השוואת ציונים לפי אזורים
-                </CardTitle>
-                {!isPresenterMode && (
-                  <CardDescription className="text-right">
-                    פערים יחסית לאזור ההזדמנות
-                  </CardDescription>
-                )}
-              </CardHeader>
-              <CardContent>
-                <GapAnalysisChart 
-                  categoryScores={wocaAnalysis.groupCategoryScores} 
-                  hideXAxisNumbers={true}
-                  showYAxisLabels={true}
-                />
-              </CardContent>
-            </Card>
-
             {/* Radar Chart */}
-            <Card className="lg:col-span-2">
+            <Card>
               <CardHeader>
                 <CardTitle className={`flex items-center text-right ${isPresenterMode ? 'text-2xl' : ''}`}>
                   <Radar className="h-5 w-5 ml-2" />
@@ -338,28 +333,45 @@ export const GroupWorkshopInsights: React.FC = () => {
               </CardContent>
             </Card>
 
-            {/* Heatmap Chart - Full Width */}
-            <Card className="lg:col-span-2">
+            {/* Pie Chart - Zone Distribution */}
+            <Card>
               <CardHeader>
                 <CardTitle className={`flex items-center text-right ${isPresenterMode ? 'text-2xl' : ''}`}>
-                  <BarChart3 className="h-5 w-5 ml-2" />
-                  מפת חום לפי שאלות
+                  <PieChart className="h-5 w-5 ml-2" />
+                  התפלגות משתתפים לפי אזורים
                 </CardTitle>
                 {!isPresenterMode && (
                   <CardDescription className="text-right">
-                    ממוצע לכל שאלה לפי קטגוריית WOCA
+                    חלוקת המשתתפים בין אזורי WOCA השונים
                   </CardDescription>
                 )}
               </CardHeader>
               <CardContent>
-                <HeatmapChart participants={workshopData.participants} />
+                <ZoneDistributionChart zoneDistribution={getZoneDistribution()} />
               </CardContent>
             </Card>
           </div>
 
-          {/* Add proper spacing before the informational section */}
+          {/* 3. Heatmap Chart - Full Width */}
+          <Card className="lg:col-span-2">
+            <CardHeader>
+              <CardTitle className={`flex items-center text-right ${isPresenterMode ? 'text-2xl' : ''}`}>
+                <BarChart3 className="h-5 w-5 ml-2" />
+                מפת חום לפי שאלות
+              </CardTitle>
+              {!isPresenterMode && (
+                <CardDescription className="text-right">
+                  ממוצע לכל שאלה לפי קטגוריית WOCA
+                </CardDescription>
+              )}
+            </CardHeader>
+            <CardContent>
+              <HeatmapChart participants={workshopData.participants} />
+            </CardContent>
+          </Card>
+
+          {/* 4. Opportunity Zone Paragraph */}
           <div className={`${isPresenterMode ? 'mt-16' : 'mt-12'}`}>
-            {/* Informational Section - Why Move to Opportunity Zone */}
             <Card className={`${isPresenterMode ? 'border-2 border-green-200 bg-green-50' : 'bg-green-50'}`}>
               <CardContent className={isPresenterMode ? 'p-8' : 'p-6'}>
                 <div className={`text-center ${isPresenterMode ? 'space-y-6' : 'space-y-4'}`}>
@@ -382,66 +394,66 @@ export const GroupWorkshopInsights: React.FC = () => {
             </Card>
           </div>
 
-          {/* Participant Summary - Only in normal mode */}
-          {!isPresenterMode && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center text-right">
-                  <TrendingUp className="h-5 w-5 ml-2" />
-                  סקירת משתתפים
-                </CardTitle>
+          {/* 5. Demographics Section - Now visible in Presenter Mode too */}
+          <Card>
+            <CardHeader>
+              <CardTitle className={`flex items-center text-right ${isPresenterMode ? 'text-2xl font-bold' : ''}`}>
+                <TrendingUp className="h-5 w-5 ml-2" />
+                סקירת משתתפים
+              </CardTitle>
+              {!isPresenterMode && (
                 <CardDescription className="text-right">
                   ציונים אישיים ודמוגרפיה {showNames ? '(שמות גלויים)' : '(אנונימי)'}
                 </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {wocaAnalysis.participants.map((participant, index) => (
-                    <div key={participant.participantId} className="p-4 border rounded-lg hover:shadow-md transition-shadow">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="font-medium text-sm">
-                          {showNames ? participant.participantName : `משתתף ${index + 1}`}
-                        </span>
-                        {participant.isTie ? (
-                          <Badge variant="secondary">תיקו</Badge>
-                        ) : (
-                          <Badge 
-                            variant={
-                              participant.dominantZone === 'opportunity' ? "default" : 
-                              participant.dominantZone === 'war' ? "destructive" : 
-                              "secondary"
-                            }
-                          >
-                            {participant.dominantZone ? getZoneInfo(participant.dominantZone).name : 'N/A'}
-                          </Badge>
-                        )}
+              )}
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {wocaAnalysis.participants.map((participant, index) => (
+                  <div key={participant.participantId} className="p-4 border rounded-lg hover:shadow-md transition-shadow bg-white">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className={`font-medium ${isPresenterMode ? 'text-base' : 'text-sm'}`}>
+                        {showNames ? participant.participantName : `משתתף ${index + 1}`}
+                      </span>
+                      {participant.isTie ? (
+                        <Badge variant="secondary">תיקו</Badge>
+                      ) : (
+                        <Badge 
+                          variant={
+                            participant.dominantZone === 'opportunity' ? "default" : 
+                            participant.dominantZone === 'war' ? "destructive" : 
+                            "secondary"
+                          }
+                        >
+                          {participant.dominantZone ? getZoneInfo(participant.dominantZone).name : 'N/A'}
+                        </Badge>
+                      )}
+                    </div>
+                    
+                    {/* Mini category scores */}
+                    <div className={`space-y-1 text-right ${isPresenterMode ? 'text-sm' : 'text-xs'}`}>
+                      <div className="flex justify-between">
+                        <span className="font-medium">{participant.categoryScores.opportunity.toFixed(1)}</span>
+                        <span>:הזדמנות</span>
                       </div>
-                      
-                      {/* Mini category scores */}
-                      <div className="space-y-1 text-xs text-right">
-                        <div className="flex justify-between">
-                          <span className="font-medium">{participant.categoryScores.opportunity.toFixed(1)}</span>
-                          <span>:הזדמנות</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="font-medium">{participant.categoryScores.comfort.toFixed(1)}</span>
-                          <span>:נוחות</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="font-medium">{participant.categoryScores.apathy.toFixed(1)}</span>
-                          <span>:אדישות</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="font-medium">{participant.categoryScores.war.toFixed(1)}</span>
-                          <span>:מלחמה</span>
-                        </div>
+                      <div className="flex justify-between">
+                        <span className="font-medium">{participant.categoryScores.comfort.toFixed(1)}</span>
+                        <span>:נוחות</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-medium">{participant.categoryScores.apathy.toFixed(1)}</span>
+                        <span>:אדישות</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="font-medium">{participant.categoryScores.war.toFixed(1)}</span>
+                        <span>:מלחמה</span>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </>
       )}
     </div>

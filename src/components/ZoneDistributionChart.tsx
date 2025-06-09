@@ -46,8 +46,10 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
   };
 
   const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, value, name }: any) => {
+    if (value === 0) return null;
+    
     const RADIAN = Math.PI / 180;
-    const radius = innerRadius + (outerRadius - innerRadius) * 1.4;
+    const radius = innerRadius + (outerRadius - innerRadius) * 1.3;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
     const percentage = ((value / total) * 100).toFixed(1);
@@ -59,18 +61,26 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
         fill="black"
         textAnchor={x > cx ? 'start' : 'end'}
         dominantBaseline="central"
-        fontSize={14}
+        fontSize={12}
         fontWeight="500"
       >
-        {`${name}: ${value} (${percentage}%)`}
+        {`${value} (${percentage}%)`}
       </text>
     );
   };
 
+  if (total === 0) {
+    return (
+      <div className="flex justify-center items-center h-[300px] text-gray-500">
+        אין נתונים להצגה
+      </div>
+    );
+  }
+
   return (
-    <div className="flex justify-center items-center w-full p-4">
-      <div className="max-w-2xl w-full mx-auto">
-        <ChartContainer config={chartConfig} className="h-[500px] w-full">
+    <div className="flex justify-center items-center w-full">
+      <div className="max-w-lg w-full mx-auto">
+        <ChartContainer config={chartConfig} className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -79,7 +89,7 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
                 cy="50%"
                 labelLine={false}
                 label={renderCustomLabel}
-                outerRadius={120}
+                outerRadius={90}
                 fill="#8884d8"
                 dataKey="value"
               >
@@ -92,6 +102,12 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
                   `${value} משתתפים (${((value / total) * 100).toFixed(1)}%)`,
                   name
                 ]}
+              />
+              <Legend 
+                verticalAlign="bottom" 
+                height={36}
+                iconType="circle"
+                wrapperStyle={{ fontSize: '14px', textAlign: 'center' }}
               />
             </PieChart>
           </ResponsiveContainer>
