@@ -45,21 +45,21 @@ export const GapAnalysisChart: React.FC<GapAnalysisChartProps> = ({
           <BarChart
             data={barData}
             layout="vertical"
-            margin={{ top: 20, right: 30, left: 120, bottom: 10 }}
+            margin={{ top: 20, right: 30, left: 150, bottom: 10 }}
             barCategoryGap={20}
           >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               type="number"
               domain={[domainMin, domainMax]}
-              tick={hideXAxisNumbers ? false : { fontSize: 12 }}
-              hide={hideXAxisNumbers}
+              tick={false}
+              hide={true}
             />
             <YAxis 
               type="category" 
               dataKey="name" 
               tick={showYAxisLabels ? { fontSize: 14, textAnchor: 'end' } : false}
-              width={100}
+              width={130}
             />
             <Tooltip 
               formatter={(value: number) => [value.toFixed(2), 'ציון']}
