@@ -29,21 +29,35 @@ export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
     };
     
     const zoneDescriptions = {
-      opportunity: { name: 'הזדמנות', color: 'bg-green-500' },
-      comfort: { name: 'נוחות', color: 'bg-blue-500' },
-      apathy: { name: 'אדישות', color: 'bg-yellow-500' },
-      war: { name: 'מלחמה', color: 'bg-red-500' }
+      opportunity: { 
+        name: 'אזור ההזדמנות', 
+        color: 'bg-green-500',
+        description: 'מצב תודעתי המאופיין בסקרנות, הקשבה וחדשנות. ארגון באזור זה מחולל שינוי ומוביל השראה.'
+      },
+      comfort: { 
+        name: 'אזור הנוחות', 
+        color: 'bg-blue-500',
+        description: 'ארגון השואף לשמר יציבות, אך לעיתים מתקשה לנוע קדימה או להתמודד עם שינוי.'
+      },
+      apathy: { 
+        name: 'אזור האדישות', 
+        color: 'bg-yellow-500',
+        description: 'מאופיין בפסיביות, נתק רגשי וחוסר עניין. ארגון במצב זה נמצא בסכנת קיפאון.'
+      },
+      war: { 
+        name: 'אזור המלחמה', 
+        color: 'bg-red-500',
+        description: 'ארגון עם קונפליקטים פנימיים, מאבקי כוח ומחסור באמון הדדי – דבר המעכב שיתוף פעולה.'
+      }
     };
     
-    const zoneDesc = zoneDescriptions[zone as keyof typeof zoneDescriptions] || { name: 'לא זוהה', color: 'bg-gray-500' };
-    
-    return {
-      name: zoneDesc.name,
-      color: zoneDesc.color,
-      description: zone === 'opportunity' 
-        ? 'זהו המצב התודעתי האידיאלי עבור ארגונים המבקשים לייצר ערך משותף, להתפתח, ולנוע לעבר עתיד בעל משמעות.'
-        : 'תיאור האזור'
+    const zoneDesc = zoneDescriptions[zone as keyof typeof zoneDescriptions] || { 
+      name: 'לא זוהה', 
+      color: 'bg-gray-500',
+      description: 'לא ניתן לזהות אזור דומיננטי'
     };
+    
+    return zoneDesc;
   };
 
   const zoneInfo = wocaAnalysis ? getZoneInfo(wocaAnalysis.groupDominantZone) : null;
@@ -108,7 +122,7 @@ export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
               </div>
               
               {/* Category Scores Display */}
-              <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 ${isPresenterMode ? 'gap-8' : ''}`}>
+              <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 ${isPresenterMode ? 'gap-8' : ''} mb-6`}>
                 <div className="text-center">
                   <div 
                     className={`font-bold ${isPresenterMode ? 'text-4xl' : 'text-2xl'}`} 
@@ -147,6 +161,7 @@ export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
                 </div>
               </div>
 
+              {/* Zone Description */}
               <div className={`text-lg leading-relaxed text-green-700 text-right px-4 mt-6 ${isPresenterMode ? 'text-xl' : ''}`}>
                 {zoneInfo.description}
               </div>

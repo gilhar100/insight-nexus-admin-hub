@@ -1,7 +1,8 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Lightbulb } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Lightbulb, X } from 'lucide-react';
 
 interface OpportunityZoneSectionProps {
   isPresenterMode: boolean;
@@ -10,24 +11,46 @@ interface OpportunityZoneSectionProps {
 export const OpportunityZoneSection: React.FC<OpportunityZoneSectionProps> = ({
   isPresenterMode
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const firstLine = "מהו אזור ההזדמנות ומדוע נרצה לנוע אליו?";
+  
+  const fullContent = `אזור ההזדמנות הוא מצב תודעתי ארגוני שבו מתקיימים סקרנות מתמדת, פתיחות לשינויים, ולמידה מתמשכת. זהו אזור המאופיין בהקשבה עמוקה לאחר, טיפוח מערכות יחסים בינאישיות, וחתירה לחדשנות מתוך משמעות.
+
+רק ארגון שפועל מתוך אזור ההזדמנות מסוגל לגבש חזון בהיר ומעורר השראה, ללמוד מכישלונות, לזהות הזדמנויות נסתרות – ולעיתים אף לגלות את "האוקיינוסים הכחולים".
+
+בזמן משבר, ארגון כזה אינו מתכווץ אלא מתרחב – הוא מאפשר טרנספורמציה בקרב אנשיו דרך שיתוף פעולה, השראה הדדית, ועיבוד משותף של אתגרים. זהו ארגון שמסוגל לבנות נרטיב משמעותי ומחולל שינוי – נרטיב שמניע אנשים קדימה.`;
+
   return (
     <div className={`${isPresenterMode ? 'mt-16' : 'mt-12'}`}>
       <Card className={`${isPresenterMode ? 'border-2 border-green-200 bg-green-50' : 'bg-green-50'}`}>
         <CardContent className={isPresenterMode ? 'p-8' : 'p-6'}>
           <div className={`text-center ${isPresenterMode ? 'space-y-6' : 'space-y-4'}`}>
-            <h3 className={`${isPresenterMode ? 'text-2xl' : 'text-lg'} font-bold mb-4 text-green-800 flex items-center justify-center`}>
-              <Lightbulb className="h-6 w-6 ml-2" />
-              מדוע כדאי לנוע לאזור ההזדמנות
-            </h3>
             <div className={`${isPresenterMode ? 'text-lg' : 'text-base'} leading-relaxed text-green-700 text-right px-4`}>
-              <p className="mb-4">
-                <strong>מדוע אזור ההזדמנות הוא אידיאלי?</strong>
-              </p>
-              <p className="leading-relaxed">
-                אזור ההזדמנות מייצג איזון נדיר בין יוזמה לאחריות, בין יצירתיות לבקרה, ובין הישגיות לשיתוף פעולה.
-                זהו המרחב שבו הארגון מסוגל ליזום שינוי, לנהל קונפליקטים באופן בונה, ולנוע לעבר עתיד משמעותי ובר־קיימא.
-                תרבות ארגונית המתבססת על ערכים אלו אינה רק אפקטיבית יותר – היא גם עמידה, חדשנית ובעלת השפעה חיובית על עובדיה ועל סביבתה.
-              </p>
+              <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                <DialogTrigger asChild>
+                  <div className="cursor-pointer hover:bg-green-100 p-4 rounded-lg transition-colors">
+                    <div className="flex items-center justify-center mb-4">
+                      <Lightbulb className="h-6 w-6 ml-2" />
+                      <h3 className={`${isPresenterMode ? 'text-2xl' : 'text-lg'} font-bold text-green-800`}>
+                        {firstLine}
+                      </h3>
+                    </div>
+                    <p className="text-sm text-green-600">לחץ לקריאה מלאה</p>
+                  </div>
+                </DialogTrigger>
+                <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto" dir="rtl">
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl font-bold text-green-800 text-right flex items-center justify-center">
+                      <Lightbulb className="h-6 w-6 ml-2" />
+                      {firstLine}
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="mt-6 text-lg leading-relaxed text-green-700 text-right whitespace-pre-line">
+                    {fullContent}
+                  </div>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         </CardContent>
