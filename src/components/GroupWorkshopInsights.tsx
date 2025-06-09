@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -74,7 +75,7 @@ export const GroupWorkshopInsights: React.FC = () => {
       analysis_date: new Date().toISOString(),
       participants: workshopData.participants.map(p => ({
         ...p,
-        full_name: showNames ? p.full_name : Participant ${workshopData.participants.indexOf(p) + 1}
+        full_name: showNames ? p.full_name : `Participant ${workshopData.participants.indexOf(p) + 1}`
       }))
     };
     const dataStr = JSON.stringify(exportData, null, 2);
@@ -84,7 +85,7 @@ export const GroupWorkshopInsights: React.FC = () => {
     const url = URL.createObjectURL(dataBlob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = group-${workshopData.workshop_id}-woca-analysis-${new Date().toISOString().split('T')[0]}.json;
+    link.download = `group-${workshopData.workshop_id}-woca-analysis-${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -122,7 +123,7 @@ export const GroupWorkshopInsights: React.FC = () => {
   const hasMinimumData = workshopData && workshopData.participants.length >= 3;
 
   const renderContent = () => (
-    <div className={space-y-6 ${isPresenterMode ? 'presenter-mode' : ''}}>
+    <div className={`space-y-6 ${isPresenterMode ? 'presenter-mode' : ''}`}>
       {/* Page Header */}
       {!isPresenterMode && (
         <div className="bg-white rounded-lg shadow-sm border p-6">
@@ -218,7 +219,7 @@ export const GroupWorkshopInsights: React.FC = () => {
           {/* WOCA Zone Classification */}
           <Card>
             <CardHeader>
-              <CardTitle className={flex items-center justify-between ${isPresenterMode ? 'text-3xl' : ''}}>
+              <CardTitle className={`flex items-center justify-between ${isPresenterMode ? 'text-3xl' : ''}`}>
                 <span>סיווג אזור WOCA</span>
                 {!isPresenterMode && (
                   <div className="flex gap-2">
@@ -235,12 +236,12 @@ export const GroupWorkshopInsights: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className={text-center ${isPresenterMode ? 'p-12' : 'p-8'}}>
+              <div className={`text-center ${isPresenterMode ? 'p-12' : 'p-8'}`}>
                 {wocaAnalysis.groupIsTie ? (
                   <div className="mb-6">
                     <div className="flex items-center justify-center mb-4">
                       <AlertCircle className="h-6 w-6 text-yellow-500 mr-2" />
-                      <span className={font-semibold ${isPresenterMode ? 'text-2xl' : 'text-lg'}}>תיקו בין אזורים</span>
+                      <span className={`font-semibold ${isPresenterMode ? 'text-2xl' : 'text-lg'}`}>תיקו בין אזורים</span>
                     </div>
                     <div className="flex flex-wrap justify-center gap-2">
                       {wocaAnalysis.groupTiedCategories.map(category => {
@@ -249,14 +250,14 @@ export const GroupWorkshopInsights: React.FC = () => {
                           <Badge 
                             key={category} 
                             variant="secondary" 
-                            className={px-3 py-1 ${categoryZoneInfo.color} text-white ${isPresenterMode ? 'text-lg' : 'text-sm'}}
+                            className={`px-3 py-1 ${categoryZoneInfo.color} text-white ${isPresenterMode ? 'text-lg' : 'text-sm'}`}
                           >
                             {categoryZoneInfo.name}
                           </Badge>
                         );
                       })}
                     </div>
-                    <p className={text-gray-600 mt-4 ${isPresenterMode ? 'text-xl' : ''}}>
+                    <p className={`text-gray-600 mt-4 ${isPresenterMode ? 'text-xl' : ''}`}>
                       לא זוהה אזור תודעה דומיננטי עקב ציונים זהים
                     </p>
                   </div>
@@ -264,51 +265,51 @@ export const GroupWorkshopInsights: React.FC = () => {
                   <div className="mb-6">
                     <Badge 
                       variant="secondary" 
-                      className={px-4 py-2 ${zoneInfo.color} text-white ${isPresenterMode ? 'text-2xl' : 'text-lg'}}
+                      className={`px-4 py-2 ${zoneInfo.color} text-white ${isPresenterMode ? 'text-2xl' : 'text-lg'}`}
                     >
                       {zoneInfo.name}
                     </Badge>
-                    <div className={mt-4 ${isPresenterMode ? 'text-2xl' : 'text-lg'} text-gray-600 mb-4}>
+                    <div className={`mt-4 ${isPresenterMode ? 'text-2xl' : 'text-lg'} text-gray-600 mb-4`}>
                       אזור תודעה ארגונית ({wocaAnalysis.participantCount} משתתפים)
                     </div>
                     
                     {/* Category Scores Display */}
-                    <div className={grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 ${isPresenterMode ? 'gap-8' : ''}}>
+                    <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 ${isPresenterMode ? 'gap-8' : ''}`}>
                       <div className="text-center">
                         <div 
-                          className={font-bold ${isPresenterMode ? 'text-4xl' : 'text-2xl'}} 
+                          className={`font-bold ${isPresenterMode ? 'text-4xl' : 'text-2xl'}`} 
                           style={{ color: WOCA_ZONE_COLORS.opportunity }}
                         >
                           {wocaAnalysis.groupCategoryScores.opportunity.toFixed(1)}
                         </div>
-                        <div className={text-gray-600 ${isPresenterMode ? 'text-lg' : 'text-sm'}}>הזדמנות</div>
+                        <div className={`text-gray-600 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>הזדמנות</div>
                       </div>
                       <div className="text-center">
                         <div 
-                          className={font-bold ${isPresenterMode ? 'text-4xl' : 'text-2xl'}} 
+                          className={`font-bold ${isPresenterMode ? 'text-4xl' : 'text-2xl'}`} 
                           style={{ color: WOCA_ZONE_COLORS.comfort }}
                         >
                           {wocaAnalysis.groupCategoryScores.comfort.toFixed(1)}
                         </div>
-                        <div className={text-gray-600 ${isPresenterMode ? 'text-lg' : 'text-sm'}}>נוחות</div>
+                        <div className={`text-gray-600 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>נוחות</div>
                       </div>
                       <div className="text-center">
                         <div 
-                          className={font-bold ${isPresenterMode ? 'text-4xl' : 'text-2xl'}} 
+                          className={`font-bold ${isPresenterMode ? 'text-4xl' : 'text-2xl'}`} 
                           style={{ color: WOCA_ZONE_COLORS.apathy }}
                         >
                           {wocaAnalysis.groupCategoryScores.apathy.toFixed(1)}
                         </div>
-                        <div className={text-gray-600 ${isPresenterMode ? 'text-lg' : 'text-sm'}}>אדישות</div>
+                        <div className={`text-gray-600 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>אדישות</div>
                       </div>
                       <div className="text-center">
                         <div 
-                          className={font-bold ${isPresenterMode ? 'text-4xl' : 'text-2xl'}} 
+                          className={`font-bold ${isPresenterMode ? 'text-4xl' : 'text-2xl'}`} 
                           style={{ color: WOCA_ZONE_COLORS.war }}
                         >
                           {wocaAnalysis.groupCategoryScores.war.toFixed(1)}
                         </div>
-                        <div className={text-gray-600 ${isPresenterMode ? 'text-lg' : 'text-sm'}}>מלחמה</div>
+                        <div className={`text-gray-600 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>מלחמה</div>
                       </div>
                     </div>
                   </div>
@@ -323,11 +324,11 @@ export const GroupWorkshopInsights: React.FC = () => {
           )}
 
           {/* Visualizations - Show in both normal and presenter mode */}
-          <div className={grid grid-cols-1 ${isPresenterMode ? 'gap-12' : 'lg:grid-cols-2 gap-6'}}>
+          <div className={`grid grid-cols-1 ${isPresenterMode ? 'gap-12' : 'lg:grid-cols-2 gap-6'}`}>
             {/* Gap Analysis Chart */}
             <Card>
               <CardHeader>
-                <CardTitle className={flex items-center ${isPresenterMode ? 'text-2xl' : ''}}>
+                <CardTitle className={`flex items-center ${isPresenterMode ? 'text-2xl' : ''}`}>
                   <BarChart3 className="h-5 w-5 mr-2" />
                   ניתוח פערים
                 </CardTitle>
@@ -345,7 +346,7 @@ export const GroupWorkshopInsights: React.FC = () => {
             {/* Zone Distribution Pie Chart */}
             <Card>
               <CardHeader>
-                <CardTitle className={flex items-center ${isPresenterMode ? 'text-2xl' : ''}}>
+                <CardTitle className={`flex items-center ${isPresenterMode ? 'text-2xl' : ''}`}>
                   <PieChart className="h-5 w-5 mr-2" />
                   התפלגות משתתפים לפי אזורים
                 </CardTitle>
@@ -363,7 +364,7 @@ export const GroupWorkshopInsights: React.FC = () => {
             {/* Radar Chart Comparison */}
             <Card className={isPresenterMode ? 'lg:col-span-2' : ''}>
               <CardHeader>
-                <CardTitle className={flex items-center ${isPresenterMode ? 'text-2xl' : ''}}>
+                <CardTitle className={`flex items-center ${isPresenterMode ? 'text-2xl' : ''}`}>
                   <Radar className="h-5 w-5 mr-2" />
                   מחוונים WOCA
                 </CardTitle>
@@ -392,7 +393,7 @@ export const GroupWorkshopInsights: React.FC = () => {
                     <div key={participant.participantId} className="p-4 border rounded-lg hover:shadow-md transition-shadow">
                       <div className="flex justify-between items-center mb-2">
                         <span className="font-medium text-sm">
-                          {showNames ? participant.participantName : משתתף ${index + 1}}
+                          {showNames ? participant.participantName : `משתתף ${index + 1}`}
                         </span>
                         {participant.isTie ? (
                           <Badge variant="secondary">תיקו</Badge>
@@ -485,5 +486,3 @@ export const GroupWorkshopInsights: React.FC = () => {
     </PresenterMode>
   );
 };
-
-
