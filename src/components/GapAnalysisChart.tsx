@@ -26,31 +26,39 @@ export const GapAnalysisChart: React.FC<GapAnalysisChartProps> = ({ categoryScor
   const values = [opportunity, comfort, apathy, war];
   const min = Math.min(...values);
   const max = Math.max(...values);
-  const buffer = (max - min) * 0.5 || 0.5;
+  
+  // Ensure we have a reasonable domain even if all values are the same
+  const domainMin = min > 0 ? Math.max(0, min - 0.5) : 0;
+  const domainMax = max > 0 ? max + 0.5 : 5;
 
   return (
     <div className="w-full px-4 py-6">
-      {/* Enhanced Gap Analysis Bar Chart without X-axis numbers and without Legend */}
-      <div className="max-w-3xl mx-auto">
-        <h3 className="text-xl font-semibold mb-4 text-center">השוואת ציונים לפי אזורים</h3>
-        <ResponsiveContainer width="100%" height={300}>
+      <div className="max-w-4xl mx-auto">
+        <h3 className="text-xl font-semibold mb-4 text-center text-right">השוואת ציונים לפי אזורים</h3>
+        <ResponsiveContainer width="100%" height={400}>
           <BarChart
             data={barData}
             layout="vertical"
-            margin={{ top: 20, right: 30, left: 60, bottom: 10 }}
-            barCategoryGap={30}
+            margin={{ top: 20, right: 30, left: 80, bottom: 10 }}
+            barCategoryGap={20}
           >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               type="number"
-              domain={[min - buffer, max + buffer]}
-              tick={false}
-              axisLine={false}
-              tickLine={false}
+              domain={[domainMin, domainMax]}
+              tick={{ fontSize: 12 }}
             />
-            <YAxis type="category" dataKey="name" tick={{ fontSize: 14 }} width={100} />
-            <Tooltip formatter={(value: number) => value.toFixed(2)} />
-            <Bar dataKey="value" radius={[0, 6, 6, 0]}>
+            <YAxis 
+              type="category" 
+              dataKey="name" 
+              tick={{ fontSize: 14, textAnchor: 'end' }} 
+              width={70}
+            />
+            <Tooltip 
+              formatter={(value: number) => [value.toFixed(2), 'ציון']}
+              labelFormatter={(label) => `אזור: ${label}`}
+            />
+            <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={40}>
               {barData.map((entry, index) => (
                 <Cell key={`bar-cell-${index}`} fill={entry.color} />
               ))}

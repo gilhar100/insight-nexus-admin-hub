@@ -82,28 +82,28 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({ participants }) => {
 
   return (
     <ChartContainer config={chartConfig} className="w-full">
-      <div className="w-full p-4">
-        <div className="grid grid-cols-1 gap-6">
+      <div className="w-full p-4 pb-8" dir="rtl">
+        <div className="space-y-6">
           {Object.entries(groupedData).map(([category, questions]) => (
-            <div key={category} className="space-y-2">
+            <div key={category} className="space-y-3">
               <h4 
-                className="text-lg font-semibold text-center py-2 px-4 rounded-lg text-white"
+                className="text-lg font-semibold text-center py-3 px-4 rounded-lg text-white"
                 style={{ backgroundColor: WOCA_ZONE_COLORS[category as keyof typeof WOCA_ZONE_COLORS] }}
               >
                 {getCategoryLabel(category)}
               </h4>
-              <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-9 gap-2">
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-9 gap-2 justify-items-center">
                 {questions.map((question) => (
                   <div
                     key={question.question}
-                    className="aspect-square flex flex-col items-center justify-center rounded-lg border border-gray-200 p-2 text-center hover:shadow-md transition-shadow"
+                    className="aspect-square flex flex-col items-center justify-center rounded-lg border border-gray-200 p-2 text-center hover:shadow-md transition-shadow min-w-[60px] max-w-[80px]"
                     style={{ 
                       backgroundColor: getIntensityColor(question.average),
                       color: question.average > 2.5 ? 'white' : 'black'
                     }}
                     title={`${question.question}: ממוצע ${question.average.toFixed(2)} (${question.count} תגובות)`}
                   >
-                    <div className="text-xs font-medium">
+                    <div className="text-xs font-medium mb-1">
                       {question.question.replace('q', 'ש')}
                     </div>
                     <div className="text-sm font-bold">
@@ -117,7 +117,7 @@ export const HeatmapChart: React.FC<HeatmapChartProps> = ({ participants }) => {
         </div>
         
         {/* Legend */}
-        <div className="mt-6 flex items-center justify-center space-x-4 rtl:space-x-reverse">
+        <div className="mt-8 flex items-center justify-center space-x-4 rtl:space-x-reverse">
           <span className="text-sm text-gray-600">נמוך</span>
           <div className="flex space-x-1 rtl:space-x-reverse">
             {[1, 2, 3, 4, 5].map(level => (

@@ -102,12 +102,12 @@ export const GroupWorkshopInsights: React.FC = () => {
   const hasMinimumData = workshopData && workshopData.participants.length >= 3;
 
   const renderContent = () => (
-    <div className={`space-y-6 ${isPresenterMode ? 'presenter-mode' : ''}`}>
+    <div className={`space-y-6 ${isPresenterMode ? 'presenter-mode' : ''}`} dir="rtl">
       {/* Page Header */}
       {!isPresenterMode && (
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <div className="flex items-center justify-between">
-            <div>
+            <div className="text-right">
               <h2 className="text-3xl font-bold text-gray-900 mb-2">
                 ניתוח קבוצתי - מודל WOCA
               </h2>
@@ -129,11 +129,11 @@ export const GroupWorkshopInsights: React.FC = () => {
       {!isPresenterMode && (
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <Users className="h-5 w-5 mr-2" />
+            <CardTitle className="flex items-center text-right">
+              <Users className="h-5 w-5 ml-2" />
               בחירת קבוצה
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-right">
               בחר קבוצה מטבלת woca_responses לניתוח דינמיקה קבוצתית
             </CardDescription>
           </CardHeader>
@@ -147,7 +147,7 @@ export const GroupWorkshopInsights: React.FC = () => {
                   <SelectContent>
                     {workshops.map(workshop => (
                       <SelectItem key={workshop.id} value={workshop.id.toString()}>
-                        <div className="flex flex-col">
+                        <div className="flex flex-col text-right">
                           <span className="font-medium">{workshop.name}</span>
                           <span className="text-sm text-gray-500">
                             {workshop.participant_count} משתתפים • {new Date(workshop.date).toLocaleDateString('he-IL')}
@@ -162,7 +162,7 @@ export const GroupWorkshopInsights: React.FC = () => {
             
             {error && (
               <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
-                <p className="text-red-600 text-sm">{error}</p>
+                <p className="text-red-600 text-sm text-right">{error}</p>
               </div>
             )}
           </CardContent>
@@ -203,11 +203,11 @@ export const GroupWorkshopInsights: React.FC = () => {
                 {!isPresenterMode && (
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm" onClick={() => setShowNames(!showNames)}>
-                      {showNames ? <EyeOff className="h-4 w-4 mr-2" /> : <Eye className="h-4 w-4 mr-2" />}
+                      {showNames ? <EyeOff className="h-4 w-4 ml-2" /> : <Eye className="h-4 w-4 ml-2" />}
                       {showNames ? 'הסתר שמות' : 'הצג שמות'}
                     </Button>
                     <Button variant="outline" size="sm" onClick={exportWorkshopData}>
-                      <Download className="h-4 w-4 mr-2" />
+                      <Download className="h-4 w-4 ml-2" />
                       ייצא ניתוח
                     </Button>
                   </div>
@@ -219,7 +219,7 @@ export const GroupWorkshopInsights: React.FC = () => {
                 {wocaAnalysis.groupIsTie ? (
                   <div className="mb-6">
                     <div className="flex items-center justify-center mb-4">
-                      <AlertCircle className="h-6 w-6 text-yellow-500 mr-2" />
+                      <AlertCircle className="h-6 w-6 text-yellow-500 ml-2" />
                       <span className={`font-semibold ${isPresenterMode ? 'text-2xl' : 'text-lg'}`}>תיקו בין אזורים</span>
                     </div>
                     <div className="flex flex-wrap justify-center gap-2">
@@ -302,17 +302,17 @@ export const GroupWorkshopInsights: React.FC = () => {
             <ZoneDescription zone={wocaAnalysis.groupDominantZone} isPresenterMode={isPresenterMode} />
           )}
 
-          {/* Visualizations - Updated */}
-          <div className={`grid grid-cols-1 gap-6`}>
-            {/* Enlarged Gap Analysis Chart */}
+          {/* Visualizations */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Gap Analysis Chart - Full Width */}
             <Card className="lg:col-span-2">
               <CardHeader>
-                <CardTitle className={`flex items-center ${isPresenterMode ? 'text-2xl' : ''}`}>
-                  <BarChart3 className="h-5 w-5 mr-2" />
+                <CardTitle className={`flex items-center text-right ${isPresenterMode ? 'text-2xl' : ''}`}>
+                  <BarChart3 className="h-5 w-5 ml-2" />
                   השוואת ציונים לפי אזורים
                 </CardTitle>
                 {!isPresenterMode && (
-                  <CardDescription>
+                  <CardDescription className="text-right">
                     פערים יחסית לאזור ההזדמנות
                   </CardDescription>
                 )}
@@ -325,8 +325,8 @@ export const GroupWorkshopInsights: React.FC = () => {
             {/* Radar Chart */}
             <Card className="lg:col-span-2">
               <CardHeader>
-                <CardTitle className={`flex items-center ${isPresenterMode ? 'text-2xl' : ''}`}>
-                  <Radar className="h-5 w-5 mr-2" />
+                <CardTitle className={`flex items-center text-right ${isPresenterMode ? 'text-2xl' : ''}`}>
+                  <Radar className="h-5 w-5 ml-2" />
                   מחוונים WOCA
                 </CardTitle>
               </CardHeader>
@@ -335,15 +335,15 @@ export const GroupWorkshopInsights: React.FC = () => {
               </CardContent>
             </Card>
 
-            {/* Enlarged Heatmap Chart */}
+            {/* Heatmap Chart - Full Width */}
             <Card className="lg:col-span-2">
               <CardHeader>
-                <CardTitle className={`flex items-center ${isPresenterMode ? 'text-2xl' : ''}`}>
-                  <BarChart3 className="h-5 w-5 mr-2" />
+                <CardTitle className={`flex items-center text-right ${isPresenterMode ? 'text-2xl' : ''}`}>
+                  <BarChart3 className="h-5 w-5 ml-2" />
                   מפת חום לפי שאלות
                 </CardTitle>
                 {!isPresenterMode && (
-                  <CardDescription>
+                  <CardDescription className="text-right">
                     ממוצע לכל שאלה לפי קטגוריית WOCA
                   </CardDescription>
                 )}
@@ -355,18 +355,18 @@ export const GroupWorkshopInsights: React.FC = () => {
           </div>
 
           {/* Informational Section - Why Move to Opportunity Zone */}
-          <Card className={`${isPresenterMode ? 'border-2 border-green-200 bg-green-50' : 'bg-green-50'} mt-6`}>
+          <Card className={`${isPresenterMode ? 'border-2 border-green-200 bg-green-50' : 'bg-green-50'} mt-8`}>
             <CardContent className={isPresenterMode ? 'p-8' : 'p-6'}>
               <div className={`text-center ${isPresenterMode ? 'space-y-6' : 'space-y-4'}`}>
                 <h3 className={`${isPresenterMode ? 'text-2xl' : 'text-lg'} font-bold mb-4 text-green-800 flex items-center justify-center`}>
-                  <Lightbulb className="h-6 w-6 mr-2" />
+                  <Lightbulb className="h-6 w-6 ml-2" />
                   מדוע כדאי לנוע לאזור ההזדמנות
                 </h3>
-                <div className={`${isPresenterMode ? 'text-lg' : 'text-base'} leading-relaxed text-green-700 text-right`}>
+                <div className={`${isPresenterMode ? 'text-lg' : 'text-base'} leading-relaxed text-green-700 text-right px-4`}>
                   <p className="mb-4">
                     <strong>מדוע אזור ההזדמנות הוא אידיאלי?</strong>
                   </p>
-                  <p>
+                  <p className="leading-relaxed">
                     אזור ההזדמנות מייצג איזון נדיר בין יוזמה לאחריות, בין יצירתיות לבקרה, ובין הישגיות לשיתוף פעולה.
                     זהו המרחב שבו הארגון מסוגל ליזום שינוי, לנהל קונפליקטים באופן בונה, ולנוע לעבר עתיד משמעותי ובר־קיימא.
                     תרבות ארגונית המתבססת על ערכים אלו אינה רק אפקטיבית יותר – היא גם עמידה, חדשנית ובעלת השפעה חיובית על עובדיה ועל סביבתה.
@@ -380,11 +380,11 @@ export const GroupWorkshopInsights: React.FC = () => {
           {!isPresenterMode && (
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <TrendingUp className="h-5 w-5 mr-2" />
+                <CardTitle className="flex items-center text-right">
+                  <TrendingUp className="h-5 w-5 ml-2" />
                   סקירת משתתפים
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-right">
                   ציונים אישיים ודמוגרפיה {showNames ? '(שמות גלויים)' : '(אנונימי)'}
                 </CardDescription>
               </CardHeader>
@@ -412,22 +412,22 @@ export const GroupWorkshopInsights: React.FC = () => {
                       </div>
                       
                       {/* Mini category scores */}
-                      <div className="space-y-1 text-xs">
+                      <div className="space-y-1 text-xs text-right">
                         <div className="flex justify-between">
-                          <span>הזדמנות:</span>
                           <span className="font-medium">{participant.categoryScores.opportunity.toFixed(1)}</span>
+                          <span>:הזדמנות</span>
                         </div>
                         <div className="flex justify-between">
-                          <span>נוחות:</span>
                           <span className="font-medium">{participant.categoryScores.comfort.toFixed(1)}</span>
+                          <span>:נוחות</span>
                         </div>
                         <div className="flex justify-between">
-                          <span>אדישות:</span>
                           <span className="font-medium">{participant.categoryScores.apathy.toFixed(1)}</span>
+                          <span>:אדישות</span>
                         </div>
                         <div className="flex justify-between">
-                          <span>מלחמה:</span>
                           <span className="font-medium">{participant.categoryScores.war.toFixed(1)}</span>
+                          <span>:מלחמה</span>
                         </div>
                       </div>
                     </div>
