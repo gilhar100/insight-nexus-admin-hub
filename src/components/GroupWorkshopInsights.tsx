@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Users, BarChart3, Radar, Download, TrendingUp, Eye, EyeOff, AlertCircle, PieChart } from 'lucide-react';
+import { Users, BarChart3, Radar, Download, TrendingUp, Eye, EyeOff, AlertCircle, PieChart, LayoutGrid } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useWorkshopData } from '@/hooks/useWorkshopData';
 import { WocaRadarChart } from '@/components/WocaRadarChart';
@@ -14,6 +14,8 @@ import { ZoneDescription } from '@/components/ZoneDescription';
 import { ParticipantSearch } from '@/components/ParticipantSearch';
 import { GapAnalysisChart } from '@/components/GapAnalysisChart';
 import { ZoneDistributionChart } from '@/components/ZoneDistributionChart';
+import { StackedBarChart } from '@/components/StackedBarChart';
+import { HeatmapChart } from '@/components/HeatmapChart';
 
 export const GroupWorkshopInsights: React.FC = () => {
   const [selectedGroupId, setSelectedGroupId] = useState<number | undefined>();
@@ -361,6 +363,24 @@ export const GroupWorkshopInsights: React.FC = () => {
               </CardContent>
             </Card>
 
+            {/* Stacked Bar Chart - New */}
+            <Card className="lg:col-span-2">
+              <CardHeader>
+                <CardTitle className={`flex items-center ${isPresenterMode ? 'text-2xl' : ''}`}>
+                  <LayoutGrid className="h-5 w-5 mr-2" />
+                  פרופיל משתתפים לפי ציונים יחסיים
+                </CardTitle>
+                {!isPresenterMode && (
+                  <CardDescription>
+                    ציונים לכל אזור עבור כל משתתף
+                  </CardDescription>
+                )}
+              </CardHeader>
+              <CardContent>
+                <StackedBarChart participants={workshopData.participants} />
+              </CardContent>
+            </Card>
+
             {/* Radar Chart Comparison */}
             <Card className={isPresenterMode ? 'lg:col-span-2' : ''}>
               <CardHeader>
@@ -371,6 +391,24 @@ export const GroupWorkshopInsights: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <WocaRadarChart participants={workshopData.participants} />
+              </CardContent>
+            </Card>
+
+            {/* Heatmap Chart - New */}
+            <Card className="lg:col-span-2">
+              <CardHeader>
+                <CardTitle className={`flex items-center ${isPresenterMode ? 'text-2xl' : ''}`}>
+                  <BarChart3 className="h-5 w-5 mr-2" />
+                  מפת חום לפי שאלות
+                </CardTitle>
+                {!isPresenterMode && (
+                  <CardDescription>
+                    ממוצע לכל שאלה לפי קטגוריית WOCA
+                  </CardDescription>
+                )}
+              </CardHeader>
+              <CardContent>
+                <HeatmapChart participants={workshopData.participants} />
               </CardContent>
             </Card>
           </div>
