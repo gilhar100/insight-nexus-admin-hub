@@ -3,18 +3,16 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Users, BarChart3, Radar, Download, TrendingUp, Eye, EyeOff, AlertCircle, Lightbulb, PieChart } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { Users, AlertCircle } from 'lucide-react';
 import { useWorkshopData } from '@/hooks/useWorkshopData';
-import { WocaRadarChart } from '@/components/WocaRadarChart';
-import { analyzeWorkshopWoca, getZoneDescription } from '@/utils/wocaAnalysis';
-import { WOCA_ZONE_COLORS } from '@/utils/wocaColors';
+import { analyzeWorkshopWoca } from '@/utils/wocaAnalysis';
 import { PresenterMode } from '@/components/PresenterMode';
-import { ZoneDescription } from '@/components/ZoneDescription';
 import { ParticipantSearch } from '@/components/ParticipantSearch';
-import { GapAnalysisChart } from '@/components/GapAnalysisChart';
-import { HeatmapChart } from '@/components/HeatmapChart';
-import { ZoneDistributionChart } from '@/components/ZoneDistributionChart';
+import { WocaZoneSection } from '@/components/WocaZoneSection';
+import { WocaChartsRow } from '@/components/WocaChartsRow';
+import { WocaHeatmapSection } from '@/components/WocaHeatmapSection';
+import { OpportunityZoneSection } from '@/components/OpportunityZoneSection';
+import { WocaDemographicsSection } from '@/components/WocaDemographicsSection';
 
 export const GroupWorkshopInsights: React.FC = () => {
   const [selectedGroupId, setSelectedGroupId] = useState<number | undefined>();
@@ -41,27 +39,6 @@ export const GroupWorkshopInsights: React.FC = () => {
 
   // Get WOCA analysis results
   const wocaAnalysis = workshopData ? analyzeWorkshopWoca(workshopData.participants, workshopData.workshop_id) : null;
-
-  // WOCA Zone classification using new analysis
-  const getZoneInfo = (zone: string | null) => {
-    if (!zone) return {
-      name: 'לא זוהה',
-      color: 'bg-gray-500',
-      description: 'לא ניתן לזהות אזור דומיננטי'
-    };
-    const zoneDesc = getZoneDescription(zone);
-    const colorMap = {
-      opportunity: 'bg-green-500',
-      comfort: 'bg-blue-500',
-      apathy: 'bg-yellow-500',
-      war: 'bg-red-500'
-    };
-    return {
-      name: zoneDesc.name,
-      color: colorMap[zone as keyof typeof colorMap] || 'bg-gray-500',
-      description: zoneDesc.description
-    };
-  };
 
   const handleGroupSelect = (value: string) => {
     const groupId = Number(value);
@@ -96,7 +73,6 @@ export const GroupWorkshopInsights: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
-  const zoneInfo = wocaAnalysis ? getZoneInfo(wocaAnalysis.groupDominantZone) : null;
   console.log('🔍 WOCA Analysis results:', wocaAnalysis);
 
   // Check if we have enough data for analysis
@@ -211,249 +187,36 @@ export const GroupWorkshopInsights: React.FC = () => {
       {workshopData && wocaAnalysis && hasMinimumData && (
         <>
           {/* 1. WOCA Zone Description Section */}
-          <Card className={`${isPresenterMode ? 'border-2 border-green-200' : ''}`}>
-            <CardContent className={isPresenterMode ? 'p-12' : 'p-8'}>
-              <div className="text-center space-y-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className={`text-3xl font-bold text-green-800 text-center flex-1 ${isPresenterMode ? 'text-4xl' : ''}`}>
-                    <Lightbulb className="h-8 w-8 ml-2 inline" />
-                    סיווג אזור WOCA
-                  </h3>
-                  {!isPresenterMode && (
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" onClick={() => setShowNames(!showNames)}>
-                        {showNames ? <EyeOff className="h-4 w-4 ml-2" /> : <Eye className="h-4 w-4 ml-2" />}
-                        {showNames ? 'הסתר שמות' : 'הצג שמות'}
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={exportWorkshopData}>
-                        <Download className="h-4 w-4 ml-2" />
-                        ייצא ניתוח
-                      </Button>
-                    </div>
-                  )}
-                </div>
-
-                {wocaAnalysis.groupIsTie ? (
-                  <div className="bg-green-50 p-6 rounded-lg">
-                    <div className="flex items-center justify-center mb-4">
-                      <AlertCircle className="h-6 w-6 text-yellow-500 ml-2" />
-                      <span className={`font-semibold ${isPresenterMode ? 'text-2xl' : 'text-lg'}`}>תיקו בין אזורים</span>
-                    </div>
-                    <div className="flex flex-wrap justify-center gap-2">
-                      {wocaAnalysis.groupTiedCategories.map(category => {
-                        const categoryZoneInfo = getZoneInfo(category);
-                        return (
-                          <Badge 
-                            key={category} 
-                            variant="secondary" 
-                            className={`px-3 py-1 ${categoryZoneInfo.color} text-white ${isPresenterMode ? 'text-lg' : 'text-sm'}`}
-                          >
-                            {categoryZoneInfo.name}
-                          </Badge>
-                        );
-                      })}
-                    </div>
-                    <p className={`text-gray-600 mt-4 text-lg leading-relaxed text-right ${isPresenterMode ? 'text-xl' : ''}`}>
-                      לא זוהה אזור תודעה דומיננטי עקב ציונים זהים
-                    </p>
-                  </div>
-                ) : zoneInfo && (
-                  <div className="bg-green-50 p-6 rounded-lg">
-                    <Badge 
-                      variant="secondary" 
-                      className={`px-4 py-2 ${zoneInfo.color} text-white mb-4 ${isPresenterMode ? 'text-2xl' : 'text-lg'}`}
-                    >
-                      {zoneInfo.name}
-                    </Badge>
-                    <div className={`${isPresenterMode ? 'text-2xl' : 'text-lg'} text-gray-600 mb-6`}>
-                      אזור תודעה ארגונית ({wocaAnalysis.participantCount} משתתפים)
-                    </div>
-                    
-                    {/* Category Scores Display */}
-                    <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 ${isPresenterMode ? 'gap-8' : ''}`}>
-                      <div className="text-center">
-                        <div 
-                          className={`font-bold ${isPresenterMode ? 'text-4xl' : 'text-2xl'}`} 
-                          style={{ color: WOCA_ZONE_COLORS.opportunity }}
-                        >
-                          {wocaAnalysis.groupCategoryScores.opportunity.toFixed(1)}
-                        </div>
-                        <div className={`text-gray-600 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>הזדמנות</div>
-                      </div>
-                      <div className="text-center">
-                        <div 
-                          className={`font-bold ${isPresenterMode ? 'text-4xl' : 'text-2xl'}`} 
-                          style={{ color: WOCA_ZONE_COLORS.comfort }}
-                        >
-                          {wocaAnalysis.groupCategoryScores.comfort.toFixed(1)}
-                        </div>
-                        <div className={`text-gray-600 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>נוחות</div>
-                      </div>
-                      <div className="text-center">
-                        <div 
-                          className={`font-bold ${isPresenterMode ? 'text-4xl' : 'text-2xl'}`} 
-                          style={{ color: WOCA_ZONE_COLORS.apathy }}
-                        >
-                          {wocaAnalysis.groupCategoryScores.apathy.toFixed(1)}
-                        </div>
-                        <div className={`text-gray-600 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>אדישות</div>
-                      </div>
-                      <div className="text-center">
-                        <div 
-                          className={`font-bold ${isPresenterMode ? 'text-4xl' : 'text-2xl'}`} 
-                          style={{ color: WOCA_ZONE_COLORS.war }}
-                        >
-                          {wocaAnalysis.groupCategoryScores.war.toFixed(1)}
-                        </div>
-                        <div className={`text-gray-600 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>מלחמה</div>
-                      </div>
-                    </div>
-
-                    <div className={`text-lg leading-relaxed text-green-700 text-right px-4 mt-6 ${isPresenterMode ? 'text-xl' : ''}`}>
-                      {zoneInfo.description}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+          <WocaZoneSection
+            wocaAnalysis={wocaAnalysis}
+            isPresenterMode={isPresenterMode}
+            showNames={showNames}
+            onToggleNames={() => setShowNames(!showNames)}
+            onExportData={exportWorkshopData}
+          />
 
           {/* 2. Charts Row - Radar + Pie Side-by-Side */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Radar Chart */}
-            <Card>
-              <CardHeader>
-                <CardTitle className={`flex items-center text-right ${isPresenterMode ? 'text-2xl' : ''}`}>
-                  <Radar className="h-5 w-5 ml-2" />
-                  מחוונים WOCA
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <WocaRadarChart participants={workshopData.participants} />
-              </CardContent>
-            </Card>
-
-            {/* Pie Chart - Zone Distribution */}
-            <Card>
-              <CardHeader>
-                <CardTitle className={`flex items-center text-right ${isPresenterMode ? 'text-2xl' : ''}`}>
-                  <PieChart className="h-5 w-5 ml-2" />
-                  התפלגות משתתפים לפי אזורים
-                </CardTitle>
-                {!isPresenterMode && (
-                  <CardDescription className="text-right">
-                    חלוקת המשתתפים בין אזורי WOCA השונים
-                  </CardDescription>
-                )}
-              </CardHeader>
-              <CardContent>
-                <ZoneDistributionChart zoneDistribution={getZoneDistribution()} />
-              </CardContent>
-            </Card>
-          </div>
+          <WocaChartsRow
+            workshopData={workshopData}
+            zoneDistribution={getZoneDistribution()}
+            isPresenterMode={isPresenterMode}
+          />
 
           {/* 3. Heatmap Chart - Full Width */}
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle className={`flex items-center text-right ${isPresenterMode ? 'text-2xl' : ''}`}>
-                <BarChart3 className="h-5 w-5 ml-2" />
-                מפת חום לפי שאלות
-              </CardTitle>
-              {!isPresenterMode && (
-                <CardDescription className="text-right">
-                  ממוצע לכל שאלה לפי קטגוריית WOCA
-                </CardDescription>
-              )}
-            </CardHeader>
-            <CardContent>
-              <HeatmapChart participants={workshopData.participants} />
-            </CardContent>
-          </Card>
+          <WocaHeatmapSection
+            workshopData={workshopData}
+            isPresenterMode={isPresenterMode}
+          />
 
           {/* 4. Opportunity Zone Paragraph */}
-          <div className={`${isPresenterMode ? 'mt-16' : 'mt-12'}`}>
-            <Card className={`${isPresenterMode ? 'border-2 border-green-200 bg-green-50' : 'bg-green-50'}`}>
-              <CardContent className={isPresenterMode ? 'p-8' : 'p-6'}>
-                <div className={`text-center ${isPresenterMode ? 'space-y-6' : 'space-y-4'}`}>
-                  <h3 className={`${isPresenterMode ? 'text-2xl' : 'text-lg'} font-bold mb-4 text-green-800 flex items-center justify-center`}>
-                    <Lightbulb className="h-6 w-6 ml-2" />
-                    מדוע כדאי לנוע לאזור ההזדמנות
-                  </h3>
-                  <div className={`${isPresenterMode ? 'text-lg' : 'text-base'} leading-relaxed text-green-700 text-right px-4`}>
-                    <p className="mb-4">
-                      <strong>מדוע אזור ההזדמנות הוא אידיאלי?</strong>
-                    </p>
-                    <p className="leading-relaxed">
-                      אזור ההזדמנות מייצג איזון נדיר בין יוזמה לאחריות, בין יצירתיות לבקרה, ובין הישגיות לשיתוף פעולה.
-                      זהו המרחב שבו הארגון מסוגל ליזום שינוי, לנהל קונפליקטים באופן בונה, ולנוע לעבר עתיד משמעותי ובר־קיימא.
-                      תרבות ארגונית המתבססת על ערכים אלו אינה רק אפקטיבית יותר – היא גם עמידה, חדשנית ובעלת השפעה חיובית על עובדיה ועל סביבתה.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <OpportunityZoneSection isPresenterMode={isPresenterMode} />
 
-          {/* 5. Demographics Section - Now visible in Presenter Mode too */}
-          <Card>
-            <CardHeader>
-              <CardTitle className={`flex items-center text-right ${isPresenterMode ? 'text-2xl font-bold' : ''}`}>
-                <TrendingUp className="h-5 w-5 ml-2" />
-                סקירת משתתפים
-              </CardTitle>
-              {!isPresenterMode && (
-                <CardDescription className="text-right">
-                  ציונים אישיים ודמוגרפיה {showNames ? '(שמות גלויים)' : '(אנונימי)'}
-                </CardDescription>
-              )}
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {wocaAnalysis.participants.map((participant, index) => (
-                  <div key={participant.participantId} className="p-4 border rounded-lg hover:shadow-md transition-shadow bg-white">
-                    <div className="flex justify-between items-center mb-2">
-                      <span className={`font-medium ${isPresenterMode ? 'text-base' : 'text-sm'}`}>
-                        {showNames ? participant.participantName : `משתתף ${index + 1}`}
-                      </span>
-                      {participant.isTie ? (
-                        <Badge variant="secondary">תיקו</Badge>
-                      ) : (
-                        <Badge 
-                          variant={
-                            participant.dominantZone === 'opportunity' ? "default" : 
-                            participant.dominantZone === 'war' ? "destructive" : 
-                            "secondary"
-                          }
-                        >
-                          {participant.dominantZone ? getZoneInfo(participant.dominantZone).name : 'N/A'}
-                        </Badge>
-                      )}
-                    </div>
-                    
-                    {/* Mini category scores */}
-                    <div className={`space-y-1 text-right ${isPresenterMode ? 'text-sm' : 'text-xs'}`}>
-                      <div className="flex justify-between">
-                        <span className="font-medium">{participant.categoryScores.opportunity.toFixed(1)}</span>
-                        <span>:הזדמנות</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium">{participant.categoryScores.comfort.toFixed(1)}</span>
-                        <span>:נוחות</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium">{participant.categoryScores.apathy.toFixed(1)}</span>
-                        <span>:אדישות</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="font-medium">{participant.categoryScores.war.toFixed(1)}</span>
-                        <span>:מלחמה</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          {/* 5. Demographics Section */}
+          <WocaDemographicsSection
+            wocaAnalysis={wocaAnalysis}
+            showNames={showNames}
+            isPresenterMode={isPresenterMode}
+          />
         </>
       )}
     </div>

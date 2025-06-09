@@ -1,0 +1,159 @@
+
+import React from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Lightbulb, Eye, EyeOff, Download, AlertCircle } from 'lucide-react';
+import { WOCA_ZONE_COLORS } from '@/utils/wocaColors';
+
+interface WocaZoneSectionProps {
+  wocaAnalysis: any;
+  isPresenterMode: boolean;
+  showNames: boolean;
+  onToggleNames: () => void;
+  onExportData: () => void;
+}
+
+export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
+  wocaAnalysis,
+  isPresenterMode,
+  showNames,
+  onToggleNames,
+  onExportData
+}) => {
+  const getZoneInfo = (zone: string | null) => {
+    if (!zone) return {
+      name: 'לא זוהה',
+      color: 'bg-gray-500',
+      description: 'לא ניתן לזהות אזור דומיננטי'
+    };
+    
+    const zoneDescriptions = {
+      opportunity: { name: 'הזדמנות', color: 'bg-green-500' },
+      comfort: { name: 'נוחות', color: 'bg-blue-500' },
+      apathy: { name: 'אדישות', color: 'bg-yellow-500' },
+      war: { name: 'מלחמה', color: 'bg-red-500' }
+    };
+    
+    const zoneDesc = zoneDescriptions[zone as keyof typeof zoneDescriptions] || { name: 'לא זוהה', color: 'bg-gray-500' };
+    
+    return {
+      name: zoneDesc.name,
+      color: zoneDesc.color,
+      description: zone === 'opportunity' 
+        ? 'זהו המצב התודעתי האידיאלי עבור ארגונים המבקשים לייצר ערך משותף, להתפתח, ולנוע לעבר עתיד בעל משמעות.'
+        : 'תיאור האזור'
+    };
+  };
+
+  const zoneInfo = wocaAnalysis ? getZoneInfo(wocaAnalysis.groupDominantZone) : null;
+
+  return (
+    <Card className={`${isPresenterMode ? 'border-2 border-green-200' : ''}`}>
+      <CardContent className={isPresenterMode ? 'p-12' : 'p-8'}>
+        <div className="text-center space-y-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className={`text-3xl font-bold text-green-800 text-center flex-1 ${isPresenterMode ? 'text-4xl' : ''}`}>
+              <Lightbulb className="h-8 w-8 ml-2 inline" />
+              סיווג אזור WOCA
+            </h3>
+            {!isPresenterMode && (
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={onToggleNames}>
+                  {showNames ? <EyeOff className="h-4 w-4 ml-2" /> : <Eye className="h-4 w-4 ml-2" />}
+                  {showNames ? 'הסתר שמות' : 'הצג שמות'}
+                </Button>
+                <Button variant="outline" size="sm" onClick={onExportData}>
+                  <Download className="h-4 w-4 ml-2" />
+                  ייצא ניתוח
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {wocaAnalysis?.groupIsTie ? (
+            <div className="bg-green-50 p-6 rounded-lg">
+              <div className="flex items-center justify-center mb-4">
+                <AlertCircle className="h-6 w-6 text-yellow-500 ml-2" />
+                <span className={`font-semibold ${isPresenterMode ? 'text-2xl' : 'text-lg'}`}>תיקו בין אזורים</span>
+              </div>
+              <div className="flex flex-wrap justify-center gap-2">
+                {wocaAnalysis.groupTiedCategories.map((category: string) => {
+                  const categoryZoneInfo = getZoneInfo(category);
+                  return (
+                    <Badge 
+                      key={category} 
+                      variant="secondary" 
+                      className={`px-3 py-1 ${categoryZoneInfo.color} text-white ${isPresenterMode ? 'text-lg' : 'text-sm'}`}
+                    >
+                      {categoryZoneInfo.name}
+                    </Badge>
+                  );
+                })}
+              </div>
+              <p className={`text-gray-600 mt-4 text-lg leading-relaxed text-right ${isPresenterMode ? 'text-xl' : ''}`}>
+                לא זוהה אזור תודעה דומיננטי עקב ציונים זהים
+              </p>
+            </div>
+          ) : zoneInfo && (
+            <div className="bg-green-50 p-6 rounded-lg">
+              <Badge 
+                variant="secondary" 
+                className={`px-4 py-2 ${zoneInfo.color} text-white mb-4 ${isPresenterMode ? 'text-2xl' : 'text-lg'}`}
+              >
+                {zoneInfo.name}
+              </Badge>
+              <div className={`${isPresenterMode ? 'text-2xl' : 'text-lg'} text-gray-600 mb-6`}>
+                אזור תודעה ארגונית ({wocaAnalysis.participantCount} משתתפים)
+              </div>
+              
+              {/* Category Scores Display */}
+              <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 ${isPresenterMode ? 'gap-8' : ''}`}>
+                <div className="text-center">
+                  <div 
+                    className={`font-bold ${isPresenterMode ? 'text-4xl' : 'text-2xl'}`} 
+                    style={{ color: WOCA_ZONE_COLORS.opportunity }}
+                  >
+                    {wocaAnalysis.groupCategoryScores.opportunity.toFixed(1)}
+                  </div>
+                  <div className={`text-gray-600 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>הזדמנות</div>
+                </div>
+                <div className="text-center">
+                  <div 
+                    className={`font-bold ${isPresenterMode ? 'text-4xl' : 'text-2xl'}`} 
+                    style={{ color: WOCA_ZONE_COLORS.comfort }}
+                  >
+                    {wocaAnalysis.groupCategoryScores.comfort.toFixed(1)}
+                  </div>
+                  <div className={`text-gray-600 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>נוחות</div>
+                </div>
+                <div className="text-center">
+                  <div 
+                    className={`font-bold ${isPresenterMode ? 'text-4xl' : 'text-2xl'}`} 
+                    style={{ color: WOCA_ZONE_COLORS.apathy }}
+                  >
+                    {wocaAnalysis.groupCategoryScores.apathy.toFixed(1)}
+                  </div>
+                  <div className={`text-gray-600 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>אדישות</div>
+                </div>
+                <div className="text-center">
+                  <div 
+                    className={`font-bold ${isPresenterMode ? 'text-4xl' : 'text-2xl'}`} 
+                    style={{ color: WOCA_ZONE_COLORS.war }}
+                  >
+                    {wocaAnalysis.groupCategoryScores.war.toFixed(1)}
+                  </div>
+                  <div className={`text-gray-600 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>מלחמה</div>
+                </div>
+              </div>
+
+              <div className={`text-lg leading-relaxed text-green-700 text-right px-4 mt-6 ${isPresenterMode ? 'text-xl' : ''}`}>
+                {zoneInfo.description}
+              </div>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
