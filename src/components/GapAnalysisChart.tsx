@@ -11,9 +11,15 @@ interface GapAnalysisChartProps {
     apathy: number;
     war: number;
   };
+  hideXAxisNumbers?: boolean;
+  showYAxisLabels?: boolean;
 }
 
-export const GapAnalysisChart: React.FC<GapAnalysisChartProps> = ({ categoryScores }) => {
+export const GapAnalysisChart: React.FC<GapAnalysisChartProps> = ({ 
+  categoryScores, 
+  hideXAxisNumbers = false,
+  showYAxisLabels = true 
+}) => {
   const { opportunity = 0, comfort = 0, apathy = 0, war = 0 } = categoryScores;
 
   const barData = [
@@ -39,20 +45,21 @@ export const GapAnalysisChart: React.FC<GapAnalysisChartProps> = ({ categoryScor
           <BarChart
             data={barData}
             layout="vertical"
-            margin={{ top: 20, right: 30, left: 80, bottom: 10 }}
+            margin={{ top: 20, right: 30, left: 120, bottom: 10 }}
             barCategoryGap={20}
           >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               type="number"
               domain={[domainMin, domainMax]}
-              tick={{ fontSize: 12 }}
+              tick={hideXAxisNumbers ? false : { fontSize: 12 }}
+              hide={hideXAxisNumbers}
             />
             <YAxis 
               type="category" 
               dataKey="name" 
-              tick={{ fontSize: 14, textAnchor: 'end' }} 
-              width={70}
+              tick={showYAxisLabels ? { fontSize: 14, textAnchor: 'end' } : false}
+              width={100}
             />
             <Tooltip 
               formatter={(value: number) => [value.toFixed(2), 'ציון']}
