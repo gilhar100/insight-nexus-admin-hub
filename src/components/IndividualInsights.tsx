@@ -138,17 +138,19 @@ export const IndividualInsights: React.FC = () => {
     setIsDropdownOpen(false);
     // Clear group selection when individual is selected
     setSelectedGroup(null);
+    setGroupSearchQuery('');
     console.log('Selected respondent:', nameOption);
   };
 
   const handleGroupSelect = (groupNumber: number) => {
     setSelectedGroup(groupNumber);
-    setGroupSearchQuery(groupNumber.toString());
+    setGroupSearchQuery(`Group ${groupNumber}`);
     // Clear individual selection when group is selected
     setSelectedRespondent('');
     setSelectedName('');
     setSelectedSource('');
     setSearchQuery('');
+    setIsDropdownOpen(false);
   };
 
   const handleAnalyzeResults = async () => {
@@ -215,7 +217,7 @@ export const IndividualInsights: React.FC = () => {
   ] : [];
 
   const filteredGroups = availableGroups.filter(group => 
-    group.toString().includes(groupSearchQuery)
+    group.toString().includes(groupSearchQuery.replace('Group ', ''))
   );
 
   return (
@@ -250,29 +252,38 @@ export const IndividualInsights: React.FC = () => {
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
-            <div className="flex-1">
+            <div className="flex-1 relative">
               <Input
                 placeholder="Search by group number..."
                 value={groupSearchQuery}
                 onChange={(e) => setGroupSearchQuery(e.target.value)}
                 className="w-full"
               />
-              {groupSearchQuery && filteredGroups.length > 0 && (
-                <div className="mt-2 space-y-1">
-                  {filteredGroups.slice(0, 5).map((groupNumber) => (
-                    <Button
+              {groupSearchQuery && !selectedGroup && filteredGroups.length > 0 && (
+                <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border rounded-md shadow-lg max-h-40 overflow-y-auto">
+                  {filteredGroups.slice(0, 10).map((groupNumber) => (
+                    <button
                       key={groupNumber}
-                      variant="outline"
-                      size="sm"
                       onClick={() => handleGroupSelect(groupNumber)}
-                      className="mr-2 mb-1"
+                      className="w-full text-left px-3 py-2 hover:bg-gray-100 border-b last:border-b-0"
                     >
                       Group {groupNumber}
-                    </Button>
+                    </button>
                   ))}
                 </div>
               )}
             </div>
+            {selectedGroup && (
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setSelectedGroup(null);
+                  setGroupSearchQuery('');
+                }}
+              >
+                Clear Selection
+              </Button>
+            )}
           </div>
           {selectedGroup && (
             <div className="mt-4 p-3 bg-green-50 rounded-lg">
