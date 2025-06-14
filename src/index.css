@@ -158,7 +158,7 @@
 .presenter-mode h2,
 .presenter-mode h3 {
   text-align: center;
-  font-size: 1.5em;
+  font-size: 1.8em;
   font-weight: bold;
 }
 
@@ -175,38 +175,69 @@
 }
 
 .presenter-mode .text-lg {
-  font-size: 1.5rem;
-  line-height: 1.75rem;
+  font-size: 1.8rem;
+  line-height: 2rem;
 }
 
 .presenter-mode .text-base {
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+
+.presenter-mode .text-sm {
   font-size: 1.25rem;
   line-height: 1.75rem;
 }
 
-.presenter-mode .text-sm {
-  font-size: 1.125rem;
-  line-height: 1.5rem;
-}
-
-/* Chart-specific presenter mode improvements */
+/* Enhanced presenter mode for SALIMA charts */
 .presenter-mode .recharts-wrapper {
   margin: 0 auto;
 }
 
 .presenter-mode .recharts-legend-wrapper {
-  font-size: 1.125rem !important;
+  font-size: 1.5rem !important;
   font-weight: bold !important;
 }
 
 .presenter-mode .recharts-cartesian-axis-tick text {
-  font-size: 16px !important;
+  font-size: 18px !important;
   font-weight: bold !important;
 }
 
 .presenter-mode .recharts-polar-angle-axis-tick text {
-  font-size: 16px !important;
+  font-size: 18px !important;
   font-weight: bold !important;
+}
+
+.presenter-mode .recharts-pie-label-text {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+}
+
+/* Hide scrollbars in presenter mode unless hovering */
+.presenter-mode {
+  overflow: hidden;
+}
+
+.presenter-mode:hover {
+  overflow-y: auto;
+}
+
+.presenter-mode::-webkit-scrollbar {
+  width: 8px;
+}
+
+.presenter-mode::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.presenter-mode::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+.presenter-mode::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.5);
 }
 
 /* RTL improvements for charts */
@@ -216,4 +247,18 @@
 
 [dir="rtl"] .recharts-tooltip-wrapper {
   direction: rtl;
+}
+
+/* Pie chart label positioning improvements */
+.recharts-pie-label-line {
+  stroke-width: 1.5;
+}
+
+.recharts-pie-label-text {
+  font-weight: 600;
+  text-anchor: start;
+}
+
+[dir="rtl"] .recharts-pie-label-text {
+  text-anchor: end;
 }

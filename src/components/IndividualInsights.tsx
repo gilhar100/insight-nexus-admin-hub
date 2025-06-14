@@ -27,6 +27,7 @@ import {
 import { SalimaGroupBarChart } from '@/components/SalimaGroupBarChart';
 import { SalimaDimensionPieChart } from '@/components/SalimaDimensionPieChart';
 import { SalimaScoreDistributionChart } from '@/components/SalimaScoreDistributionChart';
+import { PresenterMode } from '@/components/PresenterMode';
 
 interface GroupData {
   group_number: number;
@@ -56,6 +57,7 @@ export const IndividualInsights: React.FC = () => {
   const [selectedSource, setSelectedSource] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isPresenterMode, setIsPresenterMode] = useState(false);
   
   // Group search states
   const [groupSearchQuery, setGroupSearchQuery] = useState('');
@@ -231,178 +233,182 @@ export const IndividualInsights: React.FC = () => {
     group.toString().includes(groupSearchQuery.replace('קבוצה ', ''))
   );
 
-  return (
+  const content = (
     <div className="space-y-6" dir="rtl">
       {/* Page Header */}
       <div className="bg-white rounded-lg shadow-sm border p-6">
         <div className="flex items-center justify-between">
           <div className="text-right">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2 presenter-mode:text-5xl">
               תובנות אישיות וקבוצתיות - מודל SALIMA
             </h2>
-            <p className="text-gray-600">
+            <p className="text-gray-600 presenter-mode:text-2xl">
               ניתוח תגובות אישיות או סטטיסטיקות קבוצתיות מסקר SALIMA בן 90 השאלות
             </p>
           </div>
           <div className="bg-blue-50 p-4 rounded-lg">
-            <User className="h-8 w-8 text-blue-600" />
+            <User className="h-8 w-8 text-blue-600 presenter-mode:h-12 presenter-mode:w-12" />
           </div>
         </div>
       </div>
 
-      {/* Group Search Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center text-right">
-            <Users className="h-5 w-5 ml-2" />
-            ניתוח קבוצתי
-          </CardTitle>
-          <CardDescription className="text-right">
-            חיפוש וניתוח סטטיסטיקות קבוצתיות לפי מספר קבוצה
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-4">
-            <div className="flex-1 relative">
-              <Input
-                placeholder="חיפוש לפי מספר קבוצה..."
-                value={groupSearchQuery}
-                onChange={(e) => setGroupSearchQuery(e.target.value)}
-                className="w-full text-right"
-              />
-              {groupSearchQuery && !selectedGroup && filteredGroups.length > 0 && (
-                <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border rounded-md shadow-lg max-h-40 overflow-y-auto">
-                  {filteredGroups.slice(0, 10).map((groupNumber) => (
-                    <button
-                      key={groupNumber}
-                      onClick={() => handleGroupSelect(groupNumber)}
-                      className="w-full text-right px-3 py-2 hover:bg-gray-100 border-b last:border-b-0"
-                    >
-                      קבוצה {groupNumber}
-                    </button>
-                  ))}
-                </div>
+      {/* Group Search Section - Hidden in presenter mode */}
+      {!isPresenterMode && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center text-right">
+              <Users className="h-5 w-5 ml-2" />
+              ניתוח קבוצתי
+            </CardTitle>
+            <CardDescription className="text-right">
+              חיפוש וניתוח סטטיסטיקות קבוצתיות לפי מספר קבוצה
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-4">
+              <div className="flex-1 relative">
+                <Input
+                  placeholder="חיפוש לפי מספר קבוצה..."
+                  value={groupSearchQuery}
+                  onChange={(e) => setGroupSearchQuery(e.target.value)}
+                  className="w-full text-right"
+                />
+                {groupSearchQuery && !selectedGroup && filteredGroups.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border rounded-md shadow-lg max-h-40 overflow-y-auto">
+                    {filteredGroups.slice(0, 10).map((groupNumber) => (
+                      <button
+                        key={groupNumber}
+                        onClick={() => handleGroupSelect(groupNumber)}
+                        className="w-full text-right px-3 py-2 hover:bg-gray-100 border-b last:border-b-0"
+                      >
+                        קבוצה {groupNumber}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {selectedGroup && (
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setSelectedGroup(null);
+                    setGroupSearchQuery('');
+                  }}
+                >
+                  נקה בחירה
+                </Button>
               )}
             </div>
             {selectedGroup && (
-              <Button 
-                variant="outline" 
-                onClick={() => {
-                  setSelectedGroup(null);
-                  setGroupSearchQuery('');
-                }}
-              >
-                נקה בחירה
-              </Button>
+              <div className="mt-4 p-3 bg-green-50 rounded-lg">
+                <p className="text-sm text-green-800 text-right">
+                  נבחרה: <span className="font-medium">קבוצה {selectedGroup}</span>
+                  {groupData && <span className="ml-2">({groupData.participant_count} משתתפים)</span>}
+                </p>
+              </div>
             )}
-          </div>
-          {selectedGroup && (
-            <div className="mt-4 p-3 bg-green-50 rounded-lg">
-              <p className="text-sm text-green-800 text-right">
-                נבחרה: <span className="font-medium">קבוצה {selectedGroup}</span>
-                {groupData && <span className="ml-2">({groupData.participant_count} משתתפים)</span>}
-              </p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
-      {/* Individual Respondent Selection */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center text-right">
-            <Search className="h-5 w-5 ml-2" />
-            ניתוח אישי
-          </CardTitle>
-          <CardDescription className="text-right">
-            חיפוש ובחירת יחיד מטבלאות survey_responses או colleague_survey_responses (נתוני SALIMA בלבד)
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-4">
-            <div className="flex-1 relative">
-              <Input
-                placeholder="חיפוש נבדקי SALIMA לפי שם או אימייל..."
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  if (e.target.value.length >= 2) {
-                    setIsDropdownOpen(true);
-                  } else {
-                    setIsDropdownOpen(false);
-                  }
-                }}
-                onFocus={() => {
-                  if (searchQuery.length >= 2) {
-                    setIsDropdownOpen(true);
-                  }
-                }}
-                className="w-full text-right"
-              />
+      {/* Individual Respondent Selection - Hidden in presenter mode */}
+      {!isPresenterMode && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center text-right">
+              <Search className="h-5 w-5 ml-2" />
+              ניתוח אישי
+            </CardTitle>
+            <CardDescription className="text-right">
+              חיפוש ובחירת יחיד מטבלאות survey_responses או colleague_survey_responses (נתוני SALIMA בלבד)
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-4">
+              <div className="flex-1 relative">
+                <Input
+                  placeholder="חיפוש נבדקי SALIMA לפי שם או אימייל..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    if (e.target.value.length >= 2) {
+                      setIsDropdownOpen(true);
+                    } else {
+                      setIsDropdownOpen(false);
+                    }
+                  }}
+                  onFocus={() => {
+                    if (searchQuery.length >= 2) {
+                      setIsDropdownOpen(true);
+                    }
+                  }}
+                  className="w-full text-right"
+                />
               
-              {/* Dropdown Results */}
-              {isDropdownOpen && (searchQuery.length >= 2) && (
-                <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border rounded-md shadow-lg max-h-80 overflow-y-auto">
-                  <Command>
-                    <CommandList>
-                      {isLoading && (
-                        <CommandEmpty>מחפש...</CommandEmpty>
-                      )}
-                      {error && (
-                        <CommandEmpty className="text-red-500">שגיאה: {error}</CommandEmpty>
-                      )}
-                      {!isLoading && !error && names.length === 0 && (
-                        <CommandEmpty>לא נמצאו נבדקי SALIMA.</CommandEmpty>
-                      )}
-                      {names.length > 0 && (
-                        <CommandGroup>
-                          {names.map((nameOption) => (
-                            <CommandItem
-                              key={nameOption.id}
-                              value={nameOption.name}
-                              onSelect={() => handleNameSelect(nameOption)}
-                              className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50"
-                            >
-                              <div className="flex flex-col text-right">
-                                <span className="font-medium">{nameOption.name}</span>
-                                {nameOption.email && (
-                                  <span className="text-sm text-gray-500">{nameOption.email}</span>
-                                )}
-                              </div>
-                              <Badge className={getSourceBadgeColor(nameOption.source)}>
-                                {nameOption.source}
-                              </Badge>
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      )}
-                    </CommandList>
-                  </Command>
-                </div>
-              )}
+                {/* Dropdown Results */}
+                {isDropdownOpen && (searchQuery.length >= 2) && (
+                  <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border rounded-md shadow-lg max-h-80 overflow-y-auto">
+                    <Command>
+                      <CommandList>
+                        {isLoading && (
+                          <CommandEmpty>מחפש...</CommandEmpty>
+                        )}
+                        {error && (
+                          <CommandEmpty className="text-red-500">שגיאה: {error}</CommandEmpty>
+                        )}
+                        {!isLoading && !error && names.length === 0 && (
+                          <CommandEmpty>לא נמצאו נבדקי SALIMA.</CommandEmpty>
+                        )}
+                        {names.length > 0 && (
+                          <CommandGroup>
+                            {names.map((nameOption) => (
+                              <CommandItem
+                                key={nameOption.id}
+                                value={nameOption.name}
+                                onSelect={() => handleNameSelect(nameOption)}
+                                className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50"
+                              >
+                                <div className="flex flex-col text-right">
+                                  <span className="font-medium">{nameOption.name}</span>
+                                  {nameOption.email && (
+                                    <span className="text-sm text-gray-500">{nameOption.email}</span>
+                                  )}
+                                </div>
+                                <Badge className={getSourceBadgeColor(nameOption.source)}>
+                                  {nameOption.source}
+                                </Badge>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        )}
+                      </CommandList>
+                    </Command>
+                  </div>
+                )}
+              </div>
+              <Button 
+                onClick={handleAnalyzeResults} 
+                disabled={!selectedRespondent || isDataLoading}
+              >
+                {isDataLoading ? 'מנתח...' : 'נתח תוצאות'}
+              </Button>
             </div>
-            <Button 
-              onClick={handleAnalyzeResults} 
-              disabled={!selectedRespondent || isDataLoading}
-            >
-              {isDataLoading ? 'מנתח...' : 'נתח תוצאות'}
-            </Button>
-          </div>
-          {selectedName && (
-            <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-              <p className="text-sm text-blue-800 text-right">
-                נבחר: <span className="font-medium">{selectedName}</span>
-                {selectedSource && <span className="ml-2">({selectedSource})</span>}
-              </p>
-            </div>
-          )}
-          {dataError && (
-            <div className="mt-4 p-3 bg-red-50 rounded-lg">
-              <p className="text-sm text-red-800 text-right">שגיאה: {dataError}</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            {selectedName && (
+              <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                <p className="text-sm text-blue-800 text-right">
+                  נבחר: <span className="font-medium">{selectedName}</span>
+                  {selectedSource && <span className="ml-2">({selectedSource})</span>}
+                </p>
+              </div>
+            )}
+            {dataError && (
+              <div className="mt-4 p-3 bg-red-50 rounded-lg">
+                <p className="text-sm text-red-800 text-right">שגיאה: {dataError}</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Group Results Section */}
       {groupData && (
@@ -411,8 +417,8 @@ export const IndividualInsights: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between text-right">
-                <span>קבוצה {groupData.group_number} - ציונים ממוצעים במודל SALIMA</span>
-                <Badge variant="secondary" className="bg-green-100 text-green-800">
+                <span className="presenter-mode:text-4xl">קבוצה {groupData.group_number} - ציונים ממוצעים במודל SALIMA</span>
+                <Badge variant="secondary" className="bg-green-100 text-green-800 presenter-mode:text-2xl presenter-mode:px-6 presenter-mode:py-3">
                   {groupData.participant_count} משתתפים
                 </Badge>
               </CardTitle>
@@ -420,11 +426,11 @@ export const IndividualInsights: React.FC = () => {
             <CardContent>
               <div className="flex items-center justify-center p-8">
                 <div className="text-center">
-                  <div className="text-6xl font-bold text-green-600 mb-2">
+                  <div className="text-6xl font-bold text-green-600 mb-2 presenter-mode:text-9xl">
                     {groupData.averages.overall.toFixed(1)}
                   </div>
-                  <div className="text-lg text-gray-600">ציון SLQ ממוצע</div>
-                  <div className="mt-4 text-sm text-gray-500">
+                  <div className="text-lg text-gray-600 presenter-mode:text-3xl">ציון SLQ ממוצע</div>
+                  <div className="mt-4 text-sm text-gray-500 presenter-mode:text-xl">
                     ממוצע קבוצתי בכל שישת ממדי SALIMA
                   </div>
                 </div>
@@ -437,8 +443,8 @@ export const IndividualInsights: React.FC = () => {
             {/* Group Bar Chart */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center text-right text-xl font-bold">
-                  <BarChart3 className="h-6 w-6 ml-3" />
+                <CardTitle className="flex items-center text-right text-xl font-bold presenter-mode:text-3xl">
+                  <BarChart3 className="h-6 w-6 ml-3 presenter-mode:h-10 presenter-mode:w-10" />
                   גרף עמודות - ממוצע לפי ממד
                 </CardTitle>
               </CardHeader>
@@ -450,8 +456,8 @@ export const IndividualInsights: React.FC = () => {
             {/* Group Radar Chart */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center text-right text-xl font-bold">
-                  <BarChart3 className="h-6 w-6 ml-3" />
+                <CardTitle className="flex items-center text-right text-xl font-bold presenter-mode:text-3xl">
+                  <BarChart3 className="h-6 w-6 ml-3 presenter-mode:h-10 presenter-mode:w-10" />
                   גרף רדאר - פרופיל קבוצתי
                 </CardTitle>
               </CardHeader>
@@ -463,8 +469,8 @@ export const IndividualInsights: React.FC = () => {
             {/* Dimension Strength Pie Chart */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center text-right text-xl font-bold">
-                  <BarChart3 className="h-6 w-6 ml-3" />
+                <CardTitle className="flex items-center text-right text-xl font-bold presenter-mode:text-3xl">
+                  <BarChart3 className="h-6 w-6 ml-3 presenter-mode:h-10 presenter-mode:w-10" />
                   התפלגות חוזקות הממדים
                 </CardTitle>
               </CardHeader>
@@ -477,8 +483,8 @@ export const IndividualInsights: React.FC = () => {
             {groupData.participant_count > 5 && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center text-right text-xl font-bold">
-                    <BarChart3 className="h-6 w-6 ml-3" />
+                  <CardTitle className="flex items-center text-right text-xl font-bold presenter-mode:text-3xl">
+                    <BarChart3 className="h-6 w-6 ml-3 presenter-mode:h-10 presenter-mode:w-10" />
                     התפלגות טווחי ציונים
                   </CardTitle>
                 </CardHeader>
@@ -487,27 +493,6 @@ export const IndividualInsights: React.FC = () => {
                 </CardContent>
               </Card>
             )}
-
-            {/* Group Intensity Bars */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center text-right text-xl font-bold">
-                  <BarChart3 className="h-6 w-6 ml-3" />
-                  ממוצעי ממדים קבוצתיים
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {groupRadarChartData.map((dimension, index) => (
-                    <SalimaIntensityBar
-                      key={index}
-                      dimension={dimension.dimension}
-                      score={dimension.score}
-                    />
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </>
       )}
@@ -519,33 +504,35 @@ export const IndividualInsights: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between text-right">
-                <span>ציון SALIMA כללי (SLQ)</span>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <Download className="h-4 w-4 ml-2" />
-                      ייצא דוח
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => handleExport('json')}>
-                      ייצא כ-JSON
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleExport('csv')}>
-                      ייצא כ-CSV
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <span className="presenter-mode:text-4xl">ציון SALIMA כללי (SLQ)</span>
+                {!isPresenterMode && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <Download className="h-4 w-4 ml-2" />
+                        ייצא דוח
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem onClick={() => handleExport('json')}>
+                        ייצא כ-JSON
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleExport('csv')}>
+                        ייצא כ-CSV
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-center p-8">
                 <div className="text-center">
-                  <div className="text-6xl font-bold text-blue-600 mb-2">
+                  <div className="text-6xl font-bold text-blue-600 mb-2 presenter-mode:text-9xl">
                     {respondentData.overallScore.toFixed(1)}
                   </div>
-                  <div className="text-lg text-gray-600">מתוך 5.0</div>
-                  <div className="mt-4 text-sm text-gray-500">
+                  <div className="text-lg text-gray-600 presenter-mode:text-3xl">מתוך 5.0</div>
+                  <div className="mt-4 text-sm text-gray-500 presenter-mode:text-xl">
                     ממוצע בכל שישת ממדי SALIMA
                   </div>
                 </div>
@@ -558,8 +545,8 @@ export const IndividualInsights: React.FC = () => {
             {/* Individual Radar Chart */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center text-right">
-                  <BarChart3 className="h-5 w-5 ml-2" />
+                <CardTitle className="flex items-center text-right presenter-mode:text-3xl">
+                  <BarChart3 className="h-5 w-5 ml-2 presenter-mode:h-10 presenter-mode:w-10" />
                   גרף רדאר - שישה ממדים
                 </CardTitle>
               </CardHeader>
@@ -571,8 +558,8 @@ export const IndividualInsights: React.FC = () => {
             {/* Individual Intensity Bars */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center text-right">
-                  <BarChart3 className="h-5 w-5 ml-2" />
+                <CardTitle className="flex items-center text-right presenter-mode:text-3xl">
+                  <BarChart3 className="h-5 w-5 ml-2 presenter-mode:h-10 presenter-mode:w-10" />
                   עוצמת הממדים
                 </CardTitle>
               </CardHeader>
@@ -593,16 +580,16 @@ export const IndividualInsights: React.FC = () => {
           {/* Individual AI-Generated Insights */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-right">סיכום הניתוח</CardTitle>
-              <CardDescription className="text-right">
+              <CardTitle className="text-right presenter-mode:text-3xl">סיכום הניתוח</CardTitle>
+              <CardDescription className="text-right presenter-mode:text-xl">
                 בהתבסס על תגובות הסקר בפועל מנתוני {respondentData.source}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                  <h4 className="font-semibold text-green-800 mb-2 text-right">ממדים בעלי הציון הגבוה ביותר</h4>
-                  <ul className="text-sm text-green-700 space-y-1">
+                  <h4 className="font-semibold text-green-800 mb-2 text-right presenter-mode:text-2xl">ממדים בעלי הציון הגבוה ביותר</h4>
+                  <ul className="text-sm text-green-700 space-y-1 presenter-mode:text-lg">
                     {radarChartData
                       .sort((a, b) => b.score - a.score)
                       .slice(0, 3)
@@ -612,8 +599,8 @@ export const IndividualInsights: React.FC = () => {
                   </ul>
                 </div>
                 <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
-                  <h4 className="font-semibold text-amber-800 mb-2 text-right">תחומים לפיתוח</h4>
-                  <ul className="text-sm text-amber-700 space-y-1">
+                  <h4 className="font-semibold text-amber-800 mb-2 text-right presenter-mode:text-2xl">תחומים לפיתוח</h4>
+                  <ul className="text-sm text-amber-700 space-y-1 presenter-mode:text-lg">
                     {radarChartData
                       .sort((a, b) => a.score - b.score)
                       .slice(0, 3)
@@ -628,5 +615,14 @@ export const IndividualInsights: React.FC = () => {
         </>
       )}
     </div>
+  );
+
+  return (
+    <PresenterMode 
+      isPresenterMode={isPresenterMode} 
+      onToggle={() => setIsPresenterMode(!isPresenterMode)}
+    >
+      {content}
+    </PresenterMode>
   );
 };
