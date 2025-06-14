@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, Cell } from 'recharts';
 import { ChartContainer } from '@/components/ui/chart';
 
 interface SalimaScoreDistributionChartProps {
@@ -48,27 +48,37 @@ export const SalimaScoreDistributionChart: React.FC<SalimaScoreDistributionChart
   const COLORS = ['#3B82F6', '#10B981', '#EF4444', '#8B5CF6', '#EC4899', '#F59E0B'];
 
   return (
-    <ChartContainer config={{}} className="h-80" dir="rtl">
+    <ChartContainer config={{}} className="h-96 presenter-mode:h-[500px]" dir="rtl">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis 
             dataKey="range" 
-            tick={{ fontSize: 12 }}
-            label={{ value: 'טווח ציונים', position: 'insideBottom', offset: -5 }}
+            tick={{ fontSize: 14, fontWeight: 'bold' }}
+            label={{ 
+              value: 'טווח ציונים', 
+              position: 'insideBottom', 
+              offset: -5,
+              style: { fontSize: '16px', fontWeight: 'bold' }
+            }}
           />
           <YAxis 
-            tick={{ fontSize: 10 }}
-            label={{ value: 'מספר משתתפים', angle: -90, position: 'insideLeft' }}
+            tick={{ fontSize: 12 }}
+            label={{ 
+              value: 'מספר משתתפים', 
+              angle: -90, 
+              position: 'insideLeft',
+              style: { fontSize: '16px', fontWeight: 'bold' }
+            }}
           />
           <Tooltip 
             content={({ active, payload, label }) => {
               if (active && payload && payload.length) {
                 return (
-                  <div className="bg-white p-3 border rounded shadow-lg text-right">
-                    <p className="font-semibold">טווח: {label}</p>
+                  <div className="bg-white p-4 border rounded shadow-lg text-right">
+                    <p className="font-bold text-lg">טווח: {label}</p>
                     {payload.map((entry, index) => (
-                      <p key={index} style={{ color: entry.color }}>
+                      <p key={index} style={{ color: entry.color }} className="text-base font-semibold">
                         {entry.dataKey}: {entry.value} משתתפים
                       </p>
                     ))}
@@ -78,13 +88,23 @@ export const SalimaScoreDistributionChart: React.FC<SalimaScoreDistributionChart
               return null;
             }}
           />
-          <Legend wrapperStyle={{ textAlign: 'right' }} />
+          <Legend 
+            wrapperStyle={{ 
+              textAlign: 'right', 
+              fontSize: '14px', 
+              fontWeight: 'bold',
+              paddingTop: '20px'
+            }}
+            formatter={(value) => <span className="presenter-mode:text-lg">{value}</span>}
+          />
           {Object.values(DIMENSION_NAMES).map((dimension, index) => (
             <Bar 
               key={dimension}
               dataKey={dimension} 
               stackId="a" 
-              fill={COLORS[index]} 
+              fill={COLORS[index]}
+              stroke="#000000"
+              strokeWidth={0.5}
             />
           ))}
         </BarChart>

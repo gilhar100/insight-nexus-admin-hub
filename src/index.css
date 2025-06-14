@@ -158,6 +158,8 @@
 .presenter-mode h2,
 .presenter-mode h3 {
   text-align: center;
+  font-size: 1.5em;
+  font-weight: bold;
 }
 
 .presenter-mode .grid {
@@ -173,16 +175,45 @@
 }
 
 .presenter-mode .text-lg {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   line-height: 1.75rem;
 }
 
 .presenter-mode .text-base {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   line-height: 1.75rem;
 }
 
 .presenter-mode .text-sm {
-  font-size: 1rem;
+  font-size: 1.125rem;
   line-height: 1.5rem;
+}
+
+/* Chart-specific presenter mode improvements */
+.presenter-mode .recharts-wrapper {
+  margin: 0 auto;
+}
+
+.presenter-mode .recharts-legend-wrapper {
+  font-size: 1.125rem !important;
+  font-weight: bold !important;
+}
+
+.presenter-mode .recharts-cartesian-axis-tick text {
+  font-size: 16px !important;
+  font-weight: bold !important;
+}
+
+.presenter-mode .recharts-polar-angle-axis-tick text {
+  font-size: 16px !important;
+  font-weight: bold !important;
+}
+
+/* RTL improvements for charts */
+[dir="rtl"] .recharts-legend-wrapper {
+  direction: rtl;
+}
+
+[dir="rtl"] .recharts-tooltip-wrapper {
+  direction: rtl;
 }

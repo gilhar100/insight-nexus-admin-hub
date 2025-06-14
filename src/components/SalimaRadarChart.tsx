@@ -48,11 +48,11 @@ export const SalimaRadarChart: React.FC<SalimaRadarChartProps> = ({ data }) => {
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
           <PolarGrid />
-          <PolarAngleAxis dataKey="dimension" tick={{ fontSize: 12 }} />
+          <PolarAngleAxis dataKey="dimension" tick={{ fontSize: 14, fontWeight: 'bold' }} />
           <PolarRadiusAxis 
             angle={90} 
             domain={[0, 5]} 
-            tick={{ fontSize: 10 }}
+            tick={{ fontSize: 12 }}
             tickCount={6}
           />
           <Radar
@@ -66,11 +66,12 @@ export const SalimaRadarChart: React.FC<SalimaRadarChartProps> = ({ data }) => {
           <ChartTooltip 
             content={({ active, payload, label }) => {
               if (active && payload && payload.length) {
+                const value = payload[0].value;
                 return (
                   <div className="bg-white p-3 border rounded shadow-lg text-right">
-                    <p className="font-semibold">{label}</p>
-                    <p className="text-blue-600">
-                      ציון: {payload[0].value?.toFixed(2)}
+                    <p className="font-semibold text-lg">{label}</p>
+                    <p className="text-blue-600 text-base">
+                      ציון: {typeof value === 'number' ? value.toFixed(2) : value}
                     </p>
                   </div>
                 );

@@ -32,22 +32,23 @@ export const SalimaGroupBarChart: React.FC<SalimaGroupBarChartProps> = ({ data }
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis 
             dataKey="dimension" 
-            tick={{ fontSize: 12 }}
+            tick={{ fontSize: 14, fontWeight: 'bold' }}
             textAnchor="middle"
           />
           <YAxis 
             domain={[0, 5]} 
-            tick={{ fontSize: 10 }}
-            label={{ value: 'ציון', angle: -90, position: 'insideLeft' }}
+            tick={{ fontSize: 12 }}
+            label={{ value: 'ציון', angle: -90, position: 'insideLeft', style: { fontSize: '14px', fontWeight: 'bold' } }}
           />
           <Tooltip 
             content={({ active, payload, label }) => {
               if (active && payload && payload.length) {
+                const value = payload[0].value;
                 return (
                   <div className="bg-white p-3 border rounded shadow-lg text-right">
-                    <p className="font-semibold">{label}</p>
-                    <p className="text-blue-600">
-                      ציון: {payload[0].value?.toFixed(2)}
+                    <p className="font-semibold text-lg">{label}</p>
+                    <p className="text-blue-600 text-base">
+                      ציון: {typeof value === 'number' ? value.toFixed(2) : value}
                     </p>
                   </div>
                 );

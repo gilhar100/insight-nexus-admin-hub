@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -434,12 +433,12 @@ export const IndividualInsights: React.FC = () => {
           </Card>
 
           {/* Group Visualizations */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Group Bar Chart */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center text-right">
-                  <BarChart3 className="h-5 w-5 ml-2" />
+                <CardTitle className="flex items-center text-right text-xl font-bold">
+                  <BarChart3 className="h-6 w-6 ml-3" />
                   גרף עמודות - ממוצע לפי ממד
                 </CardTitle>
               </CardHeader>
@@ -451,8 +450,8 @@ export const IndividualInsights: React.FC = () => {
             {/* Group Radar Chart */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center text-right">
-                  <BarChart3 className="h-5 w-5 ml-2" />
+                <CardTitle className="flex items-center text-right text-xl font-bold">
+                  <BarChart3 className="h-6 w-6 ml-3" />
                   גרף רדאר - פרופיל קבוצתי
                 </CardTitle>
               </CardHeader>
@@ -464,8 +463,8 @@ export const IndividualInsights: React.FC = () => {
             {/* Dimension Strength Pie Chart */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center text-right">
-                  <BarChart3 className="h-5 w-5 ml-2" />
+                <CardTitle className="flex items-center text-right text-xl font-bold">
+                  <BarChart3 className="h-6 w-6 ml-3" />
                   התפלגות חוזקות הממדים
                 </CardTitle>
               </CardHeader>
@@ -478,8 +477,8 @@ export const IndividualInsights: React.FC = () => {
             {groupData.participant_count > 5 && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center text-right">
-                    <BarChart3 className="h-5 w-5 ml-2" />
+                  <CardTitle className="flex items-center text-right text-xl font-bold">
+                    <BarChart3 className="h-6 w-6 ml-3" />
                     התפלגות טווחי ציונים
                   </CardTitle>
                 </CardHeader>
@@ -492,8 +491,8 @@ export const IndividualInsights: React.FC = () => {
             {/* Group Intensity Bars */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center text-right">
-                  <BarChart3 className="h-5 w-5 ml-2" />
+                <CardTitle className="flex items-center text-right text-xl font-bold">
+                  <BarChart3 className="h-6 w-6 ml-3" />
                   ממוצעי ממדים קבוצתיים
                 </CardTitle>
               </CardHeader>

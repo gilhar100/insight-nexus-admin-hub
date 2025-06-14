@@ -62,16 +62,38 @@ export const SalimaDimensionPieChart: React.FC<SalimaDimensionPieChartProps> = (
       percentage: ((count / participants.length) * 100).toFixed(1)
     }));
 
+  const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, name, percentage }: any) => {
+    const RADIAN = Math.PI / 180;
+    const radius = outerRadius + 40;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+    return (
+      <text 
+        x={x} 
+        y={y} 
+        fill="#374151" 
+        textAnchor={x > cx ? 'start' : 'end'} 
+        dominantBaseline="central"
+        fontSize="13"
+        fontWeight="600"
+        className="presenter-mode:text-lg"
+      >
+        {`${name} - ${percentage}%`}
+      </text>
+    );
+  };
+
   return (
-    <ChartContainer config={{}} className="h-80" dir="rtl">
+    <ChartContainer config={{}} className="h-96 presenter-mode:h-[500px]" dir="rtl">
       <ResponsiveContainer width="100%" height="100%">
-        <PieChart>
+        <PieChart margin={{ top: 20, right: 80, bottom: 20, left: 80 }}>
           <Pie
             data={chartData}
             cx="50%"
             cy="50%"
             labelLine={false}
-            label={({ name, percentage }) => `${name} (${percentage}%)`}
+            label={renderCustomLabel}
             outerRadius={80}
             fill="#8884d8"
             dataKey="value"
@@ -85,10 +107,10 @@ export const SalimaDimensionPieChart: React.FC<SalimaDimensionPieChartProps> = (
               if (active && payload && payload.length) {
                 const data = payload[0].payload;
                 return (
-                  <div className="bg-white p-3 border rounded shadow-lg text-right">
-                    <p className="font-semibold">{data.name}</p>
-                    <p>משתתפים: {data.value}</p>
-                    <p>אחוז: {data.percentage}%</p>
+                  <div className="bg-white p-4 border rounded shadow-lg text-right">
+                    <p className="font-bold text-lg">{data.name}</p>
+                    <p className="text-base">משתתפים: {data.value}</p>
+                    <p className="text-base">אחוז: {data.percentage}%</p>
                   </div>
                 );
               }
@@ -96,8 +118,13 @@ export const SalimaDimensionPieChart: React.FC<SalimaDimensionPieChartProps> = (
             }}
           />
           <Legend 
-            wrapperStyle={{ textAlign: 'right' }}
-            formatter={(value) => value}
+            wrapperStyle={{ 
+              textAlign: 'right', 
+              fontSize: '14px', 
+              fontWeight: 'bold',
+              paddingTop: '20px'
+            }}
+            formatter={(value) => <span className="presenter-mode:text-lg">{value}</span>}
           />
         </PieChart>
       </ResponsiveContainer>
