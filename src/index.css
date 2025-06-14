@@ -149,138 +149,72 @@
   }
 }
 
-/* Presenter Mode Styles */
+/* Presenter Mode Base Styles */
 .presenter-mode {
-  text-align: center;
-  padding: 2rem;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   min-height: 100vh;
+  padding: 2rem;
+  overflow-y: auto;
 }
 
+/* Typography in Presenter Mode */
 .presenter-mode h1,
 .presenter-mode h2,
 .presenter-mode h3 {
   text-align: center;
-  font-size: 2.5em;
-  font-weight: bold;
-  margin-bottom: 1.5rem;
+  font-size: 3rem;
+  font-weight: 900;
+  margin-bottom: 2rem;
   color: #1e293b;
   text-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
+.presenter-mode .card-title {
+  font-size: 2.5rem !important;
+  font-weight: 800 !important;
+  text-align: center;
+  color: #1e293b;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.presenter-mode .text-lg {
+  font-size: 2.25rem;
+  line-height: 2.75rem;
+  font-weight: 600;
+}
+
+.presenter-mode .text-base {
+  font-size: 2rem;
+  line-height: 2.5rem;
+  font-weight: 500;
+}
+
+.presenter-mode .text-sm {
+  font-size: 1.75rem;
+  line-height: 2.25rem;
+  font-weight: 500;
+}
+
+.presenter-mode .text-6xl {
+  font-size: 6rem;
+  font-weight: 900;
+  text-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.presenter-mode .text-9xl {
+  font-size: 9rem;
+  font-weight: 900;
+  text-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Grid and Layout */
 .presenter-mode .grid {
   justify-content: center;
   gap: 3rem;
   margin: 2rem 0;
 }
 
-.presenter-mode .flex {
-  justify-content: center;
-}
-
-.presenter-mode .card {
-  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 10px 10px -5px rgb(0 0 0 / 0.04);
-  border: 2px solid #e2e8f0;
-  border-radius: 1rem;
-  background: white;
-  margin: 1.5rem;
-  min-height: 400px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.presenter-mode .card-header {
-  padding: 2rem 2rem 1rem 2rem;
-  border-bottom: 2px solid #f1f5f9;
-}
-
-.presenter-mode .card-content {
-  padding: 2rem;
-  flex-grow: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.presenter-mode .text-lg {
-  font-size: 2rem;
-  line-height: 2.5rem;
-  font-weight: 600;
-}
-
-.presenter-mode .text-base {
-  font-size: 1.75rem;
-  line-height: 2.25rem;
-  font-weight: 500;
-}
-
-.presenter-mode .text-sm {
-  font-size: 1.5rem;
-  line-height: 2rem;
-  font-weight: 500;
-}
-
-.presenter-mode .text-3xl {
-  font-size: 3rem;
-  line-height: 3.5rem;
-  font-weight: bold;
-}
-
-/* Enhanced presenter mode for SALIMA charts */
-.presenter-mode .recharts-wrapper {
-  margin: 0 auto;
-  min-height: 500px;
-}
-
-.presenter-mode .recharts-legend-wrapper {
-  font-size: 1.75rem !important;
-  font-weight: bold !important;
-  margin-top: 2rem !important;
-}
-
-.presenter-mode .recharts-cartesian-axis-tick text {
-  font-size: 20px !important;
-  font-weight: bold !important;
-  fill: #1e293b !important;
-}
-
-.presenter-mode .recharts-polar-angle-axis-tick text {
-  font-size: 20px !important;
-  font-weight: bold !important;
-  fill: #1e293b !important;
-}
-
-.presenter-mode .recharts-pie-label-text {
-  font-size: 18px !important;
-  font-weight: 700 !important;
-  fill: #1e293b !important;
-}
-
-.presenter-mode .recharts-tooltip-wrapper {
-  font-size: 1.25rem !important;
-}
-
-/* Badge and score improvements */
-.presenter-mode .badge {
-  font-size: 1.5rem;
-  padding: 0.75rem 1.5rem;
-  font-weight: bold;
-}
-
-.presenter-mode .text-6xl {
-  font-size: 5rem;
-  font-weight: 900;
-  text-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.presenter-mode .text-9xl {
-  font-size: 8rem;
-  font-weight: 900;
-  text-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-/* Uniform grid layout for charts */
 .presenter-mode .grid-cols-1 {
   grid-template-columns: 1fr;
 }
@@ -290,18 +224,124 @@
   gap: 3rem;
 }
 
-/* Chart container improvements */
+/* Card Styling in Presenter Mode */
+.presenter-mode .card {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  margin: 1.5rem;
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.presenter-mode .card-header {
+  padding: 2.5rem 2rem 1.5rem 2rem;
+  border-bottom: 2px solid #f1f5f9;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 1rem 1rem 0 0;
+}
+
+.presenter-mode .card-content {
+  padding: 2.5rem;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+/* Chart Improvements */
+.presenter-mode .recharts-wrapper {
+  margin: 0 auto;
+  min-height: 500px;
+}
+
+.presenter-mode .recharts-legend-wrapper {
+  font-size: 2rem !important;
+  font-weight: bold !important;
+  margin-top: 2rem !important;
+}
+
+.presenter-mode .recharts-cartesian-axis-tick text {
+  font-size: 24px !important;
+  font-weight: bold !important;
+  fill: #1e293b !important;
+}
+
+.presenter-mode .recharts-polar-angle-axis-tick text {
+  font-size: 24px !important;
+  font-weight: bold !important;
+  fill: #1e293b !important;
+}
+
+.presenter-mode .recharts-pie-label-text {
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  fill: #1e293b !important;
+}
+
+.presenter-mode .recharts-tooltip-wrapper {
+  font-size: 1.5rem !important;
+}
+
+/* Uniform Heights */
 .presenter-mode .h-96,
 .presenter-mode .h-80,
 .presenter-mode .h-\\[500px\\] {
-  height: 600px !important;
+  height: 500px !important;
 }
 
 .presenter-mode .h-\\[600px\\] {
-  height: 700px !important;
+  height: 600px !important;
 }
 
-/* Hide scrollbars in presenter mode unless hovering */
+/* Score Display */
+.presenter-mode .score-display {
+  text-align: center;
+  padding: 3rem;
+}
+
+.presenter-mode .score-number {
+  font-size: 8rem;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.presenter-mode .score-label {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  color: #64748b;
+}
+
+.presenter-mode .score-description {
+  font-size: 1.75rem;
+  color: #64748b;
+  margin-top: 1.5rem;
+}
+
+/* Badge Improvements */
+.presenter-mode .badge {
+  font-size: 1.75rem;
+  padding: 1rem 2rem;
+  font-weight: bold;
+  border-radius: 0.75rem;
+}
+
+/* Spacing Improvements */
+.presenter-mode .space-y-6 > * + * {
+  margin-top: 3rem;
+}
+
+.presenter-mode .space-y-8 > * + * {
+  margin-top: 4rem;
+}
+
+/* Hide scrollbars unless hovering */
 .presenter-mode {
   overflow: hidden;
 }
@@ -350,42 +390,4 @@
 
 [dir="rtl"] .recharts-pie-label-text {
   text-anchor: end;
-}
-
-/* Presenter mode specific improvements */
-.presenter-mode .space-y-6 > * + * {
-  margin-top: 3rem;
-}
-
-.presenter-mode .space-y-8 > * + * {
-  margin-top: 4rem;
-}
-
-/* Chart title improvements */
-.presenter-mode .card-title {
-  font-size: 2.25rem;
-  font-weight: bold;
-  color: #1e293b;
-  margin-bottom: 1rem;
-}
-
-/* Consistent spacing for all cards */
-.presenter-mode .card {
-  padding: 0;
-  margin: 2rem 1rem;
-}
-
-.presenter-mode .card-header h3,
-.presenter-mode .card-header .card-title {
-  font-size: 2.25rem !important;
-  font-weight: bold !important;
-  text-align: center;
-  color: #1e293b;
-  margin: 0;
-}
-
-/* Better visual separation */
-.presenter-mode .bg-white {
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
-  border: 2px solid #e2e8f0 !important;
 }
