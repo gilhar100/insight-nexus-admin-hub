@@ -234,7 +234,7 @@ export const IndividualInsights: React.FC = () => {
   );
 
   const content = (
-    <div className="space-y-8" dir="rtl">
+    <div className={`space-y-8${isPresenterMode ? ' presenter-mode' : ''}`} dir="rtl">
       {/* Page Header */}
       <div className="bg-white rounded-lg shadow-sm border p-8">
         <div className="flex items-center justify-between">
@@ -412,96 +412,76 @@ export const IndividualInsights: React.FC = () => {
 
       {/* Group Results Section */}
       {groupData && (
-        <div className="space-y-8">
+        <div className={isPresenterMode ? "presenter-grid" : "grid grid-cols-1 lg:grid-cols-2 gap-8"}>
           {/* Group Overall Score Summary */}
-          <Card className={isPresenterMode ? 'min-h-[500px]' : ''}>
-            <CardHeader className="text-center">
-              <CardTitle className={`flex items-center justify-between text-right ${isPresenterMode ? 'flex-col gap-4' : ''}`}>
-                <span className={`text-2xl font-bold ${isPresenterMode ? 'text-4xl' : ''}`}>
+          <div className="card">
+            <div className="card-header text-center">
+              <div className={`flex items-center justify-between text-right card-title${isPresenterMode ? ' flex-col gap-4' : ''}`}>
+                <span className={`font-bold${isPresenterMode ? ' text-4xl' : ' text-2xl'}`}>
                   קבוצה {groupData.group_number} - ציונים ממוצעים במודל SALIMA
                 </span>
-                <Badge variant="secondary" className={`bg-green-100 text-green-800 ${isPresenterMode ? 'text-2xl px-8 py-4' : ''}`}>
+                <span className={`bg-green-100 text-green-800 rounded badge${isPresenterMode ? ' text-2xl px-8 py-4' : ''}`}>
                   {groupData.participant_count} משתתפים
-                </Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className={`flex items-center justify-center ${isPresenterMode ? 'p-12' : 'p-8'}`}>
-                <div className="text-center score-display">
-                  <div className={`font-bold text-green-600 mb-4 score-number ${isPresenterMode ? 'text-9xl' : 'text-6xl'}`}>
-                    {groupData.averages.overall.toFixed(1)}
-                  </div>
-                  <div className={`text-gray-600 font-semibold score-label ${isPresenterMode ? 'text-3xl' : 'text-xl'}`}>
-                    ציון SLQ ממוצע
-                  </div>
-                  <div className={`mt-6 text-gray-500 score-description ${isPresenterMode ? 'text-xl' : 'text-base'}`}>
-                    ממוצע קבוצתי בכל שישת ממדי SALIMA
-                  </div>
+                </span>
+              </div>
+            </div>
+            <div className="card-content">
+              <div className={`score-display`}>
+                <div className={`font-bold text-green-600 mb-4 score-number`}>
+                  {groupData.averages.overall.toFixed(1)}
+                </div>
+                <div className={`text-gray-600 font-semibold score-label`}>
+                  ציון SLQ ממוצע
+                </div>
+                <div className={`mt-6 text-gray-500 score-description`}>
+                  ממוצע קבוצתי בכל שישת ממדי SALIMA
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          {/* Group Visualizations */}
-          <div className={`grid grid-cols-1 lg:grid-cols-2 gap-8 ${isPresenterMode ? 'gap-12' : ''}`}>
-            {/* Group Radar Chart */}
-            <Card className={isPresenterMode ? 'min-h-[600px]' : ''}>
-              <CardHeader className="text-center">
-                <CardTitle className={`flex items-center justify-center text-right text-xl font-bold ${isPresenterMode ? 'text-3xl' : ''}`}>
-                  <BarChart3 className={`h-6 w-6 ml-3 ${isPresenterMode ? 'h-10 w-10' : ''}`} />
-                  גרף רדאר - פרופיל קבוצתי
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className={isPresenterMode ? 'h-[500px]' : 'h-96'}>
-                  <SalimaRadarChart data={groupRadarChartData} />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Dimension Strength Pie Chart */}
-            <Card className={isPresenterMode ? 'min-h-[600px]' : ''}>
-              <CardHeader className="text-center">
-                <CardTitle className={`flex items-center justify-center text-right text-xl font-bold ${isPresenterMode ? 'text-3xl' : ''}`}>
-                  <BarChart3 className={`h-6 w-6 ml-3 ${isPresenterMode ? 'h-10 w-10' : ''}`} />
-                  התפלגות חוזקות הממדים
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className={isPresenterMode ? 'h-[500px]' : 'h-96'}>
-                  <SalimaDimensionPieChart participants={groupData.participants} />
-                </div>
-              </CardContent>
-            </Card>
+          {/* Dimension Strength Pie Chart */}
+          <div className="card">
+            <div className="card-header text-center">
+              <div className={`flex items-center justify-center text-right card-title${isPresenterMode ? " text-3xl" : ""}`}>
+                <span className={`ml-3`}><svg className={isPresenterMode ? "h-10 w-10" : "h-6 w-6"} style={{display: "inline-block"}} viewBox="0 0 24 24"><path fill="currentColor" d="M5 10c-1.656 0-3 1.343-3 3 0 1.656 1.344 3 3 3h2v-6H5zm2 9V8c0-1.104.896-2 2-2h6v2H9v11H7zm8-2h2c1.657 0 3-1.344 3-3 0-1.657-1.343-3-3-3v6z"/></svg></span>
+                התפלגות חוזקות הממדים
+              </div>
+            </div>
+            <div className="card-content">
+              <div className="h-[520px] w-full flex items-center justify-center">
+                <SalimaDimensionPieChart participants={groupData.participants} />
+              </div>
+            </div>
           </div>
 
           {/* Score Distribution Chart - Full Width */}
           {groupData.participant_count > 5 && (
-            <Card className={isPresenterMode ? 'min-h-[600px]' : ''}>
-              <CardHeader className="text-center">
-                <CardTitle className={`flex items-center justify-center text-right text-xl font-bold ${isPresenterMode ? 'text-3xl' : ''}`}>
-                  <BarChart3 className={`h-6 w-6 ml-3 ${isPresenterMode ? 'h-10 w-10' : ''}`} />
+            <div className="card" style={{gridColumn: isPresenterMode ? "span 2" : undefined}}>
+              <div className="card-header text-center">
+                <div className={`flex items-center justify-center text-right card-title${isPresenterMode ? " text-3xl" : ""}`}>
+                  <span className="ml-3"><svg className={isPresenterMode ? "h-10 w-10" : "h-6 w-6"} style={{display: "inline-block"}} viewBox="0 0 24 24"><path fill="currentColor" d="M5 10c-1.656 0-3 1.343-3 3 0 1.656 1.344 3 3 3h2v-6H5zm2 9V8c0-1.104.896-2 2-2h6v2H9v11H7zm8-2h2c1.657 0 3-1.344 3-3 0-1.657-1.343-3-3-3v6z"/></svg></span>
                   התפלגות טווחי ציונים
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className={isPresenterMode ? 'h-[500px]' : 'h-96'}>
+                </div>
+              </div>
+              <div className="card-content">
+                <div className="h-[520px] w-full flex items-center justify-center">
                   <SalimaScoreDistributionChart participants={groupData.participants} />
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           )}
         </div>
       )}
 
-      {/* Individual Results Section - Only show when respondent data is loaded */}
+      {/* Individual Results Section */}
       {respondentData && (
-        <div className="space-y-8">
+        <div className={isPresenterMode ? "presenter-grid" : "grid grid-cols-1 lg:grid-cols-2 gap-8"}>
           {/* Individual Overall Score Summary */}
-          <Card className={isPresenterMode ? 'min-h-[500px]' : ''}>
-            <CardHeader className="text-center">
-              <CardTitle className={`flex items-center justify-between text-right ${isPresenterMode ? 'flex-col gap-4' : ''}`}>
-                <span className={`text-2xl font-bold ${isPresenterMode ? 'text-4xl' : ''}`}>
+          <div className="card">
+            <div className="card-header text-center">
+              <div className={`flex items-center justify-between text-right card-title${isPresenterMode ? ' flex-col gap-4' : ''}`}>
+                <span className={`font-bold${isPresenterMode ? ' text-4xl' : ' text-2xl'}`}>
                   ציון SALIMA כללי (SLQ)
                 </span>
                 {!isPresenterMode && (
@@ -522,76 +502,69 @@ export const IndividualInsights: React.FC = () => {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 )}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className={`flex items-center justify-center ${isPresenterMode ? 'p-12' : 'p-8'}`}>
-                <div className="text-center score-display">
-                  <div className={`font-bold text-blue-600 mb-4 score-number ${isPresenterMode ? 'text-9xl' : 'text-6xl'}`}>
-                    {respondentData.overallScore.toFixed(1)}
-                  </div>
-                  <div className={`text-gray-600 font-semibold score-label ${isPresenterMode ? 'text-3xl' : 'text-xl'}`}>
-                    מתוך 5.0
-                  </div>
-                  <div className={`mt-6 text-gray-500 score-description ${isPresenterMode ? 'text-xl' : 'text-base'}`}>
-                    ממוצע בכל שישת ממדי SALIMA
-                  </div>
+              </div>
+            </div>
+            <div className="card-content">
+              <div className={`score-display`}>
+                <div className={`font-bold text-blue-600 mb-4 score-number`}>
+                  {respondentData.overallScore.toFixed(1)}
+                </div>
+                <div className={`text-gray-600 font-semibold score-label`}>
+                  מתוך 5.0
+                </div>
+                <div className={`mt-6 text-gray-500 score-description`}>
+                  ממוצע בכל שישת ממדי SALIMA
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
-          {/* Individual Dimension Scores */}
-          <div className={`grid grid-cols-1 lg:grid-cols-2 gap-8 ${isPresenterMode ? 'gap-12' : ''}`}>
-            {/* Individual Radar Chart */}
-            <Card className={isPresenterMode ? 'min-h-[600px]' : ''}>
-              <CardHeader className="text-center">
-                <CardTitle className={`flex items-center justify-center text-right ${isPresenterMode ? 'text-3xl' : ''}`}>
-                  <BarChart3 className={`h-5 w-5 ml-2 ${isPresenterMode ? 'h-10 w-10' : ''}`} />
-                  גרף רדאר - שישה ממדים
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className={isPresenterMode ? 'h-[500px]' : 'h-96'}>
-                  <SalimaRadarChart data={radarChartData} />
-                </div>
-              </CardContent>
-            </Card>
+          {/* Individual Radar Chart */}
+          <div className="card">
+            <div className="card-header text-center">
+              <div className={`flex items-center justify-center text-right card-title${isPresenterMode ? " text-3xl" : ""}`}>
+                <span className="ml-2"><svg className={isPresenterMode ? "h-10 w-10" : "h-6 w-6"} style={{display: "inline-block"}} viewBox="0 0 24 24"><path fill="currentColor" d="M5 10c-1.656 0-3 1.343-3 3 0 1.656 1.344 3 3 3h2v-6H5zm2 9V8c0-1.104.896-2 2-2h6v2H9v11H7zm8-2h2c1.657 0 3-1.344 3-3 0-1.657-1.343-3-3-3v6z"/></svg></span>
+                גרף רדאר - שישה ממדים
+              </div>
+            </div>
+            <div className="card-content">
+              <div className="h-[520px] w-full flex items-center justify-center">
+                <SalimaRadarChart data={radarChartData} />
+              </div>
+            </div>
+          </div>
 
-            {/* Individual Intensity Bars */}
-            <Card className={isPresenterMode ? 'min-h-[600px]' : ''}>
-              <CardHeader className="text-center">
-                <CardTitle className={`flex items-center justify-center text-right ${isPresenterMode ? 'text-3xl' : ''}`}>
-                  <BarChart3 className={`h-5 w-5 ml-2 ${isPresenterMode ? 'h-10 w-10' : ''}`} />
-                  עוצמת הממדים
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className={`space-y-6 ${isPresenterMode ? 'space-y-8' : ''}`}>
-                  {radarChartData.map((dimension, index) => (
-                    <SalimaIntensityBar
-                      key={index}
-                      dimension={dimension.dimension}
-                      score={dimension.score}
-                    />
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+          {/* Individual Intensity Bars */}
+          <div className="card">
+            <div className="card-header text-center">
+              <div className={`flex items-center justify-center text-right card-title${isPresenterMode ? " text-3xl" : ""}`}>
+                <span className="ml-2"><svg className={isPresenterMode ? "h-10 w-10" : "h-6 w-6"} style={{display: "inline-block"}} viewBox="0 0 24 24"><path fill="currentColor" d="M5 10c-1.656 0-3 1.343-3 3 0 1.656 1.344 3 3 3h2v-6H5zm2 9V8c0-1.104.896-2 2-2h6v2H9v11H7zm8-2h2c1.657 0 3-1.344 3-3 0-1.657-1.343-3-3-3v6z"/></svg></span>
+                עוצמת הממדים
+              </div>
+            </div>
+            <div className="card-content">
+              <div className="w-full">
+                {radarChartData.map((dimension, index) => (
+                  <SalimaIntensityBar
+                    key={index}
+                    dimension={dimension.dimension}
+                    score={dimension.score}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Individual AI-Generated Insights */}
-          <Card className={isPresenterMode ? 'min-h-[500px]' : ''}>
-            <CardHeader className="text-center">
-              <CardTitle className={`text-right ${isPresenterMode ? 'text-3xl' : ''}`}>
-                סיכום הניתוח
-              </CardTitle>
-              <CardDescription className={`text-right ${isPresenterMode ? 'text-xl' : ''}`}>
+          <div className="card" style={{gridColumn: isPresenterMode ? "span 2" : undefined}}>
+            <div className="card-header text-center">
+              <div className={`card-title${isPresenterMode ? " text-3xl" : ""}`}>סיכום הניתוח</div>
+              <div className={`text-right${isPresenterMode ? " text-xl" : ""}`}>
                 בהתבסס על תגובות הסקר בפועל מנתוני {respondentData.source}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className={`grid grid-cols-1 md:grid-cols-2 gap-8 ${isPresenterMode ? 'gap-12' : ''}`}>
+              </div>
+            </div>
+            <div className="card-content">
+              <div className={`grid grid-cols-1 md:grid-cols-2 gap-8${isPresenterMode ? ' gap-12' : ''}`}>
                 <div className="bg-green-50 p-6 rounded-lg border border-green-200">
                   <h4 className={`font-semibold text-green-800 mb-4 text-right ${isPresenterMode ? 'text-2xl' : ''}`}>
                     ממדים בעלי הציון הגבוה ביותר
@@ -619,8 +592,8 @@ export const IndividualInsights: React.FC = () => {
                   </ul>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       )}
     </div>

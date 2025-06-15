@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -390,4 +389,147 @@
 
 [dir="rtl"] .recharts-pie-label-text {
   text-anchor: end;
+}
+
+/* --- Fixes for Presenter Mode Uniformity --- */
+
+.presenter-mode {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  min-height: 100vh;
+  padding: 2rem 0;
+  overflow-y: hidden;
+  transition: background 0.3s;
+}
+
+.presenter-mode:hover {
+  overflow-y: auto;
+}
+
+.presenter-mode .presenter-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3.5rem;
+  margin: 0 auto;
+  width: 98vw;
+  max-width: 1700px;
+}
+
+@media (max-width: 1200px) {
+  .presenter-mode .presenter-grid {
+    grid-template-columns: 1fr;
+    width: 100vw;
+    gap: 2rem;
+  }
+}
+
+/* Card Styles */
+.presenter-mode .card {
+  background: #fff;
+  border: 2.5px solid #e2e8f0;
+  border-radius: 1.2rem;
+  box-shadow: 0 22px 48px -14px rgb(0 0 0 / 0.21);
+  min-width: 0;
+  min-height: 525px !important;
+  max-width: 830px;
+  margin: 0 auto 2.5rem auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  /* chart content adjusts layout */
+  padding: 0;
+  transition: box-shadow 0.2s;
+}
+
+.presenter-mode .card-header {
+  padding: 2.8rem 2.5rem 1.5rem 2.5rem;
+  border-bottom: 2px solid #f1f5f9;
+  background: linear-gradient(135deg, #f5f7fa 0%, #f8fafc 100%);
+  border-radius: 1.2rem 1.2rem 0 0;
+}
+
+.presenter-mode .card-content {
+  padding: 2.5rem 2.2rem;
+  flex: 1 1 auto;
+  min-height: 315px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.presenter-mode .score-display {
+  text-align: center;
+  padding: 2.7rem 0;
+}
+
+.presenter-mode .score-number {
+  font-size: 7.2rem;
+  font-weight: 900;
+}
+
+.presenter-mode .score-label {
+  font-size: 2.45rem;
+}
+
+.presenter-mode .score-description {
+  font-size: 1.3rem;
+}
+
+/* --- Chart Resizing --- */
+/* Make sure chart wrappers never shrink below target height */
+.presenter-mode .h-96,
+.presenter-mode .h-80,
+.presenter-mode .h-\\[500px\],
+.presenter-mode .h-\\[600px\\] {
+  height: 520px !important;
+  min-height: 520px !important;
+  max-height: 600px !important;
+}
+
+.presenter-mode .recharts-wrapper,
+.presenter-mode .recharts-responsive-container {
+  min-height: 400px !important;
+  height: 480px !important;
+  max-height: 600px !important;
+  width: 100% !important;
+}
+
+/* Custom font sizes global for all presenter charts */
+.presenter-mode .recharts-legend-wrapper,
+.presenter-mode .recharts-default-tooltip,
+.presenter-mode .recharts-cartesian-axis-tick text,
+.presenter-mode .recharts-polar-angle-axis-tick text,
+.presenter-mode .recharts-pie-label-text {
+  font-size: 2.12rem !important;
+  font-weight: 700 !important;
+  fill: #2d3748 !important;
+}
+
+/* Pie chart label line visual */
+.presenter-mode .recharts-pie-label-line {
+  stroke-width: 3.2;
+  stroke: #64748b !important;
+}
+
+/* Fixes to input hiding in presenter mode */
+.presenter-mode input,
+.presenter-mode .shadcn-input,
+.presenter-mode .command,
+.presenter-mode select,
+.presenter-mode button {
+  display: none !important;
+}
+
+/* Fix presenter-mode spacing for "space-y-8" and big titles */
+.presenter-mode .space-y-8 > * + * {
+  margin-top: 3.5rem;
+}
+.presenter-mode h2,
+.presenter-mode .card-title {
+  font-size: 3.05rem !important;
+  font-weight: 900 !important;
+}
+/* Ensure all chart backgrounds blend in */
+.presenter-mode .recharts-surface {
+  background: #fff;
+  border-radius: 1.2rem;
 }
