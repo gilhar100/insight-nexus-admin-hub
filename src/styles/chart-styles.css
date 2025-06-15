@@ -1,0 +1,45 @@
+
+/* Pie chart label positioning improvements */
+.recharts-pie-label-line {
+  stroke-width: 2;
+  stroke: #64748b;
+}
+
+.recharts-pie-label-text {
+  font-weight: 700;
+  text-anchor: start;
+  font-size: 14px;
+}
+
+/* Chart improvements for all modes */
+.recharts-wrapper {
+  margin: 0 auto;
+}
+
+.recharts-legend-wrapper {
+  font-size: 1rem !important;
+  font-weight: bold !important;
+  margin-top: 1rem !important;
+}
+
+.recharts-cartesian-axis-tick text {
+  font-size: 12px !important;
+  font-weight: bold !important;
+  fill: #1e293b !important;
+}
+
+.recharts-polar-angle-axis-tick text {
+  font-size: 12px !important;
+  font-weight: bold !important;
+  fill: #1e293b !important;
+}
+
+.recharts-pie-label-text {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  fill: #1e293b !important;
+}
+
+.recharts-tooltip-wrapper {
+  font-size: 0.875rem !important;
+}
