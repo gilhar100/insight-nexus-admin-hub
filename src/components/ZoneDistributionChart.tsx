@@ -35,7 +35,7 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
       value: zoneDistribution.war,
       color: WOCA_ZONE_COLORS.war
     }
-  ].filter(item => item.value > 0); // Only show zones with participants
+  ]; // Remove the filter to show all zones including those with 0 participants
 
   const total = data.reduce((sum, item) => sum + item.value, 0);
 
@@ -46,13 +46,13 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
   };
 
   const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, value, name }: any) => {
-    if (value === 0) return null;
+    if (value === 0) return null; // Don't show labels for 0 values to avoid clutter
     
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 1.3;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
-    const percentage = ((value / total) * 100).toFixed(1);
+    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0';
 
     return (
       <text
@@ -99,7 +99,7 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
               </Pie>
               <Tooltip 
                 formatter={(value: number, name: string) => [
-                  `${value} משתתפים (${((value / total) * 100).toFixed(1)}%)`,
+                  total > 0 ? `${value} משתתפים (${((value / total) * 100).toFixed(1)}%)` : `${value} משתתפים`,
                   name
                 ]}
               />
