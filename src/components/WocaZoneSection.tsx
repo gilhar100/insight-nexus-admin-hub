@@ -112,7 +112,7 @@ export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
             <div className="bg-green-50 p-6 rounded-lg">
               <Badge 
                 variant="secondary" 
-                className={`px-4 py-2 ${zoneInfo.color} text-white mb-4 ${isPresenterMode ? 'text-2xl' : 'text-lg'}`}
+                className={`px-6 py-3 ${zoneInfo.color} text-white mb-6 ${isPresenterMode ? 'text-4xl font-black' : 'text-3xl font-bold'}`}
               >
                 {zoneInfo.name}
               </Badge>
