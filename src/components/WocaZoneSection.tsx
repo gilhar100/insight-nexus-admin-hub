@@ -4,7 +4,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Lightbulb, Eye, EyeOff, Download, AlertCircle } from 'lucide-react';
-import { WOCA_ZONE_COLORS } from '@/utils/wocaColors';
 
 interface WocaZoneSectionProps {
   wocaAnalysis: any;
@@ -119,46 +118,6 @@ export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
               </Badge>
               <div className={`${isPresenterMode ? 'text-2xl' : 'text-lg'} text-gray-600 mb-6`}>
                 אזור תודעה ארגונית ({wocaAnalysis.participantCount} משתתפים)
-              </div>
-              
-              {/* Category Scores Display */}
-              <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 ${isPresenterMode ? 'gap-8' : ''} mb-6`}>
-                <div className="text-center">
-                  <div 
-                    className={`font-bold ${isPresenterMode ? 'text-4xl' : 'text-2xl'}`} 
-                    style={{ color: WOCA_ZONE_COLORS.opportunity }}
-                  >
-                    {wocaAnalysis.groupCategoryScores.opportunity.toFixed(1)}
-                  </div>
-                  <div className={`text-gray-600 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>הזדמנות</div>
-                </div>
-                <div className="text-center">
-                  <div 
-                    className={`font-bold ${isPresenterMode ? 'text-4xl' : 'text-2xl'}`} 
-                    style={{ color: WOCA_ZONE_COLORS.comfort }}
-                  >
-                    {wocaAnalysis.groupCategoryScores.comfort.toFixed(1)}
-                  </div>
-                  <div className={`text-gray-600 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>נוחות</div>
-                </div>
-                <div className="text-center">
-                  <div 
-                    className={`font-bold ${isPresenterMode ? 'text-4xl' : 'text-2xl'}`} 
-                    style={{ color: WOCA_ZONE_COLORS.apathy }}
-                  >
-                    {wocaAnalysis.groupCategoryScores.apathy.toFixed(1)}
-                  </div>
-                  <div className={`text-gray-600 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>אדישות</div>
-                </div>
-                <div className="text-center">
-                  <div 
-                    className={`font-bold ${isPresenterMode ? 'text-4xl' : 'text-2xl'}`} 
-                    style={{ color: WOCA_ZONE_COLORS.war }}
-                  >
-                    {wocaAnalysis.groupCategoryScores.war.toFixed(1)}
-                  </div>
-                  <div className={`text-gray-600 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>מלחמה</div>
-                </div>
               </div>
 
               {/* Zone Full Paragraph Description */}
