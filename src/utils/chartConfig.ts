@@ -6,7 +6,7 @@ export const CHART_MARGINS = {
 };
 
 export const CHART_DIMENSIONS = {
-  horizontalBarHeight: 264, // h-64 equivalent
+  horizontalBarHeight: 256, // h-64 equivalent (64 * 4 = 256px)
   radarHeight: 500,
   pieHeight: 300
 };

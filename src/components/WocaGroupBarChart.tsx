@@ -3,7 +3,6 @@ import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell } from 'recharts';
 import { WocaCategoryScores } from '@/utils/wocaAnalysis';
 import { WOCA_COLORS } from '@/utils/wocaColors';
-import { CHART_MARGINS, CHART_DIMENSIONS, CHART_STYLES } from '@/utils/chartConfig';
 
 interface WocaGroupBarChartProps {
   groupCategoryScores: WocaCategoryScores;
@@ -36,13 +35,16 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
     }
   ];
 
+  console.log('WocaGroupBarChart data:', data);
+  console.log('groupCategoryScores:', groupCategoryScores);
+
   return (
-    <div className="w-full" dir="rtl" style={{ height: CHART_DIMENSIONS.horizontalBarHeight }}>
+    <div className="w-full h-64" dir="rtl">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
           data={data}
           layout="horizontal"
-          margin={CHART_MARGINS.horizontalBar}
+          margin={{ top: 20, right: 30, left: 80, bottom: 20 }}
         >
           <XAxis type="number" hide />
           <YAxis 
@@ -50,7 +52,7 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
             dataKey="zone" 
             axisLine={false}
             tickLine={false}
-            tick={{ ...CHART_STYLES.tickStyle, textAnchor: 'end' }}
+            tick={{ fontSize: 14, fill: '#000000', textAnchor: 'end' }}
             width={70}
           />
           <Bar dataKey="value" radius={[0, 4, 4, 0]}>
