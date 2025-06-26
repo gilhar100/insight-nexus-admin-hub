@@ -31,56 +31,52 @@ export const WocaDemographicsSection: React.FC<WocaDemographicsSectionProps> = (
   return (
     <Card>
       <CardHeader>
-        <CardTitle className={`flex items-center text-right ${isPresenterMode ? 'text-2xl font-bold' : ''}`}>
+        <CardTitle className={`flex items-center text-right ${isPresenterMode ? 'text-2xl font-bold' : 'text-xl font-bold'}`} style={{ color: '#000000' }}>
           <TrendingUp className="h-5 w-5 ml-2" />
           סקירת משתתפים
         </CardTitle>
         {!isPresenterMode && (
-          <CardDescription className="text-right">
+          <CardDescription className="text-right text-base" style={{ color: '#000000' }}>
             ציונים אישיים ודמוגרפיה {showNames ? '(שמות גלויים)' : '(אנונימי)'}
           </CardDescription>
         )}
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" dir="rtl">
           {wocaAnalysis.participants.map((participant: any, index: number) => (
             <div key={participant.participantId} className="p-4 border rounded-lg hover:shadow-md transition-shadow bg-white">
               <div className="flex justify-between items-center mb-2">
-                <span className={`font-medium ${isPresenterMode ? 'text-base' : 'text-sm'}`}>
+                <Badge 
+                  variant={
+                    participant.dominantZone === 'opportunity' ? "default" : 
+                    participant.dominantZone === 'war' ? "destructive" : 
+                    "secondary"
+                  }
+                >
+                  {participant.isTie ? 'תיקו' : (participant.dominantZone ? getZoneInfo(participant.dominantZone).name : 'N/A')}
+                </Badge>
+                <span className={`font-medium ${isPresenterMode ? 'text-lg' : 'text-base'}`} style={{ color: '#000000' }}>
                   {showNames ? participant.participantName : `משתתף ${index + 1}`}
                 </span>
-                {participant.isTie ? (
-                  <Badge variant="secondary">תיקו</Badge>
-                ) : (
-                  <Badge 
-                    variant={
-                      participant.dominantZone === 'opportunity' ? "default" : 
-                      participant.dominantZone === 'war' ? "destructive" : 
-                      "secondary"
-                    }
-                  >
-                    {participant.dominantZone ? getZoneInfo(participant.dominantZone).name : 'N/A'}
-                  </Badge>
-                )}
               </div>
               
-              {/* Mini category scores */}
-              <div className={`space-y-1 text-right ${isPresenterMode ? 'text-sm' : 'text-xs'}`}>
+              {/* Mini category scores with correct RTL alignment */}
+              <div className={`space-y-1 text-right ${isPresenterMode ? 'text-base' : 'text-sm'}`} style={{ color: '#000000' }}>
                 <div className="flex justify-between">
+                  <span>הזדמנות:</span>
                   <span className="font-medium">{participant.categoryScores.opportunity.toFixed(1)}</span>
-                  <span>:הזדמנות</span>
                 </div>
                 <div className="flex justify-between">
+                  <span>נוחות:</span>
                   <span className="font-medium">{participant.categoryScores.comfort.toFixed(1)}</span>
-                  <span>:נוחות</span>
                 </div>
                 <div className="flex justify-between">
+                  <span>אדישות:</span>
                   <span className="font-medium">{participant.categoryScores.apathy.toFixed(1)}</span>
-                  <span>:אדישות</span>
                 </div>
                 <div className="flex justify-between">
+                  <span>מלחמה:</span>
                   <span className="font-medium">{participant.categoryScores.war.toFixed(1)}</span>
-                  <span>:מלחמה</span>
                 </div>
               </div>
             </div>
