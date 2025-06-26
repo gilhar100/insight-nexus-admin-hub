@@ -15,7 +15,7 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
   if (!groupCategoryScores || typeof groupCategoryScores !== 'object') {
     console.error('❌ Invalid groupCategoryScores:', groupCategoryScores);
     return (
-      <div className="w-full h-64 flex items-center justify-center">
+      <div className="w-full h-96 flex items-center justify-center">
         <p className="text-gray-500">אין נתונים זמינים</p>
       </div>
     );
@@ -24,7 +24,7 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
   // Apply stronger nonlinear scaling to exaggerate differences while maintaining ratios
   const applyScaling = (value: number) => {
     if (typeof value !== 'number' || isNaN(value) || value <= 0) return 1; // Minimum value for visibility
-    return Math.pow(value, 1.8) * 28; // Stronger exaggeration with multiplier for visual impact
+    return Math.pow(value, 2.3) * 20; // Stronger exaggeration with multiplier for visual impact
   };
 
   // Prepare data in the specified order with Hebrew labels
@@ -54,12 +54,29 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
   console.log('📊 WocaGroupBarChart processed data:', data);
 
   return (
-    <div className="w-full h-80 animate-fade-in" dir="rtl">
+    <div className="w-full h-96 animate-fade-in relative" dir="rtl">
+      <style>{`
+        @keyframes scale-in {
+          0% {
+            transform: scaleY(0);
+            opacity: 0;
+          }
+          100% {
+            transform: scaleY(1);
+            opacity: 1;
+          }
+        }
+        .bar-animation {
+          transform-origin: bottom;
+        }
+      `}</style>
+      
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
           data={data}
-          margin={{ top: 20, right: 20, left: 20, bottom: 60 }}
-          barCategoryGap="8%"
+          margin={{ top: 30, right: 20, left: 20, bottom: 80 }}
+          barCategoryGap="4%"
+          baseValue={0}
         >
           <XAxis 
             dataKey="zone" 
@@ -71,43 +88,31 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
               fontWeight: 'bold',
               textAnchor: 'middle'
             }}
-            height={60}
+            height={80}
             interval={0}
           />
           <YAxis hide />
           <Bar 
             dataKey="value" 
-            radius={[6, 6, 0, 0]}
-            maxBarSize={80}
+            radius={[8, 8, 0, 0]}
+            maxBarSize={100}
             style={{
-              filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))',
+              filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.15))',
             }}
           >
             {data.map((entry, index) => (
               <Cell 
                 key={`cell-${index}`} 
                 fill={entry.color}
+                className="bar-animation"
                 style={{
-                  animation: `scale-in 0.6s ease-out ${index * 0.1}s both`
+                  animation: `scale-in 0.8s ease-out ${index * 0.15}s both`
                 }}
               />
             ))}
           </Bar>
         </BarChart>
       </ResponsiveContainer>
-      
-      <style jsx>{`
-        @keyframes scale-in {
-          0% {
-            transform: scaleY(0);
-            opacity: 0;
-          }
-          100% {
-            transform: scaleY(1);
-            opacity: 1;
-          }
-        }
-      `}</style>
     </div>
   );
 };
