@@ -9,37 +9,51 @@ interface WocaGroupBarChartProps {
 }
 
 export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCategoryScores }) => {
+  console.log('WocaGroupBarChart received groupCategoryScores:', groupCategoryScores);
+
+  // Check if we have valid data
+  if (!groupCategoryScores || typeof groupCategoryScores !== 'object') {
+    console.error('Invalid groupCategoryScores:', groupCategoryScores);
+    return (
+      <div className="w-full h-64 flex items-center justify-center">
+        <p className="text-gray-500">אין נתונים זמינים</p>
+      </div>
+    );
+  }
+
   // Apply nonlinear scaling to exaggerate differences while maintaining ratios
-  const applyScaling = (value: number) => Math.pow(value, 1.5);
+  const applyScaling = (value: number) => {
+    if (typeof value !== 'number' || isNaN(value)) return 0;
+    return Math.pow(value, 1.5);
+  };
 
   const data = [
     {
       zone: 'הזדמנות',
-      value: applyScaling(groupCategoryScores.opportunity),
+      value: applyScaling(groupCategoryScores.opportunity || 0),
       color: WOCA_COLORS['הזדמנות']
     },
     {
       zone: 'נוחות', 
-      value: applyScaling(groupCategoryScores.comfort),
+      value: applyScaling(groupCategoryScores.comfort || 0),
       color: WOCA_COLORS['נוחות']
     },
     {
       zone: 'אדישות',
-      value: applyScaling(groupCategoryScores.apathy),
+      value: applyScaling(groupCategoryScores.apathy || 0),
       color: WOCA_COLORS['אדישות']
     },
     {
       zone: 'מלחמה',
-      value: applyScaling(groupCategoryScores.war),
+      value: applyScaling(groupCategoryScores.war || 0),
       color: WOCA_COLORS['מלחמה']
     }
   ];
 
-  console.log('WocaGroupBarChart rendering with data:', data);
-  console.log('Original groupCategoryScores:', groupCategoryScores);
+  console.log('WocaGroupBarChart processed data:', data);
 
   return (
-    <div className="w-full h-64" dir="rtl">
+    <div className="w-full" style={{ height: '256px' }} dir="rtl">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
           data={data}

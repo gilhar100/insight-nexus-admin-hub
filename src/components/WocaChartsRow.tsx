@@ -22,6 +22,9 @@ export const WocaChartsRow: React.FC<WocaChartsRowProps> = ({
   zoneDistribution,
   isPresenterMode
 }) => {
+  console.log('WocaChartsRow workshopData:', workshopData);
+  console.log('WocaChartsRow groupCategoryScores:', workshopData?.groupCategoryScores);
+
   return (
     <div className="space-y-6" dir="rtl">
       {/* First Row - Radar + Pie Side-by-Side */}
@@ -72,7 +75,13 @@ export const WocaChartsRow: React.FC<WocaChartsRowProps> = ({
           )}
         </CardHeader>
         <CardContent>
-          <WocaGroupBarChart groupCategoryScores={workshopData.groupCategoryScores} />
+          {workshopData?.groupCategoryScores ? (
+            <WocaGroupBarChart groupCategoryScores={workshopData.groupCategoryScores} />
+          ) : (
+            <div className="text-center p-8">
+              <p className="text-gray-500">טוען נתוני קבוצה...</p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
