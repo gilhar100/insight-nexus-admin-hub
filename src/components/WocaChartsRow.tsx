@@ -1,9 +1,10 @@
 
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Radar, PieChart } from 'lucide-react';
+import { Radar, PieChart, BarChart3 } from 'lucide-react';
 import { WocaRadarChart } from '@/components/WocaRadarChart';
 import { ZoneDistributionChart } from '@/components/ZoneDistributionChart';
+import { WocaGroupBarChart } from '@/components/WocaGroupBarChart';
 
 interface WocaChartsRowProps {
   workshopData: any;
@@ -22,35 +23,56 @@ export const WocaChartsRow: React.FC<WocaChartsRowProps> = ({
   isPresenterMode
 }) => {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" dir="rtl">
-      {/* Radar Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle className={`flex items-center text-right ${isPresenterMode ? 'text-xl' : 'text-lg'}`} style={{ color: '#000000' }}>
-            <Radar className="h-5 w-5 ml-2" />
-            פרופיל WOCA ארגוני
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <WocaRadarChart participants={workshopData.participants} />
-        </CardContent>
-      </Card>
+    <div className="space-y-6" dir="rtl">
+      {/* First Row - Radar + Pie Side-by-Side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Radar Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle className={`flex items-center text-right ${isPresenterMode ? 'text-xl' : 'text-lg'}`} style={{ color: '#000000' }}>
+              <Radar className="h-5 w-5 ml-2" />
+              פרופיל WOCA ארגוני
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <WocaRadarChart participants={workshopData.participants} />
+          </CardContent>
+        </Card>
 
-      {/* Pie Chart - Zone Distribution */}
+        {/* Pie Chart - Zone Distribution */}
+        <Card>
+          <CardHeader>
+            <CardTitle className={`flex items-center text-right ${isPresenterMode ? 'text-xl' : 'text-lg'}`} style={{ color: '#000000' }}>
+              <PieChart className="h-5 w-5 ml-2" />
+              התפלגות משתתפים לפי אזורים
+            </CardTitle>
+            {!isPresenterMode && (
+              <CardDescription className="text-right text-base" style={{ color: '#000000' }}>
+                חלוקת המשתתפים בין אזורי WOCA השונים
+              </CardDescription>
+            )}
+          </CardHeader>
+          <CardContent>
+            <ZoneDistributionChart zoneDistribution={zoneDistribution} />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Second Row - Horizontal Bar Chart */}
       <Card>
         <CardHeader>
           <CardTitle className={`flex items-center text-right ${isPresenterMode ? 'text-xl' : 'text-lg'}`} style={{ color: '#000000' }}>
-            <PieChart className="h-5 w-5 ml-2" />
-            התפלגות משתתפים לפי אזורים
+            <BarChart3 className="h-5 w-5 ml-2" />
+            עוצמת אזורי WOCA בקבוצה
           </CardTitle>
           {!isPresenterMode && (
             <CardDescription className="text-right text-base" style={{ color: '#000000' }}>
-              חלוקת המשתתפים בין אזורי WOCA השונים
+              השוואה ויזואלית של עוצמת האזורים השונים
             </CardDescription>
           )}
         </CardHeader>
         <CardContent>
-          <ZoneDistributionChart zoneDistribution={zoneDistribution} />
+          <WocaGroupBarChart groupCategoryScores={workshopData.groupCategoryScores} />
         </CardContent>
       </Card>
     </div>

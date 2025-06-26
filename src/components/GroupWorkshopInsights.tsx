@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -194,9 +193,9 @@ export const GroupWorkshopInsights: React.FC = () => {
             onExportData={exportWorkshopData}
           />
 
-          {/* 2. Charts Row - Radar + Pie Side-by-Side */}
+          {/* 2. Charts Section - Radar + Pie + Horizontal Bar */}
           <WocaChartsRow
-            workshopData={workshopData}
+            workshopData={{ ...workshopData, groupCategoryScores: wocaAnalysis.groupCategoryScores }}
             zoneDistribution={getZoneDistribution()}
             isPresenterMode={isPresenterMode}
           />

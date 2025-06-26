@@ -3,14 +3,14 @@
 export const WOCA_COLORS = {
   'הזדמנות': '#009E73', // Green - Opportunity
   'נוחות': '#F0E442',   // Yellow - Comfort  
-  'אדישות': '#D55E00',  // Vermillion - Apathy
+  'אדישות': '#E69F00',  // Orange - Apathy
   'מלחמה': '#0072B2'    // Blue - War
 };
 
 export const WOCA_ZONE_COLORS = {
   opportunity: '#009E73', // Green
   comfort: '#F0E442',     // Yellow
-  apathy: '#D55E00',      // Vermillion
+  apathy: '#E69F00',      // Orange
   war: '#0072B2'          // Blue
 };
 
