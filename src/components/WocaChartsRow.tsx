@@ -28,7 +28,7 @@ export const WocaChartsRow: React.FC<WocaChartsRowProps> = ({
         <CardHeader>
           <CardTitle className={`flex items-center text-right ${isPresenterMode ? 'text-xl' : 'text-lg'}`} style={{ color: '#000000' }}>
             <Radar className="h-5 w-5 ml-2" />
-            מחוונים WOCA
+            פרופיל WOCA ארגוני
           </CardTitle>
         </CardHeader>
         <CardContent>

@@ -58,7 +58,7 @@ export const WocaCategoryRadarChart: React.FC<WocaCategoryRadarChartProps> = ({ 
               <PolarRadiusAxis 
                 angle={90} 
                 domain={[0, 5]} 
-                tick={{ fontSize: 12, fill: '#000000' }}
+                tick={false}
                 tickCount={6}
               />
               <Radar
