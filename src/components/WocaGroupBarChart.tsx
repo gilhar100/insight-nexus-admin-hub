@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell } from 'recharts';
 import { WocaCategoryScores } from '@/utils/wocaAnalysis';
 import { WOCA_COLORS } from '@/utils/wocaColors';
 
@@ -52,11 +52,11 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
             tick={{ fontSize: 14, fill: '#000000', textAnchor: 'end' }}
             width={70}
           />
-          <Bar 
-            dataKey="value" 
-            fill={(entry) => entry.color}
-            radius={[0, 4, 4, 0]}
-          />
+          <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.color} />
+            ))}
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
     </div>
