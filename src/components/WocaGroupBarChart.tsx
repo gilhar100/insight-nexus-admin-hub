@@ -54,35 +54,30 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
   console.log('📊 WocaGroupBarChart processed data:', data);
 
   return (
-    <div className="w-full h-64" dir="rtl">
+    <div className="w-full h-80" dir="rtl">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
           data={data}
-          layout="horizontal"
-          margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+          margin={{ top: 20, right: 20, left: 20, bottom: 20 }}
+          barCategoryGap="20%"
         >
           <XAxis 
-            type="number" 
-            hide={true}
-            domain={[0, 'dataMax']}
-          />
-          <YAxis 
-            type="category" 
             dataKey="zone" 
             axisLine={false}
             tickLine={false}
             tick={{ 
               fontSize: 16, 
-              fill: '#000000', 
-              textAnchor: 'end',
-              fontWeight: 'bold'
+              fill: '#1f2937', 
+              fontWeight: 'bold',
+              textAnchor: 'middle'
             }}
-            width={80}
+            height={60}
           />
+          <YAxis hide />
           <Bar 
             dataKey="value" 
-            radius={[0, 8, 8, 0]}
-            minPointSize={10}
+            radius={[4, 4, 0, 0]}
+            maxBarSize={120}
           >
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.color} />
