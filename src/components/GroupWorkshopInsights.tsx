@@ -10,7 +10,6 @@ import { PresenterMode } from '@/components/PresenterMode';
 import { ParticipantSearch } from '@/components/ParticipantSearch';
 import { WocaZoneSection } from '@/components/WocaZoneSection';
 import { WocaChartsRow } from '@/components/WocaChartsRow';
-import { WocaHeatmapSection } from '@/components/WocaHeatmapSection';
 import { OpportunityZoneSection } from '@/components/OpportunityZoneSection';
 import { WocaDemographicsSection } from '@/components/WocaDemographicsSection';
 
@@ -99,10 +98,10 @@ export const GroupWorkshopInsights: React.FC = () => {
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <div className="flex items-center justify-between">
             <div className="text-right">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              <h2 className="text-2xl font-bold mb-2" style={{ color: '#000000' }}>
                 ניתוח קבוצתי - מודל WOCA
               </h2>
-              <p className="text-gray-600">
+              <p className="text-base" style={{ color: '#000000' }}>
                 ניתוח דינמיקה קבוצתי ואפקטיביות הסדנה באמצעות 36 שאלות מודל WOCA
               </p>
             </div>
@@ -120,11 +119,11 @@ export const GroupWorkshopInsights: React.FC = () => {
       {!isPresenterMode && (
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center text-right">
+            <CardTitle className="flex items-center text-right text-lg" style={{ color: '#000000' }}>
               <Users className="h-5 w-5 ml-2" />
               בחירת קבוצה
             </CardTitle>
-            <CardDescription className="text-right">
+            <CardDescription className="text-right text-base" style={{ color: '#000000' }}>
               בחר קבוצה מטבלת woca_responses לניתוח דינמיקה קבוצתית
             </CardDescription>
           </CardHeader>
@@ -139,8 +138,8 @@ export const GroupWorkshopInsights: React.FC = () => {
                     {workshops.map(workshop => (
                       <SelectItem key={workshop.id} value={workshop.id.toString()}>
                         <div className="flex flex-col text-right">
-                          <span className="font-medium">{workshop.name}</span>
-                          <span className="text-sm text-gray-500">
+                          <span className="font-medium text-base" style={{ color: '#000000' }}>{workshop.name}</span>
+                          <span className="text-sm" style={{ color: '#000000' }}>
                             {workshop.participant_count} משתתפים • {new Date(workshop.date).toLocaleDateString('he-IL')}
                           </span>
                         </div>
@@ -153,7 +152,7 @@ export const GroupWorkshopInsights: React.FC = () => {
             
             {error && (
               <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
-                <p className="text-red-600 text-sm text-right">{error}</p>
+                <p className="text-sm text-right" style={{ color: '#000000' }}>{error}</p>
               </div>
             )}
           </CardContent>
@@ -164,7 +163,7 @@ export const GroupWorkshopInsights: React.FC = () => {
       {isLoading && (
         <Card>
           <CardContent className="p-8 text-center">
-            <div className="text-gray-500">טוען נתוני קבוצה...</div>
+            <div className="text-base" style={{ color: '#000000' }}>טוען נתוני קבוצה...</div>
           </CardContent>
         </Card>
       )}
@@ -174,9 +173,9 @@ export const GroupWorkshopInsights: React.FC = () => {
         <Card>
           <CardContent className="p-8 text-center">
             <AlertCircle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">אין מספיק תגובות עדיין לחישוב תובנות ברמת הקבוצה</h3>
-            <p className="text-gray-600">נדרשות לפחות 3 תגובות לניתוח קבוצתי אמין</p>
-            <p className="text-sm text-gray-500 mt-2">
+            <h3 className="text-lg font-semibold mb-2" style={{ color: '#000000' }}>אין מספיק תגובות עדיין לחישוב תובנות ברמת הקבוצה</h3>
+            <p className="text-base" style={{ color: '#000000' }}>נדרשות לפחות 3 תגובות לניתוח קבוצתי אמין</p>
+            <p className="text-sm mt-2" style={{ color: '#000000' }}>
               כרגע יש {workshopData.participants.length} תגובות
             </p>
           </CardContent>
@@ -202,16 +201,10 @@ export const GroupWorkshopInsights: React.FC = () => {
             isPresenterMode={isPresenterMode}
           />
 
-          {/* 3. Heatmap Chart - Full Width */}
-          <WocaHeatmapSection
-            workshopData={workshopData}
-            isPresenterMode={isPresenterMode}
-          />
-
-          {/* 4. Opportunity Zone Paragraph */}
+          {/* 3. Opportunity Zone Paragraph */}
           <OpportunityZoneSection isPresenterMode={isPresenterMode} />
 
-          {/* 5. Demographics Section */}
+          {/* 4. Demographics Section */}
           <WocaDemographicsSection
             wocaAnalysis={wocaAnalysis}
             showNames={showNames}

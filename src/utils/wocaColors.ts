@@ -1,17 +1,17 @@
 
-// WOCA category colors
+// WOCA category colors - Colorblind-friendly palette (Color Universal Design)
 export const WOCA_COLORS = {
-  'הזדמנות': '#10B981', // Green - Opportunity
-  'נוחות': '#3B82F6',   // Blue - Comfort  
-  'אדישות': '#F59E0B',  // Orange - Apathy
-  'מלחמה': '#EF4444'    // Red - War
+  'הזדמנות': '#009E73', // Green - Opportunity
+  'נוחות': '#F0E442',   // Yellow - Comfort  
+  'אדישות': '#D55E00',  // Vermillion - Apathy
+  'מלחמה': '#0072B2'    // Blue - War
 };
 
 export const WOCA_ZONE_COLORS = {
-  opportunity: '#10B981', // Green
-  comfort: '#3B82F6',     // Blue
-  apathy: '#F59E0B',      // Orange
-  war: '#EF4444'          // Red
+  opportunity: '#009E73', // Green
+  comfort: '#F0E442',     // Yellow
+  apathy: '#D55E00',      // Vermillion
+  war: '#0072B2'          // Blue
 };
 
 export const getWocaZoneColor = (score: number): string => {

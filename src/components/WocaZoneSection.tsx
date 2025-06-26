@@ -62,11 +62,11 @@ export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
   const zoneInfo = wocaAnalysis ? getZoneInfo(wocaAnalysis.groupDominantZone) : null;
 
   return (
-    <Card className={`${isPresenterMode ? 'border-2 border-green-200' : ''}`}>
+    <Card className={`${isPresenterMode ? 'border-2 border-green-200' : ''}`} dir="rtl">
       <CardContent className={isPresenterMode ? 'p-12' : 'p-8'}>
         <div className="text-center space-y-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className={`text-3xl font-bold text-green-800 text-center flex-1 ${isPresenterMode ? 'text-4xl' : ''}`}>
+            <h3 className={`font-bold text-center flex-1 ${isPresenterMode ? 'text-3xl' : 'text-2xl'}`} style={{ color: '#000000' }}>
               <Lightbulb className="h-8 w-8 ml-2 inline" />
               סיווג אזור WOCA
             </h3>
@@ -74,11 +74,13 @@ export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" onClick={onToggleNames}>
                   {showNames ? <EyeOff className="h-4 w-4 ml-2" /> : <Eye className="h-4 w-4 ml-2" />}
-                  {showNames ? 'הסתר שמות' : 'הצג שמות'}
+                  <span className="text-sm" style={{ color: '#000000' }}>
+                    {showNames ? 'הסתר שמות' : 'הצג שמות'}
+                  </span>
                 </Button>
                 <Button variant="outline" size="sm" onClick={onExportData}>
                   <Download className="h-4 w-4 ml-2" />
-                  ייצא ניתוח
+                  <span className="text-sm" style={{ color: '#000000' }}>ייצא ניתוח</span>
                 </Button>
               </div>
             )}
@@ -88,7 +90,9 @@ export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
             <div className="bg-green-50 p-6 rounded-lg">
               <div className="flex items-center justify-center mb-4">
                 <AlertCircle className="h-6 w-6 text-yellow-500 ml-2" />
-                <span className={`font-semibold ${isPresenterMode ? 'text-2xl' : 'text-lg'}`}>תיקו בין אזורים</span>
+                <span className={`font-semibold ${isPresenterMode ? 'text-xl' : 'text-lg'}`} style={{ color: '#000000' }}>
+                  תיקו בין אזורים
+                </span>
               </div>
               <div className="flex flex-wrap justify-center gap-2">
                 {wocaAnalysis.groupTiedCategories.map((category: string) => {
@@ -104,7 +108,7 @@ export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
                   );
                 })}
               </div>
-              <p className={`text-gray-600 mt-4 text-lg leading-relaxed text-right ${isPresenterMode ? 'text-xl' : ''}`}>
+              <p className={`mt-4 leading-relaxed text-right ${isPresenterMode ? 'text-xl' : 'text-base'}`} style={{ color: '#000000' }}>
                 לא זוהה אזור תודעה דומיננטי עקב ציונים זהים
               </p>
             </div>
@@ -112,16 +116,15 @@ export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
             <div className="bg-green-50 p-6 rounded-lg">
               <Badge 
                 variant="secondary" 
-                className={`px-6 py-3 ${zoneInfo.color} text-white mb-6 ${isPresenterMode ? 'text-4xl font-black' : 'text-3xl font-bold'}`}
+                className={`px-6 py-3 ${zoneInfo.color} text-white mb-6 ${isPresenterMode ? 'text-3xl font-black' : 'text-2xl font-bold'}`}
               >
                 {zoneInfo.name}
               </Badge>
-              <div className={`${isPresenterMode ? 'text-2xl' : 'text-lg'} text-gray-600 mb-6`}>
+              <div className={`${isPresenterMode ? 'text-xl' : 'text-lg'} mb-6`} style={{ color: '#000000' }}>
                 אזור תודעה ארגונית ({wocaAnalysis.participantCount} משתתפים)
               </div>
 
-              {/* Zone Full Paragraph Description */}
-              <div className={`text-lg leading-relaxed text-green-700 text-right px-4 mt-6 ${isPresenterMode ? 'text-xl' : ''}`}>
+              <div className={`leading-relaxed text-right px-4 mt-6 ${isPresenterMode ? 'text-lg' : 'text-base'}`} style={{ color: '#000000' }}>
                 {zoneInfo.description}
               </div>
             </div>

@@ -618,9 +618,38 @@ export type Database = {
         }
         Relationships: []
       }
+      salima_q_logic: {
+        Row: {
+          dimension: string | null
+          high_text: string | null
+          id: number | null
+          isReversed: boolean | null
+          low_text: string | null
+          order: number
+          text: string | null
+        }
+        Insert: {
+          dimension?: string | null
+          high_text?: string | null
+          id?: number | null
+          isReversed?: boolean | null
+          low_text?: string | null
+          order: number
+          text?: string | null
+        }
+        Update: {
+          dimension?: string | null
+          high_text?: string | null
+          id?: number | null
+          isReversed?: boolean | null
+          low_text?: string | null
+          order?: number
+          text?: string | null
+        }
+        Relationships: []
+      }
       survey_responses: {
         Row: {
-          "1": number | null
           "10": number | null
           "11": number | null
           "12": number | null
@@ -642,7 +671,6 @@ export type Database = {
           "27": number | null
           "28": number | null
           "29": number | null
-          "3": number | null
           "30": number | null
           "31": number | null
           "32": number | null
@@ -722,6 +750,12 @@ export type Database = {
           dimension_s: number
           group_number: number | null
           id: string
+          insight_adaptive: string | null
+          insight_authentic: string | null
+          insight_inspiration: string | null
+          insight_learning: string | null
+          insight_meaning: string | null
+          insight_strategy: string | null
           is_anonymous: boolean | null
           manager_id: number | null
           organization: string | null
@@ -823,7 +857,6 @@ export type Database = {
           user_name: string | null
         }
         Insert: {
-          "1"?: number | null
           "10"?: number | null
           "11"?: number | null
           "12"?: number | null
@@ -845,7 +878,6 @@ export type Database = {
           "27"?: number | null
           "28"?: number | null
           "29"?: number | null
-          "3"?: number | null
           "30"?: number | null
           "31"?: number | null
           "32"?: number | null
@@ -925,6 +957,12 @@ export type Database = {
           dimension_s?: number
           group_number?: number | null
           id?: string
+          insight_adaptive?: string | null
+          insight_authentic?: string | null
+          insight_inspiration?: string | null
+          insight_learning?: string | null
+          insight_meaning?: string | null
+          insight_strategy?: string | null
           is_anonymous?: boolean | null
           manager_id?: number | null
           organization?: string | null
@@ -1026,7 +1064,6 @@ export type Database = {
           user_name?: string | null
         }
         Update: {
-          "1"?: number | null
           "10"?: number | null
           "11"?: number | null
           "12"?: number | null
@@ -1048,7 +1085,6 @@ export type Database = {
           "27"?: number | null
           "28"?: number | null
           "29"?: number | null
-          "3"?: number | null
           "30"?: number | null
           "31"?: number | null
           "32"?: number | null
@@ -1128,6 +1164,12 @@ export type Database = {
           dimension_s?: number
           group_number?: number | null
           id?: string
+          insight_adaptive?: string | null
+          insight_authentic?: string | null
+          insight_inspiration?: string | null
+          insight_learning?: string | null
+          insight_meaning?: string | null
+          insight_strategy?: string | null
           is_anonymous?: boolean | null
           manager_id?: number | null
           organization?: string | null
