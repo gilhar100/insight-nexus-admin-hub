@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Users, AlertCircle } from 'lucide-react';
 import { useWorkshopData } from '@/hooks/useWorkshopData';
-import { useWocaAnalysis } from '@/hooks/useWocaAnalysis';
+import { analyzeWorkshopWoca } from '@/utils/wocaAnalysis';
 import { PresenterMode } from '@/components/PresenterMode';
 import { ParticipantSearch } from '@/components/ParticipantSearch';
 import { WocaZoneSection } from '@/components/WocaZoneSection';
@@ -20,26 +20,24 @@ export const GroupWorkshopInsights: React.FC = () => {
   const {
     workshopData,
     workshops,
-    isLoading: isWorkshopLoading,
-    error: workshopError
+    isLoading,
+    error
   } = useWorkshopData(selectedGroupId);
-
-  // Use the new WOCA analysis hook
-  const { wocaAnalysis, isLoading: isAnalysisLoading, error: analysisError } = useWocaAnalysis(
-    workshopData?.participants || [],
-    workshopData?.workshop_id
-  );
 
   console.log('🏠 GroupWorkshopInsights render:', {
     selectedGroupId,
-    isWorkshopLoading,
-    isAnalysisLoading,
-    workshopError,
-    analysisError,
+    isLoading,
+    error,
     hasWorkshopData: !!workshopData,
-    hasWocaAnalysis: !!wocaAnalysis,
-    workshopsCount: workshops.length
+    workshopsCount: workshops.length,
+    workshopData: workshopData ? {
+      participantCount: workshopData.participant_count,
+      firstParticipant: workshopData.participants[0]
+    } : null
   });
+
+  // Get WOCA analysis results
+  const wocaAnalysis = workshopData ? analyzeWorkshopWoca(workshopData.participants, workshopData.workshop_id) : null;
 
   const handleGroupSelect = (value: string) => {
     const groupId = Number(value);
@@ -48,8 +46,8 @@ export const GroupWorkshopInsights: React.FC = () => {
   };
 
   const exportWorkshopData = () => {
-    if (!workshopData || !wocaAnalysis) return;
-    
+    if (!workshopData) return;
+    const wocaAnalysis = analyzeWorkshopWoca(workshopData.participants, workshopData.workshop_id);
     const exportData = {
       group_id: workshopData.workshop_id,
       participant_count: workshopData.participant_count,
@@ -74,6 +72,8 @@ export const GroupWorkshopInsights: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
+  console.log('🔍 WOCA Analysis results:', wocaAnalysis);
+
   // Check if we have enough data for analysis
   const hasMinimumData = workshopData && workshopData.participants.length >= 3;
 
@@ -90,9 +90,6 @@ export const GroupWorkshopInsights: React.FC = () => {
     
     return distribution;
   };
-
-  const isLoading = isWorkshopLoading || isAnalysisLoading;
-  const error = workshopError || analysisError;
 
   const renderContent = () => (
     <div className={`space-y-6 ${isPresenterMode ? 'presenter-mode' : ''}`} dir="rtl">
@@ -166,10 +163,7 @@ export const GroupWorkshopInsights: React.FC = () => {
       {isLoading && (
         <Card>
           <CardContent className="p-8 text-center">
-            <div className="text-base" style={{ color: '#000000' }}>
-              {isWorkshopLoading && 'טוען נתוני קבוצה...'}
-              {isAnalysisLoading && 'מנתח נתוני WOCA...'}
-            </div>
+            <div className="text-base" style={{ color: '#000000' }}>טוען נתוני קבוצה...</div>
           </CardContent>
         </Card>
       )}

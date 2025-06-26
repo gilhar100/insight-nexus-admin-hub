@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Search, User } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { useWocaAnalysis } from '@/hooks/useWocaAnalysis';
+import { analyzeParticipantWoca } from '@/utils/wocaAnalysis';
 import { Badge } from '@/components/ui/badge';
 import { WOCA_ZONE_COLORS } from '@/utils/wocaColors';
 
@@ -17,12 +17,6 @@ export const ParticipantSearch: React.FC<ParticipantSearchProps> = ({ onParticip
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [selectedParticipant, setSelectedParticipant] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  // Use WOCA analysis hook for selected participant
-  const { wocaAnalysis: participantAnalysis, isLoading: isAnalysisLoading } = useWocaAnalysis(
-    selectedParticipant ? [selectedParticipant] : [],
-    1
-  );
 
   const searchParticipants = async (term: string) => {
     if (term.length < 2) {
@@ -80,27 +74,21 @@ export const ParticipantSearch: React.FC<ParticipantSearchProps> = ({ onParticip
   const renderParticipantInsights = () => {
     if (!selectedParticipant) return null;
 
-    if (isAnalysisLoading) {
-      return (
-        <Card className="mt-4">
-          <CardContent className="p-8 text-center">
-            <div className="text-base" style={{ color: '#000000' }}>מנתח נתוני משתתף...</div>
-          </CardContent>
-        </Card>
-      );
+    // Convert individual question columns to question_responses format
+    const questionResponses: any = {};
+    for (let i = 1; i <= 36; i++) {
+      const qKey = `q${i}`;
+      if (selectedParticipant[qKey] !== null && selectedParticipant[qKey] !== undefined) {
+        questionResponses[qKey] = selectedParticipant[qKey];
+      }
     }
 
-    if (!participantAnalysis || !participantAnalysis.participants.length) {
-      return (
-        <Card className="mt-4">
-          <CardContent className="p-8 text-center">
-            <div className="text-base" style={{ color: '#000000' }}>שגיאה בניתוח נתוני משתתף</div>
-          </CardContent>
-        </Card>
-      );
-    }
+    const analysis = analyzeParticipantWoca(
+      { question_responses: questionResponses },
+      selectedParticipant.full_name,
+      selectedParticipant.id
+    );
 
-    const analysis = participantAnalysis.participants[0];
     const zoneInfo = getZoneInfo(analysis.dominantZone);
 
     return (
