@@ -35,8 +35,8 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
     }
   ];
 
-  console.log('WocaGroupBarChart data:', data);
-  console.log('groupCategoryScores:', groupCategoryScores);
+  console.log('WocaGroupBarChart rendering with data:', data);
+  console.log('Original groupCategoryScores:', groupCategoryScores);
 
   return (
     <div className="w-full h-64" dir="rtl">
