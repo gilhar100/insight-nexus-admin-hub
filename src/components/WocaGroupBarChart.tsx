@@ -21,10 +21,10 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
     );
   }
 
-  // Apply nonlinear scaling to exaggerate differences while maintaining ratios
+  // Apply stronger nonlinear scaling to exaggerate differences while maintaining ratios
   const applyScaling = (value: number) => {
-    if (typeof value !== 'number' || isNaN(value) || value <= 0) return 0.1; // Minimum value for visibility
-    return Math.pow(value, 1.5);
+    if (typeof value !== 'number' || isNaN(value) || value <= 0) return 1; // Minimum value for visibility
+    return Math.pow(value, 1.8) * 28; // Stronger exaggeration with multiplier for visual impact
   };
 
   // Prepare data in the specified order with Hebrew labels
@@ -54,12 +54,12 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
   console.log('📊 WocaGroupBarChart processed data:', data);
 
   return (
-    <div className="w-full h-80" dir="rtl">
+    <div className="w-full h-80 animate-fade-in" dir="rtl">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
           data={data}
-          margin={{ top: 20, right: 20, left: 20, bottom: 20 }}
-          barCategoryGap="20%"
+          margin={{ top: 20, right: 20, left: 20, bottom: 60 }}
+          barCategoryGap="8%"
         >
           <XAxis 
             dataKey="zone" 
@@ -67,24 +67,47 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
             tickLine={false}
             tick={{ 
               fontSize: 16, 
-              fill: '#1f2937', 
+              fill: '#000000', 
               fontWeight: 'bold',
               textAnchor: 'middle'
             }}
             height={60}
+            interval={0}
           />
           <YAxis hide />
           <Bar 
             dataKey="value" 
-            radius={[4, 4, 0, 0]}
-            maxBarSize={120}
+            radius={[6, 6, 0, 0]}
+            maxBarSize={80}
+            style={{
+              filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))',
+            }}
           >
             {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} />
+              <Cell 
+                key={`cell-${index}`} 
+                fill={entry.color}
+                style={{
+                  animation: `scale-in 0.6s ease-out ${index * 0.1}s both`
+                }}
+              />
             ))}
           </Bar>
         </BarChart>
       </ResponsiveContainer>
+      
+      <style jsx>{`
+        @keyframes scale-in {
+          0% {
+            transform: scaleY(0);
+            opacity: 0;
+          }
+          100% {
+            transform: scaleY(1);
+            opacity: 1;
+          }
+        }
+      `}</style>
     </div>
   );
 };
