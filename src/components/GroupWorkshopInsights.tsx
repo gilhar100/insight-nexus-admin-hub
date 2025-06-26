@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -31,11 +32,12 @@ export const GroupWorkshopInsights: React.FC = () => {
     workshopsCount: workshops.length,
     workshopData: workshopData ? {
       participantCount: workshopData.participant_count,
-      firstParticipant: workshopData.participants[0]
+      firstParticipant: workshopData.participants[0],
+      groupCategoryScores: workshopData.groupCategoryScores
     } : null
   });
 
-  // Get WOCA analysis results
+  // Get WOCA analysis results - now calculated directly in the hook
   const wocaAnalysis = workshopData ? analyzeWorkshopWoca(workshopData.participants, workshopData.workshop_id) : null;
 
   const handleGroupSelect = (value: string) => {
@@ -195,7 +197,7 @@ export const GroupWorkshopInsights: React.FC = () => {
 
           {/* 2. Charts Section - Radar + Pie + Horizontal Bar */}
           <WocaChartsRow
-            workshopData={{ ...workshopData, groupCategoryScores: wocaAnalysis.groupCategoryScores }}
+            workshopData={{ ...workshopData, groupCategoryScores: workshopData.groupCategoryScores || wocaAnalysis.groupCategoryScores }}
             zoneDistribution={getZoneDistribution()}
             isPresenterMode={isPresenterMode}
           />

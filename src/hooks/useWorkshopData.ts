@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { analyzeWorkshopWoca } from '@/utils/wocaAnalysis';
 
 export interface WorkshopParticipant {
   id: string;
@@ -59,6 +60,13 @@ export interface WorkshopData {
   participants: WorkshopParticipant[];
   participant_count: number;
   average_score: number;
+  // Add WOCA analysis results directly to workshop data
+  groupCategoryScores?: {
+    opportunity: number;
+    comfort: number;
+    apathy: number;
+    war: number;
+  };
 }
 
 export interface Workshop {
@@ -209,14 +217,24 @@ export const useWorkshopData = (groupId?: number) => {
 
         console.log('✅ Processed participants with question_responses:', participants);
 
-        // Calculate average score (we'll compute this from the WOCA analysis)
-        const average_score = 0; // Will be calculated by WOCA analysis
+        // Calculate WOCA analysis directly here
+        const wocaAnalysis = analyzeWorkshopWoca(participants, groupId);
+        console.log('🧮 WOCA Analysis calculated:', wocaAnalysis);
+
+        // Calculate average score from WOCA analysis
+        const average_score = wocaAnalysis.groupCategoryScores 
+          ? (wocaAnalysis.groupCategoryScores.opportunity + 
+             wocaAnalysis.groupCategoryScores.comfort + 
+             wocaAnalysis.groupCategoryScores.apathy + 
+             wocaAnalysis.groupCategoryScores.war) / 4
+          : 0;
 
         setWorkshopData({
           workshop_id: groupId,
           participants,
           participant_count: participants.length,
-          average_score
+          average_score,
+          groupCategoryScores: wocaAnalysis.groupCategoryScores
         });
 
       } catch (err) {
