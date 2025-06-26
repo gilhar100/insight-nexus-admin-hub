@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 
 export interface WocaAnalysisResult {
   groupCategoryScores: {
@@ -47,18 +46,22 @@ export const useWocaAnalysis = (participants: any[], workshopId?: number) => {
       try {
         console.log('🔄 Calling WOCA analysis edge function...');
         
-        const { data, error } = await supabase.functions.invoke('analyze_woca', {
-          body: {
+        const response = await fetch("https://lhmrghebdtcbhmgtbqfe.supabase.co/functions/v1/analyze_woca", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
             participants,
             workshopId: workshopId || 1
-          }
+          })
         });
-
-        if (error) {
-          console.error('❌ Edge function error:', error);
-          throw error;
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
-
+        
+        const data = await response.json();
         console.log('✅ WOCA analysis received:', data);
         setWocaAnalysis(data);
       } catch (err) {
