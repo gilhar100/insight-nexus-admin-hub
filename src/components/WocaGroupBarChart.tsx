@@ -76,7 +76,6 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
           data={data}
           margin={{ top: 30, right: 20, left: 20, bottom: 80 }}
           barCategoryGap="4%"
-          baseValue={0}
         >
           <XAxis 
             dataKey="zone" 
