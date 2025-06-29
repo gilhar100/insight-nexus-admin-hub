@@ -10,7 +10,7 @@ export const useWorkshops = () => {
   useEffect(() => {
     const fetchWorkshops = async () => {
       try {
-        console.log('🔄 Fetching workshops/groups...');
+        console.log('🔄 Fetching workshops/groups from woca_responses...');
         const { data, error } = await supabase
           .from('woca_responses')
           .select('group_id, created_at')
@@ -18,7 +18,7 @@ export const useWorkshops = () => {
 
         if (error) throw error;
 
-        console.log('📥 Raw groups data:', data);
+        console.log('📥 Raw groups data from woca_responses:', data);
 
         // Group by group_id and create workshop list
         const workshopMap = new Map();
@@ -29,7 +29,7 @@ export const useWorkshops = () => {
                 id: item.group_id,
                 name: `סדנה ${item.group_id}`,
                 participant_count: 0,
-                date: item.created_at || 'Unknown'
+                date: item.created_at || new Date().toISOString()
               });
             }
             workshopMap.get(item.group_id).participant_count++;
@@ -37,10 +37,10 @@ export const useWorkshops = () => {
         });
 
         const workshopsList = Array.from(workshopMap.values());
-        console.log('🏢 Processed workshops:', workshopsList);
+        console.log('🏢 Processed workshops from woca_responses:', workshopsList);
         setWorkshops(workshopsList);
       } catch (err) {
-        console.error('❌ Error fetching workshops:', err);
+        console.error('❌ Error fetching workshops from woca_responses:', err);
         setError('Failed to fetch workshops');
       }
     };
