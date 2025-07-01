@@ -49,7 +49,7 @@ export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
   const dominantZoneHebrew = getZoneNameInHebrew(dominantZone);
   const zoneColor = WOCA_ZONE_COLORS[dominantZone as keyof typeof WOCA_ZONE_COLORS];
   const zoneDescription = getZoneDescription(dominantZone);
-  const participantCount = wocaAnalysis.groupZoneCounts[dominantZone] || 0;
+  const participantCount = Number(wocaAnalysis.groupZoneCounts[dominantZone] || 0);
   const totalParticipants = Object.values(wocaAnalysis.groupZoneCounts).reduce((sum: number, count) => sum + Number(count), 0);
 
   return (
