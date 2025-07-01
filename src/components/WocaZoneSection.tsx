@@ -1,9 +1,12 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Lightbulb, Eye, EyeOff, Download, AlertCircle, Users } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Target, Download, Eye, EyeOff } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { WOCA_ZONE_COLORS } from '@/utils/wocaColors';
 
 interface WocaZoneSectionProps {
   wocaAnalysis: any;
@@ -13,6 +16,26 @@ interface WocaZoneSectionProps {
   onExportData: () => void;
 }
 
+const getZoneNameInHebrew = (zone: string): string => {
+  const zoneMap: Record<string, string> = {
+    'opportunity': 'הזדמנות',
+    'comfort': 'נוחות', 
+    'apathy': 'אדישות',
+    'war': 'מלחמה'
+  };
+  return zoneMap[zone] || zone;
+};
+
+const getZoneDescription = (zone: string): string => {
+  const descriptions: Record<string, string> = {
+    'opportunity': 'אזור של חדשנות, צמיחה והתפתחות. הקבוצה מוכנה לקחת סיכונים מחושבים ולחקור הזדמנויות חדשות.',
+    'comfort': 'אזור של יציבות וביטחון. הקבוצה מרוצה מהמצב הנוכחי ומעדיפה לשמור על השגרה.',
+    'apathy': 'אזור של חוסר מעורבות ואדישות. הקבוצה חסרת מוטיבציה ועניין בשינוי או התפתחות.',
+    'war': 'אזור של מתח וקונפליקט. הקבוצה חווה קשיים פנימיים ומאבקים שמקשים על התקדמות.'
+  };
+  return descriptions[zone] || 'תיאור לא זמין';
+};
+
 export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
   wocaAnalysis,
   isPresenterMode,
@@ -20,147 +43,129 @@ export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
   onToggleNames,
   onExportData
 }) => {
-  const getZoneInfo = (zone: string | null) => {
-    if (!zone) return {
-      name: 'לא זוהה',
-      color: 'bg-gray-500',
-      description: 'לא ניתן לזהות אזור דומיננטי'
-    };
-    
-    const zoneDescriptions = {
-      opportunity: { 
-        name: 'אזור ההזדמנות', 
-        color: 'bg-green-500',
-        description: 'ארגון הפועל מתוך תודעה של הזדמנות הוא ארגון פתוח, לומד וגמיש, שמזהה שינוי כהזדמנות ולא כאיום. מערכות היחסים בו מבוססות על הקשבה הדדית, יצירתיות, חשיבה לטווח ארוך ושיתוף פעולה בין יחידות. מדובר בארגון שמסוגל לנווט אל עבר "אוקיינוסים כחולים" בזכות תרבות של סקרנות, בחינת חלופות וחיפוש אחר משמעות. זהו המרחב היחיד שבו מתאפשרת דינמיקה של Win/Win – כולם מרוויחים דרך חיבור, ערכים וראייה מערכתית.'
-      },
-      comfort: { 
-        name: 'אזור הנוחות', 
-        color: 'bg-blue-500',
-        description: 'ארגון המצוי באזור הנוחות מתאפיין בשימור השגרה ובהימנעות משינויים. קיימת תחושת איום מפני יוזמות חדשות, והמערכת כולה נוטה לקפוא על שמריה. היעדר יוזמה, רצון להישאר במוכר והתנגדות עקבית לתנועה קדימה, יוצרים תרבות של קיפאון. בתודעה זו, הארגון פועל במצב של Lose/Lose – לא מושגת פריצת דרך, והמערכת שוקעת בתחזוקה ולא בצמיחה.'
-      },
-      apathy: { 
-        name: 'אזור האדישות', 
-        color: 'bg-yellow-500',
-        description: 'אזור האדישות מייצג מצב תודעתי ארגוני של ניתוק, חוסר תקווה ודכדוך. בארגון כזה אין הקשבה, אין יוזמה, ואין אמונה ביכולת לשנות או להשפיע. התחושות המרכזיות הן של עייפות, חוסר תכלית ותחושת אין־אונים קולקטיבית. זוהי תרבות ארגונית מקובעת, חסרת תנועה, שבה גם הפרטים וגם המערכת כולה שוקעים במצב של Lose/Lose – הפסד הדדי, חוסר ערך, וחוסר התקדמות.'
-      },
-      war: { 
-        name: 'אזור המלחמה', 
-        color: 'bg-red-500',
-        description: 'כאשר ארגון פועל מתוך תודעה של מלחמה, הוא מתאפיין באווירה של עימות, תחרותיות פנימית, וניסיון מתמיד "לנצח" על חשבון אחרים. יחסי העבודה בו נוקשים, התקשורת סגורה, והדגש מושם על שליטה, צודקות וכוחניות. זוהי תרבות של הקשבה עצמית בלבד, שבה כל שינוי נתפס כאיום, ולא כהזדמנות. במצב זה, הארגון פועל מתוך לוגיקת Win/Lose – הצלחת אחד באה תמיד על חשבון האחר, מה שמוביל לשחיקה וחוסר אמון בין יחידות וצוותים.'
-      }
-    };
-    
-    const zoneDesc = zoneDescriptions[zone as keyof typeof zoneDescriptions] || { 
-      name: 'לא זוהה', 
-      color: 'bg-gray-500',
-      description: 'לא ניתן לזהות אזור דומיננטי'
-    };
-    
-    return zoneDesc;
-  };
+  if (!wocaAnalysis) return null;
 
-  // Use frequency-based analysis instead of score-based
-  const dominantZone = wocaAnalysis?.groupDominantZoneByCount;
-  const isTie = wocaAnalysis?.groupIsTieByCount;
-  const tiedCategories = wocaAnalysis?.groupTiedCategoriesByCount || [];
-  const zoneCounts = wocaAnalysis?.groupZoneCounts;
-
-  const zoneInfo = dominantZone ? getZoneInfo(dominantZone) : null;
+  const dominantZone = wocaAnalysis.dominantZone;
+  const dominantZoneHebrew = getZoneNameInHebrew(dominantZone);
+  const zoneColor = WOCA_ZONE_COLORS[dominantZone as keyof typeof WOCA_ZONE_COLORS];
+  const zoneDescription = getZoneDescription(dominantZone);
+  const participantCount = wocaAnalysis.groupZoneCounts[dominantZone] || 0;
+  const totalParticipants = Object.values(wocaAnalysis.groupZoneCounts).reduce((sum: number, count) => sum + (count as number), 0);
 
   return (
-    <Card className={`${isPresenterMode ? 'border-2 border-green-200' : ''}`} dir="rtl">
-      <CardContent className={isPresenterMode ? 'p-12' : 'p-8'}>
-        <div className="text-center space-y-6">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className={`font-bold text-center flex-1 ${isPresenterMode ? 'text-3xl' : 'text-2xl'}`} style={{ color: '#000000' }}>
-              <Lightbulb className="h-8 w-8 ml-2 inline" />
-              סיווג אזור WOCA
-            </h3>
-            {!isPresenterMode && (
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={onToggleNames}>
-                  {showNames ? <EyeOff className="h-4 w-4 ml-2" /> : <Eye className="h-4 w-4 ml-2" />}
-                  <span className="text-sm" style={{ color: '#000000' }}>
-                    {showNames ? 'הסתר שמות' : 'הצג שמות'}
-                  </span>
-                </Button>
-                <Button variant="outline" size="sm" onClick={onExportData}>
-                  <Download className="h-4 w-4 ml-2" />
-                  <span className="text-sm" style={{ color: '#000000' }}>ייצא ניתוח</span>
-                </Button>
+    <Card className={isPresenterMode ? 'presenter-card' : ''}>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className={`flex items-center text-right ${isPresenterMode ? 'text-xl' : 'text-lg'}`} style={{ color: '#000000' }}>
+            <Target className="h-5 w-5 ml-2" />
+            אזור התודעה הארגונית הדומיננטי של הקבוצה
+          </CardTitle>
+          {!isPresenterMode && (
+            <div className="flex gap-2">
+              <div className="flex items-center space-x-2 space-x-reverse">
+                <Switch
+                  id="show-names"
+                  checked={showNames}
+                  onCheckedChange={onToggleNames}
+                />
+                <Label htmlFor="show-names" className="flex items-center">
+                  {showNames ? <Eye className="h-4 w-4 ml-1" /> : <EyeOff className="h-4 w-4 ml-1" />}
+                  הצג שמות
+                </Label>
               </div>
-            )}
-          </div>
-
-          {isTie ? (
-            <div className="bg-green-50 p-6 rounded-lg">
-              <div className="flex items-center justify-center mb-4">
-                <AlertCircle className="h-6 w-6 text-yellow-500 ml-2" />
-                <span className={`font-semibold ${isPresenterMode ? 'text-xl' : 'text-lg'}`} style={{ color: '#000000' }}>
-                  תיקו בין אזורים
-                </span>
-              </div>
-              <div className="flex flex-wrap justify-center gap-2 mb-4">
-                {tiedCategories.map((category: string) => {
-                  const categoryZoneInfo = getZoneInfo(category);
-                  const count = zoneCounts ? zoneCounts[category as keyof typeof zoneCounts] : 0;
-                  return (
-                    <Badge 
-                      key={category} 
-                      variant="secondary" 
-                      className={`px-3 py-1 ${categoryZoneInfo.color} text-white ${isPresenterMode ? 'text-lg' : 'text-sm'}`}
-                    >
-                      {categoryZoneInfo.name} ({count} משתתפים)
-                    </Badge>
-                  );
-                })}
-              </div>
-              <p className={`mt-4 leading-relaxed text-right ${isPresenterMode ? 'text-xl' : 'text-base'}`} style={{ color: '#000000' }}>
-                מספר זהה של משתתפים נמצא בכמה אזורים - לא זוהה אזור דומיננטי
-              </p>
-            </div>
-          ) : zoneInfo && (
-            <div className="bg-green-50 p-6 rounded-lg">
-              <Badge 
-                variant="secondary" 
-                className={`px-6 py-3 ${zoneInfo.color} text-white mb-6 ${isPresenterMode ? 'text-3xl font-black' : 'text-2xl font-bold'}`}
-              >
-                {zoneInfo.name}
-              </Badge>
-              
-              <div className={`${isPresenterMode ? 'text-xl' : 'text-lg'} mb-4 flex items-center justify-center gap-2`} style={{ color: '#000000' }}>
-                <Users className="h-5 w-5" />
-                <span>
-                  {zoneCounts && dominantZone ? zoneCounts[dominantZone as keyof typeof zoneCounts] : 0} מתוך {wocaAnalysis?.participantCount || 0} משתתפים באזור זה
-                </span>
-              </div>
-
-              {/* Show breakdown of all zones */}
-              {zoneCounts && !isPresenterMode && (
-                <div className="mb-6 bg-white p-4 rounded-lg">
-                  <h4 className="font-semibold mb-3 text-center" style={{ color: '#000000' }}>התפלגות משתתפים לפי אזורים:</h4>
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    {Object.entries(zoneCounts).map(([zone, count]) => {
-                      const zoneDesc = getZoneInfo(zone);
-                      return (
-                        <div key={zone} className="flex justify-between items-center p-2 rounded" style={{ backgroundColor: '#f8f9fa' }}>
-                          <span style={{ color: '#000000' }}>{zoneDesc.name}</span>
-                          <Badge variant="outline" className="text-xs">
-                            {count} משתתפים
-                          </Badge>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              <div className={`leading-relaxed text-right px-4 mt-6 ${isPresenterMode ? 'text-lg' : 'text-base'}`} style={{ color: '#000000' }}>
-                {zoneInfo.description}
-              </div>
+              <Button onClick={onExportData} variant="outline" size="sm">
+                <Download className="h-4 w-4 ml-2" />
+                ייצא נתונים
+              </Button>
             </div>
           )}
         </div>
+        {!isPresenterMode && (
+          <CardDescription className="text-right text-base" style={{ color: '#000000' }}>
+            זיהוי האזור בו נמצא הכי הרבה משתתפים בקבוצה
+          </CardDescription>
+        )}
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Zone Badge and Count */}
+        <div className="text-center space-y-4">
+          <Badge 
+            className={`text-xl px-6 py-3 font-bold text-white ${isPresenterMode ? 'text-3xl px-8 py-4' : ''}`}
+            style={{ backgroundColor: zoneColor }}
+          >
+            אזור {dominantZoneHebrew}
+          </Badge>
+          
+          <div className={`${isPresenterMode ? 'text-2xl' : 'text-lg'} font-semibold`} style={{ color: '#000000' }}>
+            {participantCount} מתוך {totalParticipants} משתתפים ({Math.round((participantCount / totalParticipants) * 100)}%)
+          </div>
+        </div>
+
+        {/* Zone Description */}
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <p className={`text-right leading-relaxed ${isPresenterMode ? 'text-xl' : 'text-base'}`} style={{ color: '#000000' }}>
+            {zoneDescription}
+          </p>
+        </div>
+
+        {/* Distribution by Zones */}
+        {isPresenterMode && (
+          <div className="mt-8">
+            <h3 className="text-center text-2xl font-bold mb-6" style={{ color: '#000000' }}>
+              התפלגות משתתפים לפי אזורים:
+            </h3>
+            <div className="grid grid-cols-2 gap-6">
+              {Object.entries(wocaAnalysis.groupZoneCounts).map(([zone, count]) => {
+                const zoneHebrew = getZoneNameInHebrew(zone);
+                const color = WOCA_ZONE_COLORS[zone as keyof typeof WOCA_ZONE_COLORS];
+                const percentage = totalParticipants > 0 ? Math.round(((count as number) / totalParticipants) * 100) : 0;
+                
+                return (
+                  <div key={zone} className="text-center">
+                    <div 
+                      className="text-6xl font-bold mb-2"
+                      style={{ color }}
+                    >
+                      {count as number}
+                    </div>
+                    <div className="text-xl font-semibold" style={{ color: '#000000' }}>
+                      אזור {zoneHebrew}
+                    </div>
+                    <div className="text-lg" style={{ color: '#000000' }}>
+                      {percentage}% משתתפים
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Detailed breakdown for non-presenter mode */}
+        {!isPresenterMode && (
+          <div className="grid grid-cols-2 gap-4">
+            {Object.entries(wocaAnalysis.groupZoneCounts).map(([zone, count]) => {
+              const zoneHebrew = getZoneNameInHebrew(zone);
+              const color = WOCA_ZONE_COLORS[zone as keyof typeof WOCA_ZONE_COLORS];
+              const percentage = totalParticipants > 0 ? Math.round(((count as number) / totalParticipants) * 100) : 0;
+              
+              return (
+                <div key={zone} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                  <div className="flex items-center">
+                    <div 
+                      className="w-4 h-4 rounded-full ml-2"
+                      style={{ backgroundColor: color }}
+                    />
+                    <span className="font-medium" style={{ color: '#000000' }}>אזור {zoneHebrew}</span>
+                  </div>
+                  <div className="text-sm" style={{ color: '#000000' }}>
+                    {count as number} ({percentage}%)
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
