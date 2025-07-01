@@ -50,7 +50,7 @@ export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
   const zoneColor = WOCA_ZONE_COLORS[dominantZone as keyof typeof WOCA_ZONE_COLORS];
   const zoneDescription = getZoneDescription(dominantZone);
   const participantCount = wocaAnalysis.groupZoneCounts[dominantZone] || 0;
-  const totalParticipants = Object.values(wocaAnalysis.groupZoneCounts).reduce((sum: number, count) => sum + (count as number), 0);
+  const totalParticipants = Object.values(wocaAnalysis.groupZoneCounts).reduce((sum: number, count) => sum + Number(count), 0);
 
   return (
     <Card className={isPresenterMode ? 'presenter-card' : ''}>
@@ -118,7 +118,8 @@ export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
               {Object.entries(wocaAnalysis.groupZoneCounts).map(([zone, count]) => {
                 const zoneHebrew = getZoneNameInHebrew(zone);
                 const color = WOCA_ZONE_COLORS[zone as keyof typeof WOCA_ZONE_COLORS];
-                const percentage = totalParticipants > 0 ? Math.round(((count as number) / totalParticipants) * 100) : 0;
+                const numericCount = Number(count);
+                const percentage = totalParticipants > 0 ? Math.round((numericCount / totalParticipants) * 100) : 0;
                 
                 return (
                   <div key={zone} className="text-center">
@@ -126,7 +127,7 @@ export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
                       className="text-6xl font-bold mb-2"
                       style={{ color }}
                     >
-                      {count as number}
+                      {numericCount}
                     </div>
                     <div className="text-xl font-semibold" style={{ color: '#000000' }}>
                       אזור {zoneHebrew}
@@ -147,7 +148,8 @@ export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
             {Object.entries(wocaAnalysis.groupZoneCounts).map(([zone, count]) => {
               const zoneHebrew = getZoneNameInHebrew(zone);
               const color = WOCA_ZONE_COLORS[zone as keyof typeof WOCA_ZONE_COLORS];
-              const percentage = totalParticipants > 0 ? Math.round(((count as number) / totalParticipants) * 100) : 0;
+              const numericCount = Number(count);
+              const percentage = totalParticipants > 0 ? Math.round((numericCount / totalParticipants) * 100) : 0;
               
               return (
                 <div key={zone} className="flex items-center justify-between p-3 bg-gray-50 rounded">
@@ -159,7 +161,7 @@ export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
                     <span className="font-medium" style={{ color: '#000000' }}>אזור {zoneHebrew}</span>
                   </div>
                   <div className="text-sm" style={{ color: '#000000' }}>
-                    {count as number} ({percentage}%)
+                    {numericCount} ({percentage}%)
                   </div>
                 </div>
               );
