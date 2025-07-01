@@ -1,4 +1,3 @@
-
 export interface WocaQuestionMapping {
   [key: string]: {
     category: 'war' | 'opportunity' | 'comfort' | 'apathy';
@@ -61,6 +60,13 @@ export interface WocaCategoryScores {
   apathy: number;
 }
 
+export interface WocaZoneCounts {
+  war: number;
+  opportunity: number;
+  comfort: number;
+  apathy: number;
+}
+
 export interface WocaAnalysisResult {
   categoryScores: WocaCategoryScores;
   dominantZone: string | null;
@@ -78,6 +84,11 @@ export interface WorkshopWocaAnalysis {
   groupTiedCategories: string[];
   participants: WocaAnalysisResult[];
   participantCount: number;
+  // New frequency-based analysis
+  groupZoneCounts: WocaZoneCounts;
+  groupDominantZoneByCount: string | null;
+  groupIsTieByCount: boolean;
+  groupTiedCategoriesByCount: string[];
 }
 
 // Reverse score a value (1->5, 2->4, 3->3, 4->2, 5->1)
@@ -156,6 +167,38 @@ export const getDominantZone = (categoryScores: WocaCategoryScores): {
   };
 };
 
+// NEW: Determine dominant zone by participant count
+export const getDominantZoneByCount = (zoneCounts: WocaZoneCounts): {
+  dominantZone: string | null;
+  isTie: boolean;
+  tiedCategories: string[];
+} => {
+  const categories = Object.entries(zoneCounts);
+  const maxCount = Math.max(...categories.map(([_, count]) => count));
+  
+  if (maxCount === 0) {
+    return { dominantZone: null, isTie: false, tiedCategories: [] };
+  }
+  
+  const topCategories = categories
+    .filter(([_, count]) => count === maxCount)
+    .map(([category, _]) => category);
+  
+  if (topCategories.length > 1) {
+    return {
+      dominantZone: null,
+      isTie: true,
+      tiedCategories: topCategories
+    };
+  }
+  
+  return {
+    dominantZone: topCategories[0],
+    isTie: false,
+    tiedCategories: []
+  };
+};
+
 // Analyze single participant
 export const analyzeParticipantWoca = (
   participant: any,
@@ -192,7 +235,7 @@ export const analyzeWorkshopWoca = (participants: any[], workshopId: number): Wo
     console.log(`Participant ${index + 1} analysis:`, analysis);
   });
   
-  // Calculate group averages
+  // Calculate group averages (for radar chart and other visualizations)
   const groupTotals = { war: 0, opportunity: 0, comfort: 0, apathy: 0 };
   const validParticipants = participantAnalyses.filter(p => 
     p.categoryScores.war > 0 || p.categoryScores.opportunity > 0 || 
@@ -223,10 +266,31 @@ export const analyzeWorkshopWoca = (participants: any[], workshopId: number): Wo
   
   console.log('Group category scores:', groupCategoryScores);
   
+  // Calculate frequency-based zone analysis
+  const groupZoneCounts: WocaZoneCounts = { war: 0, opportunity: 0, comfort: 0, apathy: 0 };
+  
+  // Count how many participants fall into each zone
+  participantAnalyses.forEach(participant => {
+    if (participant.dominantZone && !participant.isTie) {
+      groupZoneCounts[participant.dominantZone as keyof WocaZoneCounts]++;
+    }
+  });
+  
+  console.log('Group zone counts:', groupZoneCounts);
+  
+  // Determine group's dominant zone by participant count (NEW APPROACH)
+  const { 
+    dominantZone: groupDominantZoneByCount, 
+    isTie: groupIsTieByCount, 
+    tiedCategories: groupTiedCategoriesByCount 
+  } = getDominantZoneByCount(groupZoneCounts);
+  
+  // Keep the old score-based approach for backward compatibility
   const { dominantZone: groupDominantZone, isTie: groupIsTie, tiedCategories: groupTiedCategories } = 
     getDominantZone(groupCategoryScores);
   
-  console.log('Group dominant zone:', groupDominantZone, 'Is tie:', groupIsTie);
+  console.log('Group dominant zone by count:', groupDominantZoneByCount, 'Is tie by count:', groupIsTieByCount);
+  console.log('Group dominant zone by score:', groupDominantZone, 'Is tie by score:', groupIsTie);
   
   return {
     workshopId,
@@ -235,7 +299,12 @@ export const analyzeWorkshopWoca = (participants: any[], workshopId: number): Wo
     groupIsTie,
     groupTiedCategories,
     participants: participantAnalyses,
-    participantCount: participants.length
+    participantCount: participants.length,
+    // New frequency-based results
+    groupZoneCounts,
+    groupDominantZoneByCount,
+    groupIsTieByCount,
+    groupTiedCategoriesByCount
   };
 };
 

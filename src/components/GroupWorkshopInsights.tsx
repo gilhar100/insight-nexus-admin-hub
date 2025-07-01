@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -78,18 +77,16 @@ export const GroupWorkshopInsights: React.FC = () => {
   // Check if we have enough data for analysis
   const hasMinimumData = workshopData && workshopData.participants.length >= 3;
 
-  // Calculate zone distribution for pie chart
+  // Calculate zone distribution for pie chart using the new frequency-based data
   const getZoneDistribution = () => {
-    if (!wocaAnalysis) return { opportunity: 0, comfort: 0, apathy: 0, war: 0 };
+    if (!wocaAnalysis?.groupZoneCounts) return { opportunity: 0, comfort: 0, apathy: 0, war: 0 };
     
-    const distribution = { opportunity: 0, comfort: 0, apathy: 0, war: 0 };
-    wocaAnalysis.participants.forEach(participant => {
-      if (participant.dominantZone && !participant.isTie) {
-        distribution[participant.dominantZone as keyof typeof distribution]++;
-      }
-    });
-    
-    return distribution;
+    return {
+      opportunity: wocaAnalysis.groupZoneCounts.opportunity,
+      comfort: wocaAnalysis.groupZoneCounts.comfort,
+      apathy: wocaAnalysis.groupZoneCounts.apathy,
+      war: wocaAnalysis.groupZoneCounts.war
+    };
   };
 
   const renderContent = () => (

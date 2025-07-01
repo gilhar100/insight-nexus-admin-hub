@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Lightbulb, Eye, EyeOff, Download, AlertCircle } from 'lucide-react';
+import { Lightbulb, Eye, EyeOff, Download, AlertCircle, Users } from 'lucide-react';
 
 interface WocaZoneSectionProps {
   wocaAnalysis: any;
@@ -59,7 +59,13 @@ export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
     return zoneDesc;
   };
 
-  const zoneInfo = wocaAnalysis ? getZoneInfo(wocaAnalysis.groupDominantZone) : null;
+  // Use frequency-based analysis instead of score-based
+  const dominantZone = wocaAnalysis?.groupDominantZoneByCount;
+  const isTie = wocaAnalysis?.groupIsTieByCount;
+  const tiedCategories = wocaAnalysis?.groupTiedCategoriesByCount || [];
+  const zoneCounts = wocaAnalysis?.groupZoneCounts;
+
+  const zoneInfo = dominantZone ? getZoneInfo(dominantZone) : null;
 
   return (
     <Card className={`${isPresenterMode ? 'border-2 border-green-200' : ''}`} dir="rtl">
@@ -86,7 +92,7 @@ export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
             )}
           </div>
 
-          {wocaAnalysis?.groupIsTie ? (
+          {isTie ? (
             <div className="bg-green-50 p-6 rounded-lg">
               <div className="flex items-center justify-center mb-4">
                 <AlertCircle className="h-6 w-6 text-yellow-500 ml-2" />
@@ -94,22 +100,23 @@ export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
                   תיקו בין אזורים
                 </span>
               </div>
-              <div className="flex flex-wrap justify-center gap-2">
-                {wocaAnalysis.groupTiedCategories.map((category: string) => {
+              <div className="flex flex-wrap justify-center gap-2 mb-4">
+                {tiedCategories.map((category: string) => {
                   const categoryZoneInfo = getZoneInfo(category);
+                  const count = zoneCounts ? zoneCounts[category as keyof typeof zoneCounts] : 0;
                   return (
                     <Badge 
                       key={category} 
                       variant="secondary" 
                       className={`px-3 py-1 ${categoryZoneInfo.color} text-white ${isPresenterMode ? 'text-lg' : 'text-sm'}`}
                     >
-                      {categoryZoneInfo.name}
+                      {categoryZoneInfo.name} ({count} משתתפים)
                     </Badge>
                   );
                 })}
               </div>
               <p className={`mt-4 leading-relaxed text-right ${isPresenterMode ? 'text-xl' : 'text-base'}`} style={{ color: '#000000' }}>
-                לא זוהה אזור תודעה דומיננטי עקב ציונים זהים
+                מספר זהה של משתתפים נמצא בכמה אזורים - לא זוהה אזור דומיננטי
               </p>
             </div>
           ) : zoneInfo && (
@@ -120,9 +127,33 @@ export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
               >
                 {zoneInfo.name}
               </Badge>
-              <div className={`${isPresenterMode ? 'text-xl' : 'text-lg'} mb-6`} style={{ color: '#000000' }}>
-                אזור תודעה ארגונית ({wocaAnalysis.participantCount} משתתפים)
+              
+              <div className={`${isPresenterMode ? 'text-xl' : 'text-lg'} mb-4 flex items-center justify-center gap-2`} style={{ color: '#000000' }}>
+                <Users className="h-5 w-5" />
+                <span>
+                  {zoneCounts && dominantZone ? zoneCounts[dominantZone as keyof typeof zoneCounts] : 0} מתוך {wocaAnalysis?.participantCount || 0} משתתפים באזור זה
+                </span>
               </div>
+
+              {/* Show breakdown of all zones */}
+              {zoneCounts && !isPresenterMode && (
+                <div className="mb-6 bg-white p-4 rounded-lg">
+                  <h4 className="font-semibold mb-3 text-center" style={{ color: '#000000' }}>התפלגות משתתפים לפי אזורים:</h4>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    {Object.entries(zoneCounts).map(([zone, count]) => {
+                      const zoneDesc = getZoneInfo(zone);
+                      return (
+                        <div key={zone} className="flex justify-between items-center p-2 rounded" style={{ backgroundColor: '#f8f9fa' }}>
+                          <span style={{ color: '#000000' }}>{zoneDesc.name}</span>
+                          <Badge variant="outline" className="text-xs">
+                            {count} משתתפים
+                          </Badge>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
               <div className={`leading-relaxed text-right px-4 mt-6 ${isPresenterMode ? 'text-lg' : 'text-base'}`} style={{ color: '#000000' }}>
                 {zoneInfo.description}
