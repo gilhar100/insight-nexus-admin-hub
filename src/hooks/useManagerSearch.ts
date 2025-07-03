@@ -6,6 +6,7 @@ interface Manager {
   id: string;
   name: string;
   email?: string;
+  groupNumber?: number;
 }
 
 export const useManagerSearch = (query: string) => {
@@ -26,12 +27,24 @@ export const useManagerSearch = (query: string) => {
       try {
         console.log('Searching for managers with query:', query);
         
-        const { data, error } = await supabase
+        // Check if query is numeric (could be group_number)
+        const isNumeric = /^\d+$/.test(query.trim());
+        
+        let supabaseQuery = supabase
           .from('survey_responses')
-          .select('id, user_name, user_email')
-          .ilike('user_name', `%${query}%`)
+          .select('id, user_name, user_email, group_number')
           .not('user_name', 'is', null)
           .limit(10);
+
+        if (isNumeric) {
+          // Search by group_number if query is numeric
+          supabaseQuery = supabaseQuery.eq('group_number', parseInt(query.trim()));
+        } else {
+          // Search by name and email using OR condition
+          supabaseQuery = supabaseQuery.or(`user_name.ilike.%${query}%,user_email.ilike.%${query}%`);
+        }
+
+        const { data, error } = await supabaseQuery;
 
         if (error) {
           console.error('Search error:', error);
@@ -43,7 +56,8 @@ export const useManagerSearch = (query: string) => {
         const managersData = data?.map(item => ({
           id: item.id,
           name: item.user_name || 'Unknown',
-          email: item.user_email || undefined
+          email: item.user_email || undefined,
+          groupNumber: item.group_number || undefined
         })) || [];
 
         setManagers(managersData);

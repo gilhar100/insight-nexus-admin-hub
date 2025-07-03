@@ -61,14 +61,14 @@ export const IndividualSearch: React.FC<IndividualSearchProps> = ({
           ניתוח אישי
         </CardTitle>
         <CardDescription className="text-right">
-          חיפוש ובחירת יחיד מטבלאות survey_responses או colleague_survey_responses (נתוני SALIMA בלבד)
+          חיפוש ובחירת יחיד מטבלאות survey_responses או colleague_survey_responses (נתוני SALIMA בלבד) - ניתן לחפש לפי שם, אימייל או מספר קבוצה
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex gap-4">
           <div className="flex-1 relative">
             <Input
-              placeholder="חיפוש נבדקי SALIMA לפי שם או אימייל..."
+              placeholder="חיפוש נבדקי SALIMA לפי שם, אימייל או מספר קבוצה..."
               value={searchQuery}
               onChange={(e) => {
                 onSearchQueryChange(e.target.value);
@@ -113,6 +113,9 @@ export const IndividualSearch: React.FC<IndividualSearchProps> = ({
                               <span className="font-medium">{nameOption.name}</span>
                               {nameOption.email && (
                                 <span className="text-sm text-gray-500">{nameOption.email}</span>
+                              )}
+                              {nameOption.groupNumber && (
+                                <span className="text-sm text-blue-600">קבוצה: {nameOption.groupNumber}</span>
                               )}
                             </div>
                             <Badge className={getSourceBadgeColor(nameOption.source)}>
