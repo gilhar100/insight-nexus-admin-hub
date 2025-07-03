@@ -114,6 +114,7 @@ export type Database = {
           evaluator_email: string | null
           evaluator_name: string | null
           evaluator_position: string | null
+          group_id: number | null
           id: string
           is_anonymous: boolean | null
           manager_department: string | null
@@ -316,6 +317,7 @@ export type Database = {
           evaluator_email?: string | null
           evaluator_name?: string | null
           evaluator_position?: string | null
+          group_id?: number | null
           id?: string
           is_anonymous?: boolean | null
           manager_department?: string | null
@@ -518,6 +520,7 @@ export type Database = {
           evaluator_email?: string | null
           evaluator_name?: string | null
           evaluator_position?: string | null
+          group_id?: number | null
           id?: string
           is_anonymous?: boolean | null
           manager_department?: string | null

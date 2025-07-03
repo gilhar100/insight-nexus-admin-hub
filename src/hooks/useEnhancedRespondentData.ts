@@ -80,12 +80,12 @@ export const useEnhancedRespondentData = () => {
       let colleagueReport = undefined;
       let combinedReport = undefined;
 
-      // Fetch colleague data if group_number exists
+      // Fetch colleague data using group_number from survey_responses matched against group_id in colleague_survey_responses
       if (surveyData.group_number) {
         const { data: colleagueData, error: colleagueError } = await supabase
           .from('colleague_survey_responses')
           .select('*')
-          .eq('group_number', surveyData.group_number);
+          .eq('group_id', surveyData.group_number);
 
         if (!colleagueError && colleagueData && colleagueData.length > 0) {
           // Calculate colleague averages
