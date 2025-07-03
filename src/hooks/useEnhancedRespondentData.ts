@@ -88,7 +88,7 @@ export const useEnhancedRespondentData = () => {
           .eq('group_id', surveyData.group_number);
 
         if (!colleagueError && colleagueData && colleagueData.length > 0) {
-          // Calculate colleague averages
+          // First: Calculate colleague averages across all colleague responses
           const colleagueAverages = {
             strategy: colleagueData.reduce((sum, r) => sum + (r.dimension_s || 0), 0) / colleagueData.length,
             adaptability: colleagueData.reduce((sum, r) => sum + (r.dimension_a2 || 0), 0) / colleagueData.length,
@@ -102,7 +102,7 @@ export const useEnhancedRespondentData = () => {
 
           colleagueReport = colleagueAverages;
 
-          // Calculate combined report (arithmetic average of self and colleague)
+          // Second: Calculate combined report as average between self-report and colleague averages
           combinedReport = {
             strategy: (selfReport.strategy + colleagueAverages.strategy) / 2,
             adaptability: (selfReport.adaptability + colleagueAverages.adaptability) / 2,
