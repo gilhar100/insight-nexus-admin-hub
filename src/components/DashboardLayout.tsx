@@ -2,12 +2,12 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { LayoutDashboard, User, Users, UserCheck } from 'lucide-react';
+import { LayoutDashboard, User, Users } from 'lucide-react';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
-  activeTab: 'individual' | 'group' | 'colleague';
-  onTabChange: (tab: 'individual' | 'group' | 'colleague') => void;
+  activeTab: 'individual' | 'group';
+  onTabChange: (tab: 'individual' | 'group') => void;
 }
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
@@ -55,14 +55,6 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             >
               <Users className="h-4 w-4 mr-2" />
               Group Workshop Insights (WOCA)
-            </Button>
-            <Button
-              variant={activeTab === 'colleague' ? 'default' : 'ghost'}
-              onClick={() => onTabChange('colleague')}
-              className="flex items-center px-4 py-3 border-b-2 border-transparent hover:border-blue-300 transition-colors"
-            >
-              <UserCheck className="h-4 w-4 mr-2" />
-              השוואת קולגות
             </Button>
           </nav>
         </div>
