@@ -37,7 +37,7 @@ const getDimensionInsights = (averages: GroupData['averages']) => {
     score: averages.strategy
   }, {
     key: 'authenticity',
-    name: 'אותנטיות (A)',
+    name: 'אותנטיות (A2)',  // Fixed: authenticity is A2
     score: averages.authenticity
   }, {
     key: 'learning',
@@ -53,7 +53,7 @@ const getDimensionInsights = (averages: GroupData['averages']) => {
     score: averages.meaning
   }, {
     key: 'adaptability',
-    name: 'הסתגלות (A2)',
+    name: 'הסתגלות (A)',  // Fixed: adaptability is A
     score: averages.adaptability
   }];
 
