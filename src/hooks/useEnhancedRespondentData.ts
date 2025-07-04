@@ -69,11 +69,11 @@ export const useEnhancedRespondentData = () => {
 
       const selfReport = {
         strategy: surveyData.dimension_s || 0,
-        adaptability: surveyData.dimension_a2 || 0,
+        adaptability: surveyData.dimension_a || 0,  // dimension_a is adaptability
         learning: surveyData.dimension_l || 0,
         inspiration: surveyData.dimension_i || 0,
         meaning: surveyData.dimension_m || 0,
-        authenticity: surveyData.dimension_a || 0,
+        authenticity: surveyData.dimension_a2 || 0,  // dimension_a2 is authenticity
         overall: surveyData.slq_score || 0,
       };
 
@@ -91,11 +91,11 @@ export const useEnhancedRespondentData = () => {
           // First: Calculate colleague averages across all colleague responses
           const colleagueAverages = {
             strategy: colleagueData.reduce((sum, r) => sum + (r.dimension_s || 0), 0) / colleagueData.length,
-            adaptability: colleagueData.reduce((sum, r) => sum + (r.dimension_a2 || 0), 0) / colleagueData.length,
+            adaptability: colleagueData.reduce((sum, r) => sum + (r.dimension_a || 0), 0) / colleagueData.length,  // dimension_a is adaptability
             learning: colleagueData.reduce((sum, r) => sum + (r.dimension_l || 0), 0) / colleagueData.length,
             inspiration: colleagueData.reduce((sum, r) => sum + (r.dimension_i || 0), 0) / colleagueData.length,
             meaning: colleagueData.reduce((sum, r) => sum + (r.dimension_m || 0), 0) / colleagueData.length,
-            authenticity: colleagueData.reduce((sum, r) => sum + (r.dimension_a || 0), 0) / colleagueData.length,
+            authenticity: colleagueData.reduce((sum, r) => sum + (r.dimension_a2 || 0), 0) / colleagueData.length,  // dimension_a2 is authenticity
             overall: colleagueData.reduce((sum, r) => sum + (r.slq_score || 0), 0) / colleagueData.length,
             responseCount: colleagueData.length
           };
