@@ -19,8 +19,8 @@ const DIMENSION_NAMES = {
   dimension_l: 'למידה',
   dimension_i: 'השראה',
   dimension_m: 'משמעות',
-  dimension_a: 'אותנטיות',
-  dimension_a2: 'הסתגלות'
+  dimension_a: 'הסתגלות',   // dimension_a is adaptability
+  dimension_a2: 'אותנטיות'  // dimension_a2 is authenticity
 };
 
 const SCORE_RANGES = [
@@ -45,7 +45,7 @@ export const SalimaScoreDistributionChart: React.FC<SalimaScoreDistributionChart
     return rangeData;
   });
 
-  const COLORS = ['#3B82F6', '#10B981', '#EF4444', '#8B5CF6', '#EC4899', '#F59E0B'];
+  const COLORS = ['#3B82F6', '#10B981', '#EF4444', '#8B5CF6', '#F59E0B', '#EC4899'];
 
   return (
     <ChartContainer config={{}} className="h-96 presenter-mode:h-[500px]" dir="rtl">
