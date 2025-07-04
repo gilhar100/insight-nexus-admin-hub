@@ -70,13 +70,6 @@ export const EnhancedSalimaRadarChart: React.FC<EnhancedSalimaRadarChartProps> =
       fullMark: 5
     },
     {
-      dimension: 'הסתגלות',
-      self: selfData.adaptability,
-      colleague: colleagueData?.adaptability,
-      combined: combinedData?.adaptability,
-      fullMark: 5
-    },
-    {
       dimension: 'למידה',
       self: selfData.learning,
       colleague: colleagueData?.learning,
@@ -91,10 +84,10 @@ export const EnhancedSalimaRadarChart: React.FC<EnhancedSalimaRadarChartProps> =
       fullMark: 5
     },
     {
-      dimension: 'משמעות',
-      self: selfData.meaning,
-      colleague: colleagueData?.meaning,
-      combined: combinedData?.meaning,
+      dimension: 'הסתגלות',
+      self: selfData.adaptability,
+      colleague: colleagueData?.adaptability,
+      combined: combinedData?.adaptability,
       fullMark: 5
     },
     {
@@ -102,6 +95,13 @@ export const EnhancedSalimaRadarChart: React.FC<EnhancedSalimaRadarChartProps> =
       self: selfData.authenticity,
       colleague: colleagueData?.authenticity,
       combined: combinedData?.authenticity,
+      fullMark: 5
+    },
+    {
+      dimension: 'משמעות',
+      self: selfData.meaning,
+      colleague: colleagueData?.meaning,
+      combined: combinedData?.meaning,
       fullMark: 5
     }
   ];
