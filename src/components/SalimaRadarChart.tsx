@@ -20,12 +20,12 @@ const chartConfig = {
 
 // SALIMA dimension colors
 const SALIMA_COLORS = {
-  'אסטרטגיה': '#3B82F6', // Blue
-  'למידה': '#10B981', // Green
-  'השראה': '#EF4444', // Red
-  'הסתגלות': '#F59E0B', // Orange
-  'אותנטיות': '#EC4899', // Pink
-  'משמעות': '#8B5CF6', // Purple
+  'אסטרטגיה': '#3B82F6', // Blue - Strategy
+  'למידה': '#10B981',    // Green - Learning
+  'השראה': '#EF4444',    // Red - Inspiration
+  'הסתגלות': '#F59E0B',  // Orange - Adaptability
+  'אותנטיות': '#EC4899', // Pink - Authenticity
+  'משמעות': '#8B5CF6',   // Purple - Meaning
   // English fallbacks
   'Strategy': '#3B82F6',
   'Learning': '#10B981',

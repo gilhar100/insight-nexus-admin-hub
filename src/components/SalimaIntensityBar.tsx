@@ -8,6 +8,13 @@ interface SalimaIntensityBarProps {
 }
 
 const SALIMA_COLORS = {
+  'אסטרטגיה': '#3B82F6', // Strategy
+  'למידה': '#10B981',    // Learning
+  'השראה': '#EF4444',    // Inspiration
+  'הסתגלות': '#F59E0B',  // Adaptability  
+  'אותנטיות': '#EC4899', // Authenticity
+  'משמעות': '#8B5CF6',   // Meaning
+  // English fallbacks
   'Strategy': '#3B82F6',
   'Learning': '#10B981', 
   'Inspiration': '#EF4444',

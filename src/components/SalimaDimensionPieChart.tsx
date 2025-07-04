@@ -19,11 +19,11 @@ const DIMENSION_NAMES = {
   dimension_l: 'למידה',
   dimension_i: 'השראה',
   dimension_m: 'משמעות',
-  dimension_a: 'אותנטיות',
-  dimension_a2: 'הסתגלות'
+  dimension_a: 'הסתגלות',   // dimension_a is adaptability
+  dimension_a2: 'אותנטיות'  // dimension_a2 is authenticity
 };
 
-const COLORS = ['#3B82F6', '#10B981', '#EF4444', '#8B5CF6', '#EC4899', '#F59E0B'];
+const COLORS = ['#3B82F6', '#10B981', '#EF4444', '#8B5CF6', '#F59E0B', '#EC4899'];
 
 export const SalimaDimensionPieChart: React.FC<SalimaDimensionPieChartProps> = ({ participants }) => {
   // Calculate strongest dimension for each participant
@@ -32,8 +32,8 @@ export const SalimaDimensionPieChart: React.FC<SalimaDimensionPieChartProps> = (
     'למידה': 0,
     'השראה': 0,
     'משמעות': 0,
-    'אותנטיות': 0,
-    'הסתגלות': 0
+    'הסתגלות': 0,
+    'אותנטיות': 0
   };
 
   participants.forEach(participant => {
