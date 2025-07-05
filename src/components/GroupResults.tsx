@@ -1,7 +1,10 @@
-
 import React from 'react';
 import { SalimaDimensionPieChart } from '@/components/SalimaDimensionPieChart';
 import { SalimaScoreDistributionChart } from '@/components/SalimaScoreDistributionChart';
+import { SalimaGroupRadarChart } from '@/components/SalimaGroupRadarChart';
+import { SalimaStandardDeviationChart } from '@/components/SalimaStandardDeviationChart';
+import { SalimaBoxPlotsChart } from '@/components/SalimaBoxPlotsChart';
+import { SalimaBellCurveChart } from '@/components/SalimaBellCurveChart';
 
 interface GroupData {
   group_number: number;
@@ -219,6 +222,77 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
           </div>
         </div>
       )}
+
+      {/* New Visualizations */}
+      
+      {/* 1. Radar Chart – Group Averages per SALIMA Dimension */}
+      <div className="card">
+        <div className="card-header text-center">
+          <div className={`flex items-center justify-center text-right card-title${isPresenterMode ? " text-3xl" : ""}`}>
+            <span className="ml-2">📊</span>
+            תרשים רדאר – פרופיל קבוצתי לפי ממד
+          </div>
+        </div>
+        <div className="card-content">
+          <div className="h-[520px] w-full flex items-center justify-center">
+            <SalimaGroupRadarChart averages={groupData.averages} />
+          </div>
+          <p className={`text-center text-gray-600 mt-4 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+            הצגת הפרופיל הקבוצתי הממוצע בכל ששת ממדי SALIMA
+          </p>
+        </div>
+      </div>
+
+      {/* 2. Bar Chart – Standard Deviation by Dimension */}
+      <div className="card">
+        <div className="card-header text-center">
+          <div className={`flex items-center justify-center text-right card-title${isPresenterMode ? " text-3xl" : ""}`}>
+            <span className="ml-2">📏</span>
+            שונות בין חברי הקבוצה
+          </div>
+        </div>
+        <div className="card-content">
+          <div className="h-[400px] w-full flex items-center justify-center">
+            <SalimaStandardDeviationChart participants={groupData.participants} />
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Box Plots – Distribution by Dimension */}
+      <div className="card" style={{ gridColumn: isPresenterMode ? "span 2" : undefined }}>
+        <div className="card-header text-center">
+          <div className={`flex items-center justify-center text-right card-title${isPresenterMode ? " text-3xl" : ""}`}>
+            <span className="ml-2">📦</span>
+            טווחי תשובות לכל ממד
+          </div>
+        </div>
+        <div className="card-content">
+          <div className="h-[400px] w-full flex items-center justify-center">
+            <SalimaBoxPlotsChart participants={groupData.participants} />
+          </div>
+          <p className={`text-center text-gray-600 mt-4 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+            הצגת החציון, הרבעונים והקיצוניים לכל ממד
+          </p>
+        </div>
+      </div>
+
+      {/* 4. Bell Curve – SLQ Score Distribution */}
+      <div className="card" style={{ gridColumn: isPresenterMode ? "span 2" : undefined }}>
+        <div className="card-header text-center">
+          <div className={`flex items-center justify-center text-right card-title${isPresenterMode ? " text-3xl" : ""}`}>
+            <span className="ml-2">📈</span>
+            פיזור המשתתפים
+          </div>
+        </div>
+        <div className="card-content">
+          <div className="h-[400px] w-full flex items-center justify-center">
+            <SalimaBellCurveChart participants={groupData.participants} averageScore={groupData.averages.overall} />
+          </div>
+          <p className={`text-center text-gray-600 mt-4 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+            הקו מייצג את ממוצע הקבוצה. הנקודות מציגות את מיקומם של חברי הקבוצה ביחס לממוצע.
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
