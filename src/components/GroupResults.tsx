@@ -1,8 +1,9 @@
+
 import React from 'react';
 import { SalimaScoreDistributionChart } from '@/components/SalimaScoreDistributionChart';
 import { SalimaGroupRadarChart } from '@/components/SalimaGroupRadarChart';
-import { SalimaStandardDeviationChart } from '@/components/SalimaStandardDeviationChart';
 import { SalimaBellCurveChart } from '@/components/SalimaBellCurveChart';
+
 interface GroupData {
   group_number: number;
   participant_count: number;
@@ -24,10 +25,12 @@ interface GroupData {
     dimension_a2: number;
   }>;
 }
+
 interface GroupResultsProps {
   groupData: GroupData;
   isPresenterMode: boolean;
 }
+
 const getDimensionInsights = (averages: GroupData['averages']) => {
   const dimensions = [{
     key: 'strategy',
@@ -36,7 +39,6 @@ const getDimensionInsights = (averages: GroupData['averages']) => {
   }, {
     key: 'authenticity',
     name: 'אותנטיות (A2)',
-    // Fixed: authenticity is A2
     score: averages.authenticity
   }, {
     key: 'learning',
@@ -53,17 +55,19 @@ const getDimensionInsights = (averages: GroupData['averages']) => {
   }, {
     key: 'adaptability',
     name: 'הסתגלות (A)',
-    // Fixed: adaptability is A
     score: averages.adaptability
   }];
+
   const strongest = dimensions.reduce((max, dim) => dim.score > max.score ? dim : max);
   const weakest = dimensions.reduce((min, dim) => dim.score < min.score ? dim : min);
+
   return {
     strongest,
     weakest,
     isSameDimension: strongest.key === weakest.key
   };
 };
+
 const getDimensionExplanation = (dimensionKey: string) => {
   const explanations = {
     strategy: "ממד זה משקף יכולת ניהול חזון ברור, חשיבה לטווח ארוך, והתבוננות מעמיקה. מנהלים חזקים בתחום זה פועלים לפי \"מפה דינמית\" – הם לא מוותרים על היעד, אך יודעים לשנות מסלול בהתאם לשינויים במציאות. הם מביטים קדימה, מזהים תהליכים מורכבים, ומובילים מתוך הבנה רחבה ולא רק מתוך תגובה מיידית.",
@@ -75,17 +79,20 @@ const getDimensionExplanation = (dimensionKey: string) => {
   };
   return explanations[dimensionKey as keyof typeof explanations] || "";
 };
+
 export const GroupResults: React.FC<GroupResultsProps> = ({
   groupData,
   isPresenterMode
 }) => {
   // Add safety check for groupData
   if (!groupData || !groupData.participants || groupData.participants.length === 0) {
-    return <div className="card">
+    return (
+      <div className="card">
         <div className="card-content p-8 text-center">
           <p className="text-gray-600">אין נתונים להצגה עבור קבוצה זו</p>
         </div>
-      </div>;
+      </div>
+    );
   }
 
   // Add safety check for dimension insights
@@ -95,32 +102,22 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
   } catch (error) {
     console.error('Error calculating dimension insights:', error);
     dimensionInsights = {
-      strongest: {
-        key: 'strategy',
-        name: 'אסטרטגיה',
-        score: 0
-      },
-      weakest: {
-        key: 'strategy',
-        name: 'אסטרטגיה',
-        score: 0
-      },
+      strongest: { key: 'strategy', name: 'אסטרטגיה', score: 0 },
+      weakest: { key: 'strategy', name: 'אסטרטגיה', score: 0 },
       isSameDimension: false
     };
   }
-  const {
-    strongest,
-    weakest,
-    isSameDimension
-  } = dimensionInsights;
-  return <div className={isPresenterMode ? "presenter-grid" : "grid grid-cols-1 lg:grid-cols-2 gap-8"}>
+
+  const { strongest, weakest, isSameDimension } = dimensionInsights;
+
+  return (
+    <div className={isPresenterMode ? "presenter-grid" : "grid grid-cols-1 lg:grid-cols-2 gap-8"}>
       {/* Dimension Insights Section */}
-      <div className="card" style={{
-      gridColumn: isPresenterMode ? "span 2" : undefined
-    }}>
+      <div className="card" style={{ gridColumn: isPresenterMode ? "span 2" : undefined }}>
         <div className="card-header text-center"></div>
         <div className="card-content">
-          {!isSameDimension ? <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+          {!isSameDimension ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
               {/* Strongest Dimension */}
               <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
                 <h3 className={`font-bold text-green-800 mb-3 ${isPresenterMode ? 'text-2xl' : 'text-xl'}`}>
@@ -135,11 +132,6 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
                 <p className={`text-green-600 mt-2 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
                   הממד עם הציון הממוצע הגבוה ביותר בקבוצה
                 </p>
-                
-                {/* Explanatory paragraph for strongest dimension */}
-                <div className={`mt-4 p-4 bg-white border border-green-300 rounded-lg text-right ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                  
-                </div>
               </div>
 
               {/* Weakest Dimension */}
@@ -157,14 +149,15 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
                   הממד הדורש הכי הרבה פיתוח בקבוצה
                 </p>
                 
-                {/* Explanatory paragraph for weakest dimension */}
                 <div className={`mt-4 p-4 bg-white border border-orange-300 rounded-lg text-right ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
                   <p className="text-gray-700 leading-relaxed">
                     {getDimensionExplanation(weakest.key)}
                   </p>
                 </div>
               </div>
-            </div> : <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+            </div>
+          ) : (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
               <h3 className={`font-bold text-yellow-800 mb-3 ${isPresenterMode ? 'text-2xl' : 'text-xl'}`}>
                 ממד דומיננטי
               </h3>
@@ -178,36 +171,19 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
                 אותו ממד זוהה כחזק ביותר וכדורש פיתוח—כדאי לבחון את התפלגות הציונים
               </p>
               
-              {/* Explanatory paragraph for same dimension */}
               <div className={`mt-4 p-4 bg-white border border-yellow-300 rounded-lg text-right ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
                 <p className="text-gray-700 leading-relaxed">
                   {getDimensionExplanation(strongest.key)}
                 </p>
               </div>
-            </div>}
-        </div>
-      </div>
-
-      {/* Group Overall Score Summary */}
-      <div className="card">
-        <div className="card-header text-center">
-          <div className={`flex items-center justify-between text-right card-title${isPresenterMode ? ' flex-col gap-4' : ''}`}>
-            
-            
-          </div>
-        </div>
-        <div className="card-content">
-          <div className={`score-display`}>
-            
-            
-          </div>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Score Distribution Chart - Full Width */}
-      {groupData.participant_count > 5 && <div className="card" style={{
-      gridColumn: isPresenterMode ? "span 2" : undefined
-    }}>
+      {groupData.participant_count > 5 && (
+        <div className="card" style={{ gridColumn: isPresenterMode ? "span 2" : undefined }}>
           <div className="card-header text-center">
             <div className={`flex items-center justify-center text-right card-title${isPresenterMode ? " text-3xl" : ""}`}>
               התפלגות טווחי ציונים
@@ -218,13 +194,13 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
               <SalimaScoreDistributionChart participants={groupData.participants} />
             </div>
           </div>
-        </div>}
+        </div>
+      )}
 
-      {/* 1. Radar Chart – Group Averages per SALIMA Dimension */}
+      {/* Radar Chart – Group Averages per SALIMA Dimension */}
       <div className="card">
         <div className="card-header text-center">
           <div className={`flex items-center justify-center text-right card-title${isPresenterMode ? " text-3xl" : ""}`}>
-            
             תרשים רדאר – פרופיל קבוצתי לפי ממד
           </div>
         </div>
@@ -232,38 +208,22 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
           <div className="h-[520px] w-full flex items-center justify-center">
             <SalimaGroupRadarChart averages={groupData.averages} />
           </div>
-          
         </div>
       </div>
 
-      {/* 2. Bar Chart – Standard Deviation by Dimension */}
-      <div className="card">
+      {/* Bell Curve – SLQ Score Distribution - Full Width */}
+      <div className="card" style={{ gridColumn: "span 2" }}>
         <div className="card-header text-center">
           <div className={`flex items-center justify-center text-right card-title${isPresenterMode ? " text-3xl" : ""}`}>
-            <span className="ml-2">📏</span>
-            שונות בין חברי הקבוצה
+            התפלגות ציוני SLQ
           </div>
-        </div>
-        <div className="card-content">
-          <div className="h-[400px] w-full flex items-center justify-center">
-            <SalimaStandardDeviationChart participants={groupData.participants} />
-          </div>
-        </div>
-      </div>
-
-      {/* 4. Bell Curve – SLQ Score Distribution */}
-      <div className="card" style={{
-      gridColumn: isPresenterMode ? "span 2" : undefined
-    }}>
-        <div className="card-header text-center">
-          
         </div>
         <div className="card-content">
           <div className="h-[400px] w-full flex items-center justify-center">
             <SalimaBellCurveChart participants={groupData.participants} averageScore={groupData.averages.overall} />
           </div>
-          
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
