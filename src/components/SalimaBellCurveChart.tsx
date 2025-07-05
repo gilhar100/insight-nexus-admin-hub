@@ -33,19 +33,19 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
   const variance = participantScores.reduce((sum, score) => sum + Math.pow(score - mean, 2), 0) / participantScores.length;
   const stdDev = Math.sqrt(variance);
 
-  // Generate bell curve data points - smoother and wider curve
+  // Generate bell curve data points - wider range and more points for smoother curve
   const generateBellCurve = () => {
     const points = [];
-    const min = 1; // Start from 1 instead of 0
-    const max = 5; // End at 5
-    const step = (max - min) / 400; // More points for smoother curve
+    const min = 1;
+    const max = 5;
+    const step = (max - min) / 500; // More points for smoother curve
 
     for (let x = min; x <= max; x += step) {
       const y = (1 / (stdDev * Math.sqrt(2 * Math.PI))) * 
                 Math.exp(-0.5 * Math.pow((x - mean) / stdDev, 2));
       points.push({ 
         slqScore: x, 
-        density: y * 150 // Increased scaling for better visibility
+        density: y * 200 // Increased scaling for better visibility
       });
     }
     return points;
@@ -80,7 +80,7 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
     <div className="w-full h-full relative">
       <ChartContainer config={chartConfig} className="h-full w-full" dir="rtl">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={bellCurveData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+          <LineChart data={bellCurveData} margin={{ top: 40, right: 30, left: 20, bottom: 60 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis 
               dataKey="slqScore"
@@ -123,7 +123,7 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
               strokeDasharray="5 5"
               label={{ 
                 value: "ממוצע קבוצתי", 
-                position: "topRight", 
+                position: "top", 
                 offset: 10,
                 style: { 
                   fontWeight: 'bold', 
