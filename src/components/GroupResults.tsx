@@ -1,10 +1,7 @@
-
 import React from 'react';
-import { SalimaDimensionPieChart } from '@/components/SalimaDimensionPieChart';
 import { SalimaScoreDistributionChart } from '@/components/SalimaScoreDistributionChart';
 import { SalimaGroupRadarChart } from '@/components/SalimaGroupRadarChart';
 import { SalimaStandardDeviationChart } from '@/components/SalimaStandardDeviationChart';
-import { SalimaBoxPlotsChart } from '@/components/SalimaBoxPlotsChart';
 import { SalimaBellCurveChart } from '@/components/SalimaBellCurveChart';
 
 interface GroupData {
@@ -218,20 +215,6 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
         </div>
       </div>
 
-      {/* Dimension Strength Pie Chart */}
-      <div className="card">
-        <div className="card-header text-center">
-          <div className={`flex items-center justify-center text-right card-title${isPresenterMode ? " text-3xl" : ""}`}>
-            התפלגות חוזקות הממדים
-          </div>
-        </div>
-        <div className="card-content">
-          <div className="h-[520px] w-full flex items-center justify-center">
-            <SalimaDimensionPieChart participants={groupData.participants} />
-          </div>
-        </div>
-      </div>
-
       {/* Score Distribution Chart - Full Width */}
       {groupData.participant_count > 5 && (
         <div className="card" style={{ gridColumn: isPresenterMode ? "span 2" : undefined }}>
@@ -248,8 +231,6 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
         </div>
       )}
 
-      {/* New Visualizations */}
-      
       {/* 1. Radar Chart – Group Averages per SALIMA Dimension */}
       <div className="card">
         <div className="card-header text-center">
@@ -280,24 +261,6 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
           <div className="h-[400px] w-full flex items-center justify-center">
             <SalimaStandardDeviationChart participants={groupData.participants} />
           </div>
-        </div>
-      </div>
-
-      {/* 3. Box Plots – Distribution by Dimension */}
-      <div className="card" style={{ gridColumn: isPresenterMode ? "span 2" : undefined }}>
-        <div className="card-header text-center">
-          <div className={`flex items-center justify-center text-right card-title${isPresenterMode ? " text-3xl" : ""}`}>
-            <span className="ml-2">📦</span>
-            טווחי תשובות לכל ממד
-          </div>
-        </div>
-        <div className="card-content">
-          <div className="h-[400px] w-full flex items-center justify-center">
-            <SalimaBoxPlotsChart participants={groupData.participants} />
-          </div>
-          <p className={`text-center text-gray-600 mt-4 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-            הצגת החציון, הרבעונים והקיצוניים לכל ממד
-          </p>
         </div>
       </div>
 
