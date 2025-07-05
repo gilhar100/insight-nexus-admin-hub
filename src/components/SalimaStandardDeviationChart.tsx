@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { ChartContainer } from '@/components/ui/chart';
 
 interface SalimaStandardDeviationChartProps {
@@ -80,12 +80,16 @@ export const SalimaStandardDeviationChart: React.FC<SalimaStandardDeviationChart
                 return null;
               }}
             />
-            <Bar 
-              dataKey="deviation" 
-              fill="#f59e0b"
-              stroke={(entry) => entry?.dimension === highestDeviationDimension ? "#dc2626" : "none"}
-              strokeWidth={(entry) => entry?.dimension === highestDeviationDimension ? 2 : 0}
-            />
+            <Bar dataKey="deviation">
+              {chartData.map((entry, index) => (
+                <Cell 
+                  key={`cell-${index}`} 
+                  fill="#f59e0b"
+                  stroke={entry.dimension === highestDeviationDimension ? "#dc2626" : "none"}
+                  strokeWidth={entry.dimension === highestDeviationDimension ? 2 : 0}
+                />
+              ))}
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
       </ChartContainer>
