@@ -241,6 +241,149 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
                 </ul>
               </div>
             </div>
+
+            {/* Individual Insights Section with Static Labels */}
+            {respondentData.rawData && (
+              <div className="mt-8 space-y-6">
+                {/* Strategy Insights */}
+                {respondentData.rawData.insight_strategy && (
+                  <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
+                    <h4 className={`font-semibold text-blue-800 mb-4 text-right ${isPresenterMode ? 'text-2xl' : 'text-lg'}`}>
+                      תובנות אסטרטגיה
+                    </h4>
+                    <div className="space-y-4 text-right">
+                      <div>
+                        <h5 className="font-medium text-green-700 mb-2">שימור</h5>
+                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                          {respondentData.rawData.insight_strategy.split('\n')[0]}
+                        </p>
+                      </div>
+                      <div>
+                        <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
+                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                          {respondentData.rawData.insight_strategy.split('\n')[1]}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Adaptability Insights */}
+                {respondentData.rawData.insight_adaptive && (
+                  <div className="bg-orange-50 p-6 rounded-lg border border-orange-200">
+                    <h4 className={`font-semibold text-orange-800 mb-4 text-right ${isPresenterMode ? 'text-2xl' : 'text-lg'}`}>
+                      תובנות הסתגלות
+                    </h4>
+                    <div className="space-y-4 text-right">
+                      <div>
+                        <h5 className="font-medium text-green-700 mb-2">שימור</h5>
+                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                          {respondentData.rawData.insight_adaptive.split('\n')[0]}
+                        </p>
+                      </div>
+                      <div>
+                        <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
+                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                          {respondentData.rawData.insight_adaptive.split('\n')[1]}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Learning Insights */}
+                {respondentData.rawData.insight_learning && (
+                  <div className="bg-green-50 p-6 rounded-lg border border-green-200">
+                    <h4 className={`font-semibold text-green-800 mb-4 text-right ${isPresenterMode ? 'text-2xl' : 'text-lg'}`}>
+                      תובנות למידה
+                    </h4>
+                    <div className="space-y-4 text-right">
+                      <div>
+                        <h5 className="font-medium text-green-700 mb-2">שימור</h5>
+                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                          {respondentData.rawData.insight_learning.split('\n')[0]}
+                        </p>
+                      </div>
+                      <div>
+                        <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
+                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                          {respondentData.rawData.insight_learning.split('\n')[1]}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Inspiration Insights */}
+                {respondentData.rawData.insight_inspiration && (
+                  <div className="bg-red-50 p-6 rounded-lg border border-red-200">
+                    <h4 className={`font-semibold text-red-800 mb-4 text-right ${isPresenterMode ? 'text-2xl' : 'text-lg'}`}>
+                      תובנות השראה
+                    </h4>
+                    <div className="space-y-4 text-right">
+                      <div>
+                        <h5 className="font-medium text-green-700 mb-2">שימור</h5>
+                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                          {respondentData.rawData.insight_inspiration.split('\n')[0]}
+                        </p>
+                      </div>
+                      <div>
+                        <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
+                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                          {respondentData.rawData.insight_inspiration.split('\n')[1]}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Meaning Insights */}
+                {respondentData.rawData.insight_meaning && (
+                  <div className="bg-purple-50 p-6 rounded-lg border border-purple-200">
+                    <h4 className={`font-semibold text-purple-800 mb-4 text-right ${isPresenterMode ? 'text-2xl' : 'text-lg'}`}>
+                      תובנות משמעות
+                    </h4>
+                    <div className="space-y-4 text-right">
+                      <div>
+                        <h5 className="font-medium text-green-700 mb-2">שימור</h5>
+                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                          {respondentData.rawData.insight_meaning.split('\n')[0]}
+                        </p>
+                      </div>
+                      <div>
+                        <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
+                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                          {respondentData.rawData.insight_meaning.split('\n')[1]}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Authenticity Insights */}
+                {respondentData.rawData.insight_authentic && (
+                  <div className="bg-pink-50 p-6 rounded-lg border border-pink-200">
+                    <h4 className={`font-semibold text-pink-800 mb-4 text-right ${isPresenterMode ? 'text-2xl' : 'text-lg'}`}>
+                      תובנות אותנטיות
+                    </h4>
+                    <div className="space-y-4 text-right">
+                      <div>
+                        <h5 className="font-medium text-green-700 mb-2">שימור</h5>
+                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                          {respondentData.rawData.insight_authentic.split('\n')[0]}
+                        </p>
+                      </div>
+                      <div>
+                        <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
+                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                          {respondentData.rawData.insight_authentic.split('\n')[1]}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
