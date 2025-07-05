@@ -43,24 +43,31 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
   const stdDev = Math.sqrt(variance);
 
   // Ensure minimum standard deviation for visible curve
-  const effectiveStdDev = Math.max(stdDev, 0.3);
+  const effectiveStdDev = Math.max(stdDev, 0.5);
 
-  // Generate smooth bell curve data points
+  // Generate smooth bell curve data points using kernel density estimation
   const generateBellCurve = () => {
     const points = [];
     const min = 1;
     const max = 5;
-    const step = (max - min) / 200; // High resolution for smooth curve
+    const step = (max - min) / 100; // Increased resolution for smoother curve
 
     for (let x = min; x <= max; x += step) {
-      // Normal distribution formula
-      const exponent = -0.5 * Math.pow((x - mean) / effectiveStdDev, 2);
-      const coefficient = 1 / (effectiveStdDev * Math.sqrt(2 * Math.PI));
-      const y = coefficient * Math.exp(exponent);
+      // Calculate kernel density estimation at point x
+      let density = 0;
+      const bandwidth = effectiveStdDev * 0.8; // Smoothing bandwidth
+      
+      participantScores.forEach(score => {
+        // Gaussian kernel
+        const u = (x - score) / bandwidth;
+        density += Math.exp(-0.5 * u * u) / Math.sqrt(2 * Math.PI);
+      });
+      
+      density = density / (participantScores.length * bandwidth);
       
       points.push({ 
         slqScore: parseFloat(x.toFixed(3)), 
-        density: y * 100 // Scale for better visibility
+        density: density * 10 // Scale for better visibility
       });
     }
     return points;
@@ -70,7 +77,7 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
 
   // Find maximum density for Y-axis scaling
   const maxDensity = Math.max(...bellCurveData.map(point => point.density));
-  const yAxisMax = Math.ceil(maxDensity * 1.2); // Add 20% padding
+  const yAxisMax = Math.ceil(maxDensity * 1.3); // Add 30% padding
 
   // Custom component to render tick marks for individual scores
   const CustomTicks = () => {
@@ -130,7 +137,7 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
                   return (
                     <div className="bg-white p-3 border rounded shadow-lg text-right">
                       <p className="text-blue-600 text-sm">
-                        ציון SLQ: {typeof label === 'number' ? label.toFixed(2) : label}
+                        ציון SLQ: {typeof label === 'number' ? label.toFixed(2) : parseFloat(String(label)).toFixed(2)}
                       </p>
                       <p className="text-gray-600 text-sm">
                         צפיפות: {payload[0].value?.toFixed(3)}
