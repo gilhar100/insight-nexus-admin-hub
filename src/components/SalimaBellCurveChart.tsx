@@ -134,10 +134,22 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
             <Tooltip 
               content={({ active, payload, label }) => {
                 if (active && payload && payload.length) {
+                  // Safely handle the label conversion
+                  const formatLabel = (labelValue: any): string => {
+                    if (typeof labelValue === 'number') {
+                      return labelValue.toFixed(2);
+                    }
+                    if (typeof labelValue === 'string') {
+                      const parsed = parseFloat(labelValue);
+                      return isNaN(parsed) ? '0.00' : parsed.toFixed(2);
+                    }
+                    return '0.00';
+                  };
+
                   return (
                     <div className="bg-white p-3 border rounded shadow-lg text-right">
                       <p className="text-blue-600 text-sm">
-                        ציון SLQ: {typeof label === 'number' ? label.toFixed(2) : parseFloat(String(label)).toFixed(2)}
+                        ציון SLQ: {formatLabel(label)}
                       </p>
                       <p className="text-gray-600 text-sm">
                         צפיפות: {payload[0].value?.toFixed(3)}
