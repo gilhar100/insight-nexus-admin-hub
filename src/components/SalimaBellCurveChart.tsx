@@ -146,13 +146,25 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
                     return '0.00';
                   };
 
+                  // Safely handle the payload value conversion
+                  const formatValue = (value: any): string => {
+                    if (typeof value === 'number') {
+                      return value.toFixed(3);
+                    }
+                    if (typeof value === 'string') {
+                      const parsed = parseFloat(value);
+                      return isNaN(parsed) ? '0.000' : parsed.toFixed(3);
+                    }
+                    return '0.000';
+                  };
+
                   return (
                     <div className="bg-white p-3 border rounded shadow-lg text-right">
                       <p className="text-blue-600 text-sm">
                         ציון SLQ: {formatLabel(label)}
                       </p>
                       <p className="text-gray-600 text-sm">
-                        צפיפות: {payload[0].value?.toFixed(3)}
+                        צפיפות: {formatValue(payload[0].value)}
                       </p>
                     </div>
                   );
