@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { SalimaDimensionPieChart } from '@/components/SalimaDimensionPieChart';
 import { SalimaScoreDistributionChart } from '@/components/SalimaScoreDistributionChart';
@@ -87,7 +88,31 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
   groupData,
   isPresenterMode
 }) => {
-  const { strongest, weakest, isSameDimension } = getDimensionInsights(groupData.averages);
+  // Add safety check for groupData
+  if (!groupData || !groupData.participants || groupData.participants.length === 0) {
+    return (
+      <div className="card">
+        <div className="card-content p-8 text-center">
+          <p className="text-gray-600">אין נתונים להצגה עבור קבוצה זו</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Add safety check for dimension insights
+  let dimensionInsights;
+  try {
+    dimensionInsights = getDimensionInsights(groupData.averages);
+  } catch (error) {
+    console.error('Error calculating dimension insights:', error);
+    dimensionInsights = {
+      strongest: { key: 'strategy', name: 'אסטרטגיה', score: 0 },
+      weakest: { key: 'strategy', name: 'אסטרטגיה', score: 0 },
+      isSameDimension: false
+    };
+  }
+
+  const { strongest, weakest, isSameDimension } = dimensionInsights;
 
   return (
     <div className={isPresenterMode ? "presenter-grid" : "grid grid-cols-1 lg:grid-cols-2 gap-8"}>

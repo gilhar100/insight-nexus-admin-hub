@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Scatter, ReferenceLine } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Dot } from 'recharts';
 import { ChartContainer } from '@/components/ui/chart';
 
 interface SalimaBellCurveChartProps {
@@ -47,24 +47,53 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
     for (let x = min; x <= max; x += step) {
       const y = (1 / (stdDev * Math.sqrt(2 * Math.PI))) * 
                 Math.exp(-0.5 * Math.pow((x - mean) / stdDev, 2));
-      points.push({ x: x, y: y * 100 }); // Scale for visibility
+      points.push({ 
+        x: x, 
+        y: y * 100, // Scale for visibility
+        participants: participantScores.filter(score => Math.abs(score - x) < step * 2).length
+      });
     }
     return points;
   };
 
   const bellCurveData = generateBellCurve();
 
-  // Create participant data points for scatter
-  const participantData = participantScores.map((score, index) => ({
-    x: score,
-    y: 0,
-    id: index + 1
-  }));
+  // Add participant markers to the curve data
+  const dataWithParticipants = bellCurveData.map(point => {
+    const nearbyParticipants = participantScores.filter(score => 
+      Math.abs(score - point.x) < 0.1
+    );
+    return {
+      ...point,
+      participantCount: nearbyParticipants.length
+    };
+  });
+
+  const CustomDot = (props: any) => {
+    const { cx, cy, payload } = props;
+    if (payload.participantCount > 0) {
+      return (
+        <g>
+          {Array.from({ length: Math.min(payload.participantCount, 5) }).map((_, index) => (
+            <circle
+              key={index}
+              cx={cx}
+              cy={cy + (index * 3)}
+              r={2}
+              fill="#ef4444"
+              opacity={0.7}
+            />
+          ))}
+        </g>
+      );
+    }
+    return null;
+  };
 
   return (
     <ChartContainer config={chartConfig} className="h-full w-full" dir="rtl">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={bellCurveData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+        <LineChart data={dataWithParticipants} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis 
             dataKey="x"
@@ -80,11 +109,17 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
           <Tooltip 
             content={({ active, payload, label }) => {
               if (active && payload && payload.length) {
+                const data = payload[0].payload;
                 return (
                   <div className="bg-white p-3 border rounded shadow-lg text-right">
                     <p className="text-blue-600 text-sm">
                       ציון SLQ: {typeof label === 'number' ? label.toFixed(2) : label}
                     </p>
+                    {data.participantCount > 0 && (
+                      <p className="text-red-600 text-sm">
+                        משתתפים באזור: {data.participantCount}
+                      </p>
+                    )}
                   </div>
                 );
               }
@@ -96,7 +131,7 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
             dataKey="y" 
             stroke="#3b82f6" 
             strokeWidth={3}
-            dot={false}
+            dot={<CustomDot />}
             name="התפלגות נורמלית"
           />
           <ReferenceLine 
@@ -106,15 +141,6 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
             strokeDasharray="5 5"
             label={{ value: "ממוצע קבוצה", position: "top" }}
           />
-          {/* Add participant dots */}
-          {participantData.map((point, index) => (
-            <Scatter
-              key={index}
-              data={[point]}
-              fill="#ef4444"
-              opacity={0.7}
-            />
-          ))}
         </LineChart>
       </ResponsiveContainer>
     </ChartContainer>

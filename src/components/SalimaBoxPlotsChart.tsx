@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ResponsiveContainer, ComposedChart, XAxis, YAxis, CartesianGrid, Tooltip, Bar } from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts';
 import { ChartContainer } from '@/components/ui/chart';
 
 interface SalimaBoxPlotsChartProps {
@@ -60,7 +60,7 @@ export const SalimaBoxPlotsChart: React.FC<SalimaBoxPlotsChartProps> = ({ partic
   return (
     <ChartContainer config={chartConfig} className="h-full w-full" dir="rtl">
       <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
+        <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis 
             dataKey="dimension" 
@@ -99,8 +99,12 @@ export const SalimaBoxPlotsChart: React.FC<SalimaBoxPlotsChartProps> = ({ partic
               return null;
             }}
           />
-          <Bar dataKey="range" fill="#3b82f6" fillOpacity={0.3} />
-        </ComposedChart>
+          <Bar dataKey="range">
+            {chartData.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill="#3b82f6" fillOpacity={0.3} />
+            ))}
+          </Bar>
+        </BarChart>
       </ResponsiveContainer>
     </ChartContainer>
   );
