@@ -132,6 +132,12 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
                 <p className={`text-green-600 mt-2 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
                   הממד עם הציון הממוצע הגבוה ביותר בקבוצה
                 </p>
+                
+                <div className={`mt-4 p-4 bg-white border border-green-300 rounded-lg text-right ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                  <p className="text-gray-700 leading-relaxed">
+                    {getDimensionExplanation(strongest.key)}
+                  </p>
+                </div>
               </div>
 
               {/* Weakest Dimension */}
