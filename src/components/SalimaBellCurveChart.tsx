@@ -44,8 +44,8 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
       const y = (1 / (stdDev * Math.sqrt(2 * Math.PI))) * 
                 Math.exp(-0.5 * Math.pow((x - mean) / stdDev, 2));
       points.push({ 
-        x: x, 
-        y: y * 100 // Scale for visibility
+        slqScore: x, 
+        density: y * 100 // Scale for visibility
       });
     }
     return points;
@@ -58,8 +58,8 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
     return (
       <g>
         {participantScores.map((score, index) => {
-          // Calculate x position based on chart scale
-          const xPercent = ((score - 0) / (5 - 0)) * 100;
+          // Calculate x position based on the chart's domain (0 to 5)
+          const xPercent = (score / 5) * 100;
           return (
             <line
               key={index}
@@ -83,10 +83,11 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
           <LineChart data={bellCurveData} margin={{ top: 20, right: 30, left: 20, bottom: 40 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis 
-              dataKey="x"
+              dataKey="slqScore"
               domain={[0, 5]}
               type="number"
               tick={{ fontSize: 12, fill: '#64748b' }}
+              tickFormatter={(value) => value.toFixed(1)}
               label={{ value: 'ציון SLQ', position: 'insideBottom', offset: -10, style: { fontSize: '14px', fontWeight: 'bold' } }}
             />
             <YAxis 
@@ -109,7 +110,7 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
             />
             <Line 
               type="monotone" 
-              dataKey="y" 
+              dataKey="density" 
               stroke="#3b82f6" 
               strokeWidth={3}
               dot={false}
