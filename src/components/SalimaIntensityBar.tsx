@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { getSalimaColor } from '@/utils/salimaColors';
 
 interface SalimaIntensityBarProps {
   dimension: string;
@@ -7,28 +8,12 @@ interface SalimaIntensityBarProps {
   maxScore?: number;
 }
 
-const SALIMA_COLORS = {
-  'אסטרטגיה': '#3B82F6', // Strategy
-  'למידה': '#10B981',    // Learning
-  'השראה': '#EF4444',    // Inspiration
-  'הסתגלות': '#F59E0B',  // Adaptability  
-  'אותנטיות': '#EC4899', // Authenticity
-  'משמעות': '#8B5CF6',   // Meaning
-  // English fallbacks
-  'Strategy': '#3B82F6',
-  'Learning': '#10B981', 
-  'Inspiration': '#EF4444',
-  'Adaptability': '#F59E0B',
-  'Authenticity': '#EC4899',
-  'Meaning': '#8B5CF6'
-};
-
 export const SalimaIntensityBar: React.FC<SalimaIntensityBarProps> = ({ 
   dimension, 
   score, 
   maxScore = 5 
 }) => {
-  const baseColor = SALIMA_COLORS[dimension as keyof typeof SALIMA_COLORS] || '#6B7280';
+  const baseColor = getSalimaColor(dimension);
   const intensity = Math.min(score / maxScore, 1);
   const percentage = (score / maxScore) * 100;
   

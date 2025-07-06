@@ -2,6 +2,7 @@
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { ChartContainer } from '@/components/ui/chart';
+import { getSalimaColor } from '@/utils/salimaColors';
 
 interface SalimaBellCurveChartProps {
   participants: Array<{
@@ -85,29 +86,6 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
   // Find maximum density for Y-axis scaling
   const maxDensity = Math.max(...bellCurveData.map(point => point.density));
   const yAxisMax = Math.ceil(maxDensity * 1.3); // Add 30% padding
-
-  // Custom component to render tick marks for individual scores
-  const CustomTicks = () => {
-    return (
-      <g>
-        {participantScores.map((score, index) => {
-          // Calculate x position based on the chart's domain
-          const xPercent = ((score - xMin) / (xMax - xMin)) * 100;
-          return (
-            <line
-              key={index}
-              x1={`${xPercent}%`}
-              y1="100%"
-              x2={`${xPercent}%`}
-              y2="95%"
-              stroke="#dc2626"
-              strokeWidth={2}
-            />
-          );
-        })}
-      </g>
-    );
-  };
 
   return (
     <div className="w-full h-full relative">
@@ -205,7 +183,16 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
                 } 
               }}
             />
-            <CustomTicks />
+            {/* Individual participant score markers */}
+            {participantScores.map((score, index) => (
+              <ReferenceLine 
+                key={`participant-${index}`}
+                x={score} 
+                stroke="#dc2626" 
+                strokeWidth={2}
+                strokeDasharray="none"
+              />
+            ))}
           </LineChart>
         </ResponsiveContainer>
       </ChartContainer>

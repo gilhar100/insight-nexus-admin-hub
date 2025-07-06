@@ -2,6 +2,7 @@
 import React from 'react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { getSalimaColor } from '@/utils/salimaColors';
 
 interface SalimaRadarChartProps {
   data: {
@@ -18,29 +19,12 @@ const chartConfig = {
   },
 };
 
-// SALIMA dimension colors
-const SALIMA_COLORS = {
-  'אסטרטגיה': '#3B82F6', // Blue - Strategy
-  'למידה': '#10B981',    // Green - Learning
-  'השראה': '#EF4444',    // Red - Inspiration
-  'הסתגלות': '#F59E0B',  // Orange - Adaptability
-  'אותנטיות': '#EC4899', // Pink - Authenticity
-  'משמעות': '#8B5CF6',   // Purple - Meaning
-  // English fallbacks
-  'Strategy': '#3B82F6',
-  'Learning': '#10B981',
-  'Inspiration': '#EF4444',
-  'Adaptability': '#F59E0B',
-  'Authenticity': '#EC4899',
-  'Meaning': '#8B5CF6'
-};
-
 export const SalimaRadarChart: React.FC<SalimaRadarChartProps> = ({ data }) => {
   const chartData = data.map(item => ({
     dimension: item.dimension,
     score: item.score,
     fullMark: 5,
-    color: SALIMA_COLORS[item.dimension as keyof typeof SALIMA_COLORS] || item.color
+    color: getSalimaColor(item.dimension)
   }));
 
   return (

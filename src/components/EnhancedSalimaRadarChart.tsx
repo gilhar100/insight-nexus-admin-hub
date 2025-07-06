@@ -3,6 +3,7 @@ import React from 'react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { DataSourceType } from '@/hooks/useEnhancedRespondentData';
+import { getSalimaColor } from '@/utils/salimaColors';
 
 interface ChartDataPoint {
   dimension: string;
@@ -177,7 +178,13 @@ export const EnhancedSalimaRadarChart: React.FC<EnhancedSalimaRadarChartProps> =
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart data={chartData} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
           <PolarGrid />
-          <PolarAngleAxis dataKey="dimension" tick={{ fontSize: 14, fontWeight: 'bold' }} />
+          <PolarAngleAxis 
+            dataKey="dimension" 
+            tick={{ fontSize: 14, fontWeight: 'bold' }}
+            tickFormatter={(value) => (
+              <tspan fill={getSalimaColor(value)}>{value}</tspan>
+            )}
+          />
           <PolarRadiusAxis 
             angle={90} 
             domain={[0, 5]} 
@@ -190,7 +197,9 @@ export const EnhancedSalimaRadarChart: React.FC<EnhancedSalimaRadarChartProps> =
               if (active && payload && payload.length) {
                 return (
                   <div className="bg-white p-3 border rounded shadow-lg text-right">
-                    <p className="font-semibold text-lg">{label}</p>
+                    <p className="font-semibold text-lg" style={{ color: getSalimaColor(label || '') }}>
+                      {label}
+                    </p>
                     {payload.map((entry, index) => (
                       <p key={index} style={{ color: entry.color }} className="text-base">
                         {entry.name}: {typeof entry.value === 'number' ? entry.value.toFixed(2) : entry.value}
