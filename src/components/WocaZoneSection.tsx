@@ -1,10 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, Eye, EyeOff } from 'lucide-react';
 import { WorkshopWocaAnalysis } from '@/utils/wocaAnalysis';
-
 interface WocaZoneSectionProps {
   wocaAnalysis: WorkshopWocaAnalysis;
   isPresenterMode?: boolean;
@@ -12,7 +10,6 @@ interface WocaZoneSectionProps {
   onToggleNames: () => void;
   onExportData: () => void;
 }
-
 export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
   wocaAnalysis,
   isPresenterMode = false,
@@ -34,7 +31,6 @@ export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
         return zone;
     }
   };
-
   const getZoneColor = (zone: string): string => {
     switch (zone) {
       case 'war':
@@ -49,7 +45,6 @@ export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
         return '#6b7280';
     }
   };
-
   const getZoneName = (zone: string): string => {
     switch (zone) {
       case 'war':
@@ -92,16 +87,13 @@ export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
     percentage: totalParticipants > 0 ? wocaAnalysis.groupZoneCounts.war / totalParticipants * 100 : 0,
     color: getZoneColor('war')
   }];
-
-  return (
-    <Card>
+  return <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className={`text-center ${isPresenterMode ? 'text-3xl' : 'text-xl'}`}>
             התפלגות לפי אזורי WOCA
           </CardTitle>
-          {!isPresenterMode && (
-            <div className="flex gap-2">
+          {!isPresenterMode && <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={onToggleNames} className="flex items-center gap-2">
                 {showNames ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 {showNames ? 'הסתר שמות' : 'הצג שמות'}
@@ -110,37 +102,28 @@ export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
                 <Download className="h-4 w-4" />
                 ייצא נתונים
               </Button>
-            </div>
-          )}
+            </div>}
         </div>
       </CardHeader>
       <CardContent>
         {/* Dominant Zone Display */}
         <div className="mb-6 text-center">
-          {isTie ? (
-            <div className="inline-block px-6 py-3 rounded-full bg-gray-200">
+          {isTie ? <div className="inline-block px-6 py-3 rounded-full bg-gray-200">
               <span className="text-lg font-semibold text-black">
                 תיקו בין אזורים
               </span>
-            </div>
-          ) : dominantZone ? (
-            <div 
-              className="inline-block px-6 py-3 rounded-full"
-              style={{ backgroundColor: getZoneColor(dominantZone) }}
-            >
-              <span className="text-lg font-semibold text-black">
+            </div> : dominantZone ? <div className="inline-block px-6 py-3 rounded-full" style={{
+          backgroundColor: getZoneColor(dominantZone)
+        }}>
+              <span className="font-semibold text-black text-5xl">
                 {getZoneName(dominantZone)}
               </span>
-            </div>
-          ) : (
-            <div className="inline-block px-6 py-3 rounded-full bg-gray-200">
+            </div> : <div className="inline-block px-6 py-3 rounded-full bg-gray-200">
               <span className="text-lg font-semibold text-black">
                 לא זוהה אזור דומיננטי
               </span>
-            </div>
-          )}
+            </div>}
         </div>
       </CardContent>
-    </Card>
-  );
+    </Card>;
 };
