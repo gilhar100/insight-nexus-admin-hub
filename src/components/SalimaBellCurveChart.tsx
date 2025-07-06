@@ -45,14 +45,21 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
   // Ensure minimum standard deviation for visible curve
   const effectiveStdDev = Math.max(stdDev, 0.5);
 
+  // Create a dynamic range centered around the group average
+  const minScore = Math.min(...participantScores);
+  const maxScore = Math.max(...participantScores);
+  const range = Math.max(maxScore - minScore, 2); // Minimum range of 2
+  const padding = range * 0.3; // Add 30% padding
+  
+  const xMin = Math.max(1, averageScore - range/2 - padding);
+  const xMax = Math.min(5, averageScore + range/2 + padding);
+
   // Generate smooth bell curve data points using kernel density estimation
   const generateBellCurve = () => {
     const points = [];
-    const min = 1;
-    const max = 5;
-    const step = (max - min) / 100; // Increased resolution for smoother curve
+    const step = (xMax - xMin) / 100; // Increased resolution for smoother curve
 
-    for (let x = min; x <= max; x += step) {
+    for (let x = xMin; x <= xMax; x += step) {
       // Calculate kernel density estimation at point x
       let density = 0;
       const bandwidth = effectiveStdDev * 0.8; // Smoothing bandwidth
@@ -84,15 +91,15 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
     return (
       <g>
         {participantScores.map((score, index) => {
-          // Calculate x position based on the chart's domain (1 to 5)
-          const xPercent = ((score - 1) / (5 - 1)) * 100;
+          // Calculate x position based on the chart's domain
+          const xPercent = ((score - xMin) / (xMax - xMin)) * 100;
           return (
             <line
               key={index}
               x1={`${xPercent}%`}
-              y1="90%"
+              y1="100%"
               x2={`${xPercent}%`}
-              y2="85%"
+              y2="95%"
               stroke="#dc2626"
               strokeWidth={2}
             />
@@ -110,7 +117,7 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
             <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
             <XAxis 
               dataKey="slqScore"
-              domain={[1, 5]}
+              domain={[xMin, xMax]}
               type="number"
               tick={{ fontSize: 12, fill: '#64748b' }}
               tickFormatter={(value) => value.toFixed(1)}
