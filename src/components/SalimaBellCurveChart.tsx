@@ -87,17 +87,16 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
 
   const bellCurveData = generateBellCurve();
 
-  // Create participant dots data for scatter plot
+  // Create participant dots data for scatter plot - positioned at fixed y-value
   const participantDots = participantScores.map((score, index) => ({
     slqScore: score,
-    y: -0.2, // Position below x-axis
+    y: 0.05, // Fixed y-position for all dots, slightly above x-axis
     participantIndex: index + 1,
     exactScore: score
   }));
 
-  // Find maximum density for Y-axis scaling
+  // Find maximum density for scaling
   const maxDensity = Math.max(...bellCurveData.map(point => point.density));
-  const yAxisMax = Math.ceil(maxDensity * 1.3); // Add 30% padding
 
   return (
     <div className="w-full h-full relative">
@@ -118,36 +117,28 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
                 style: { fontSize: '14px', fontWeight: 'bold', textAnchor: 'middle' } 
               }}
             />
+            {/* Hide Y-axis completely */}
             <YAxis 
-              domain={[-0.5, yAxisMax]}
-              tick={{ fontSize: 12, fill: '#64748b' }}
-              label={{ 
-                value: 'צפיפות', 
-                angle: -90, 
-                position: 'insideLeft', 
-                style: { fontSize: '14px', fontWeight: 'bold', textAnchor: 'middle' } 
-              }}
+              hide={true}
+              domain={[0, maxDensity * 1.3]}
             />
             <Tooltip 
               content={({ active, payload, label }) => {
                 if (active && payload && payload.length) {
                   // Check if this is a participant dot
-                  const isParticipantDot = payload.some(p => p.dataKey === 'y');
+                  const participantData = payload.find(p => p.payload.exactScore !== undefined);
                   
-                  if (isParticipantDot) {
-                    const participantData = payload.find(p => p.payload.exactScore !== undefined);
-                    if (participantData) {
-                      return (
-                        <div className="bg-white p-3 border rounded shadow-lg text-right">
-                          <p className="text-red-600 text-sm font-semibold">
-                            משתתף #{participantData.payload.participantIndex}
-                          </p>
-                          <p className="text-gray-600 text-sm">
-                            ציון SLQ: {participantData.payload.exactScore.toFixed(2)}
-                          </p>
-                        </div>
-                      );
-                    }
+                  if (participantData) {
+                    return (
+                      <div className="bg-white p-3 border rounded shadow-lg text-right">
+                        <p className="text-red-600 text-sm font-semibold">
+                          משתתף #{participantData.payload.participantIndex}
+                        </p>
+                        <p className="text-gray-600 text-sm">
+                          ציון SLQ: {participantData.payload.exactScore.toFixed(2)}
+                        </p>
+                      </div>
+                    );
                   }
 
                   // Regular curve tooltip
