@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, ScatterChart, Scatter, ComposedChart } from 'recharts';
 import { ChartContainer } from '@/components/ui/chart';
 import { getSalimaColor } from '@/utils/salimaColors';
 
@@ -20,6 +20,10 @@ const chartConfig = {
   curve: {
     label: "התפלגות",
     color: "#3b82f6",
+  },
+  participants: {
+    label: "משתתפים",
+    color: "#D32F2F",
   },
 };
 
@@ -83,6 +87,14 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
 
   const bellCurveData = generateBellCurve();
 
+  // Create participant dots data for scatter plot
+  const participantDots = participantScores.map((score, index) => ({
+    slqScore: score,
+    y: -0.2, // Position below x-axis
+    participantIndex: index + 1,
+    exactScore: score
+  }));
+
   // Find maximum density for Y-axis scaling
   const maxDensity = Math.max(...bellCurveData.map(point => point.density));
   const yAxisMax = Math.ceil(maxDensity * 1.3); // Add 30% padding
@@ -91,7 +103,7 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
     <div className="w-full h-full relative">
       <ChartContainer config={chartConfig} className="h-full w-full" dir="rtl">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={bellCurveData} margin={{ top: 40, right: 30, left: 20, bottom: 60 }}>
+          <ComposedChart data={bellCurveData} margin={{ top: 40, right: 30, left: 20, bottom: 80 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
             <XAxis 
               dataKey="slqScore"
@@ -107,7 +119,7 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
               }}
             />
             <YAxis 
-              domain={[0, yAxisMax]}
+              domain={[-0.5, yAxisMax]}
               tick={{ fontSize: 12, fill: '#64748b' }}
               label={{ 
                 value: 'צפיפות', 
@@ -119,7 +131,26 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
             <Tooltip 
               content={({ active, payload, label }) => {
                 if (active && payload && payload.length) {
-                  // Safely handle the label conversion
+                  // Check if this is a participant dot
+                  const isParticipantDot = payload.some(p => p.dataKey === 'y');
+                  
+                  if (isParticipantDot) {
+                    const participantData = payload.find(p => p.payload.exactScore !== undefined);
+                    if (participantData) {
+                      return (
+                        <div className="bg-white p-3 border rounded shadow-lg text-right">
+                          <p className="text-red-600 text-sm font-semibold">
+                            משתתף #{participantData.payload.participantIndex}
+                          </p>
+                          <p className="text-gray-600 text-sm">
+                            ציון SLQ: {participantData.payload.exactScore.toFixed(2)}
+                          </p>
+                        </div>
+                      );
+                    }
+                  }
+
+                  // Regular curve tooltip
                   const formatLabel = (labelValue: any): string => {
                     if (typeof labelValue === 'number') {
                       return labelValue.toFixed(2);
@@ -131,7 +162,6 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
                     return '0.00';
                   };
 
-                  // Safely handle the payload value conversion
                   const formatValue = (value: any): string => {
                     if (typeof value === 'number') {
                       return value.toFixed(3);
@@ -166,39 +196,19 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
               name="התפלגות נורמלית"
               connectNulls={false}
             />
-            <ReferenceLine 
-              x={averageScore} 
-              stroke="#dc2626" 
-              strokeWidth={3}
-              strokeDasharray="8 4"
-              label={{ 
-                value: "ממוצע קבוצתי", 
-                position: "top", 
-                offset: 15,
-                style: { 
-                  fontWeight: 'bold', 
-                  fontSize: '14px',
-                  fill: '#dc2626',
-                  textAnchor: 'middle'
-                } 
-              }}
+            {/* Individual participant dots */}
+            <Scatter 
+              data={participantDots}
+              fill="#D32F2F"
+              shape="circle"
             />
-            {/* Individual participant score markers */}
-            {participantScores.map((score, index) => (
-              <ReferenceLine 
-                key={`participant-${index}`}
-                x={score} 
-                stroke="#dc2626" 
-                strokeWidth={2}
-                strokeDasharray="none"
-              />
-            ))}
-          </LineChart>
+          </ComposedChart>
         </ResponsiveContainer>
       </ChartContainer>
       
       <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-center text-gray-600 text-sm">
-        <p>הקווים האדומים מייצגים את הציונים האישיים של חברי הקבוצה</p>
+        <p className="font-semibold mb-1">הנקודות האדומות מייצגות את ציוני המנהיגות של המשתתפים השונים</p>
+        <p className="text-xs">העבירי עכבר מעל נקודה לצפייה בפרטים</p>
       </div>
     </div>
   );
