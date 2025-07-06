@@ -42,6 +42,9 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
     (p.dimension_s + p.dimension_l + p.dimension_i + p.dimension_m + p.dimension_a + p.dimension_a2) / 6
   );
 
+  console.log('Participant SLQ scores:', participantScores);
+  console.log('Number of participants:', participantScores.length);
+
   // Calculate statistics
   const mean = participantScores.reduce((sum, score) => sum + score, 0) / participantScores.length;
   const variance = participantScores.reduce((sum, score) => sum + Math.pow(score - mean, 2), 0) / participantScores.length;
@@ -87,13 +90,19 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
 
   const bellCurveData = generateBellCurve();
 
-  // Create participant dots data for scatter plot - positioned at fixed y-value
+  // Create participant dots data - each participant gets their own data point
   const participantDots = participantScores.map((score, index) => ({
     slqScore: score,
-    y: 0.05, // Fixed y-position for all dots, slightly above x-axis
+    density: 0.1, // Fixed low position for visibility
     participantIndex: index + 1,
-    exactScore: score
+    exactScore: score,
+    isParticipant: true
   }));
+
+  console.log('Participant dots data:', participantDots);
+
+  // Combine bell curve data with participant dots for the composed chart
+  const combinedData = [...bellCurveData];
 
   // Find maximum density for scaling
   const maxDensity = Math.max(...bellCurveData.map(point => point.density));
@@ -102,7 +111,7 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
     <div className="w-full h-full relative">
       <ChartContainer config={chartConfig} className="h-full w-full" dir="rtl">
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={bellCurveData} margin={{ top: 40, right: 30, left: 20, bottom: 80 }}>
+          <ComposedChart data={combinedData} margin={{ top: 40, right: 30, left: 20, bottom: 80 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
             <XAxis 
               dataKey="slqScore"
@@ -125,17 +134,17 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
             <Tooltip 
               content={({ active, payload, label }) => {
                 if (active && payload && payload.length) {
-                  // Check if this is a participant dot
-                  const participantData = payload.find(p => p.payload.exactScore !== undefined);
+                  // Check if this is a participant dot by looking at the data
+                  const participantData = participantDots.find(p => Math.abs(p.slqScore - parseFloat(label)) < 0.01);
                   
                   if (participantData) {
                     return (
                       <div className="bg-white p-3 border rounded shadow-lg text-right">
                         <p className="text-red-600 text-sm font-semibold">
-                          משתתף #{participantData.payload.participantIndex}
+                          משתתף #{participantData.participantIndex}
                         </p>
                         <p className="text-gray-600 text-sm">
-                          ציון SLQ: {participantData.payload.exactScore.toFixed(2)}
+                          ציון SLQ: {participantData.exactScore.toFixed(2)}
                         </p>
                       </div>
                     );
@@ -178,6 +187,7 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
                 return null;
               }}
             />
+            {/* Bell curve line */}
             <Line 
               type="monotone" 
               dataKey="density" 
@@ -187,11 +197,13 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
               name="התפלגות נורמלית"
               connectNulls={false}
             />
-            {/* Individual participant dots */}
+            {/* Individual participant dots as scatter plot */}
             <Scatter 
               data={participantDots}
               fill="#D32F2F"
-              shape="circle"
+              stroke="#D32F2F"
+              strokeWidth={2}
+              r={4}
             />
           </ComposedChart>
         </ResponsiveContainer>
