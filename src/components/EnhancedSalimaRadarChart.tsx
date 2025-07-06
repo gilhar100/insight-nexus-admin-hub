@@ -181,9 +181,6 @@ export const EnhancedSalimaRadarChart: React.FC<EnhancedSalimaRadarChartProps> =
           <PolarAngleAxis 
             dataKey="dimension" 
             tick={{ fontSize: 14, fontWeight: 'bold' }}
-            tickFormatter={(value) => (
-              <tspan fill={getSalimaColor(value)}>{value}</tspan>
-            )}
           />
           <PolarRadiusAxis 
             angle={90} 
