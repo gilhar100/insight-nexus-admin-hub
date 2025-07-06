@@ -118,19 +118,25 @@ export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
         {/* Dominant Zone Display */}
         <div className="mb-6 text-center">
           {isTie ? (
-            <div className="text-lg font-semibold text-gray-600">
-              תיקו בין אזורים
+            <div className="inline-block px-6 py-3 rounded-full bg-gray-200">
+              <span className="text-lg font-semibold text-black">
+                תיקו בין אזורים
+              </span>
             </div>
           ) : dominantZone ? (
-            <div className="text-lg font-semibold">
-              <span className="text-gray-800">אזור דומיננטי: </span>
-              <span style={{ color: getZoneColor(dominantZone) }}>
+            <div 
+              className="inline-block px-6 py-3 rounded-full"
+              style={{ backgroundColor: getZoneColor(dominantZone) }}
+            >
+              <span className="text-lg font-semibold text-black">
                 {getZoneName(dominantZone)}
               </span>
             </div>
           ) : (
-            <div className="text-lg font-semibold text-gray-600">
-              לא זוהה אזור דומיננטי
+            <div className="inline-block px-6 py-3 rounded-full bg-gray-200">
+              <span className="text-lg font-semibold text-black">
+                לא זוהה אזור דומיננטי
+              </span>
             </div>
           )}
         </div>
