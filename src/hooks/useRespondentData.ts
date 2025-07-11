@@ -16,6 +16,7 @@ export interface RespondentData {
     authenticity: number;
   };
   overallScore: number;
+  dominantArchetype?: string;
   rawData: any;
 }
 
@@ -55,6 +56,7 @@ export const useRespondentData = () => {
               authenticity: surveyData.dimension_a || 0,
             },
             overallScore: surveyData.slq_score || 0,
+            dominantArchetype: surveyData.dominant_archetype || undefined,
             rawData: surveyData
           };
         }
@@ -83,6 +85,7 @@ export const useRespondentData = () => {
               authenticity: colleagueData.dimension_a || 0,
             },
             overallScore: colleagueData.slq_score || 0,
+            dominantArchetype: colleagueData.dominant_archetype || undefined,
             rawData: colleagueData
           };
         }

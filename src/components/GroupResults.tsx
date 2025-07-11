@@ -2,6 +2,7 @@
 import React from 'react';
 import { SalimaGroupRadarChart } from '@/components/SalimaGroupRadarChart';
 import { SalimaBellCurveChart } from '@/components/SalimaBellCurveChart';
+import { SalimaArchetypeDistributionChart } from '@/components/SalimaArchetypeDistributionChart';
 
 interface GroupData {
   group_number: number;
@@ -22,6 +23,7 @@ interface GroupData {
     dimension_m: number;
     dimension_a: number;
     dimension_a2: number;
+    dominant_archetype?: string;
   }>;
 }
 
@@ -120,7 +122,7 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
               {/* Strongest Dimension */}
               <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
                 <h3 className={`font-bold text-green-800 mb-3 ${isPresenterMode ? 'text-2xl' : 'text-xl'}`}>
-                  הممד החזק ביותר
+                  הממד החזק ביותר
                 </h3>
                 <div className={`font-bold text-green-600 mb-2 ${isPresenterMode ? 'text-4xl' : 'text-3xl'}`}>
                   {strongest.score.toFixed(1)}
@@ -197,6 +199,18 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
           <div className="h-[520px] w-full flex items-center justify-center">
             <SalimaGroupRadarChart averages={groupData.averages} />
           </div>
+        </div>
+      </div>
+
+      {/* Archetype Distribution Chart */}
+      <div className="card">
+        <div className="card-header text-center">
+          <div className={`flex items-center justify-center text-right card-title${isPresenterMode ? " text-3xl" : ""}`}>
+            התפלגות ארכיטיפי מנהיגות
+          </div>
+        </div>
+        <div className="card-content">
+          <SalimaArchetypeDistributionChart participants={groupData.participants} />
         </div>
       </div>
 
