@@ -68,6 +68,8 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
     );
   }
 
+  const totalParticipants = participants.length;
+
   // Filter participants with valid archetypes (not null, undefined, or empty string)
   const participantsWithArchetypes = participants.filter(p => {
     const hasArchetype = p.dominant_archetype && 
@@ -79,6 +81,20 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
 
   console.log('Participants with valid archetypes:', participantsWithArchetypes);
   console.log('Count of participants with archetypes:', participantsWithArchetypes.length);
+
+  const participantsWithArchetypesCount = participantsWithArchetypes.length;
+
+  // If no participants have archetypes, show empty state
+  if (participantsWithArchetypesCount === 0) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        <p>אין נתוני ארכיטיפים להצגה</p>
+        <p className="text-sm mt-2">
+          נמצאו {totalParticipants} משתתפים בקבוצה, אך אף אחד מהם לא מוגדר עם ארכיטיפ דומיננטי
+        </p>
+      </div>
+    );
+  }
 
   // Count archetypes
   const archetypeCounts = participantsWithArchetypes.reduce((acc, participant) => {
@@ -93,25 +109,11 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
 
   console.log('Final archetype counts:', archetypeCounts);
 
-  const totalParticipants = participantsWithArchetypes.length;
-
-  // If no participants have archetypes, show empty state
-  if (totalParticipants === 0) {
-    return (
-      <div className="text-center py-8 text-gray-500">
-        <p>אין נתוני ארכיטיפים להצגה</p>
-        <p className="text-sm mt-2">
-          נמצאו {participants.length} משתתפים בקבוצה, אך אף אחד מהם לא מוגדר עם ארכיטיפ דומיננטי
-        </p>
-      </div>
-    );
-  }
-
-  // Prepare chart data
+  // Prepare chart data (percentages are calculated based on participants with archetypes only)
   const chartData: ArchetypeDistributionData[] = Object.entries(archetypeCounts).map(([archetype, count]) => ({
     archetype,
     count,
-    percentage: Math.round((count / totalParticipants) * 100),
+    percentage: Math.round((count / participantsWithArchetypesCount) * 100),
     color: ARCHETYPE_COLORS[archetype] || '#6B7280'
   }));
 
@@ -142,6 +144,15 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
 
   return (
     <div className="space-y-6">
+      {/* Data Coverage Note */}
+      {participantsWithArchetypesCount < totalParticipants && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-center">
+          <p className="text-yellow-800 text-sm">
+            הנתונים מתבססים על {participantsWithArchetypesCount} מתוך {totalParticipants} משתתפים שהוגדר להם ארכיטיפ דומיננטי
+          </p>
+        </div>
+      )}
+
       {/* Controls */}
       <div className="flex flex-wrap gap-4 justify-center">
         <div className="flex gap-2">
@@ -237,7 +248,7 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-right">
         <h4 className="font-semibold text-blue-800 mb-2">סיכום התפלגות הארכיטיפים</h4>
         <p className="text-blue-700">
-          הארכיטיפ הדומיננטי בקבוצה הוא <strong>{dominantArchetype.archetype}</strong> עם {dominantArchetype.count} משתתפים ({dominantArchetype.percentage}% מהקבוצה).
+          הארכיטיפ הדומיננטי בקבוצה הוא <strong>{dominantArchetype.archetype}</strong> עם {dominantArchetype.count} משתתפים ({dominantArchetype.percentage}% מהמשתתפים עם ארכיטיפ מוגדר).
         </p>
         <p className="text-blue-600 text-sm mt-2">
           {dominantArchetype.archetype === 'מנהל ההזדמנות' && 
@@ -250,9 +261,11 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
             'קבוצה זו מאופיינת במנהיגות מעצימה הרואה בפיתוח האחרים ובמתן כלים כמפתח להצלחה ארגונית.'
           }
         </p>
-        <p className="text-blue-500 text-xs mt-2">
-          מתוך {participants.length} משתתפים בקבוצה, {totalParticipants} מוגדרים עם ארכיטיפ דומיננטי
-        </p>
+        {participantsWithArchetypesCount < totalParticipants && (
+          <p className="text-blue-500 text-xs mt-2">
+            * הנתונים מבוססים על {participantsWithArchetypesCount} מתוך {totalParticipants} משתתפים בקבוצה
+          </p>
+        )}
       </div>
     </div>
   );
