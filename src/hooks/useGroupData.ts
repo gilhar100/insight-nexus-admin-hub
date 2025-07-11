@@ -38,6 +38,8 @@ export const useGroupData = (groupNumber: number) => {
       setError(null);
       
       try {
+        console.log('Fetching data for group number:', groupNumber);
+        
         // Fetch participants data including dominant_archetype
         const { data: participants, error: participantsError } = await supabase
           .from('survey_responses')
@@ -45,9 +47,15 @@ export const useGroupData = (groupNumber: number) => {
           .eq('group_number', groupNumber)
           .eq('survey_type', 'manager');
 
-        if (participantsError) throw participantsError;
+        if (participantsError) {
+          console.error('Participants error:', participantsError);
+          throw participantsError;
+        }
+
+        console.log('Fetched participants:', participants);
 
         if (!participants || participants.length === 0) {
+          console.log('No participants found for group:', groupNumber);
           setData(null);
           return;
         }
@@ -97,6 +105,7 @@ export const useGroupData = (groupNumber: number) => {
           })),
         };
 
+        console.log('Final group data:', groupData);
         setData(groupData);
       } catch (err) {
         console.error('Error fetching group data:', err);
