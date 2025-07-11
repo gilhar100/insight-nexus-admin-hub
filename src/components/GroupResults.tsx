@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { SalimaScoreDistributionChart } from '@/components/SalimaScoreDistributionChart';
 import { SalimaGroupRadarChart } from '@/components/SalimaGroupRadarChart';
 import { SalimaBellCurveChart } from '@/components/SalimaBellCurveChart';
 
@@ -121,7 +120,7 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
               {/* Strongest Dimension */}
               <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
                 <h3 className={`font-bold text-green-800 mb-3 ${isPresenterMode ? 'text-2xl' : 'text-xl'}`}>
-                  הממד החזק ביותר
+                  הممד החזק ביותר
                 </h3>
                 <div className={`font-bold text-green-600 mb-2 ${isPresenterMode ? 'text-4xl' : 'text-3xl'}`}>
                   {strongest.score.toFixed(1)}
@@ -186,22 +185,6 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
           )}
         </div>
       </div>
-
-      {/* Score Distribution Chart - Full Width */}
-      {groupData.participant_count > 5 && (
-        <div className="card" style={{ gridColumn: isPresenterMode ? "span 2" : undefined }}>
-          <div className="card-header text-center">
-            <div className={`flex items-center justify-center text-right card-title${isPresenterMode ? " text-3xl" : ""}`}>
-              התפלגות טווחי ציונים
-            </div>
-          </div>
-          <div className="card-content">
-            <div className="h-[520px] w-full flex items-center justify-center">
-              <SalimaScoreDistributionChart participants={groupData.participants} />
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Radar Chart – Group Averages per SALIMA Dimension */}
       <div className="card">
