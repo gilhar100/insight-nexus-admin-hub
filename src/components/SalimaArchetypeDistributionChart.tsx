@@ -53,6 +53,8 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
   const [viewMode, setViewMode] = useState<'count' | 'percentage'>('count');
   const [chartType, setChartType] = useState<'bar' | 'pie'>('bar');
 
+  console.log('SalimaArchetypeDistributionChart received participants:', participants);
+
   if (!participants || participants.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500">
@@ -63,11 +65,14 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
 
   const totalParticipants = participants.length;
 
+  // Filter participants with valid archetypes - only check for non-null, non-empty strings
   const participantsWithArchetypes = participants.filter(p => {
-    const value = p.dominant_archetype?.trim().toLowerCase();
-    return value && value !== 'null' && value !== 'undefined';
+    const archetype = p.dominant_archetype;
+    console.log('Checking participant archetype:', archetype, 'Type:', typeof archetype);
+    return archetype && typeof archetype === 'string' && archetype.trim() !== '';
   });
 
+  console.log('Participants with valid archetypes:', participantsWithArchetypes);
   const participantsWithArchetypesCount = participantsWithArchetypes.length;
 
   if (participantsWithArchetypesCount === 0) {
@@ -82,11 +87,15 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
   }
 
   const archetypeCounts = participantsWithArchetypes.reduce((acc, participant) => {
-    const raw = participant.dominant_archetype?.trim().toLowerCase();
+    const raw = participant.dominant_archetype?.trim();
+    // Use the raw value as the label, or map it if needed
     const label = ARCHETYPE_LABELS[raw] || raw;
+    console.log('Processing archetype:', raw, '-> mapped to:', label);
     acc[label] = (acc[label] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
+
+  console.log('Final archetype counts:', archetypeCounts);
 
   const chartData: ArchetypeDistributionData[] = Object.entries(archetypeCounts).map(([archetype, count]) => ({
     archetype,
