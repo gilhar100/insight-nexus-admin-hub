@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import { ChartContainer } from '@/components/ui/chart';
@@ -27,6 +28,9 @@ const ARCHETYPE_COLORS = {
   'מנהל ההזדמנות': '#10B981',
   'המנהל הסקרן': '#3B82F6',
   'המנהל המעצים': '#F59E0B',
+  'opportunity leader': '#10B981',
+  'curious leader': '#3B82F6',
+  'empowering leader': '#F59E0B',
 };
 
 const ARCHETYPE_LABELS: Record<string, string> = {
@@ -65,11 +69,17 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
 
   const totalParticipants = participants.length;
 
-  // Filter participants with valid archetypes - only check for non-null, non-empty strings
+  // Filter participants with valid archetypes - be more lenient with filtering
   const participantsWithArchetypes = participants.filter(p => {
     const archetype = p.dominant_archetype;
     console.log('Checking participant archetype:', archetype, 'Type:', typeof archetype);
-    return archetype && typeof archetype === 'string' && archetype.trim() !== '';
+    // Accept any non-null, non-undefined string that's not empty when trimmed
+    return archetype != null && 
+           archetype !== undefined && 
+           typeof archetype === 'string' && 
+           archetype.trim() !== '' &&
+           archetype.toLowerCase() !== 'null' &&
+           archetype.toLowerCase() !== 'undefined';
   });
 
   console.log('Participants with valid archetypes:', participantsWithArchetypes);
@@ -82,26 +92,50 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
         <p className="text-sm mt-2">
           נמצאו {totalParticipants} משתתפים בקבוצה, אך אף אחד מהם לא מוגדר עם ארכיטיפ דומיננטי
         </p>
+        <div className="text-xs mt-4 bg-gray-100 p-2 rounded">
+          <p>Debug: Archetype values found:</p>
+          <pre>{JSON.stringify(participants.map(p => p.dominant_archetype), null, 2)}</pre>
+        </div>
       </div>
     );
   }
 
+  // Count archetypes - use the actual values, clean them up, and map if needed
   const archetypeCounts = participantsWithArchetypes.reduce((acc, participant) => {
-    const raw = participant.dominant_archetype?.trim();
-    // Use the raw value as the label, or map it if needed
-    const label = ARCHETYPE_LABELS[raw] || raw;
-    console.log('Processing archetype:', raw, '-> mapped to:', label);
-    acc[label] = (acc[label] || 0) + 1;
+    const rawArchetype = participant.dominant_archetype?.toString().trim();
+    if (!rawArchetype) return acc;
+    
+    // Use the mapped label if available, otherwise use the raw value
+    const displayLabel = ARCHETYPE_LABELS[rawArchetype] || rawArchetype;
+    console.log('Processing archetype:', rawArchetype, '-> mapped to:', displayLabel);
+    
+    acc[displayLabel] = (acc[displayLabel] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
   console.log('Final archetype counts:', archetypeCounts);
 
+  // If no counts were created, show debug info
+  if (Object.keys(archetypeCounts).length === 0) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        <p>לא ניתן לעבד את נתוני הארכיטיפים</p>
+        <div className="text-xs mt-4 bg-gray-100 p-2 rounded text-left">
+          <p>Debug info:</p>
+          <p>Total participants: {totalParticipants}</p>
+          <p>With archetypes: {participantsWithArchetypesCount}</p>
+          <p>Raw archetype values:</p>
+          <pre>{JSON.stringify(participantsWithArchetypes.map(p => p.dominant_archetype), null, 2)}</pre>
+        </div>
+      </div>
+    );
+  }
+
   const chartData: ArchetypeDistributionData[] = Object.entries(archetypeCounts).map(([archetype, count]) => ({
     archetype,
     count,
     percentage: Math.round((count / participantsWithArchetypesCount) * 100),
-    color: ARCHETYPE_COLORS[archetype] || '#6B7280'
+    color: ARCHETYPE_COLORS[archetype as keyof typeof ARCHETYPE_COLORS] || '#6B7280'
   }));
 
   const dominantArchetype = chartData.length > 0 
