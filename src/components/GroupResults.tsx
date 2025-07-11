@@ -22,6 +22,9 @@ interface GroupData {
     dimension_m: number;
     dimension_a: number;
     dimension_a2: number;
+    archetype_1_score?: number | null;
+    archetype_2_score?: number | null;
+    archetype_3_score?: number | null;
   }>;
 }
 
@@ -109,6 +112,13 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
 
   const { strongest, weakest, isSameDimension } = dimensionInsights;
 
+  // Transform participants data for archetype chart
+  const archetypeParticipants = groupData.participants.map(participant => ({
+    archetype_1_score: participant.archetype_1_score || 0,
+    archetype_2_score: participant.archetype_2_score || 0,
+    archetype_3_score: participant.archetype_3_score || 0
+  }));
+
   return (
     <div className={isPresenterMode ? "presenter-grid" : "grid grid-cols-1 lg:grid-cols-2 gap-8"}>
       {/* Dimension Insights Section */}
@@ -120,7 +130,7 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
               {/* Strongest Dimension */}
               <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
                 <h3 className={`font-bold text-green-800 mb-3 ${isPresenterMode ? 'text-2xl' : 'text-xl'}`}>
-                  הممד החזק ביותר
+                  הממד החזק ביותר
                 </h3>
                 <div className={`font-bold text-green-600 mb-2 ${isPresenterMode ? 'text-4xl' : 'text-3xl'}`}>
                   {strongest.score.toFixed(1)}
@@ -209,7 +219,7 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
         </div>
         <div className="card-content">
           <SalimaArchetypeDistributionChart 
-            participants={groupData.participants}
+            participants={archetypeParticipants}
             isPresenterMode={isPresenterMode}
           />
         </div>
