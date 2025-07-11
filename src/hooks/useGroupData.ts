@@ -53,6 +53,7 @@ export const useGroupData = (groupNumber: number) => {
         }
 
         console.log('Fetched participants:', participants);
+        console.log('Participants with archetype:', participants?.filter(p => p.dominant_archetype));
 
         if (!participants || participants.length === 0) {
           console.log('No participants found for group:', groupNumber);
@@ -60,7 +61,7 @@ export const useGroupData = (groupNumber: number) => {
           return;
         }
 
-        // Calculate averages
+        // Calculate averages for all participants (not just those with archetypes)
         const totalParticipants = participants.length;
         const sums = participants.reduce((acc, p) => ({
           strategy: acc.strategy + (p.dimension_s || 0),
@@ -90,22 +91,29 @@ export const useGroupData = (groupNumber: number) => {
           overall: sums.overall / totalParticipants,
         };
 
+        // Map all participants, preserving dominant_archetype (even if null/undefined)
+        const participantData = participants.map(p => ({
+          dimension_s: p.dimension_s || 0,
+          dimension_l: p.dimension_l || 0,
+          dimension_i: p.dimension_i || 0,
+          dimension_m: p.dimension_m || 0,
+          dimension_a: p.dimension_a || 0,
+          dimension_a2: p.dimension_a2 || 0,
+          dominant_archetype: p.dominant_archetype || undefined,
+        }));
+
         const groupData: GroupData = {
           group_number: groupNumber,
           participant_count: totalParticipants,
           averages,
-          participants: participants.map(p => ({
-            dimension_s: p.dimension_s || 0,
-            dimension_l: p.dimension_l || 0,
-            dimension_i: p.dimension_i || 0,
-            dimension_m: p.dimension_m || 0,
-            dimension_a: p.dimension_a || 0,
-            dimension_a2: p.dimension_a2 || 0,
-            dominant_archetype: p.dominant_archetype || undefined,
-          })),
+          participants: participantData,
         };
 
         console.log('Final group data:', groupData);
+        console.log('Participants with valid archetypes in final data:', 
+          groupData.participants.filter(p => p.dominant_archetype && p.dominant_archetype.trim() !== '').length
+        );
+        
         setData(groupData);
       } catch (err) {
         console.error('Error fetching group data:', err);

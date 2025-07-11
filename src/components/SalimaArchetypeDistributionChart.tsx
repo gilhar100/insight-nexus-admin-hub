@@ -57,6 +57,9 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
   const [viewMode, setViewMode] = useState<'count' | 'percentage'>('count');
   const [chartType, setChartType] = useState<'bar' | 'pie'>('bar');
 
+  console.log('SalimaArchetypeDistributionChart received participants:', participants);
+  console.log('Total participants:', participants?.length || 0);
+
   if (!participants || participants.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500">
@@ -65,23 +68,41 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
     );
   }
 
-  // Count archetypes - filter out null/undefined values
-  const archetypeCounts = participants.reduce((acc, participant) => {
+  // Filter participants with valid archetypes (not null, undefined, or empty string)
+  const participantsWithArchetypes = participants.filter(p => {
+    const hasArchetype = p.dominant_archetype && 
+                        p.dominant_archetype.trim() !== '' && 
+                        p.dominant_archetype !== 'null' && 
+                        p.dominant_archetype !== 'undefined';
+    return hasArchetype;
+  });
+
+  console.log('Participants with valid archetypes:', participantsWithArchetypes);
+  console.log('Count of participants with archetypes:', participantsWithArchetypes.length);
+
+  // Count archetypes
+  const archetypeCounts = participantsWithArchetypes.reduce((acc, participant) => {
     const archetype = participant.dominant_archetype;
     if (archetype) {
       const hebrewLabel = ARCHETYPE_LABELS[archetype] || archetype;
       acc[hebrewLabel] = (acc[hebrewLabel] || 0) + 1;
+      console.log(`Adding archetype: ${archetype} -> ${hebrewLabel}, count: ${acc[hebrewLabel]}`);
     }
     return acc;
   }, {} as Record<string, number>);
 
-  const totalParticipants = participants.filter(p => p.dominant_archetype).length;
+  console.log('Final archetype counts:', archetypeCounts);
+
+  const totalParticipants = participantsWithArchetypes.length;
 
   // If no participants have archetypes, show empty state
   if (totalParticipants === 0) {
     return (
       <div className="text-center py-8 text-gray-500">
         <p>אין נתוני ארכיטיפים להצגה</p>
+        <p className="text-sm mt-2">
+          נמצאו {participants.length} משתתפים בקבוצה, אך אף אחד מהם לא מוגדר עם ארכיטיפ דומיננטי
+        </p>
       </div>
     );
   }
@@ -93,6 +114,8 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
     percentage: Math.round((count / totalParticipants) * 100),
     color: ARCHETYPE_COLORS[archetype] || '#6B7280'
   }));
+
+  console.log('Chart data:', chartData);
 
   // Find dominant archetype for summary
   const dominantArchetype = chartData.reduce((prev, current) => 
@@ -226,6 +249,9 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
           {dominantArchetype.archetype === 'המנהל המעצים' && 
             'קבוצה זו מאופיינת במנהיגות מעצימה הרואה בפיתוח האחרים ובמתן כלים כמפתח להצלחה ארגונית.'
           }
+        </p>
+        <p className="text-blue-500 text-xs mt-2">
+          מתוך {participants.length} משתתפים בקבוצה, {totalParticipants} מוגדרים עם ארכיטיפ דומיננטי
         </p>
       </div>
     </div>
