@@ -144,7 +144,7 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
               {/* Weakest Dimension */}
               <div className="bg-orange-50 border border-orange-200 rounded-lg p-6 text-center">
                 <h3 className={`font-bold text-orange-800 mb-3 ${isPresenterMode ? 'text-2xl' : 'text-xl'}`}>
-                  ממד לפיתוח
+                  ממד لפיתוח
                 </h3>
                 <div className={`font-bold text-orange-600 mb-2 ${isPresenterMode ? 'text-4xl' : 'text-3xl'}`}>
                   {weakest.score.toFixed(1)}

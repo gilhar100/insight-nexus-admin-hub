@@ -14,7 +14,7 @@ interface ArchetypeDistributionData {
 
 interface SalimaArchetypeDistributionChartProps {
   participants: Array<{
-    dominant_archetype: string | null;
+    dominant_archetype: string | null | undefined;
   }>;
 }
 
@@ -59,7 +59,7 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
     );
   }
 
-  // Count archetypes
+  // Count archetypes - filter out null/undefined values
   const archetypeCounts = participants.reduce((acc, participant) => {
     const archetype = participant.dominant_archetype;
     if (archetype) {
@@ -70,6 +70,15 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
   }, {} as Record<string, number>);
 
   const totalParticipants = participants.filter(p => p.dominant_archetype).length;
+
+  // If no participants have archetypes, show empty state
+  if (totalParticipants === 0) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        <p>אין נתוני ארכיטיפים להצגה</p>
+      </div>
+    );
+  }
 
   // Prepare chart data
   const chartData: ArchetypeDistributionData[] = Object.entries(archetypeCounts).map(([archetype, count]) => ({
@@ -166,10 +175,7 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
                 }}
               />
               <Tooltip content={<CustomTooltip />} />
-              <Bar 
-                dataKey={viewMode} 
-                fill={(entry) => entry.color}
-              >
+              <Bar dataKey={viewMode}>
                 {chartData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
