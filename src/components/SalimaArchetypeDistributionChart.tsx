@@ -14,7 +14,13 @@ interface ArchetypeDistributionData {
 
 interface SalimaArchetypeDistributionChartProps {
   participants: Array<{
-    dominant_archetype: string | null | undefined;
+    dimension_s: number;
+    dimension_l: number;
+    dimension_i: number;
+    dimension_m: number;
+    dimension_a: number;
+    dimension_a2: number;
+    dominant_archetype?: string | null | undefined;
   }>;
 }
 
