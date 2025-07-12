@@ -66,6 +66,8 @@ export const useGroupData = (groupNumber: number) => {
 
         console.log('Fetched participants:', participants);
         console.log('Participants with archetype:', participants?.filter(p => p.dominant_archetype && p.dominant_archetype.trim() !== ''));
+        console.log('Raw archetype values:', participants?.map(p => p.dominant_archetype));
+        console.log('Group number being fetched:', groupNumber, 'Type:', typeof groupNumber);
 
         if (!participants || participants.length === 0) {
           console.log('No participants found for group:', groupNumber);
