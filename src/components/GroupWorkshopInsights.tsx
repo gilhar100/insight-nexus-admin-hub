@@ -11,6 +11,7 @@ import { WocaZoneSection } from '@/components/WocaZoneSection';
 import { WocaChartsRow } from '@/components/WocaChartsRow';
 import { OpportunityZoneSection } from '@/components/OpportunityZoneSection';
 import { WocaDemographicsSection } from '@/components/WocaDemographicsSection';
+import { WocaZonesTable } from '@/components/WocaZonesTable';
 
 export const GroupWorkshopInsights: React.FC = () => {
   const [selectedGroupId, setSelectedGroupId] = useState<number | undefined>();
@@ -199,10 +200,16 @@ export const GroupWorkshopInsights: React.FC = () => {
             isPresenterMode={isPresenterMode}
           />
 
-          {/* 3. Opportunity Zone Paragraph */}
+          {/* 3. WOCA Zones Matrix Table */}
+          <WocaZonesTable
+            dominantZone={wocaAnalysis.groupDominantZoneByCount || wocaAnalysis.groupDominantZone}
+            isPresenterMode={isPresenterMode}
+          />
+
+          {/* 4. Opportunity Zone Paragraph */}
           <OpportunityZoneSection isPresenterMode={isPresenterMode} />
 
-          {/* 4. Demographics Section */}
+          {/* 5. Demographics Section */}
           <WocaDemographicsSection
             wocaAnalysis={wocaAnalysis}
             showNames={showNames}
