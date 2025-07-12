@@ -33,68 +33,68 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
 
   const tableData = [
     {
-      action: "ניסוח מחודש של חזון בעזרת מודל וייז",
-      opportunity: "חזון מעורר יוזמה",
+      central: "חזון כקריאה לפעולה",
       war: "הישרדות מיידית",
       comfort: "חזון רדום",
       apathy: "חזון מטושטש",
-      central: "חזון כקריאה לפעולה"
+      opportunity: "חזון מעורר יוזמה",
+      action: "ניסוח מחודש של חזון בעזרת מודל וייז"
     },
     {
-      action: "תרגול סריקה מערכתית",
-      opportunity: "חיבורים בין מערכות",
+      central: "ראייה מערכתית",
       war: "פוקוס על איומים",
       comfort: "קיפאון מחשבתי",
       apathy: "ראייה צרה",
-      central: "ראייה מערכתית"
+      opportunity: "חיבורים בין מערכות",
+      action: "תרגול סריקה מערכתית"
     },
     {
-      action: "עיבוד קונפליקטים כהזדמנות",
-      opportunity: "פתיחות ויצירתיות",
+      central: "גמישות מחשבתית",
       war: "תגובתיות אגרסיבית",
       comfort: "נוחות מחשבתית",
       apathy: "קיבעון",
-      central: "גמישות מחשבתית"
+      opportunity: "פתיחות ויצירתיות",
+      action: "עיבוד קונפליקטים כהזדמנות"
     },
     {
-      action: "הזמנה לשאלות \"לא נוחות\"",
-      opportunity: "שאלות חוקרות",
+      central: "סקרנות מקצועית",
       war: "חיפוש כשלים",
       comfort: "סקרנות שטחית",
       apathy: "אדישות",
-      central: "סקרנות מקצועית"
+      opportunity: "שאלות חוקרות",
+      action: "הזמנה לשאלות \"לא נוחות\""
     },
     {
-      action: "כתיבת נרטיב חדש עם הצוות",
-      opportunity: "סיפור מעורר השראה",
+      central: "נרטיב אישי",
       war: "\"אני שורד/ת\"",
       comfort: "סיפור \"בסדר\"",
       apathy: "חוסר נרטיב",
-      central: "נרטיב אישי"
+      opportunity: "סיפור מעורר השראה",
+      action: "כתיבת נרטיב חדש עם הצוות"
     },
     {
-      action: "שיח על ערכים ומשמעות בצוות",
-      opportunity: "חיבור לערכים",
+      central: "תחושת שליחות",
       war: "שליחות הישרדותית",
       comfort: "\"לא מזיז לי\"",
       apathy: "אדישות",
-      central: "תחושת שליחות"
+      opportunity: "חיבור לערכים",
+      action: "שיח על ערכים ומשמעות בצוות"
     },
     {
-      action: "תרגול משוב פתוח וישיר",
-      opportunity: "כנות ופתיחות",
+      central: "תקשורת פתוחה",
       war: "שליטה ומניפולציה",
       comfort: "נחמדות שטחית",
       apathy: "הסתרה",
-      central: "תקשורת פתוחה"
+      opportunity: "כנות ופתיחות",
+      action: "תרגול משוב פתוח וישיר"
     },
     {
-      action: "בניית חוזה אמון ושיח ערכי",
-      opportunity: "אמון מבוסס חיבור",
+      central: "אמון",
       war: "אמון מותנה",
       comfort: "\"כאילו\" אמון",
       apathy: "ניתוק",
-      central: "אמון"
+      opportunity: "אמון מבוסס חיבור",
+      action: "בניית חוזה אמון ושיח ערכי"
     }
   ];
 
@@ -114,14 +114,9 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
             <TableHeader>
               <TableRow className="border-b-2 border-gray-300">
                 <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'} ${
-                  isHighlighted('action') ? 'bg-blue-100 border-blue-300' : 'bg-gray-50'
+                  isHighlighted('central') ? 'bg-purple-100 border-purple-300' : 'bg-gray-50'
                 }`} style={{ color: '#000000' }}>
-                  פעולה למעבר לאזור ההזדמנות
-                </TableHead>
-                <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'} ${
-                  isHighlighted('opportunity') ? getZoneColor('opportunity') + ' font-semibold shadow-md' : 'bg-gray-50'
-                }`} style={{ color: '#000000' }}>
-                  אזור ההזדמנות
+                  ערך מרכזי
                 </TableHead>
                 <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'} ${
                   isHighlighted('war') ? getZoneColor('war') + ' font-semibold shadow-md' : 'bg-gray-50'
@@ -139,9 +134,14 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
                   אזור אדישות
                 </TableHead>
                 <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'} ${
-                  isHighlighted('central') ? 'bg-purple-100 border-purple-300' : 'bg-gray-50'
+                  isHighlighted('opportunity') ? getZoneColor('opportunity') + ' font-semibold shadow-md' : 'bg-gray-50'
                 }`} style={{ color: '#000000' }}>
-                  ערך מרכזי
+                  אזור ההזדמנות
+                </TableHead>
+                <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'} ${
+                  isHighlighted('action') ? 'bg-blue-100 border-blue-300' : 'bg-gray-50'
+                }`} style={{ color: '#000000' }}>
+                  פעולה למעבר לאזור ההזדמנות
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -149,14 +149,9 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
               {tableData.map((row, index) => (
                 <TableRow key={index}>
                   <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
-                    isHighlighted('action') ? 'bg-blue-100 border-blue-300 font-semibold' : 'bg-white'
+                    isHighlighted('central') ? 'bg-purple-100 border-purple-300 font-semibold' : 'bg-white'
                   }`} style={{ color: '#000000' }}>
-                    {row.action}
-                  </TableCell>
-                  <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
-                    isHighlighted('opportunity') ? getZoneColor('opportunity') + ' font-semibold shadow-md' : 'bg-white'
-                  }`} style={{ color: '#000000' }}>
-                    {row.opportunity}
+                    {row.central}
                   </TableCell>
                   <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
                     isHighlighted('war') ? getZoneColor('war') + ' font-semibold shadow-md' : 'bg-white'
@@ -174,9 +169,14 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
                     {row.apathy}
                   </TableCell>
                   <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
-                    isHighlighted('central') ? 'bg-purple-100 border-purple-300 font-semibold' : 'bg-white'
+                    isHighlighted('opportunity') ? getZoneColor('opportunity') + ' font-semibold shadow-md' : 'bg-white'
                   }`} style={{ color: '#000000' }}>
-                    {row.central}
+                    {row.opportunity}
+                  </TableCell>
+                  <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
+                    isHighlighted('action') ? 'bg-blue-100 border-blue-300 font-semibold' : 'bg-white'
+                  }`} style={{ color: '#000000' }}>
+                    {row.action}
                   </TableCell>
                 </TableRow>
               ))}
