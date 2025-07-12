@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,7 +11,6 @@ import { ParticipantSearch } from '@/components/ParticipantSearch';
 import { WocaZoneSection } from '@/components/WocaZoneSection';
 import { WocaChartsRow } from '@/components/WocaChartsRow';
 import { OpportunityZoneSection } from '@/components/OpportunityZoneSection';
-import { WocaDemographicsSection } from '@/components/WocaDemographicsSection';
 import { WocaZonesTable } from '@/components/WocaZonesTable';
 
 export const GroupWorkshopInsights: React.FC = () => {
@@ -208,13 +208,6 @@ export const GroupWorkshopInsights: React.FC = () => {
 
           {/* 4. Opportunity Zone Paragraph */}
           <OpportunityZoneSection isPresenterMode={isPresenterMode} />
-
-          {/* 5. Demographics Section */}
-          <WocaDemographicsSection
-            wocaAnalysis={wocaAnalysis}
-            showNames={showNames}
-            isPresenterMode={isPresenterMode}
-          />
         </>
       )}
     </div>
