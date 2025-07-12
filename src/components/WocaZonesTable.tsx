@@ -8,73 +8,6 @@ interface WocaZonesTableProps {
   isPresenterMode?: boolean;
 }
 
-const zoneData = [
-  {
-    zone: 'אזור אדישות',
-    zoneKey: 'apathy',
-    characteristics: 'חסר נרטיב',
-    issues: 'סגירות שחית',
-    solution: 'הסתרה',
-    action: 'כתיבת נרטיב חדש עם הצוות'
-  },
-  {
-    zone: 'אזור נוחות', 
-    zoneKey: 'comfort',
-    characteristics: 'חזון קרא להפעלה',
-    issues: 'נמדנות שחית',
-    solution: 'שליטה ומניפולציה',
-    action: 'תרגול משוב פתוח ושיר'
-  },
-  {
-    zone: 'אזור מלחמה',
-    zoneKey: 'war',
-    characteristics: 'השרדות מדית',
-    issues: 'חיפוש כשלים',
-    solution: 'שליטה היררכית',
-    action: 'בניית חזון אמון ושיח ערכי'
-  },
-  {
-    zone: 'אזור הזדמנות',
-    zoneKey: 'opportunity', 
-    characteristics: 'פוקוס על אומים',
-    issues: 'תקשורת פתוחה',
-    solution: '"אני שותף"',
-    action: 'פעולה למעבר לאזור ההזדמנות'
-  },
-  {
-    zone: 'ערך מרכזי',
-    zoneKey: 'central',
-    characteristics: 'ראיה מערכתית',
-    issues: 'גישות מחשבתית',
-    solution: '"לא מדד לי"',
-    action: 'תחושת שליחות'
-  },
-  {
-    zone: 'פעולה למעבר לאזור ההזדמנות',
-    zoneKey: 'action',
-    characteristics: 'נסיות מחודש של חזון בעזרת מודל WOCA',
-    issues: 'תקשורת שליחות',
-    solution: 'שיח על ערכים ומשמעות בצוות',
-    action: 'שיח על ערכים ומשמעות בצוות'
-  },
-  {
-    zone: 'תרגול משוב פתוח ושיר',
-    zoneKey: 'feedback',
-    characteristics: 'תקשורת פתוחה',
-    issues: 'שליטה ומניפולציה',
-    solution: 'נמדנות שחית',
-    action: 'הסתרה'
-  },
-  {
-    zone: 'בניית חזון אמון ושיח ערכי',
-    zoneKey: 'vision',
-    characteristics: 'אמון',
-    issues: 'אמון מותנה',
-    solution: '"בלאדי" אמון',
-    action: 'נתוק'
-  }
-];
-
 export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({ 
   dominantZone, 
   isPresenterMode = false 
@@ -98,6 +31,73 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
     return dominantZone === zoneKey;
   };
 
+  const tableData = [
+    {
+      action: "ניסוח מחודש של חזון בעזרת מודל וייז",
+      central: "חזון כקריאה לפעולה",
+      war: "הישרדות מיידית",
+      comfort: "חזון רדום",
+      apathy: "חזון מטושטש",
+      opportunity: ""
+    },
+    {
+      action: "תרגול סריקה מערכתית",
+      central: "ראייה מערכתית",
+      war: "פוקוס על איומים",
+      comfort: "קיפאון מחשבתי",
+      apathy: "ראייה צרה",
+      opportunity: ""
+    },
+    {
+      action: "עיבוד קונפליקטים כהזדמנות",
+      central: "גמישות מחשבתית",
+      war: "תגובתיות אגרסיבית",
+      comfort: "נוחות מחשבתית",
+      apathy: "קיבעון",
+      opportunity: ""
+    },
+    {
+      action: "הזמנה לשאלות \"לא נוחות\"",
+      central: "סקרנות מקצועית",
+      war: "חיפוש כשלים",
+      comfort: "סקרנות שטחית",
+      apathy: "אדישות",
+      opportunity: ""
+    },
+    {
+      action: "כתיבת נרטיב חדש עם הצוות",
+      central: "נרטיב אישי",
+      war: "\"אני שורד/ת\"",
+      comfort: "סיפור \"בסדר\"",
+      apathy: "חוסר נרטיב",
+      opportunity: ""
+    },
+    {
+      action: "שיח על ערכים ומשמעות בצוות",
+      central: "תחושת שליחות",
+      war: "שליחות הישרדותית",
+      comfort: "\"לא מזיז לי\"",
+      apathy: "אדישות",
+      opportunity: ""
+    },
+    {
+      action: "תרגול משוב פתוח וישיר",
+      central: "תקשורת פתוחה",
+      war: "שליטה ומניפולציה",
+      comfort: "נחמדות שטחית",
+      apathy: "הסתרה",
+      opportunity: ""
+    },
+    {
+      action: "בניית חוזה אמון ושיח ערכי",
+      central: "אמון",
+      war: "אמון מותנה",
+      comfort: "\"כאילו\" אמון",
+      apathy: "ניתוק",
+      opportunity: ""
+    }
+  ];
+
   return (
     <Card className="w-full">
       <CardHeader className="text-center">
@@ -113,196 +113,73 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
           <Table className="w-full border-collapse">
             <TableHeader>
               <TableRow className="border-b-2 border-gray-300">
-                <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'}`} style={{ color: '#000000' }}>
-                  אזור אדישות
+                <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'} ${
+                  isHighlighted('action') ? 'bg-blue-100 border-blue-300' : ''
+                }`} style={{ color: '#000000' }}>
+                  פעולה למעבר לאזור ההזדמנות
                 </TableHead>
-                <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'}`} style={{ color: '#000000' }}>
-                  אזור נוחות
+                <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'} ${
+                  isHighlighted('central') ? 'bg-purple-100 border-purple-300' : ''
+                }`} style={{ color: '#000000' }}>
+                  ערך מרכזי
                 </TableHead>
-                <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'}`} style={{ color: '#000000' }}>
+                <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'} ${
+                  isHighlighted('war') ? getZoneColor('war') + ' font-semibold shadow-md' : ''
+                }`} style={{ color: '#000000' }}>
                   אזור מלחמה
                 </TableHead>
-                <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'}`} style={{ color: '#000000' }}>
-                  אזור הזדמנות
+                <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'} ${
+                  isHighlighted('comfort') ? getZoneColor('comfort') + ' font-semibold shadow-md' : ''
+                }`} style={{ color: '#000000' }}>
+                  אזור נוחות
                 </TableHead>
-                <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'}`} style={{ color: '#000000' }}>
-                  פעולה למעבר לאזור ההזדמנות
+                <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'} ${
+                  isHighlighted('apathy') ? getZoneColor('apathy') + ' font-semibold shadow-md' : ''
+                }`} style={{ color: '#000000' }}>
+                  אזור אדישות
+                </TableHead>
+                <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'} ${
+                  isHighlighted('opportunity') ? getZoneColor('opportunity') + ' font-semibold shadow-md' : ''
+                }`} style={{ color: '#000000' }}>
+                  אזור ההזדמנות
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {/* Row 1: Main characteristics */}
-              <TableRow>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
-                  isHighlighted('apathy') ? getZoneColor('apathy') + ' font-semibold shadow-md' : 'bg-white'
-                }`} style={{ color: '#000000' }}>
-                  חסר נרטיב
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
-                  isHighlighted('comfort') ? getZoneColor('comfort') + ' font-semibold shadow-md' : 'bg-white'
-                }`} style={{ color: '#000000' }}>
-                  חזון קרא להפעלה
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
-                  isHighlighted('war') ? getZoneColor('war') + ' font-semibold shadow-md' : 'bg-white'
-                }`} style={{ color: '#000000' }}>
-                  השרדות מדית
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
-                  isHighlighted('opportunity') ? getZoneColor('opportunity') + ' font-semibold shadow-md' : 'bg-white'
-                }`} style={{ color: '#000000' }}>
-                  פוקוס על אומים
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'}`} style={{ color: '#000000' }}>
-                  נסיות מחודש של חזון בעזרות מודל WOCA
-                </TableCell>
-              </TableRow>
-
-              {/* Row 2: Issues */}
-              <TableRow>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
-                  isHighlighted('apathy') ? getZoneColor('apathy') + ' font-semibold shadow-md' : 'bg-white'
-                }`} style={{ color: '#000000' }}>
-                  ראיה צרה
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
-                  isHighlighted('comfort') ? getZoneColor('comfort') + ' font-semibold shadow-md' : 'bg-white'
-                }`} style={{ color: '#000000' }}>
-                  ראיה מערכתית
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
-                  isHighlighted('war') ? getZoneColor('war') + ' font-semibold shadow-md' : 'bg-white'
-                }`} style={{ color: '#000000' }}>
-                  חזון דרום
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
-                  isHighlighted('opportunity') ? getZoneColor('opportunity') + ' font-semibold shadow-md' : 'bg-white'
-                }`} style={{ color: '#000000' }}>
-                  תקשורת פתוחה
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'}`} style={{ color: '#000000' }}>
-                  שיח על ערכים ומשמעות בצוות
-                </TableCell>
-              </TableRow>
-
-              {/* Row 3: Solutions */}
-              <TableRow>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
-                  isHighlighted('apathy') ? getZoneColor('apathy') + ' font-semibold shadow-md' : 'bg-white'
-                }`} style={{ color: '#000000' }}>
-                  לכלווון
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
-                  isHighlighted('comfort') ? getZoneColor('comfort') + ' font-semibold shadow-md' : 'bg-white'
-                }`} style={{ color: '#000000' }}>
-                  גישות מחשבתית
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
-                  isHighlighted('war') ? getZoneColor('war') + ' font-semibold shadow-md' : 'bg-white'
-                }`} style={{ color: '#000000' }}>
-                  תחות מחשבתית
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
-                  isHighlighted('opportunity') ? getZoneColor('opportunity') + ' font-semibold shadow-md' : 'bg-white'
-                }`} style={{ color: '#000000' }}>
-                  "אני שותף"
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'}`} style={{ color: '#000000' }}>
-                  תרגול משוב פתוח ושיר
-                </TableCell>
-              </TableRow>
-
-              {/* Row 4: Actions */}
-              <TableRow>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
-                  isHighlighted('apathy') ? getZoneColor('apathy') + ' font-semibold shadow-md' : 'bg-white'
-                }`} style={{ color: '#000000' }}>
-                  אדישות
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
-                  isHighlighted('comfort') ? getZoneColor('comfort') + ' font-semibold shadow-md' : 'bg-white'
-                }`} style={{ color: '#000000' }}>
-                  סקרנות שחית
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
-                  isHighlighted('war') ? getZoneColor('war') + ' font-semibold shadow-md' : 'bg-white'
-                }`} style={{ color: '#000000' }}>
-                  "סיפור "בסדר
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
-                  isHighlighted('opportunity') ? getZoneColor('opportunity') + ' font-semibold shadow-md' : 'bg-white'
-                }`} style={{ color: '#000000' }}>
-                  חסר נרטיב
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'}`} style={{ color: '#000000' }}>
-                  תקשורת פתוחה
-                </TableCell>
-              </TableRow>
-
-              {/* Row 5: Bottom actions */}
-              <TableRow>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
-                  isHighlighted('apathy') ? getZoneColor('apathy') + ' font-semibold shadow-md' : 'bg-white'
-                }`} style={{ color: '#000000' }}>
-                  אדישות
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
-                  isHighlighted('comfort') ? getZoneColor('comfort') + ' font-semibold shadow-md' : 'bg-white'
-                }`} style={{ color: '#000000' }}>
-                  תחושת שליחות
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
-                  isHighlighted('war') ? getZoneColor('war') + ' font-semibold shadow-md' : 'bg-white'
-                }`} style={{ color: '#000000' }}>
-                  "לא מדד לי"
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
-                  isHighlighted('opportunity') ? getZoneColor('opportunity') + ' font-semibold shadow-md' : 'bg-white'
-                }`} style={{ color: '#000000' }}>
-                  אדישות
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'}`} style={{ color: '#000000' }}>
-                  שליטה ומניפולציה
-                </TableCell>
-              </TableRow>
-
-              {/* Row 6: Final row */}
-              <TableRow>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'}`} style={{ color: '#000000' }}>
-                  הסתרה
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'}`} style={{ color: '#000000' }}>
-                  שליטה היררכית
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'}`} style={{ color: '#000000' }}>
-                  שליטה היררכית
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'}`} style={{ color: '#000000' }}>
-                  "בלאדי" אמון
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'}`} style={{ color: '#000000' }}>
-                  נמדנות שחית
-                </TableCell>
-              </TableRow>
-
-              {/* Row 7: Bottom row */}
-              <TableRow>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'}`} style={{ color: '#000000' }}>
-                  נתוק
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'}`} style={{ color: '#000000' }}>
-                  אמון מותנה
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'}`} style={{ color: '#000000' }}>
-                  אמון מותנה
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'}`} style={{ color: '#000000' }}>
-                  "בלאדי" אמון
-                </TableCell>
-                <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'}`} style={{ color: '#000000' }}>
-                  הסתרה
-                </TableCell>
-              </TableRow>
+              {tableData.map((row, index) => (
+                <TableRow key={index}>
+                  <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
+                    isHighlighted('action') ? 'bg-blue-100 border-blue-300 font-semibold' : 'bg-white'
+                  }`} style={{ color: '#000000' }}>
+                    {row.action}
+                  </TableCell>
+                  <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
+                    isHighlighted('central') ? 'bg-purple-100 border-purple-300 font-semibold' : 'bg-white'
+                  }`} style={{ color: '#000000' }}>
+                    {row.central}
+                  </TableCell>
+                  <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
+                    isHighlighted('war') ? getZoneColor('war') + ' font-semibold shadow-md' : 'bg-white'
+                  }`} style={{ color: '#000000' }}>
+                    {row.war}
+                  </TableCell>
+                  <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
+                    isHighlighted('comfort') ? getZoneColor('comfort') + ' font-semibold shadow-md' : 'bg-white'
+                  }`} style={{ color: '#000000' }}>
+                    {row.comfort}
+                  </TableCell>
+                  <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
+                    isHighlighted('apathy') ? getZoneColor('apathy') + ' font-semibold shadow-md' : 'bg-white'
+                  }`} style={{ color: '#000000' }}>
+                    {row.apathy}
+                  </TableCell>
+                  <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
+                    isHighlighted('opportunity') ? getZoneColor('opportunity') + ' font-semibold shadow-md' : 'bg-white'
+                  }`} style={{ color: '#000000' }}>
+                    {row.opportunity}
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </div>
