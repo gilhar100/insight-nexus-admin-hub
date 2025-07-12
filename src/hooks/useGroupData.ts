@@ -40,6 +40,16 @@ export const useGroupData = (groupNumber: number) => {
       try {
         console.log('Fetching data for group number:', groupNumber);
         
+        // First, let's test if we can fetch archetype data directly
+        const { data: archetypeTest, error: archetypeError } = await supabase
+          .from('survey_responses')
+          .select('dominant_archetype')
+          .eq('group_number', groupNumber)
+          .eq('survey_type', 'manager');
+          
+        console.log('Archetype test query result:', archetypeTest);
+        console.log('Archetype test error:', archetypeError);
+        
         // Fetch participants data - EXPLICITLY include dominant_archetype field
         const { data: participants, error: participantsError } = await supabase
           .from('survey_responses')
@@ -64,9 +74,14 @@ export const useGroupData = (groupNumber: number) => {
           throw participantsError;
         }
 
-        console.log('Fetched participants:', participants);
+        console.log('Raw Supabase response:', participants);
+        console.log('First participant raw:', participants?.[0]);
         console.log('Participants with archetype:', participants?.filter(p => p.dominant_archetype && p.dominant_archetype.trim() !== ''));
-        console.log('Raw archetype values:', participants?.map(p => p.dominant_archetype));
+        console.log('Raw archetype values:', participants?.map(p => ({ 
+          archetype: p.dominant_archetype, 
+          type: typeof p.dominant_archetype,
+          keys: Object.keys(p)
+        })));
         console.log('Group number being fetched:', groupNumber, 'Type:', typeof groupNumber);
 
         if (!participants || participants.length === 0) {
