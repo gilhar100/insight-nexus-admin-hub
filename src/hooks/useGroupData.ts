@@ -40,10 +40,22 @@ export const useGroupData = (groupNumber: number) => {
       try {
         console.log('Fetching data for group number:', groupNumber);
         
-        // Fetch participants data including dominant_archetype
+        // Fetch participants data - EXPLICITLY include dominant_archetype field
         const { data: participants, error: participantsError } = await supabase
           .from('survey_responses')
-          .select('dimension_s, dimension_l, dimension_i, dimension_m, dimension_a, dimension_a2, slq_score, dominant_archetype')
+          .select(`
+            dimension_s, 
+            dimension_l, 
+            dimension_i, 
+            dimension_m, 
+            dimension_a, 
+            dimension_a2, 
+            slq_score, 
+            dominant_archetype,
+            archetype_1_score,
+            archetype_2_score,
+            archetype_3_score
+          `)
           .eq('group_number', groupNumber)
           .eq('survey_type', 'manager');
 
@@ -53,7 +65,7 @@ export const useGroupData = (groupNumber: number) => {
         }
 
         console.log('Fetched participants:', participants);
-        console.log('Participants with archetype:', participants?.filter(p => p.dominant_archetype));
+        console.log('Participants with archetype:', participants?.filter(p => p.dominant_archetype && p.dominant_archetype.trim() !== ''));
 
         if (!participants || participants.length === 0) {
           console.log('No participants found for group:', groupNumber);
@@ -91,7 +103,7 @@ export const useGroupData = (groupNumber: number) => {
           overall: sums.overall / totalParticipants,
         };
 
-        // Map all participants, preserving dominant_archetype (even if null/undefined)
+        // Map all participants, ensuring dominant_archetype is properly passed through
         const participantData = participants.map(p => ({
           dimension_s: p.dimension_s || 0,
           dimension_l: p.dimension_l || 0,
@@ -99,7 +111,7 @@ export const useGroupData = (groupNumber: number) => {
           dimension_m: p.dimension_m || 0,
           dimension_a: p.dimension_a || 0,
           dimension_a2: p.dimension_a2 || 0,
-          dominant_archetype: p.dominant_archetype || undefined,
+          dominant_archetype: p.dominant_archetype, // Pass through exactly as received from DB
         }));
 
         const groupData: GroupData = {
@@ -111,7 +123,7 @@ export const useGroupData = (groupNumber: number) => {
 
         console.log('Final group data:', groupData);
         console.log('Participants with valid archetypes in final data:', 
-          groupData.participants.filter(p => p.dominant_archetype && p.dominant_archetype.trim() !== '').length
+          groupData.participants.filter(p => p.dominant_archetype && typeof p.dominant_archetype === 'string' && p.dominant_archetype.trim() !== '' && p.dominant_archetype !== 'null').length
         );
         
         setData(groupData);
