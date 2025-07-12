@@ -38,7 +38,7 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
       war: "הישרדות מיידית",
       comfort: "חזון רדום",
       apathy: "חזון מטושטש",
-      opportunity: ""
+      opportunity: "חזון מעורר יוזמה"
     },
     {
       action: "תרגול סריקה מערכתית",
@@ -46,7 +46,7 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
       war: "פוקוס על איומים",
       comfort: "קיפאון מחשבתי",
       apathy: "ראייה צרה",
-      opportunity: ""
+      opportunity: "חיבורים בין מערכות"
     },
     {
       action: "עיבוד קונפליקטים כהזדמנות",
@@ -54,7 +54,7 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
       war: "תגובתיות אגרסיבית",
       comfort: "נוחות מחשבתית",
       apathy: "קיבעון",
-      opportunity: ""
+      opportunity: "פתיחות ויצירתיות"
     },
     {
       action: "הזמנה לשאלות \"לא נוחות\"",
@@ -62,7 +62,7 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
       war: "חיפוש כשלים",
       comfort: "סקרנות שטחית",
       apathy: "אדישות",
-      opportunity: ""
+      opportunity: "שאלות חוקרות"
     },
     {
       action: "כתיבת נרטיב חדש עם הצוות",
@@ -70,7 +70,7 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
       war: "\"אני שורד/ת\"",
       comfort: "סיפור \"בסדר\"",
       apathy: "חוסר נרטיב",
-      opportunity: ""
+      opportunity: "סיפור מעורר השראה"
     },
     {
       action: "שיח על ערכים ומשמעות בצוות",
@@ -78,7 +78,7 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
       war: "שליחות הישרדותית",
       comfort: "\"לא מזיז לי\"",
       apathy: "אדישות",
-      opportunity: ""
+      opportunity: "חיבור לערכים"
     },
     {
       action: "תרגול משוב פתוח וישיר",
@@ -86,7 +86,7 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
       war: "שליטה ומניפולציה",
       comfort: "נחמדות שטחית",
       apathy: "הסתרה",
-      opportunity: ""
+      opportunity: "כנות ופתיחות"
     },
     {
       action: "בניית חוזה אמון ושיח ערכי",
@@ -94,7 +94,7 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
       war: "אמון מותנה",
       comfort: "\"כאילו\" אמון",
       apathy: "ניתוק",
-      opportunity: ""
+      opportunity: "אמון מבוסס חיבור"
     }
   ];
 
