@@ -1,7 +1,7 @@
+
 import React from 'react';
 import { SalimaGroupRadarChart } from '@/components/SalimaGroupRadarChart';
 import { SalimaBellCurveChart } from '@/components/SalimaBellCurveChart';
-import { GroupArchetypeChart } from '@/components/GroupArchetypeChart';
 
 interface GroupData {
   group_number: number;
@@ -196,18 +196,6 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
           <div className="h-[520px] w-full flex items-center justify-center">
             <SalimaGroupRadarChart averages={groupData.averages} />
           </div>
-        </div>
-      </div>
-
-      {/* Archetype Distribution Chart */}
-      <div className="card">
-        <div className="card-header text-center">
-          <div className={`flex items-center justify-center text-right card-title${isPresenterMode ? " text-3xl" : ""}`}>
-            התפלגות ארכיטיפי מנהיגות
-          </div>
-        </div>
-        <div className="card-content">
-          <GroupArchetypeChart groupNumber={groupData.group_number} />
         </div>
       </div>
 
