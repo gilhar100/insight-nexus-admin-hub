@@ -50,22 +50,10 @@ export const useGroupData = (groupNumber: number) => {
         console.log('Archetype test query result:', archetypeTest);
         console.log('Archetype test error:', archetypeError);
         
-        // Fetch participants data - EXPLICITLY include dominant_archetype field
+        // Fetch participants data - select all fields to ensure dominant_archetype is included
         const { data: participants, error: participantsError } = await supabase
           .from('survey_responses')
-          .select(`
-            dimension_s, 
-            dimension_l, 
-            dimension_i, 
-            dimension_m, 
-            dimension_a, 
-            dimension_a2, 
-            slq_score, 
-            dominant_archetype,
-            archetype_1_score,
-            archetype_2_score,
-            archetype_3_score
-          `)
+          .select('*')
           .eq('group_number', groupNumber)
           .eq('survey_type', 'manager');
 
