@@ -58,6 +58,10 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
   const [chartType, setChartType] = useState<'bar' | 'pie'>('bar');
 
   console.log('SalimaArchetypeDistributionChart received participants:', participants);
+  console.log('Participants with archetype data:', participants.map(p => ({ 
+    dominant_archetype: p.dominant_archetype,
+    type: typeof p.dominant_archetype 
+  })));
 
   if (!participants || participants.length === 0) {
     return (
