@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { SalimaGroupRadarChart } from '@/components/SalimaGroupRadarChart';
 import { SalimaBellCurveChart } from '@/components/SalimaBellCurveChart';
-import { SalimaArchetypeDistributionChart } from '@/components/SalimaArchetypeDistributionChart';
+import { GroupArchetypeChart } from '@/components/GroupArchetypeChart';
 
 interface GroupData {
   group_number: number;
@@ -85,7 +84,6 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
   groupData,
   isPresenterMode
 }) => {
-  // Add safety check for groupData
   if (!groupData || !groupData.participants || groupData.participants.length === 0) {
     return (
       <div className="card">
@@ -96,7 +94,6 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
     );
   }
 
-  // Add safety check for dimension insights
   let dimensionInsights;
   try {
     dimensionInsights = getDimensionInsights(groupData.averages);
@@ -210,7 +207,7 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
           </div>
         </div>
         <div className="card-content">
-          <SalimaArchetypeDistributionChart participants={groupData.participants} />
+          <GroupArchetypeChart groupNumber={groupData.group_number} />
         </div>
       </div>
 
