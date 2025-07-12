@@ -39,26 +39,34 @@ export const ArchetypeDistributionChart: React.FC<ArchetypeDistributionChartProp
 
   useEffect(() => {
     const fetchArchetypeData = async () => {
-      if (!groupNumber) return;
+      if (!groupNumber) {
+        console.log('❌ No group number provided');
+        return;
+      }
       
       setLoading(true);
       setError(null);
       
       try {
-        console.log('🔄 Fetching archetype data for group:', groupNumber);
+        const url = `https://lhmrghebdtcbhmgtbqfe.supabase.co/functions/v1/getArchetypeDistribution?group_number=${groupNumber}`;
+        console.log('🔄 Fetching archetype data from URL:', url);
         
-        const response = await fetch(
-          `https://lhmrghebdtcbhmgtbqfe.supabase.co/functions/v1/getArchetypeDistribution?group_number=${groupNumber}`
-        );
+        const response = await fetch(url);
+        
+        console.log('📡 Response status:', response.status);
+        console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
         
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          const errorText = await response.text();
+          console.error('❌ HTTP error:', response.status, errorText);
+          throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
         }
         
         const result = await response.json();
         console.log('📊 Archetype data received:', result);
         
         if (result.error) {
+          console.error('❌ API error:', result.error);
           setError(result.error);
           setData(null);
         } else {
@@ -67,7 +75,8 @@ export const ArchetypeDistributionChart: React.FC<ArchetypeDistributionChartProp
         }
       } catch (err) {
         console.error('❌ Error fetching archetype data:', err);
-        setError('שגיאה בטעינת נתוני הארכיטיפים');
+        const errorMessage = err instanceof Error ? err.message : 'שגיאה בטעינת נתוני הארכיטיפים';
+        setError(errorMessage);
         setData(null);
       } finally {
         setLoading(false);
