@@ -1,9 +1,6 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Users, AlertCircle } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 import { useWorkshopData } from '@/hooks/useWorkshopData';
 import { analyzeWorkshopWoca } from '@/utils/wocaAnalysis';
 import { PresenterMode } from '@/components/PresenterMode';
@@ -12,11 +9,15 @@ import { WocaZoneSection } from '@/components/WocaZoneSection';
 import { WocaChartsRow } from '@/components/WocaChartsRow';
 import { OpportunityZoneSection } from '@/components/OpportunityZoneSection';
 import { WocaZonesTable } from '@/components/WocaZonesTable';
+import { GroupSelector } from '@/components/GroupSelector';
+import { GroupInsightsHeader } from '@/components/GroupInsightsHeader';
+import { InsufficientDataWarning } from '@/components/InsufficientDataWarning';
 
 export const GroupWorkshopInsights: React.FC = () => {
   const [selectedGroupId, setSelectedGroupId] = useState<number | undefined>();
   const [showNames, setShowNames] = useState(false);
   const [isPresenterMode, setIsPresenterMode] = useState(false);
+  
   const {
     workshopData,
     workshops,
@@ -37,7 +38,6 @@ export const GroupWorkshopInsights: React.FC = () => {
     } : null
   });
 
-  // Get WOCA analysis results - now calculated directly in the hook
   const wocaAnalysis = workshopData ? analyzeWorkshopWoca(workshopData.participants, workshopData.workshop_id) : null;
 
   const handleGroupSelect = (value: string) => {
@@ -75,10 +75,8 @@ export const GroupWorkshopInsights: React.FC = () => {
 
   console.log('🔍 WOCA Analysis results:', wocaAnalysis);
 
-  // Check if we have enough data for analysis
   const hasMinimumData = workshopData && workshopData.participants.length >= 3;
 
-  // Calculate zone distribution for pie chart using the new frequency-based data
   const getZoneDistribution = () => {
     if (!wocaAnalysis?.groupZoneCounts) return { opportunity: 0, comfort: 0, apathy: 0, war: 0 };
     
@@ -93,69 +91,19 @@ export const GroupWorkshopInsights: React.FC = () => {
   const renderContent = () => (
     <div className={`space-y-6 ${isPresenterMode ? 'presenter-mode' : ''}`} dir="rtl">
       {/* Page Header */}
-      {!isPresenterMode && (
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <div className="flex items-center justify-between">
-            <div className="text-right">
-              <h2 className="text-2xl font-bold mb-2" style={{ color: '#000000' }}>
-                ניתוח קבוצתי - מודל WOCA
-              </h2>
-              <p className="text-base" style={{ color: '#000000' }}>
-                ניתוח דינמיקה קבוצתי ואפקטיביות הסדנה באמצעות 36 שאלות מודל WOCA
-              </p>
-            </div>
-            <div className="bg-purple-50 p-4 rounded-lg">
-              <Users className="h-8 w-8 text-purple-600" />
-            </div>
-          </div>
-        </div>
-      )}
+      {!isPresenterMode && <GroupInsightsHeader />}
 
       {/* Individual Search Bar */}
       {!isPresenterMode && <ParticipantSearch />}
 
       {/* Group Selection */}
       {!isPresenterMode && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center text-right text-lg" style={{ color: '#000000' }}>
-              <Users className="h-5 w-5 ml-2" />
-              בחירת קבוצה
-            </CardTitle>
-            <CardDescription className="text-right text-base" style={{ color: '#000000' }}>
-              בחר קבוצה מטבלת woca_responses לניתוח דינמיקה קבוצתית
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex gap-4">
-              <div className="flex-1">
-                <Select value={selectedGroupId?.toString()} onValueChange={handleGroupSelect}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="בחר קבוצה" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {workshops.map(workshop => (
-                      <SelectItem key={workshop.id} value={workshop.id.toString()}>
-                        <div className="flex flex-col text-right">
-                          <span className="font-medium text-base" style={{ color: '#000000' }}>{workshop.name}</span>
-                          <span className="text-sm" style={{ color: '#000000' }}>
-                            {workshop.participant_count} משתתפים • {new Date(workshop.date).toLocaleDateString('he-IL')}
-                          </span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            
-            {error && (
-              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
-                <p className="text-sm text-right" style={{ color: '#000000' }}>{error}</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <GroupSelector
+          workshops={workshops}
+          selectedGroupId={selectedGroupId}
+          onGroupSelect={handleGroupSelect}
+          error={error}
+        />
       )}
 
       {/* Loading State */}
@@ -169,16 +117,7 @@ export const GroupWorkshopInsights: React.FC = () => {
 
       {/* Insufficient Data Warning */}
       {workshopData && !hasMinimumData && (
-        <Card>
-          <CardContent className="p-8 text-center">
-            <AlertCircle className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2" style={{ color: '#000000' }}>אין מספיק תגובות עדיין לחישוב תובנות ברמת הקבוצה</h3>
-            <p className="text-base" style={{ color: '#000000' }}>נדרשות לפחות 3 תגובות לניתוח קבוצתי אמין</p>
-            <p className="text-sm mt-2" style={{ color: '#000000' }}>
-              כרגע יש {workshopData.participants.length} תגובות
-            </p>
-          </CardContent>
-        </Card>
+        <InsufficientDataWarning participantCount={workshopData.participants.length} />
       )}
 
       {/* Results Section - Only show when group is selected and has minimum data */}
