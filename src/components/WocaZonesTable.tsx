@@ -114,32 +114,32 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
             <TableHeader>
               <TableRow className="border-b-2 border-gray-300">
                 <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'} ${
-                  isHighlighted('action') ? 'bg-blue-100 border-blue-300' : ''
+                  isHighlighted('action') ? 'bg-blue-100 border-blue-300' : 'bg-gray-50'
                 }`} style={{ color: '#000000' }}>
                   פעולה למעבר לאזור ההזדמנות
                 </TableHead>
                 <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'} ${
-                  isHighlighted('central') ? 'bg-purple-100 border-purple-300' : ''
+                  isHighlighted('central') ? 'bg-purple-100 border-purple-300' : 'bg-gray-50'
                 }`} style={{ color: '#000000' }}>
                   ערך מרכזי
                 </TableHead>
                 <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'} ${
-                  isHighlighted('war') ? getZoneColor('war') + ' font-semibold shadow-md' : ''
+                  isHighlighted('war') ? getZoneColor('war') + ' font-semibold shadow-md' : 'bg-gray-50'
                 }`} style={{ color: '#000000' }}>
                   אזור מלחמה
                 </TableHead>
                 <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'} ${
-                  isHighlighted('comfort') ? getZoneColor('comfort') + ' font-semibold shadow-md' : ''
+                  isHighlighted('comfort') ? getZoneColor('comfort') + ' font-semibold shadow-md' : 'bg-gray-50'
                 }`} style={{ color: '#000000' }}>
                   אזור נוחות
                 </TableHead>
                 <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'} ${
-                  isHighlighted('apathy') ? getZoneColor('apathy') + ' font-semibold shadow-md' : ''
+                  isHighlighted('apathy') ? getZoneColor('apathy') + ' font-semibold shadow-md' : 'bg-gray-50'
                 }`} style={{ color: '#000000' }}>
                   אזור אדישות
                 </TableHead>
                 <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'} ${
-                  isHighlighted('opportunity') ? getZoneColor('opportunity') + ' font-semibold shadow-md' : ''
+                  isHighlighted('opportunity') ? getZoneColor('opportunity') + ' font-semibold shadow-md' : 'bg-gray-50'
                 }`} style={{ color: '#000000' }}>
                   אזור ההזדמנות
                 </TableHead>
