@@ -48,7 +48,7 @@ export const ArchetypeDistributionChart: React.FC<ArchetypeDistributionChartProp
         console.log('🔄 Fetching archetype data for group:', groupNumber);
         
         const response = await fetch(
-          `https://salima.functions.supabase.co/getArchetypeDistribution?group_number=${groupNumber}`
+          `https://lhmrghebdtcbhmgtbqfe.supabase.co/functions/v1/getArchetypeDistribution?group_number=${groupNumber}`
         );
         
         if (!response.ok) {
