@@ -48,7 +48,7 @@ export const ArchetypeDistributionChart: React.FC<ArchetypeDistributionChartProp
       setError(null);
       
       try {
-        const url = `https://lhmrghebdtcbhmgtbqfe.supabase.co/functions/v1/getArchetypeDistribution?group_number=${groupNumber}`;
+        const url = `https://lhmrghebdtcbhmgtbqfe.functions.supabase.co/getArchetypeDistribution?group_number=${groupNumber}`;
         console.log('🔄 Fetching archetype data from URL:', url);
         
         const response = await fetch(url);
