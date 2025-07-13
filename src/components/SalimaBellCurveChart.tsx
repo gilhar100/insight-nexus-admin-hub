@@ -1,8 +1,7 @@
 
 import React from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, ScatterChart, Scatter, ComposedChart } from 'recharts';
+import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import { ChartContainer } from '@/components/ui/chart';
-import { getSalimaColor } from '@/utils/salimaColors';
 
 interface SalimaBellCurveChartProps {
   participants: Array<{
@@ -17,10 +16,6 @@ interface SalimaBellCurveChartProps {
 }
 
 const chartConfig = {
-  curve: {
-    label: "התפלגות",
-    color: "#3b82f6",
-  },
   participants: {
     label: "משתתפים",
     color: "#D32F2F",
@@ -44,74 +39,37 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
 
   console.log('Participant SLQ scores:', participantScores);
   console.log('Number of participants:', participantScores.length);
+  console.log('Average score:', averageScore);
 
-  // Calculate statistics
-  const mean = participantScores.reduce((sum, score) => sum + score, 0) / participantScores.length;
-  const variance = participantScores.reduce((sum, score) => sum + Math.pow(score - mean, 2), 0) / participantScores.length;
-  const stdDev = Math.sqrt(variance);
+  // Create scatter plot data with vertical jitter to avoid overlap
+  const scatterData = participantScores.map((score, index) => {
+    // Apply jitter based on how many participants have similar scores
+    const similarScores = participantScores.filter(s => Math.abs(s - score) < 0.1);
+    const jitterIndex = similarScores.findIndex(s => Math.abs(s - score) < 0.01);
+    const jitter = (jitterIndex * 0.15) - ((similarScores.length - 1) * 0.075); // Center the jitter
+    
+    return {
+      slqScore: score,
+      y: 1 + jitter, // Base y position with jitter
+      participantIndex: index + 1,
+      exactScore: score
+    };
+  });
 
-  // Ensure minimum standard deviation for visible curve
-  const effectiveStdDev = Math.max(stdDev, 0.5);
-
-  // Create a dynamic range centered around the group average
+  // Calculate axis ranges
   const minScore = Math.min(...participantScores);
   const maxScore = Math.max(...participantScores);
-  const range = Math.max(maxScore - minScore, 2); // Minimum range of 2
-  const padding = range * 0.3; // Add 30% padding
+  const scoreRange = maxScore - minScore;
+  const padding = Math.max(scoreRange * 0.1, 0.2); // At least 0.2 padding
   
-  const xMin = Math.max(1, averageScore - range/2 - padding);
-  const xMax = Math.min(5, averageScore + range/2 + padding);
-
-  // Generate smooth bell curve data points using kernel density estimation
-  const generateBellCurve = () => {
-    const points = [];
-    const step = (xMax - xMin) / 100; // Increased resolution for smoother curve
-
-    for (let x = xMin; x <= xMax; x += step) {
-      // Calculate kernel density estimation at point x
-      let density = 0;
-      const bandwidth = effectiveStdDev * 0.8; // Smoothing bandwidth
-      
-      participantScores.forEach(score => {
-        // Gaussian kernel
-        const u = (x - score) / bandwidth;
-        density += Math.exp(-0.5 * u * u) / Math.sqrt(2 * Math.PI);
-      });
-      
-      density = density / (participantScores.length * bandwidth);
-      
-      points.push({ 
-        slqScore: parseFloat(x.toFixed(3)), 
-        density: density * 10 // Scale for better visibility
-      });
-    }
-    return points;
-  };
-
-  const bellCurveData = generateBellCurve();
-
-  // Create participant dots data - each participant gets their own data point
-  const participantDots = participantScores.map((score, index) => ({
-    slqScore: score,
-    density: 0.1, // Fixed low position for visibility
-    participantIndex: index + 1,
-    exactScore: score,
-    isParticipant: true
-  }));
-
-  console.log('Participant dots data:', participantDots);
-
-  // Combine bell curve data with participant dots for the composed chart
-  const combinedData = [...bellCurveData];
-
-  // Find maximum density for scaling
-  const maxDensity = Math.max(...bellCurveData.map(point => point.density));
+  const xMin = Math.max(1, minScore - padding);
+  const xMax = Math.min(5, maxScore + padding);
 
   return (
     <div className="w-full h-full relative">
       <ChartContainer config={chartConfig} className="h-full w-full" dir="rtl">
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={combinedData} margin={{ top: 40, right: 30, left: 20, bottom: 80 }}>
+          <ScatterChart margin={{ top: 40, right: 30, left: 20, bottom: 80 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
             <XAxis 
               dataKey="slqScore"
@@ -126,60 +84,21 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
                 style: { fontSize: '14px', fontWeight: 'bold', textAnchor: 'middle' } 
               }}
             />
-            {/* Hide Y-axis completely */}
             <YAxis 
               hide={true}
-              domain={[0, maxDensity * 1.3]}
+              domain={[0.5, 1.8]}
             />
             <Tooltip 
-              content={({ active, payload, label }) => {
+              content={({ active, payload }) => {
                 if (active && payload && payload.length) {
-                  // Check if this is a participant dot by looking at the data
-                  const participantData = participantDots.find(p => Math.abs(p.slqScore - parseFloat(label)) < 0.01);
-                  
-                  if (participantData) {
-                    return (
-                      <div className="bg-white p-3 border rounded shadow-lg text-right">
-                        <p className="text-red-600 text-sm font-semibold">
-                          משתתף #{participantData.participantIndex}
-                        </p>
-                        <p className="text-gray-600 text-sm">
-                          ציון SLQ: {participantData.exactScore.toFixed(2)}
-                        </p>
-                      </div>
-                    );
-                  }
-
-                  // Regular curve tooltip
-                  const formatLabel = (labelValue: any): string => {
-                    if (typeof labelValue === 'number') {
-                      return labelValue.toFixed(2);
-                    }
-                    if (typeof labelValue === 'string') {
-                      const parsed = parseFloat(labelValue);
-                      return isNaN(parsed) ? '0.00' : parsed.toFixed(2);
-                    }
-                    return '0.00';
-                  };
-
-                  const formatValue = (value: any): string => {
-                    if (typeof value === 'number') {
-                      return value.toFixed(3);
-                    }
-                    if (typeof value === 'string') {
-                      const parsed = parseFloat(value);
-                      return isNaN(parsed) ? '0.000' : parsed.toFixed(3);
-                    }
-                    return '0.000';
-                  };
-
+                  const data = payload[0].payload;
                   return (
                     <div className="bg-white p-3 border rounded shadow-lg text-right">
-                      <p className="text-blue-600 text-sm">
-                        ציון SLQ: {formatLabel(label)}
+                      <p className="text-red-600 text-sm font-semibold">
+                        משתתף
                       </p>
                       <p className="text-gray-600 text-sm">
-                        צפיפות: {formatValue(payload[0].value)}
+                        ציון SLQ: {data.exactScore.toFixed(2)}
                       </p>
                     </div>
                   );
@@ -187,31 +106,33 @@ export const SalimaBellCurveChart: React.FC<SalimaBellCurveChartProps> = ({ part
                 return null;
               }}
             />
-            {/* Bell curve line */}
-            <Line 
-              type="monotone" 
-              dataKey="density" 
-              stroke="#3b82f6" 
-              strokeWidth={3}
-              dot={false}
-              name="התפלגות נורמלית"
-              connectNulls={false}
+            {/* Group average reference line */}
+            <ReferenceLine 
+              x={averageScore} 
+              stroke="#2563eb" 
+              strokeWidth={2} 
+              strokeDasharray="5 5"
+              label={{ 
+                value: `ממוצע קבוצה: ${averageScore.toFixed(2)}`, 
+                position: 'top',
+                style: { fontSize: '12px', fill: '#2563eb', fontWeight: 'bold' }
+              }}
             />
-            {/* Individual participant dots as scatter plot */}
+            {/* Individual participant dots */}
             <Scatter 
-              data={participantDots}
+              data={scatterData}
               fill="#D32F2F"
               stroke="#D32F2F"
-              strokeWidth={2}
-              r={4}
+              strokeWidth={1}
+              r={6}
             />
-          </ComposedChart>
+          </ScatterChart>
         </ResponsiveContainer>
       </ChartContainer>
       
       <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 text-center text-gray-600 text-sm">
-        <p className="font-semibold mb-1">הנקודות האדומות מייצגות את ציוני המנהיגות של המשתתפים השונים</p>
-        <p className="text-xs">העבירי עכבר מעל נקודה לצפייה בפרטים</p>
+        <p className="font-semibold mb-1">כל נקודה מייצגת ציון SLQ של משתתף אחד</p>
+        <p className="text-xs">הקו המקווקו מציין את הממוצע הקבוצתי</p>
       </div>
     </div>
   );
