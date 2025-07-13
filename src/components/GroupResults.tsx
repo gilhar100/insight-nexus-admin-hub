@@ -1,6 +1,5 @@
 import React from 'react';
 import { SalimaGroupRadarChart } from '@/components/SalimaGroupRadarChart';
-import { SalimaBellCurveChart } from '@/components/SalimaBellCurveChart';
 import { ArchetypeDistributionChart } from '@/components/ArchetypeDistributionChart';
 
 interface GroupData {
@@ -214,19 +213,6 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
         </div>
       </div>
 
-      {/* Bell Curve – SLQ Score Distribution - Full Width */}
-      <div className="card" style={{ gridColumn: "span 2" }}>
-        <div className="card-header text-center">
-          <div className={`flex items-center justify-center text-right card-title${isPresenterMode ? " text-3xl" : ""}`}>
-            התפלגות ציוני SLQ
-          </div>
-        </div>
-        <div className="card-content">
-          <div className="h-[400px] w-full flex items-center justify-center">
-            <SalimaBellCurveChart participants={groupData.participants} averageScore={groupData.averages.overall} />
-          </div>
-        </div>
-      </div>
     </div>
   );
 };
