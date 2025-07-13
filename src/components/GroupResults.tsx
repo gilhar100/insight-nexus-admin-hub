@@ -2,7 +2,6 @@ import React from 'react';
 import { SalimaGroupRadarChart } from '@/components/SalimaGroupRadarChart';
 import { ArchetypeDistributionChart } from '@/components/ArchetypeDistributionChart';
 import { SalimaIndividualScatterPlot } from '@/components/SalimaIndividualScatterPlot';
-
 interface GroupData {
   group_number: number;
   participant_count: number;
@@ -25,12 +24,10 @@ interface GroupData {
     dominant_archetype?: string;
   }>;
 }
-
 interface GroupResultsProps {
   groupData: GroupData;
   isPresenterMode: boolean;
 }
-
 const getDimensionInsights = (averages: GroupData['averages']) => {
   const dimensions = [{
     key: 'strategy',
@@ -57,17 +54,14 @@ const getDimensionInsights = (averages: GroupData['averages']) => {
     name: 'הסתגלות (A)',
     score: averages.adaptability
   }];
-
   const strongest = dimensions.reduce((max, dim) => dim.score > max.score ? dim : max);
   const weakest = dimensions.reduce((min, dim) => dim.score < min.score ? dim : min);
-
   return {
     strongest,
     weakest,
     isSameDimension: strongest.key === weakest.key
   };
 };
-
 const getDimensionExplanation = (dimensionKey: string) => {
   const explanations = {
     strategy: "היכולת לראות את התמונה הגדולה, לזהות הזדמנויות במצבים משתנים, ולפעול מתוך חזון ברור ולא רק מתוך תגובה למציאות הנוכחית. מנהלים עם ממד אסטרטגי גבוה מתמקדים באפקטיביות לטווח ארוך.",
@@ -79,43 +73,49 @@ const getDimensionExplanation = (dimensionKey: string) => {
   };
   return explanations[dimensionKey as keyof typeof explanations] || "";
 };
-
 export const GroupResults: React.FC<GroupResultsProps> = ({
   groupData,
   isPresenterMode
 }) => {
   if (!groupData || !groupData.participants || groupData.participants.length === 0) {
-    return (
-      <div className="card">
+    return <div className="card">
         <div className="card-content p-8 text-center">
           <p className="text-gray-600">אין נתונים להצגה עבור קבוצה זו</p>
         </div>
-      </div>
-    );
+      </div>;
   }
-
   let dimensionInsights;
   try {
     dimensionInsights = getDimensionInsights(groupData.averages);
   } catch (error) {
     console.error('Error calculating dimension insights:', error);
     dimensionInsights = {
-      strongest: { key: 'strategy', name: 'אסטרטגיה', score: 0 },
-      weakest: { key: 'strategy', name: 'אסטרטגיה', score: 0 },
+      strongest: {
+        key: 'strategy',
+        name: 'אסטרטגיה',
+        score: 0
+      },
+      weakest: {
+        key: 'strategy',
+        name: 'אסטרטגיה',
+        score: 0
+      },
       isSameDimension: false
     };
   }
-
-  const { strongest, weakest, isSameDimension } = dimensionInsights;
-
-  return (
-    <div className={isPresenterMode ? "presenter-grid" : "grid grid-cols-1 lg:grid-cols-2 gap-8"}>
+  const {
+    strongest,
+    weakest,
+    isSameDimension
+  } = dimensionInsights;
+  return <div className={isPresenterMode ? "presenter-grid" : "grid grid-cols-1 lg:grid-cols-2 gap-8"}>
       {/* Dimension Insights Section */}
-      <div className="card" style={{ gridColumn: isPresenterMode ? "span 2" : undefined }}>
+      <div className="card" style={{
+      gridColumn: isPresenterMode ? "span 2" : undefined
+    }}>
         <div className="card-header text-center"></div>
         <div className="card-content">
-          {!isSameDimension ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+          {!isSameDimension ? <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
               {/* Strongest Dimension */}
               <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
                 <h3 className={`font-bold text-green-800 mb-3 ${isPresenterMode ? 'text-2xl' : 'text-xl'}`}>
@@ -159,9 +159,7 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
                   </p>
                 </div>
               </div>
-            </div>
-          ) : (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+            </div> : <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
               <h3 className={`font-bold text-yellow-800 mb-3 ${isPresenterMode ? 'text-2xl' : 'text-xl'}`}>
                 ממד דומיננטי
               </h3>
@@ -180,17 +178,14 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
                   {getDimensionExplanation(strongest.key)}
                 </p>
               </div>
-            </div>
-          )}
+            </div>}
         </div>
       </div>
 
       {/* Radar Chart – Group Averages per SALIMA Dimension */}
       <div className="card">
         <div className="card-header text-center">
-          <div className={`flex items-center justify-center text-right card-title${isPresenterMode ? " text-3xl" : ""}`}>
-            תרשים רדאר – פרופיל קבוצתי לפי ממד
-          </div>
+          <div className={`flex items-center justify-center text-right card-title${isPresenterMode ? " text-3xl" : ""}`}>פרופיל קבוצתי ייחודי</div>
         </div>
         <div className="card-content">
           <div className="h-[520px] w-full flex items-center justify-center">
@@ -207,19 +202,16 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
           </div>
         </div>
         <div className="card-content">
-          <ArchetypeDistributionChart 
-            groupNumber={groupData.group_number} 
-            isPresenterMode={isPresenterMode}
-          />
+          <ArchetypeDistributionChart groupNumber={groupData.group_number} isPresenterMode={isPresenterMode} />
         </div>
       </div>
 
       {/* Individual SLQ Scores Scatter Plot - Full Width */}
-      <div className="card" style={{ gridColumn: "span 2" }}>
+      <div className="card" style={{
+      gridColumn: "span 2"
+    }}>
         <div className="card-header text-center">
-          <div className={`flex items-center justify-center text-right card-title${isPresenterMode ? " text-3xl" : ""}`}>
-            התפלגות ציוני SLQ אישיים
-          </div>
+          
         </div>
         <div className="card-content">
           <div className="h-[400px] w-full flex items-center justify-center">
@@ -228,6 +220,5 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
         </div>
       </div>
 
-    </div>
-  );
+    </div>;
 };
