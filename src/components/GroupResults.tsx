@@ -1,6 +1,7 @@
 import React from 'react';
 import { SalimaGroupRadarChart } from '@/components/SalimaGroupRadarChart';
 import { ArchetypeDistributionChart } from '@/components/ArchetypeDistributionChart';
+import { SalimaIndividualScatterPlot } from '@/components/SalimaIndividualScatterPlot';
 
 interface GroupData {
   group_number: number;
@@ -210,6 +211,20 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
             groupNumber={groupData.group_number} 
             isPresenterMode={isPresenterMode}
           />
+        </div>
+      </div>
+
+      {/* Individual SLQ Scores Scatter Plot - Full Width */}
+      <div className="card" style={{ gridColumn: "span 2" }}>
+        <div className="card-header text-center">
+          <div className={`flex items-center justify-center text-right card-title${isPresenterMode ? " text-3xl" : ""}`}>
+            התפלגות ציוני SLQ אישיים
+          </div>
+        </div>
+        <div className="card-content">
+          <div className="h-[400px] w-full flex items-center justify-center">
+            <SalimaIndividualScatterPlot participants={groupData.participants} />
+          </div>
         </div>
       </div>
 
