@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
@@ -133,88 +134,97 @@ export const ArchetypeDistributionChart: React.FC<ArchetypeDistributionChartProp
     ? { top: 20, right: 80, left: 80, bottom: 60 }
     : { top: 20, right: 30, left: 20, bottom: 60 };
 
+  // Calculate Y-axis domain with increments of 5
+  const maxCount = Math.max(...chartData.map(item => item.count));
+  const yAxisMax = Math.ceil(maxCount / 5) * 5 + 5; // Round up to next 5 and add buffer
+
   return (
-    <div className="space-y-4" dir="rtl">
-      <div className={`text-center ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+    <div className="w-full flex flex-col items-center justify-center min-h-screen py-8" dir="rtl">
+      <div className={`text-center mb-6 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
         <p className="text-gray-600">
           סה"כ משתתפים: <span className="font-bold">{data.total}</span>
         </p>
       </div>
       
-      <ChartContainer config={chartConfig} className={isPresenterMode ? "h-96" : "h-80"}>
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart 
-            data={chartData} 
-            margin={chartMargins}
-            barCategoryGap={barCategoryGap}
-          >
-            <CartesianGrid 
-              strokeDasharray="3 3" 
-              stroke="rgba(0,0,0,0.1)"
-              horizontal={true}
-              vertical={isSingleArchetype}
-            />
-            <XAxis 
-              dataKey="archetype" 
-              tick={{ 
-                fontSize: isPresenterMode ? 16 : 12, 
-                fontWeight: 'bold',
-                fill: '#1f2937'
-              }}
-              textAnchor="middle"
-              interval={0}
-              angle={isSingleArchetype ? 0 : archetypeCount <= 2 ? -10 : -20}
-              height={isSingleArchetype ? 60 : 80}
-              axisLine={{ stroke: 'rgba(0,0,0,0.2)' }}
-              tickLine={{ stroke: 'rgba(0,0,0,0.2)' }}
-            />
-            <YAxis 
-              tick={{ fontSize: isPresenterMode ? 14 : 12 }}
-              label={{ 
-                value: 'מספר משתתפים', 
-                angle: -90, 
-                position: 'insideLeft', 
-                style: { 
-                  fontSize: isPresenterMode ? '16px' : '14px', 
+      <div className="w-full max-w-6xl">
+        <ChartContainer config={chartConfig} className={isPresenterMode ? "h-[600px]" : "h-[500px]"}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart 
+              data={chartData} 
+              margin={chartMargins}
+              barCategoryGap={barCategoryGap}
+            >
+              <CartesianGrid 
+                strokeDasharray="3 3" 
+                stroke="rgba(0,0,0,0.1)"
+                horizontal={true}
+                vertical={isSingleArchetype}
+              />
+              <XAxis 
+                dataKey="archetype" 
+                tick={{ 
+                  fontSize: isPresenterMode ? 16 : 12, 
                   fontWeight: 'bold',
-                  fill: '#374151'
-                } 
-              }}
-              axisLine={{ stroke: 'rgba(0,0,0,0.2)' }}
-              tickLine={{ stroke: 'rgba(0,0,0,0.2)' }}
-            />
-            <Tooltip 
-              content={({ active, payload, label }) => {
-                if (active && payload && payload.length) {
-                  const data = payload[0].payload;
-                  return (
-                    <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg text-right">
-                      <p className={`font-semibold text-gray-800 ${isPresenterMode ? 'text-lg' : 'text-base'}`}>
-                        {label}
-                      </p>
-                      <p className={`text-blue-600 ${isPresenterMode ? 'text-base' : 'text-sm'}`}>
-                        מספר: {data.count}
-                      </p>
-                      <p className={`text-green-600 ${isPresenterMode ? 'text-base' : 'text-sm'}`}>
-                        אחוז: {data.percentage}%
-                      </p>
-                    </div>
-                  );
-                }
-                return null;
-              }}
-            />
-            <Bar 
-              dataKey="count" 
-              radius={[4, 4, 0, 0]}
-              maxBarSize={maxBarSize}
-              fill="#2563eb"
-              stroke={isSingleArchetype ? "rgba(37, 99, 235, 0.3)" : "none"}
-              strokeWidth={isSingleArchetype ? 1 : 0}
-            />
-          </BarChart>
-        </ResponsiveContainer>
-      </ChartContainer>
+                  fill: '#1f2937'
+                }}
+                textAnchor="middle"
+                interval={0}
+                angle={isSingleArchetype ? 0 : archetypeCount <= 2 ? -10 : -20}
+                height={isSingleArchetype ? 60 : 80}
+                axisLine={{ stroke: 'rgba(0,0,0,0.2)' }}
+                tickLine={{ stroke: 'rgba(0,0,0,0.2)' }}
+              />
+              <YAxis 
+                domain={[0, yAxisMax]}
+                ticks={Array.from({ length: Math.floor(yAxisMax / 5) + 1 }, (_, i) => i * 5)}
+                tick={{ fontSize: isPresenterMode ? 14 : 12 }}
+                label={{ 
+                  value: 'מספר משתתפים', 
+                  angle: -90, 
+                  position: 'insideLeft', 
+                  style: { 
+                    fontSize: isPresenterMode ? '16px' : '14px', 
+                    fontWeight: 'bold',
+                    fill: '#374151'
+                  } 
+                }}
+                axisLine={{ stroke: 'rgba(0,0,0,0.2)' }}
+                tickLine={{ stroke: 'rgba(0,0,0,0.2)' }}
+              />
+              <Tooltip 
+                content={({ active, payload, label }) => {
+                  if (active && payload && payload.length) {
+                    const data = payload[0].payload;
+                    return (
+                      <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg text-right">
+                        <p className={`font-semibold text-gray-800 ${isPresenterMode ? 'text-lg' : 'text-base'}`}>
+                          {label}
+                        </p>
+                        <p className={`text-blue-600 ${isPresenterMode ? 'text-base' : 'text-sm'}`}>
+                          מספר: {data.count}
+                        </p>
+                        <p className={`text-green-600 ${isPresenterMode ? 'text-base' : 'text-sm'}`}>
+                          אחוז: {data.percentage}%
+                        </p>
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+              />
+              <Bar 
+                dataKey="count" 
+                radius={[4, 4, 0, 0]}
+                maxBarSize={maxBarSize}
+                fill="#2563eb"
+                stroke={isSingleArchetype ? "rgba(37, 99, 235, 0.3)" : "none"}
+                strokeWidth={isSingleArchetype ? 1 : 0}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+      </div>
     </div>
   );
 };
+
