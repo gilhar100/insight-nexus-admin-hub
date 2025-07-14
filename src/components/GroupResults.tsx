@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { SalimaGroupRadarChart } from '@/components/SalimaGroupRadarChart';
 import { ArchetypeDistributionChart } from '@/components/ArchetypeDistributionChart';
@@ -107,104 +108,117 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
     weakest,
     isSameDimension
   } = dimensionInsights;
-  return <div className={isPresenterMode ? "presenter-grid" : "grid grid-cols-1 lg:grid-cols-2 gap-8"}>
-      {/* Dimension Insights Section */}
-      <div className="card" style={{
-      gridColumn: isPresenterMode ? "span 2" : undefined
-    }}>
-        <div className="card-header text-center"></div>
-        <div className="card-content">
-          {!isSameDimension ? <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-              {/* Strongest Dimension */}
-              <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
-                <h3 className={`font-bold text-green-800 mb-3 ${isPresenterMode ? 'text-2xl' : 'text-xl'}`}>
-                  הממד החזק ביותר
+  return <div className="space-y-8">
+      {/* Group Mean SLQ Score at the top */}
+      <div className="card">
+        <div className="card-content p-6 text-center">
+          <h2 className={`font-bold text-blue-800 mb-2 ${isPresenterMode ? 'text-3xl' : 'text-xl'}`}>
+            ציון מנהיגות קבוצתי
+          </h2>
+          <div className={`font-bold text-blue-600 ${isPresenterMode ? 'text-6xl' : 'text-4xl'}`}>
+            {groupData.averages.overall.toFixed(2)}
+          </div>
+          <p className={`text-blue-500 mt-2 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+            ממוצע ציוני SLQ של {groupData.participant_count} משתתפים
+          </p>
+        </div>
+      </div>
+
+      <div className={isPresenterMode ? "presenter-grid" : "grid grid-cols-1 lg:grid-cols-2 gap-8"}>
+        {/* Dimension Insights Section */}
+        <div className="card" style={{
+        gridColumn: isPresenterMode ? "span 2" : undefined
+      }}>
+          <div className="card-header text-center"></div>
+          <div className="card-content">
+            {!isSameDimension ? <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+                {/* Strongest Dimension */}
+                <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
+                  <h3 className={`font-bold text-green-800 mb-3 ${isPresenterMode ? 'text-2xl' : 'text-xl'}`}>
+                    הממד החזק ביותר
+                  </h3>
+                  <div className={`font-bold text-green-600 mb-2 ${isPresenterMode ? 'text-4xl' : 'text-3xl'}`}>
+                    {strongest.score.toFixed(1)}
+                  </div>
+                  <div className={`text-green-700 font-semibold ${isPresenterMode ? 'text-xl' : 'text-lg'}`}>
+                    {strongest.name}
+                  </div>
+                  <p className={`text-green-600 mt-2 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                    הממד עם הציון הממוצע הגבוה ביותר בקבוצה
+                  </p>
+                  
+                  <div className={`mt-4 p-4 bg-white border border-green-300 rounded-lg text-right ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                    <p className="text-gray-700 leading-relaxed">
+                      {getDimensionExplanation(strongest.key)}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Weakest Dimension */}
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-6 text-center">
+                  <h3 className={`font-bold text-orange-800 mb-3 ${isPresenterMode ? 'text-2xl' : 'text-xl'}`}>
+                    ממד לפיתוח
+                  </h3>
+                  <div className={`font-bold text-orange-600 mb-2 ${isPresenterMode ? 'text-4xl' : 'text-3xl'}`}>
+                    {weakest.score.toFixed(1)}
+                  </div>
+                  <div className={`text-orange-700 font-semibold ${isPresenterMode ? 'text-xl' : 'text-lg'}`}>
+                    {weakest.name}
+                  </div>
+                  <p className={`text-orange-600 mt-2 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                    הממד הדורש הכי הרבה פיתוח בקבוצה
+                  </p>
+                  
+                  <div className={`mt-4 p-4 bg-white border border-orange-300 rounded-lg text-right ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                    <p className="text-gray-700 leading-relaxed">
+                      {getDimensionExplanation(weakest.key)}
+                    </p>
+                  </div>
+                </div>
+              </div> : <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+                <h3 className={`font-bold text-yellow-800 mb-3 ${isPresenterMode ? 'text-2xl' : 'text-xl'}`}>
+                  ממד דומיננטי
                 </h3>
-                <div className={`font-bold text-green-600 mb-2 ${isPresenterMode ? 'text-4xl' : 'text-3xl'}`}>
+                <div className={`font-bold text-yellow-600 mb-2 ${isPresenterMode ? 'text-4xl' : 'text-3xl'}`}>
                   {strongest.score.toFixed(1)}
                 </div>
-                <div className={`text-green-700 font-semibold ${isPresenterMode ? 'text-xl' : 'text-lg'}`}>
+                <div className={`text-yellow-700 font-semibold ${isPresenterMode ? 'text-xl' : 'text-lg'}`}>
                   {strongest.name}
                 </div>
-                <p className={`text-green-600 mt-2 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                  הממד עם הציון הממוצע הגבוה ביותר בקבוצה
+                <p className={`text-yellow-600 mt-2 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                  אותו ממד זוהה כחזק ביותר וכדורש פיתוח—כדאי לבחון את התפלגות הציונים
                 </p>
                 
-                <div className={`mt-4 p-4 bg-white border border-green-300 rounded-lg text-right ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                <div className={`mt-4 p-4 bg-white border border-yellow-300 rounded-lg text-right ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
                   <p className="text-gray-700 leading-relaxed">
                     {getDimensionExplanation(strongest.key)}
                   </p>
                 </div>
-              </div>
-
-              {/* Weakest Dimension */}
-              <div className="bg-orange-50 border border-orange-200 rounded-lg p-6 text-center">
-                <h3 className={`font-bold text-orange-800 mb-3 ${isPresenterMode ? 'text-2xl' : 'text-xl'}`}>
-                  ממד לפיתוח
-                </h3>
-                <div className={`font-bold text-orange-600 mb-2 ${isPresenterMode ? 'text-4xl' : 'text-3xl'}`}>
-                  {weakest.score.toFixed(1)}
-                </div>
-                <div className={`text-orange-700 font-semibold ${isPresenterMode ? 'text-xl' : 'text-lg'}`}>
-                  {weakest.name}
-                </div>
-                <p className={`text-orange-600 mt-2 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                  הממד הדורש הכי הרבה פיתוח בקבוצה
-                </p>
-                
-                <div className={`mt-4 p-4 bg-white border border-orange-300 rounded-lg text-right ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                  <p className="text-gray-700 leading-relaxed">
-                    {getDimensionExplanation(weakest.key)}
-                  </p>
-                </div>
-              </div>
-            </div> : <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
-              <h3 className={`font-bold text-yellow-800 mb-3 ${isPresenterMode ? 'text-2xl' : 'text-xl'}`}>
-                ממד דומיננטי
-              </h3>
-              <div className={`font-bold text-yellow-600 mb-2 ${isPresenterMode ? 'text-4xl' : 'text-3xl'}`}>
-                {strongest.score.toFixed(1)}
-              </div>
-              <div className={`text-yellow-700 font-semibold ${isPresenterMode ? 'text-xl' : 'text-lg'}`}>
-                {strongest.name}
-              </div>
-              <p className={`text-yellow-600 mt-2 ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                אותו ממד זוהה כחזק ביותר וכדורש פיתוח—כדאי לבחון את התפלגות הציונים
-              </p>
-              
-              <div className={`mt-4 p-4 bg-white border border-yellow-300 rounded-lg text-right ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                <p className="text-gray-700 leading-relaxed">
-                  {getDimensionExplanation(strongest.key)}
-                </p>
-              </div>
-            </div>}
+              </div>}
+          </div>
         </div>
-      </div>
 
-      {/* Radar Chart – Group Averages per SALIMA Dimension */}
-      <div className="card">
-        <div className="card-header text-center">
-          <div className={`flex items-center justify-center text-right card-title${isPresenterMode ? " text-3xl" : ""}`}>פרופיל קבוצתי ייחודי</div>
+        {/* Radar Chart – Group Averages per SALIMA Dimension */}
+        <div className="card">
+          <div className="card-header text-center">
+            <div className={`flex items-center justify-center text-right card-title${isPresenterMode ? " text-3xl" : ""}`}>פרופיל קבוצתי ייחודי</div>
+          </div>
+          <div className="card-content">
+            <div className="h-[520px] w-full flex items-center justify-center">
+              <SalimaGroupRadarChart averages={groupData.averages} />
+            </div>
+          </div>
         </div>
-        <div className="card-content">
-          <div className="h-[520px] w-full flex items-center justify-center">
-            <SalimaGroupRadarChart averages={groupData.averages} />
+
+        {/* Archetype Distribution Chart */}
+        <div className="card">
+          <div className="card-header text-center">
+            {/* Title removed as requested */}
+          </div>
+          <div className="card-content">
+            <ArchetypeDistributionChart groupNumber={groupData.group_number} isPresenterMode={isPresenterMode} />
           </div>
         </div>
       </div>
-
-      {/* Archetype Distribution Chart */}
-      <div className="card">
-        <div className="card-header text-center">
-          <div className={`flex items-center justify-center text-right card-title${isPresenterMode ? " text-3xl" : ""}`}>
-            התפלגות ארכיטיפי מנהיגות
-          </div>
-        </div>
-        <div className="card-content">
-          <ArchetypeDistributionChart groupNumber={groupData.group_number} isPresenterMode={isPresenterMode} />
-        </div>
-      </div>
-
-
     </div>;
 };
