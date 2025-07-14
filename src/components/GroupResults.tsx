@@ -1,7 +1,7 @@
-
 import React from 'react';
 import { SalimaGroupRadarChart } from '@/components/SalimaGroupRadarChart';
 import { ArchetypeDistributionChart } from '@/components/ArchetypeDistributionChart';
+
 interface GroupData {
   group_number: number;
   participant_count: number;
@@ -24,10 +24,12 @@ interface GroupData {
     dominant_archetype?: string;
   }>;
 }
+
 interface GroupResultsProps {
   groupData: GroupData;
   isPresenterMode: boolean;
 }
+
 const getDimensionInsights = (averages: GroupData['averages']) => {
   const dimensions = [{
     key: 'strategy',
@@ -62,6 +64,7 @@ const getDimensionInsights = (averages: GroupData['averages']) => {
     isSameDimension: strongest.key === weakest.key
   };
 };
+
 const getDimensionExplanation = (dimensionKey: string) => {
   const explanations = {
     strategy: "היכולת לראות את התמונה הגדולה, לזהות הזדמנויות במצבים משתנים, ולפעול מתוך חזון ברור ולא רק מתוך תגובה למציאות הנוכחית. מנהלים עם ממד אסטרטגי גבוה מתמקדים באפקטיביות לטווח ארוך.",
@@ -73,6 +76,7 @@ const getDimensionExplanation = (dimensionKey: string) => {
   };
   return explanations[dimensionKey as keyof typeof explanations] || "";
 };
+
 export const GroupResults: React.FC<GroupResultsProps> = ({
   groupData,
   isPresenterMode
@@ -84,6 +88,7 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
         </div>
       </div>;
   }
+
   let dimensionInsights;
   try {
     dimensionInsights = getDimensionInsights(groupData.averages);
@@ -103,11 +108,13 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
       isSameDimension: false
     };
   }
+
   const {
     strongest,
     weakest,
     isSameDimension
   } = dimensionInsights;
+
   return <div className="space-y-8">
       {/* Group Mean SLQ Score at the top */}
       <div className="card">
@@ -200,7 +207,7 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
 
         {/* Radar Chart – Group Averages per SALIMA Dimension */}
         <div className="card">
-          <div className="card-header text-center">
+          <div className="card-header text-center pb-2">
             <div className={`flex items-center justify-center text-right card-title${isPresenterMode ? " text-3xl" : ""}`}>פרופיל קבוצתי ייחודי</div>
           </div>
           <div className="card-content">
