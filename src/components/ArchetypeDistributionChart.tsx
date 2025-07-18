@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
@@ -27,6 +28,18 @@ const chartConfig = {
     label: "מספר",
     color: "#2563eb",
   },
+};
+
+// Dynamic color mapping based on archetype names
+const getArchetypeColor = (archetype: string): string => {
+  if (archetype.includes("הזדמנות")) {
+    return "#9C27B0"; // Purple for Opportunity Leader
+  } else if (archetype.includes("סקרן")) {
+    return "#FF9800"; // Orange for Curious Leader
+  } else if (archetype.includes("מעצים")) {
+    return "#4CAF50"; // Green for Empowering Leader
+  }
+  return "#6B7280"; // Default gray for unknown archetypes
 };
 
 const archetypeExplanations: Record<string, { title: string; description: string }> = {
@@ -141,23 +154,22 @@ export const ArchetypeDistributionChart: React.FC<ArchetypeDistributionChartProp
     archetype: item.archetype,
     count: item.count,
     percentage: item.percentage,
-    fill: "#2563eb"
+    fill: getArchetypeColor(item.archetype)
   }));
 
   // Calculate spacing and positioning based on number of archetypes
   const archetypeCount = chartData.length;
   const isSingleArchetype = archetypeCount === 1;
   const barCategoryGap = isSingleArchetype ? "60%" : archetypeCount === 2 ? "20%" : "4%";
-  const maxBarSize = isSingleArchetype ? 120 : archetypeCount === 2 ? 100 : 80;
+  const maxBarSize = isSingleArchetype ? 100 : archetypeCount === 2 ? 80 : 60;
   
   // Adjust margins for better centering
   const chartMargins = isSingleArchetype 
-    ? { top: 20, right: 80, left: 80, bottom: 60 }
-    : { top: 20, right: 30, left: 20, bottom: 60 };
+    ? { top: 40, right: 80, left: 80, bottom: 80 }
+    : { top: 40, right: 30, left: 20, bottom: 80 };
 
-  // Calculate Y-axis domain with increments of 5
-  const maxCount = Math.max(...chartData.map(item => item.count));
-  const yAxisMax = Math.ceil(maxCount / 5) * 5 + 5; // Round up to next 5 and add buffer
+  // Dynamic Y-axis calculation using total value
+  const yAxisMax = Math.ceil(data.total / 5) * 5 + 5;
 
   return (
     <>
@@ -221,15 +233,16 @@ export const ArchetypeDistributionChart: React.FC<ArchetypeDistributionChartProp
                   content={({ active, payload, label }) => {
                     if (active && payload && payload.length) {
                       const data = payload[0].payload;
+                      const barColor = getArchetypeColor(data.archetype);
                       return (
                         <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg text-right">
                           <p className={`font-semibold text-gray-800 ${isPresenterMode ? 'text-lg' : 'text-base'}`}>
                             {label}
                           </p>
-                          <p className={`text-blue-600 ${isPresenterMode ? 'text-base' : 'text-sm'}`}>
+                          <p className={`${isPresenterMode ? 'text-base' : 'text-sm'}`} style={{ color: barColor }}>
                             מספר: {data.count}
                           </p>
-                          <p className={`text-green-600 ${isPresenterMode ? 'text-base' : 'text-sm'}`}>
+                          <p className={`${isPresenterMode ? 'text-base' : 'text-sm'}`} style={{ color: barColor }}>
                             אחוז: {data.percentage}%
                           </p>
                           <p className={`text-gray-500 text-xs mt-1`}>
@@ -245,16 +258,13 @@ export const ArchetypeDistributionChart: React.FC<ArchetypeDistributionChartProp
                   dataKey="count" 
                   radius={[4, 4, 0, 0]}
                   maxBarSize={maxBarSize}
-                  fill="#2563eb"
-                  stroke={isSingleArchetype ? "rgba(37, 99, 235, 0.3)" : "none"}
-                  strokeWidth={isSingleArchetype ? 1 : 0}
                   onClick={handleBarClick}
                   style={{ cursor: 'pointer' }}
                 >
                   {chartData.map((entry, index) => (
                     <Cell 
                       key={`cell-${index}`} 
-                      fill="#2563eb"
+                      fill={entry.fill}
                       style={{ cursor: 'pointer' }}
                     />
                   ))}
