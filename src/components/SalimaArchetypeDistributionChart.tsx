@@ -24,13 +24,14 @@ interface SalimaArchetypeDistributionChartProps {
   }>;
 }
 
+// Updated archetype colors as requested
 const ARCHETYPE_COLORS = {
-  'מנהל ההזדמנות': '#10B981',
-  'המנהל הסקרן': '#3B82F6',
-  'המנהל המעצים': '#F59E0B',
-  'opportunity leader': '#10B981',
-  'curious leader': '#3B82F6',
-  'empowering leader': '#F59E0B',
+  'מנהל ההזדמנות': '#9C27B0',
+  'המנהל הסקרן': '#FF9800',
+  'המנהל המעצים': '#4CAF50',
+  'opportunity leader': '#9C27B0',
+  'curious leader': '#FF9800',
+  'empowering leader': '#4CAF50',
 };
 
 const ARCHETYPE_LABELS: Record<string, string> = {
@@ -146,6 +147,17 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
     ? chartData.reduce((prev, current) => (prev.count > current.count ? prev : current)) 
     : null;
 
+  // Calculate dynamic Y-axis max with 15% margin above tallest bar
+  const maxCount = Math.max(...chartData.map(item => item.count));
+  const maxPercentage = Math.max(...chartData.map(item => item.percentage));
+  const yAxisMaxCount = Math.ceil(maxCount * 1.15);
+  const yAxisMaxPercentage = Math.min(100, Math.ceil(maxPercentage * 1.15));
+
+  // Calculate bar width and spacing based on number of archetypes
+  const archetypeCount = chartData.length;
+  const barCategoryGap = archetypeCount === 1 ? "60%" : archetypeCount === 2 ? "30%" : "10%";
+  const maxBarSize = archetypeCount === 1 ? 120 : archetypeCount === 2 ? 100 : 80;
+
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
@@ -158,6 +170,25 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
       );
     }
     return null;
+  };
+
+  const CustomLabel = ({ x, y, width, value, index }: any) => {
+    const data = chartData[index];
+    if (!data) return null;
+    
+    const labelY = y - 10; // Position above the bar
+    const displayValue = viewMode === 'count' ? data.count : `${data.percentage}%`;
+    
+    return (
+      <text
+        x={x + width / 2}
+        y={labelY}
+        textAnchor="middle"
+        className="fill-gray-700 text-sm font-semibold"
+      >
+        {displayValue}
+      </text>
+    );
   };
 
   return (
@@ -192,19 +223,61 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
       <ChartContainer config={chartConfig} className="h-96" dir="rtl">
         <ResponsiveContainer width="100%" height="100%">
           {chartType === 'bar' ? (
-            <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="archetype" tick={{ fontSize: 12, fontWeight: 'bold' }} textAnchor="middle" interval={0} />
-              <YAxis tick={{ fontSize: 12 }} label={{ value: viewMode === 'count' ? 'מספר משתתפים' : 'אחוז (%)', angle: -90, position: 'insideLeft', style: { fontSize: '14px', fontWeight: 'bold' } }} />
+            <BarChart 
+              data={chartData} 
+              margin={{ top: 40, right: 30, left: 20, bottom: 60 }}
+              barCategoryGap={barCategoryGap}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.1)" />
+              <XAxis 
+                dataKey="archetype" 
+                tick={{ fontSize: 12, fontWeight: 'bold', fill: '#1f2937' }} 
+                textAnchor="middle" 
+                interval={0}
+                angle={archetypeCount > 2 ? -15 : 0}
+                height={60}
+                axisLine={{ stroke: 'rgba(0,0,0,0.2)' }}
+                tickLine={{ stroke: 'rgba(0,0,0,0.2)' }}
+              />
+              <YAxis 
+                domain={[0, viewMode === 'count' ? yAxisMaxCount : yAxisMaxPercentage]}
+                tick={{ fontSize: 12, fill: '#374151' }} 
+                label={{ 
+                  value: viewMode === 'count' ? 'מספר משתתפים' : 'אחוז (%)', 
+                  angle: -90, 
+                  position: 'insideLeft', 
+                  style: { fontSize: '14px', fontWeight: 'bold', fill: '#374151' } 
+                }}
+                axisLine={{ stroke: 'rgba(0,0,0,0.2)' }}
+                tickLine={{ stroke: 'rgba(0,0,0,0.2)' }}
+              />
               <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey={viewMode}>
-                {chartData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
+              <Bar 
+                dataKey={viewMode} 
+                radius={[4, 4, 0, 0]}
+                maxBarSize={maxBarSize}
+                label={<CustomLabel />}
+              >
+                {chartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
               </Bar>
             </BarChart>
           ) : (
             <PieChart>
-              <Pie data={chartData} cx="50%" cy="50%" labelLine={false} label={({ archetype, value }) => `${archetype}: ${value}${viewMode === 'percentage' ? '%' : ''}`} outerRadius={120} fill="#8884d8" dataKey={viewMode}>
-                {chartData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
+              <Pie 
+                data={chartData} 
+                cx="50%" 
+                cy="50%" 
+                labelLine={false} 
+                label={({ archetype, value }) => `${archetype}: ${value}${viewMode === 'percentage' ? '%' : ''}`} 
+                outerRadius={120} 
+                fill="#8884d8" 
+                dataKey={viewMode}
+              >
+                {chartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
               </Pie>
               <Tooltip content={<CustomTooltip />} />
               <Legend />
