@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
@@ -168,8 +167,9 @@ export const ArchetypeDistributionChart: React.FC<ArchetypeDistributionChartProp
     ? { top: 40, right: 80, left: 80, bottom: 80 }
     : { top: 40, right: 30, left: 20, bottom: 80 };
 
-  // Dynamic Y-axis calculation using total value
-  const yAxisMax = Math.ceil(data.total / 5) * 5 + 5;
+  // Dynamic Y-axis calculation using the maximum count + 5
+  const maxCount = Math.max(...chartData.map(item => item.count));
+  const yAxisMax = maxCount + 5;
 
   return (
     <>
@@ -207,14 +207,13 @@ export const ArchetypeDistributionChart: React.FC<ArchetypeDistributionChartProp
                   }}
                   textAnchor="middle"
                   interval={0}
-                  angle={isSingleArchetype ? 0 : archetypeCount <= 2 ? -10 : -20}
-                  height={isSingleArchetype ? 60 : 80}
+                  angle={0}
+                  height={80}
                   axisLine={{ stroke: 'rgba(0,0,0,0.2)' }}
                   tickLine={{ stroke: 'rgba(0,0,0,0.2)' }}
                 />
                 <YAxis 
                   domain={[0, yAxisMax]}
-                  ticks={Array.from({ length: Math.floor(yAxisMax / 5) + 1 }, (_, i) => i * 5)}
                   tick={{ fontSize: isPresenterMode ? 14 : 12 }}
                   label={{ 
                     value: 'מספר משתתפים', 
