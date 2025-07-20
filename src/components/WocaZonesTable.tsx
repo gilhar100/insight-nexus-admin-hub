@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -127,22 +128,22 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
                 <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'} ${
                   isHighlighted('war') ? getZoneColor('war') + ' font-semibold shadow-md' : 'bg-gray-50'
                 }`} style={{ color: '#000000' }}>
-                  אזור מלחמה - W/L
+                  אזור מלחמה - WIN/LOSE
                 </TableHead>
                 <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'} ${
                   isHighlighted('comfort') ? getZoneColor('comfort') + ' font-semibold shadow-md' : 'bg-gray-50'
                 }`} style={{ color: '#000000' }}>
-                  אזור נוחות – L/L
+                  אזור נוחות – LOSE/LOSE
                 </TableHead>
                 <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'} ${
                   isHighlighted('apathy') ? getZoneColor('apathy') + ' font-semibold shadow-md' : 'bg-gray-50'
                 }`} style={{ color: '#000000' }}>
-                  אזור אדישות – L/L
+                  אזור אדישות – LOSE/LOSE
                 </TableHead>
                 <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'} ${
                   isHighlighted('opportunity') ? getZoneColor('opportunity') + ' font-semibold shadow-md' : 'bg-gray-50'
                 }`} style={{ color: '#000000' }}>
-                  אזור ההזדמנות – W/W
+                  אזור ההזדמנות – WIN/WIN
                 </TableHead>
                 <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'} ${
                   isHighlighted('action') ? 'bg-blue-100 border-blue-300' : 'bg-gray-50'
