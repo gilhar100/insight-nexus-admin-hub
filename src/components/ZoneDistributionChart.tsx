@@ -49,7 +49,7 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
     if (value === 0) return null;
     
     const RADIAN = Math.PI / 180;
-    const radius = innerRadius + (outerRadius - innerRadius) * 1.3;
+    const radius = innerRadius + (outerRadius - innerRadius) * 1.4;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
     const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0';
@@ -61,8 +61,8 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
         fill="#000000"
         textAnchor={x > cx ? 'start' : 'end'}
         dominantBaseline="central"
-        fontSize={14}
-        fontWeight="400"
+        fontSize={16}
+        fontWeight="600"
         style={{ direction: 'rtl' }}
       >
         {`${value} (${percentage}%)`}
@@ -73,15 +73,15 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
   const CustomLegend = (props: any) => {
     const { payload } = props;
     return (
-      <div className="flex justify-center mt-4" dir="rtl">
-        <div className="flex flex-wrap gap-4 justify-center">
+      <div className="flex justify-center mt-6" dir="rtl">
+        <div className="flex flex-wrap gap-6 justify-center">
           {payload.map((entry: any, index: number) => (
             <div key={index} className="flex items-center">
               <div
-                className="w-3 h-3 rounded-full ml-2"
+                className="w-4 h-4 rounded-full ml-3"
                 style={{ backgroundColor: entry.color }}
               />
-              <span className="text-sm font-medium" style={{ color: '#000000' }}>
+              <span className="text-lg font-semibold" style={{ color: '#000000' }}>
                 {entry.value}
               </span>
             </div>
@@ -93,16 +93,16 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
 
   if (total === 0) {
     return (
-      <div className="flex justify-center items-center h-[300px]" style={{ color: '#000000' }}>
-        <span className="text-base">אין נתונים להצגה</span>
+      <div className="flex justify-center items-center h-[500px]" style={{ color: '#000000' }}>
+        <span className="text-xl">אין נתונים להצגה</span>
       </div>
     );
   }
 
   return (
     <div className="flex justify-center items-center w-full" dir="rtl">
-      <div className="max-w-lg w-full mx-auto">
-        <ChartContainer config={chartConfig} className="h-[300px] w-full">
+      <div className="max-w-4xl w-full mx-auto">
+        <ChartContainer config={chartConfig} className="h-[500px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -111,7 +111,7 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
                 cy="50%"
                 labelLine={false}
                 label={renderCustomLabel}
-                outerRadius={90}
+                outerRadius={150}
                 fill="#8884d8"
                 dataKey="value"
               >
@@ -129,10 +129,10 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
                   border: '1px solid #ccc', 
                   borderRadius: '4px',
                   color: '#000000',
-                  fontSize: '14px',
+                  fontSize: '16px',
                   direction: 'rtl'
                 }}
-                labelStyle={{ color: '#000000' }}
+                labelStyle={{ color: '#000000', fontSize: '16px' }}
               />
               <Legend content={<CustomLegend />} />
             </PieChart>
