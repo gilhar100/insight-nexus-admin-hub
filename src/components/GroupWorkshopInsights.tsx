@@ -139,9 +139,11 @@ export const GroupWorkshopInsights: React.FC = () => {
             isPresenterMode={isPresenterMode}
           />
 
-          {/* 3. WOCA Zones Matrix Table */}
+          {/* 3. WOCA Zones Matrix Table - Using frequency-based analysis */}
           <WocaZonesTable
-            dominantZone={wocaAnalysis.groupDominantZoneByCount || wocaAnalysis.groupDominantZone}
+            dominantZone={wocaAnalysis.groupDominantZoneByCount}
+            isTie={wocaAnalysis.groupIsTieByCount}
+            tiedCategories={wocaAnalysis.groupTiedCategoriesByCount}
             isPresenterMode={isPresenterMode}
           />
 

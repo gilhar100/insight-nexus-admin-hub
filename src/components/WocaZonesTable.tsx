@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,11 +5,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 interface WocaZonesTableProps {
   dominantZone: string | null;
   isPresenterMode?: boolean;
+  isTie?: boolean;
+  tiedCategories?: string[];
 }
 
 export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({ 
   dominantZone, 
-  isPresenterMode = false 
+  isPresenterMode = false,
+  isTie = false,
+  tiedCategories = []
 }) => {
   const getZoneColor = (zoneKey: string) => {
     switch (zoneKey) {
@@ -28,6 +31,9 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
   };
 
   const isHighlighted = (zoneKey: string) => {
+    if (isTie) {
+      return tiedCategories.includes(zoneKey);
+    }
     return dominantZone === zoneKey;
   };
 
@@ -184,7 +190,13 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
           </Table>
         </div>
         
-        {dominantZone && (
+        {isTie ? (
+          <div className="mt-4 p-4 rounded-lg text-center bg-yellow-100 border border-yellow-300">
+            <p className={`font-semibold ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+              תיקו בין אזורים - הקבוצה מתפלגת באופן שווה בין מספר אזורים
+            </p>
+          </div>
+        ) : dominantZone ? (
           <div className={`mt-4 p-4 rounded-lg text-center ${getZoneColor(dominantZone)}`}>
             <p className={`font-semibold ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
               הקבוצה נמצאת כרגע ב{dominantZone === 'opportunity' ? 'אזור ההזדמנות' : 
@@ -192,7 +204,7 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
                 dominantZone === 'war' ? 'אזור המלחמה' : 'אזור האדישות'}
             </p>
           </div>
-        )}
+        ) : null}
       </CardContent>
     </Card>
   );
