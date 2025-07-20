@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell } from 'recharts';
 import { WocaCategoryScores } from '@/utils/wocaAnalysis';
-import { WOCA_COLORS } from '@/utils/wocaColors';
+import { WOCA_ZONE_COLORS } from '@/utils/wocaColors';
 import { ZoneExplanationDialog } from './ZoneExplanationDialog';
 
 interface WocaGroupBarChartProps {
@@ -19,7 +19,7 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
   if (!groupCategoryScores || typeof groupCategoryScores !== 'object') {
     console.error('❌ Invalid groupCategoryScores:', groupCategoryScores);
     return (
-      <div className="w-full h-96 flex items-center justify-center">
+      <div className="w-full h-[600px] flex items-center justify-center">
         <p className="text-gray-500">אין נתונים זמינים</p>
       </div>
     );
@@ -31,34 +31,34 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
     return Math.pow(value, 2.3) * 20; // Stronger exaggeration with multiplier for visual impact
   };
 
-  // Prepare data in the specified order with Hebrew labels
+  // Prepare data in the specified order with Hebrew labels and matching colors
   const data = [
     {
       zone: 'הזדמנות',
       value: applyScaling(groupCategoryScores.opportunity || 0),
       originalValue: groupCategoryScores.opportunity || 0,
-      color: '#009E73',
+      color: WOCA_ZONE_COLORS.opportunity,
       zoneKey: 'opportunity'
     },
     {
       zone: 'נוחות', 
       value: applyScaling(groupCategoryScores.comfort || 0),
       originalValue: groupCategoryScores.comfort || 0,
-      color: '#F0E442',
+      color: WOCA_ZONE_COLORS.comfort,
       zoneKey: 'comfort'
     },
     {
       zone: 'אדישות',
       value: applyScaling(groupCategoryScores.apathy || 0),
       originalValue: groupCategoryScores.apathy || 0,
-      color: '#E69F00',
+      color: WOCA_ZONE_COLORS.apathy,
       zoneKey: 'apathy'
     },
     {
       zone: 'מלחמה',
       value: applyScaling(groupCategoryScores.war || 0),
       originalValue: groupCategoryScores.war || 0,
-      color: '#0072B2',
+      color: WOCA_ZONE_COLORS.war,
       zoneKey: 'war'
     }
   ];
@@ -103,8 +103,8 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
           </p>
         </div>
 
-        {/* Chart */}
-        <div className="w-full h-96 animate-fade-in relative">
+        {/* Chart - Made taller */}
+        <div className="w-full h-[600px] animate-fade-in relative">
           <style>{`
             @keyframes scale-in {
               0% {
