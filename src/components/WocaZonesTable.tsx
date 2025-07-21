@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -233,7 +232,7 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
                 
                 <div className={`mt-6 p-4 bg-green-600 text-white rounded-lg text-center ${isPresenterMode ? 'text-lg' : 'text-base'}`}>
                   <p className="font-semibold">
-                    כל אלה מאפשרים מעבר מארבעת אזורי הקיפאון (נוחות, מלחמה, אדישות) לאזור ההזדמנות – בו מתקיים שינוי טרנספורמטיבי ויצירת ערך אמיתי.
+                    כל אלה מאפשרים מעבר משלושת אזורי הקיפאון (נוחות, מלחמה, אדישות) לאזור ההזדמנות – בו מתקיים שינוי טרנספורמטיבי ויצירת ערך אמיתי.
                   </p>
                 </div>
               </div>
@@ -294,7 +293,7 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
                 
                 <div className="mt-12 p-8 bg-green-600 text-white rounded-2xl text-center shadow-xl">
                   <p className="text-2xl font-semibold leading-relaxed">
-                    כל אלה מאפשרים מעבר מארבעת אזורי הקיפאון (נוחות, מלחמה, אדישות) לאזור ההזדמנות – בו מתקיים שינוי טרנספורמטיבי ויצירת ערך אמיתי.
+                    כל אלה מאפשרים מעבר משלושת אזורי הקיפאון (נוחות, מלחמה, אדישות) לאזור ההזדמנות – בו מתקיים שינוי טרנספורמטיבי ויצירת ערך אמיתי.
                   </p>
                 </div>
               </div>
