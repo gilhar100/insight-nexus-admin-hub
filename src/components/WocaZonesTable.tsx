@@ -1,7 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Maximize2, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface WocaZonesTableProps {
   dominantZone: string | null;
@@ -16,6 +18,7 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
   isTie = false,
   tiedCategories = []
 }) => {
+  const [isGuideFullscreen, setIsGuideFullscreen] = useState(false);
   const getZoneColor = (zoneKey: string) => {
     switch (zoneKey) {
       case 'opportunity':
@@ -183,7 +186,15 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
         {/* Opportunity Zone Guide */}
         <div className="mt-8">
           <Card className="border-2 border-green-200 bg-gradient-to-br from-green-50 to-emerald-50">
-            <CardHeader className="text-center pb-4">
+            <CardHeader className="text-center pb-4 relative">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsGuideFullscreen(true)}
+                className="absolute left-4 top-4 bg-white hover:bg-gray-50 border-green-300"
+              >
+                <Maximize2 className="h-4 w-4" />
+              </Button>
               <CardTitle className={`text-right ${isPresenterMode ? 'text-3xl' : 'text-xl'} text-black font-bold`}>
                 מדריך למעבר לאזור ההזדמנות
               </CardTitle>
@@ -229,6 +240,67 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
             </CardContent>
           </Card>
         </div>
+
+        {/* Fullscreen Guide Modal */}
+        {isGuideFullscreen && (
+          <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm animate-fade-in">
+            <div className="fixed inset-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl shadow-2xl animate-scale-in overflow-auto">
+              <div className="p-8" dir="rtl">
+                <div className="flex justify-between items-start mb-8">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsGuideFullscreen(false)}
+                    className="bg-white hover:bg-gray-50 border-green-300"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                  <div className="text-center flex-1 mr-8">
+                    <h1 className="text-4xl font-bold text-black mb-4">
+                      מדריך למעבר לאזור ההזדמנות
+                    </h1>
+                    <p className="text-2xl text-black font-medium">
+                      ההתנהגויות הנדרשות כדי לנוע לאזור ההזדמנות:
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid gap-6 max-w-5xl mx-auto">
+                  {[
+                    { title: "להגביר מודעות", desc: "לזיהוי המקום התודעתי בו אנו נמצאים." },
+                    { title: "להבין קונפליקטים", desc: "לנהל אותם ככלי למידה וצמיחה." },
+                    { title: "לאמץ למידה מתמשכת", desc: "סקרנות, שיתופי פעולה ויצירתיות." },
+                    { title: "להציף משמעות", desc: "לקשר בין העשייה לחזון אישי וארגוני." },
+                    { title: "לשדר השראה", desc: "דוגמה אישית, נרטיב ותקווה." },
+                    { title: "לראות שינוי כהזדמנות", desc: "ולא כאיום." },
+                    { title: "לטפח מנהיגות אותנטית", desc: "שקיפות, הקשבה ונוכחות רגשית." },
+                    { title: "לבנות שותפויות", desc: "לטפח מערכות יחסים משמעותיות, להקשיב, לשתף פעולה ולייצר הדדיות לאורך זמן." }
+                  ].map((item, index) => (
+                    <div key={index} className="flex items-start gap-6 p-6 bg-white/80 rounded-xl border-2 border-green-200 hover:bg-white/90 transition-colors shadow-lg">
+                      <div className="flex-shrink-0 w-12 h-12 bg-green-600 text-white rounded-full flex items-center justify-center text-lg font-bold">
+                        {index + 1}
+                      </div>
+                      <div className="flex-1 text-right">
+                        <h3 className="text-2xl font-bold text-black mb-3">
+                          {item.title}:
+                        </h3>
+                        <p className="text-xl text-black leading-relaxed">
+                          {item.desc}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="mt-12 p-8 bg-green-600 text-white rounded-2xl text-center shadow-xl">
+                  <p className="text-2xl font-semibold leading-relaxed">
+                    כל אלה מאפשרים מעבר מארבעת אזורי הקיפאון (נוחות, מלחמה, אדישות) לאזור ההזדמנות – בו מתקיים שינוי טרנספורמטיבי ויצירת ערך אמיתי.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         
         {isTie ? (
           <div className="mt-4 p-4 rounded-lg text-center bg-yellow-100 border border-yellow-300">
