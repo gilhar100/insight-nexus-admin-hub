@@ -28,7 +28,7 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
   // Apply exponential scaling to emphasize differences (visual only)
   const applyScaling = (value: number) => {
     if (typeof value !== 'number' || isNaN(value) || value <= 0) return 1; // Minimum value for visibility
-    return Math.pow(value, 2.8) * 12; // Higher exponent for more pronounced differences, lower multiplier for shorter bars
+    return Math.pow(value, 4.2) * 8; // Much higher exponent for dramatic differences
   };
 
   // Prepare data in the specified order with Hebrew labels and matching colors
@@ -104,7 +104,7 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
         </div>
 
         {/* Chart */}
-        <div className="w-full h-[450px] animate-fade-in relative">
+        <div className="w-full h-[700px] animate-fade-in relative">
           <style>{`
             @keyframes scale-in {
               0% {
