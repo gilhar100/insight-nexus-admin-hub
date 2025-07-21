@@ -180,6 +180,56 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
           </Table>
         </div>
         
+        {/* Opportunity Zone Guide */}
+        <div className="mt-8">
+          <Card className="border-2 border-green-200 bg-gradient-to-br from-green-50 to-emerald-50">
+            <CardHeader className="text-center pb-4">
+              <CardTitle className={`text-right ${isPresenterMode ? 'text-2xl' : 'text-lg'} text-green-800`}>
+                מדריך למעבר לאזור ההזדמנות
+              </CardTitle>
+              <p className={`text-right ${isPresenterMode ? 'text-lg' : 'text-sm'} text-green-700 font-medium`}>
+                ההתנהגויות הנדרשות כדי לנוע לאזור ההזדמנות:
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4" dir="rtl">
+                <div className="grid gap-3">
+                  {[
+                    { title: "להגביר מודעות", desc: "לזיהוי המקום התודעתי בו אנו נמצאים." },
+                    { title: "להבין קונפליקטים", desc: "לנהל אותם ככלי למידה וצמיחה." },
+                    { title: "לאמץ למידה מתמשכת", desc: "סקרנות, שיתופי פעולה ויצירתיות." },
+                    { title: "להציף משמעות", desc: "לקשר בין העשייה לחזון אישי וארגוני." },
+                    { title: "לשדר השראה", desc: "דוגמה אישית, נרטיב ותקווה." },
+                    { title: "לראות שינוי כהזדמנות", desc: "ולא כאיום." },
+                    { title: "לטפח מנהיגות אותנטית", desc: "שקיפות, הקשבה ונוכחות רגשית." },
+                    { title: "לבנות שותפויות", desc: "לטפח מערכות יחסים משמעותיות, להקשיב, לשתף פעולה ולייצר הדדיות לאורך זמן." }
+                  ].map((item, index) => (
+                    <div key={index} className="flex items-start gap-3 p-3 bg-white/60 rounded-lg border border-green-200 hover:bg-white/80 transition-colors">
+                      <div className="flex-shrink-0 w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-xs font-bold mt-1">
+                        {index + 1}
+                      </div>
+                      <div className="flex-1 text-right">
+                        <h4 className={`font-bold text-green-800 ${isPresenterMode ? 'text-base' : 'text-sm'}`}>
+                          {item.title}:
+                        </h4>
+                        <p className={`text-green-700 ${isPresenterMode ? 'text-sm' : 'text-xs'} mt-1`}>
+                          {item.desc}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <div className={`mt-6 p-4 bg-green-600 text-white rounded-lg text-center ${isPresenterMode ? 'text-base' : 'text-sm'}`}>
+                  <p className="font-semibold">
+                    כל אלה מאפשרים מעבר מארבעת אזורי הקיפאון (נוחות, מלחמה, אדישות) לאזור ההזדמנות – בו מתקיים שינוי טרנספורמטיבי ויצירת ערך אמיתי.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        
         {isTie ? (
           <div className="mt-4 p-4 rounded-lg text-center bg-yellow-100 border border-yellow-300">
             <p className={`font-semibold ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
