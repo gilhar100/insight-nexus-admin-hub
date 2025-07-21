@@ -25,7 +25,7 @@ const chartConfig = {
 export const SalimaGroupRadarChart: React.FC<SalimaGroupRadarChartProps> = ({ averages }) => {
   const chartData = [
     { dimension: 'אסטרטגיה', score: averages.strategy },
-    { dimension: 'הסתגלות', score: averages.adaptability },
+    { dimension: 'אדפטיביות', score: averages.adaptability },
     { dimension: 'למידה', score: averages.learning },
     { dimension: 'השראה', score: averages.inspiration },
     { dimension: 'משמעות', score: averages.meaning },

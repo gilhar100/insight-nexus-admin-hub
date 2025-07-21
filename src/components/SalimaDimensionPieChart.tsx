@@ -19,7 +19,7 @@ const DIMENSION_NAMES = {
   dimension_l: 'למידה',
   dimension_i: 'השראה',
   dimension_m: 'משמעות',
-  dimension_a: 'הסתגלות',   // dimension_a is adaptability
+  dimension_a: 'אדפטיביות',   // dimension_a is adaptability
   dimension_a2: 'אותנטיות'  // dimension_a2 is authenticity
 };
 
@@ -32,7 +32,7 @@ export const SalimaDimensionPieChart: React.FC<SalimaDimensionPieChartProps> = (
     'למידה': 0,
     'השראה': 0,
     'משמעות': 0,
-    'הסתגלות': 0,
+    'אדפטיביות': 0,
     'אותנטיות': 0
   };
 

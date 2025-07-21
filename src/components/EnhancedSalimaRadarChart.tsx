@@ -85,7 +85,7 @@ export const EnhancedSalimaRadarChart: React.FC<EnhancedSalimaRadarChartProps> =
       fullMark: 5
     },
     {
-      dimension: 'הסתגלות',
+      dimension: 'אדפטיביות',
       self: selfData.adaptability,
       colleague: colleagueData?.adaptability,
       combined: combinedData?.adaptability,

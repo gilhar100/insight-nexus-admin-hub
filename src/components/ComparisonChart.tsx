@@ -18,7 +18,7 @@ export const ComparisonChart: React.FC<ComparisonChartProps> = ({ data }) => {
     },
     {
       parameter: 'A',
-      parameterName: 'הסתגלות',
+      parameterName: 'אדפטיביות',
       self: data.selfReport.adaptability,
       colleagues: data.colleagueAverages.adaptability
     },

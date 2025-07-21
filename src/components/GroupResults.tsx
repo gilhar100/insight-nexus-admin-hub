@@ -53,7 +53,7 @@ const getDimensionInsights = (averages: GroupData['averages']) => {
     score: averages.meaning
   }, {
     key: 'adaptability',
-    name: 'הסתגלות (A)',
+    name: 'אדפטיביות (A)',
     score: averages.adaptability
   }];
   const strongest = dimensions.reduce((max, dim) => dim.score > max.score ? dim : max);

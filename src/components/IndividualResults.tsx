@@ -93,7 +93,7 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
   const currentDimensions = getCurrentDimensions();
   const radarChartData = [
     { dimension: 'אסטרטגיה', score: currentDimensions.strategy, color: '#3B82F6' },
-    { dimension: 'הסתגלות', score: currentDimensions.adaptability, color: '#F59E0B' },
+    { dimension: 'אדפטיביות', score: currentDimensions.adaptability, color: '#F59E0B' },
     { dimension: 'למידה', score: currentDimensions.learning, color: '#10B981' },
     { dimension: 'השראה', score: currentDimensions.inspiration, color: '#EF4444' },
     { dimension: 'משמעות', score: currentDimensions.meaning, color: '#8B5CF6' },
@@ -272,7 +272,7 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
                 {respondentData.rawData.insight_adaptive && (
                   <div className="bg-orange-50 p-6 rounded-lg border border-orange-200">
                     <h4 className={`font-semibold text-orange-800 mb-4 text-right ${isPresenterMode ? 'text-2xl' : 'text-lg'}`}>
-                      תובנות הסתגלות
+                      תובנות אדפטיביות
                     </h4>
                     <div className="space-y-4 text-right">
                       <div>

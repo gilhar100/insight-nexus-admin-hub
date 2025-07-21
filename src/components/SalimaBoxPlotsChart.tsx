@@ -41,7 +41,7 @@ export const SalimaBoxPlotsChart: React.FC<SalimaBoxPlotsChartProps> = ({ partic
 
   const dimensions = [
     { key: 'dimension_s', name: 'אסטרטגיה', values: participants.map(p => p.dimension_s) },
-    { key: 'dimension_a', name: 'הסתגלות', values: participants.map(p => p.dimension_a) },
+    { key: 'dimension_a', name: 'אדפטיביות', values: participants.map(p => p.dimension_a) },
     { key: 'dimension_l', name: 'למידה', values: participants.map(p => p.dimension_l) },
     { key: 'dimension_i', name: 'השראה', values: participants.map(p => p.dimension_i) },
     { key: 'dimension_m', name: 'משמעות', values: participants.map(p => p.dimension_m) },

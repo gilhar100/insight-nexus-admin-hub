@@ -17,7 +17,7 @@ export const TrueScoreDisplay: React.FC<TrueScoreDisplayProps> = ({ data }) => {
     },
     {
       parameter: 'A',
-      parameterName: 'הסתגלות',
+      parameterName: 'אדפטיביות',
       delta: data.trueScores.adaptability
     },
     {

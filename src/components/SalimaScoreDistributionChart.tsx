@@ -19,7 +19,7 @@ const DIMENSION_NAMES = {
   dimension_l: 'למידה',
   dimension_i: 'השראה',
   dimension_m: 'משמעות',
-  dimension_a: 'הסתגלות',   // dimension_a is adaptability
+  dimension_a: 'אדפטיביות',   // dimension_a is adaptability
   dimension_a2: 'אותנטיות'  // dimension_a2 is authenticity
 };
 
