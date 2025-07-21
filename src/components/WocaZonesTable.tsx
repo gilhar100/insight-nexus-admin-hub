@@ -40,68 +40,67 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
 
   const tableData = [
     {
-      central: "חזון כקריאה לפעולה",
-      war: "סדר יום אישי",
-      comfort: "שומרים על הקיים",
-      apathy: "היעדר חזון או יוזמה",
-      opportunity: "חזון מעורר יוזמה",
-      action: "ניסוח מחודש של חזון בעזרת מודל וייז"
+      central: "חזון",
+      comfort: "נתפס כמיותר או חלום",
+      war: "מעורר התנגדות",
+      apathy: "מנותק מהמציאות",
+      opportunity: "קריאה לפעולה, מייצר השראה"
     },
     {
-      central: "ראייה מערכתית",
-      war: "מיקוד בהישגים אישיים",
-      comfort: "בלימה אקטיבית",
-      apathy: "חוסר מעש",
-      opportunity: "חיבורים בין מערכות",
-      action: "תרגול סריקה מערכתית"
+      central: "קונפליקט",
+      comfort: "מודחק",
+      war: "בעוצמה גבוהה",
+      apathy: "מוביל לניתוק",
+      opportunity: "מנוהל ללמידה, ברור ערכים וחזון"
     },
     {
-      central: "גמישות מחשבתית",
-      war: "התנגדות לכל מחשבה אחרת",
-      comfort: "תחושת איום",
-      apathy: "חוסר קשב",
-      opportunity: "פתיחות ויצירתיות",
-      action: "עיבוד קונפליקטים כהזדמנות"
+      central: "למידה",
+      comfort: "פורמלית, טכנית",
+      war: "ניסוי וטעייה",
+      apathy: "שטחית או מדוכאת",
+      opportunity: "מתמשכת, סקרנית, טרנספורמטיבית"
     },
     {
-      central: "סקרנות מקצועית",
-      war: "אמת אחת",
-      comfort: "דבקות בקיים",
-      apathy: "היעדר חלחול",
-      opportunity: "סקרנות מקדמת למידה",
-      action: "הזמנה לשאלות \"לא נוחות\""
+      central: "משמעות",
+      comfort: "נשחקה או חבויה",
+      war: "נתפסת כאיום זהותי",
+      apathy: "חסרה או ממוסכת",
+      opportunity: "יוצרת מחויבות ותחושת שליחות"
     },
     {
-      central: "נרטיב ארגוני",
-      war: "נצמד לנרטיב שלי",
-      comfort: "אין מקום לחידושים",
-      apathy: "אין אמון בנרטיב חדש",
-      opportunity: "סיפור רותם ומעורר השראה",
-      action: "כתיבת נרטיב חדש עם הצוות"
+      central: "השראה",
+      comfort: "לא נדרשת",
+      war: "צינית או מאיימת",
+      apathy: "חסרת השפעה",
+      opportunity: "מניעה יוזמה, רתימה ואחריות"
     },
     {
-      central: "תחושת שליחות",
-      war: "רצון לנצח",
-      comfort: "רצון לשמר",
-      apathy: "דיבורי סרק",
-      opportunity: "תחושת שליחות מניע ומנוע לתהליך",
-      action: "שיח על ערכים ומשמעות בצוות"
+      central: "ניהול שינוי",
+      comfort: "שינוי כפרויקט",
+      war: "מאבק הישרדותי",
+      apathy: "אדישות לתהליך",
+      opportunity: "שינוי כאורח חיים, כולל התמודדות רגשית"
     },
     {
-      central: "תקשורת פתוחה",
-      war: "שליטה ומניפולציה",
-      comfort: "הקשבה לכאורה",
-      apathy: "שומע ולא מקשיב",
-      opportunity: "כנות ופתיחות",
-      action: "תרגול משוב פתוח וישיר"
+      central: "סגנון מנהיגות",
+      comfort: "תפעולי, ניהולי",
+      war: "סמכותי ותגובתי",
+      apathy: "טכני, מנותק",
+      opportunity: "טרנספורמטיבי, מחובר, אותנטי"
     },
     {
-      central: "אמון ביכולת להוביל שינוי",
-      war: "ממוקד ביעדים של עצמו",
-      comfort: "מאוים משינוי",
-      apathy: "חוסר אמון בשינוי",
-      opportunity: "מאמין בשינוי",
-      action: "בניית חוזה אמון ושיח ערכי"
+      central: "תגובת עובדים",
+      comfort: "שביעות רצון עם שעמום",
+      war: "לחץ, מגננה, התנגדות",
+      apathy: "ניכור, ציניות",
+      opportunity: "מעורבות, התלהבות, יצירתיות"
+    },
+    {
+      central: "שותפויות ומערכות יחסים",
+      comfort: "שטחיות, תפקודיות בלבד",
+      war: "מניפולטיביות, כוחניות",
+      apathy: "מנותקות, אדישות",
+      opportunity: "שיתופיות, מבוססות אמון והדדיות"
     }
   ];
 
@@ -123,7 +122,7 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
                 <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'} ${
                   isHighlighted('central') ? 'bg-purple-100 border-purple-300' : 'bg-gray-50'
                 }`} style={{ color: '#000000' }}>
-                  ערך מרכזי
+                  ערך / מושג
                 </TableHead>
                 <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'} ${
                   isHighlighted('war') ? getZoneColor('war') + ' font-semibold shadow-md' : 'bg-gray-50'
@@ -144,11 +143,6 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
                   isHighlighted('opportunity') ? getZoneColor('opportunity') + ' font-semibold shadow-md' : 'bg-gray-50'
                 }`} style={{ color: '#000000' }}>
                   אזור ההזדמנות – WIN/WIN
-                </TableHead>
-                <TableHead className={`text-right font-bold border border-gray-300 p-3 ${isPresenterMode ? 'text-lg' : 'text-sm'} ${
-                  isHighlighted('action') ? 'bg-blue-100 border-blue-300' : 'bg-gray-50'
-                }`} style={{ color: '#000000' }}>
-                  פעולה למעבר לאזור ההזדמנות
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -179,11 +173,6 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
                     isHighlighted('opportunity') ? getZoneColor('opportunity') + ' font-semibold shadow-md' : 'bg-white'
                   }`} style={{ color: '#000000' }}>
                     {row.opportunity}
-                  </TableCell>
-                  <TableCell className={`text-right border border-gray-300 p-3 ${isPresenterMode ? 'text-base' : 'text-sm'} ${
-                    isHighlighted('action') ? 'bg-blue-100 border-blue-300 font-semibold' : 'bg-white'
-                  }`} style={{ color: '#000000' }}>
-                    {row.action}
                   </TableCell>
                 </TableRow>
               ))}
