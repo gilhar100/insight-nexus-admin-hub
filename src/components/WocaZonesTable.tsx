@@ -184,10 +184,10 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
         <div className="mt-8">
           <Card className="border-2 border-green-200 bg-gradient-to-br from-green-50 to-emerald-50">
             <CardHeader className="text-center pb-4">
-              <CardTitle className={`text-right ${isPresenterMode ? 'text-2xl' : 'text-lg'} text-green-800`}>
+              <CardTitle className={`text-right ${isPresenterMode ? 'text-3xl' : 'text-xl'} text-black font-bold`}>
                 מדריך למעבר לאזור ההזדמנות
               </CardTitle>
-              <p className={`text-right ${isPresenterMode ? 'text-lg' : 'text-sm'} text-green-700 font-medium`}>
+              <p className={`text-right ${isPresenterMode ? 'text-xl' : 'text-base'} text-black font-medium`}>
                 ההתנהגויות הנדרשות כדי לנוע לאזור ההזדמנות:
               </p>
             </CardHeader>
@@ -209,10 +209,10 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
                         {index + 1}
                       </div>
                       <div className="flex-1 text-right">
-                        <h4 className={`font-bold text-green-800 ${isPresenterMode ? 'text-base' : 'text-sm'}`}>
+                        <h4 className={`font-bold text-black ${isPresenterMode ? 'text-lg' : 'text-base'}`}>
                           {item.title}:
                         </h4>
-                        <p className={`text-green-700 ${isPresenterMode ? 'text-sm' : 'text-xs'} mt-1`}>
+                        <p className={`text-black ${isPresenterMode ? 'text-base' : 'text-sm'} mt-1`}>
                           {item.desc}
                         </p>
                       </div>
@@ -220,7 +220,7 @@ export const WocaZonesTable: React.FC<WocaZonesTableProps> = ({
                   ))}
                 </div>
                 
-                <div className={`mt-6 p-4 bg-green-600 text-white rounded-lg text-center ${isPresenterMode ? 'text-base' : 'text-sm'}`}>
+                <div className={`mt-6 p-4 bg-green-600 text-white rounded-lg text-center ${isPresenterMode ? 'text-lg' : 'text-base'}`}>
                   <p className="font-semibold">
                     כל אלה מאפשרים מעבר מארבעת אזורי הקיפאון (נוחות, מלחמה, אדישות) לאזור ההזדמנות – בו מתקיים שינוי טרנספורמטיבי ויצירת ערך אמיתי.
                   </p>
