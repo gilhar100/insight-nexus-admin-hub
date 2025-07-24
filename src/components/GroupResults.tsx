@@ -3,7 +3,7 @@ import { SalimaGroupRadarChart } from '@/components/SalimaGroupRadarChart';
 import { ArchetypeDistributionChart } from '@/components/ArchetypeDistributionChart';
 import { Button } from '@/components/ui/button';
 import { FileText } from 'lucide-react';
-import { exportGroupInsightsToPDF } from '@/utils/exportUtils';
+import { exportSalimaPDFReport } from '@/utils/exportUtils';
 
 interface GroupData {
   group_number: number;
@@ -86,7 +86,7 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
 }) => {
   const exportToPDF = async () => {
     const filename = `group-${groupData.group_number}-salima-insights-${new Date().toISOString().split('T')[0]}.pdf`;
-    await exportGroupInsightsToPDF('salima-insights-content', filename);
+    await exportSalimaPDFReport(groupData, filename);
   };
   if (!groupData || !groupData.participants || groupData.participants.length === 0) {
     return <div className="card">
@@ -133,7 +133,7 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
         </div>
       )}
       
-      <div id="salima-insights-content" className="space-y-8">
+      <div className="space-y-8">
       {/* Group Mean SLQ Score at the top */}
       <div className="card">
         <div className="card-content p-6 text-center">
