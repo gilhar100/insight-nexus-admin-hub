@@ -33,7 +33,10 @@ export const GenerateReport: React.FC = () => {
       try {
         const res = await fetch("https://lhmrghebdtcbhmgtbqfe.supabase.co/functions/v1/getGroupInsights", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+          },
           body: JSON.stringify({ group_number: selectedGroupId })
         });
         const data = await res.json();
@@ -124,18 +127,10 @@ export const GenerateReport: React.FC = () => {
               <div className="text-red-600">שגיאה: {error}</div>
             ) : hasData ? (
               <div className="space-y-6">
-                <EnhancedSalimaRadarChart 
-                  selfData={reportData.salima.scores}
-                  activeDataSource="self" 
-                />
+                <EnhancedSalimaRadarChart selfData={reportData.salima.scores} activeDataSource="self" />
                 <ArchetypeDistributionChart groupNumber={selectedGroupId} />
                 <WocaGroupBarChart groupCategoryScores={reportData.woca.scores} />
-                <WocaZoneSection 
-                  wocaAnalysis={reportData.woca}
-                  showNames={false}
-                  onToggleNames={() => {}}
-                  onExportData={() => {}}
-                />
+                <WocaZoneSection wocaAnalysis={reportData.woca} showNames={false} onToggleNames={() => {}} onExportData={() => {}} />
               </div>
             ) : (
               <div className="text-gray-600">לא נמצאו נתונים לקבוצה זו</div>
@@ -151,12 +146,7 @@ export const GenerateReport: React.FC = () => {
             <p className="text-gray-600">הדוח יכלול ניתוח SALIMA, ארכיטיפים ו-WOCA</p>
           </CardHeader>
           <CardContent>
-            <Button
-              onClick={handleGenerateReport}
-              disabled={isGenerating}
-              className="w-full h-12 text-lg"
-              size="lg"
-            >
+            <Button onClick={handleGenerateReport} disabled={isGenerating} className="w-full h-12 text-lg" size="lg">
               {isGenerating ? (
                 <>
                   <Loader2 className="h-5 w-5 animate-spin mr-2" />
