@@ -1,7 +1,5 @@
 
 import { RespondentData } from '@/hooks/useRespondentData';
-import React from 'react';
-import ReactDOM from 'react-dom/client';
 // @ts-ignore
 import html2pdf from 'html2pdf.js';
 
@@ -68,104 +66,34 @@ export const exportSalimaReportCSV = (respondentData: RespondentData) => {
   URL.revokeObjectURL(url);
 };
 
-export const exportSalimaPDFReport = async (groupData: any, filename: string) => {
-  const { SalimaPDFLayout } = await import('@/components/pdf/SalimaPDFLayout');
-  
-  // Create a temporary container
-  const tempDiv = document.createElement('div');
-  tempDiv.style.position = 'absolute';
-  tempDiv.style.left = '-9999px';
-  tempDiv.style.top = '-9999px';
-  tempDiv.style.width = '210mm'; // A4 width
-  tempDiv.style.backgroundColor = '#ffffff';
-  document.body.appendChild(tempDiv);
-
-  try {
-    // Create React root and render the PDF layout
-    const root = ReactDOM.createRoot(tempDiv);
-    root.render(React.createElement(SalimaPDFLayout, { groupData }));
-
-    // Wait for rendering
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    const opt = {
-      margin: 0.5,
-      filename: filename,
-      image: { type: 'jpeg', quality: 0.95 },
-      html2canvas: { 
-        scale: 1.5,
-        useCORS: true,
-        backgroundColor: '#ffffff',
-        scrollX: 0,
-        scrollY: 0,
-        letterRendering: true,
-        allowTaint: true,
-        logging: false
-      },
-      jsPDF: { 
-        unit: 'in', 
-        format: 'a4', 
-        orientation: 'portrait',
-        compress: true
-      }
-    };
-
-    await html2pdf().from(tempDiv).set(opt).save();
-    
-    // Cleanup
-    root.unmount();
-  } finally {
-    document.body.removeChild(tempDiv);
+export const exportGroupInsightsToPDF = async (elementId: string, filename: string) => {
+  const element = document.getElementById(elementId);
+  if (!element) {
+    console.error('Element not found for PDF export');
+    return;
   }
-};
 
-export const exportWocaPDFReport = async (workshopData: any, wocaAnalysis: any, zoneDistribution: any, filename: string) => {
-  const { WocaPDFLayout } = await import('@/components/pdf/WocaPDFLayout');
-  
-  // Create a temporary container
-  const tempDiv = document.createElement('div');
-  tempDiv.style.position = 'absolute';
-  tempDiv.style.left = '-9999px';
-  tempDiv.style.top = '-9999px';
-  tempDiv.style.width = '210mm'; // A4 width
-  tempDiv.style.backgroundColor = '#ffffff';
-  document.body.appendChild(tempDiv);
+  const opt = {
+    margin: 1,
+    filename: filename,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { 
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff',
+      scrollX: 0,
+      scrollY: 0
+    },
+    jsPDF: { 
+      unit: 'in', 
+      format: 'a4', 
+      orientation: 'portrait' 
+    }
+  };
 
   try {
-    // Create React root and render the PDF layout
-    const root = ReactDOM.createRoot(tempDiv);
-    root.render(React.createElement(WocaPDFLayout, { workshopData, wocaAnalysis, zoneDistribution }));
-
-    // Wait for rendering
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    const opt = {
-      margin: 0.5,
-      filename: filename,
-      image: { type: 'jpeg', quality: 0.95 },
-      html2canvas: { 
-        scale: 1.5,
-        useCORS: true,
-        backgroundColor: '#ffffff',
-        scrollX: 0,
-        scrollY: 0,
-        letterRendering: true,
-        allowTaint: true,
-        logging: false
-      },
-      jsPDF: { 
-        unit: 'in', 
-        format: 'a4', 
-        orientation: 'portrait',
-        compress: true
-      }
-    };
-
-    await html2pdf().from(tempDiv).set(opt).save();
-    
-    // Cleanup
-    root.unmount();
-  } finally {
-    document.body.removeChild(tempDiv);
+    await html2pdf().from(element).set(opt).save();
+  } catch (error) {
+    console.error('Error generating PDF:', error);
   }
 };
