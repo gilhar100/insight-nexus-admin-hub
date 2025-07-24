@@ -4,6 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Download, FileText, Loader2 } from 'lucide-react';
 import { useWorkshops } from '@/hooks/useWorkshops';
+import { exportCombinedPDFReport } from '@/utils/exportUtils';
+import { EnhancedSalimaRadarChart } from '@/components/EnhancedSalimaRadarChart';
+import { ArchetypeDistributionChart } from '@/components/ArchetypeDistributionChart';
+import { WocaGroupBarChart } from '@/components/WocaGroupBarChart';
+import { WocaZoneSection } from '@/components/WocaZoneSection';
 
 export const GenerateReport: React.FC = () => {
   const [selectedGroupId, setSelectedGroupId] = useState<number | undefined>();
@@ -26,7 +31,7 @@ export const GenerateReport: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch("https://lhmrghebdtcbhmgtbqfe.functions.supabase.co/getGroupInsights", {
+        const res = await fetch("https://lhmrghebdtcbhmgtbqfe.supabase.co/functions/v1/getGroupInsights", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ group_number: selectedGroupId })
@@ -46,7 +51,18 @@ export const GenerateReport: React.FC = () => {
   }, [selectedGroupId]);
 
   const handleGenerateReport = async () => {
-    console.log('TODO: exportCombinedPDFReport with', reportData);
+    if (!reportData || !selectedGroupId) return;
+    setIsGenerating(true);
+    try {
+      await exportCombinedPDFReport({
+        groupId: selectedGroupId,
+        ...reportData
+      });
+    } catch (error) {
+      console.error('Error generating PDF report:', error);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const hasData = reportData && reportData.salima && reportData.archetypes && reportData.woca;
@@ -73,27 +89,23 @@ export const GenerateReport: React.FC = () => {
           <p className="text-gray-600">בחר קבוצה מהרשימה להפקת דוח מקצועי</p>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">קבוצה</label>
-            <Select onValueChange={handleGroupSelect}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="בחר קבוצה..." />
-              </SelectTrigger>
-              <SelectContent>
-                {workshops.map((workshop) => (
-                  <SelectItem key={workshop.id} value={workshop.id.toString()}>
-                    {workshop.name} ({workshop.participant_count} משתתפים)
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {workshopsError && (
-              <div className="text-red-600 text-sm">
-                שגיאה בטעינת קבוצות: {workshopsError}
-              </div>
-            )}
-          </div>
+          <Select onValueChange={handleGroupSelect}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="בחר קבוצה..." />
+            </SelectTrigger>
+            <SelectContent>
+              {workshops.map((workshop) => (
+                <SelectItem key={workshop.id} value={workshop.id.toString()}>
+                  {workshop.name} ({workshop.participant_count} משתתפים)
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {workshopsError && (
+            <div className="text-red-600 text-sm mt-2">
+              שגיאה בטעינת קבוצות: {workshopsError}
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -111,11 +123,11 @@ export const GenerateReport: React.FC = () => {
             ) : error ? (
               <div className="text-red-600">שגיאה: {error}</div>
             ) : hasData ? (
-              <div className="space-y-3 text-green-700">
-                <p>✓ ממוצע SALIMA: {reportData.salima.average.toFixed(2)}</p>
-                <p>✓ החוזקה: {reportData.salima.strongest}</p>
-                <p>✓ החולשה: {reportData.salima.weakest}</p>
-                <p>✓ אזור WOCA דומיננטי: {reportData.woca.dominantZone}</p>
+              <div className="space-y-6">
+                <EnhancedSalimaRadarChart data={reportData.salima.scores} />
+                <ArchetypeDistributionChart data={reportData.archetypes.distribution} />
+                <WocaGroupBarChart data={reportData.woca.scores} />
+                <WocaZoneSection zone={reportData.woca.dominantZone} />
               </div>
             ) : (
               <div className="text-gray-600">לא נמצאו נתונים לקבוצה זו</div>
@@ -149,20 +161,6 @@ export const GenerateReport: React.FC = () => {
                 </>
               )}
             </Button>
-          </CardContent>
-        </Card>
-      )}
-
-      {!selectedGroupId && (
-        <Card>
-          <CardContent className="p-8 text-center">
-            <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-600 mb-2">
-              בחר קבוצה להתחלה
-            </h3>
-            <p className="text-gray-500">
-              בחר קבוצה מהרשימה למעלה כדי לראות את מצב הנתונים ולהפיק דוח מקצועי
-            </p>
           </CardContent>
         </Card>
       )}
