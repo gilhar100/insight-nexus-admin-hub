@@ -12,7 +12,6 @@ import { WocaZonesTable } from '@/components/WocaZonesTable';
 import { GroupSelector } from '@/components/GroupSelector';
 import { GroupInsightsHeader } from '@/components/GroupInsightsHeader';
 import { InsufficientDataWarning } from '@/components/InsufficientDataWarning';
-import { exportGroupInsightsToPDF } from '@/utils/exportUtils';
 
 export const GroupWorkshopInsights: React.FC = () => {
   const [selectedGroupId, setSelectedGroupId] = useState<number | undefined>();
@@ -89,14 +88,8 @@ export const GroupWorkshopInsights: React.FC = () => {
     };
   };
 
-  const exportToPDF = async () => {
-    if (!workshopData) return;
-    const filename = `group-${workshopData.workshop_id}-woca-insights-${new Date().toISOString().split('T')[0]}.pdf`;
-    await exportGroupInsightsToPDF('woca-insights-content', filename);
-  };
-
   const renderContent = () => (
-    <div id="woca-insights-content" className={`space-y-6 ${isPresenterMode ? 'presenter-mode' : ''}`} dir="rtl">
+    <div className={`space-y-6 ${isPresenterMode ? 'presenter-mode' : ''}`} dir="rtl">
       {/* Page Header */}
       {!isPresenterMode && <GroupInsightsHeader />}
 
@@ -137,7 +130,6 @@ export const GroupWorkshopInsights: React.FC = () => {
             showNames={showNames}
             onToggleNames={() => setShowNames(!showNames)}
             onExportData={exportWorkshopData}
-            onExportToPDF={exportToPDF}
           />
 
           {/* 2. Charts Section - Radar + Pie + Horizontal Bar */}

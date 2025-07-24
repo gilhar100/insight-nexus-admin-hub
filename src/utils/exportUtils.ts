@@ -1,7 +1,5 @@
 
 import { RespondentData } from '@/hooks/useRespondentData';
-// @ts-ignore
-import html2pdf from 'html2pdf.js';
 
 export const exportSalimaReport = (respondentData: RespondentData) => {
   const reportData = {
@@ -64,36 +62,4 @@ export const exportSalimaReportCSV = (respondentData: RespondentData) => {
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
-};
-
-export const exportGroupInsightsToPDF = async (elementId: string, filename: string) => {
-  const element = document.getElementById(elementId);
-  if (!element) {
-    console.error('Element not found for PDF export');
-    return;
-  }
-
-  const opt = {
-    margin: 1,
-    filename: filename,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { 
-      scale: 2,
-      useCORS: true,
-      backgroundColor: '#ffffff',
-      scrollX: 0,
-      scrollY: 0
-    },
-    jsPDF: { 
-      unit: 'in', 
-      format: 'a4', 
-      orientation: 'portrait' 
-    }
-  };
-
-  try {
-    await html2pdf().from(element).set(opt).save();
-  } catch (error) {
-    console.error('Error generating PDF:', error);
-  }
 };
