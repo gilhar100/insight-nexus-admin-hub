@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Download, Eye, EyeOff } from 'lucide-react';
+import { Download, Eye, EyeOff, FileText } from 'lucide-react';
 import { WorkshopWocaAnalysis } from '@/utils/wocaAnalysis';
 interface WocaZoneSectionProps {
   wocaAnalysis: WorkshopWocaAnalysis;
@@ -9,13 +9,15 @@ interface WocaZoneSectionProps {
   showNames: boolean;
   onToggleNames: () => void;
   onExportData: () => void;
+  onExportToPDF?: () => void;
 }
 export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
   wocaAnalysis,
   isPresenterMode = false,
   showNames,
   onToggleNames,
-  onExportData
+  onExportData,
+  onExportToPDF
 }) => {
   const getZoneDescription = (zone: string): string => {
     switch (zone) {
@@ -102,6 +104,12 @@ export const WocaZoneSection: React.FC<WocaZoneSectionProps> = ({
                 <Download className="h-4 w-4" />
                 ייצא נתונים
               </Button>
+              {onExportToPDF && (
+                <Button variant="outline" size="sm" onClick={onExportToPDF} className="flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  ייצא PDF
+                </Button>
+              )}
             </div>}
         </div>
       </CardHeader>

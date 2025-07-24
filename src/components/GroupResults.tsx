@@ -1,6 +1,9 @@
 import React from 'react';
 import { SalimaGroupRadarChart } from '@/components/SalimaGroupRadarChart';
 import { ArchetypeDistributionChart } from '@/components/ArchetypeDistributionChart';
+import { Button } from '@/components/ui/button';
+import { FileText } from 'lucide-react';
+import { exportGroupInsightsToPDF } from '@/utils/exportUtils';
 
 interface GroupData {
   group_number: number;
@@ -81,6 +84,10 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
   groupData,
   isPresenterMode
 }) => {
+  const exportToPDF = async () => {
+    const filename = `group-${groupData.group_number}-salima-insights-${new Date().toISOString().split('T')[0]}.pdf`;
+    await exportGroupInsightsToPDF('salima-insights-content', filename);
+  };
   if (!groupData || !groupData.participants || groupData.participants.length === 0) {
     return <div className="card">
         <div className="card-content p-8 text-center">
@@ -115,7 +122,18 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
     isSameDimension
   } = dimensionInsights;
 
-  return <div className="space-y-8">
+  return <div>
+      {/* Export Button - Only show in non-presenter mode */}
+      {!isPresenterMode && (
+        <div className="mb-4 flex justify-end">
+          <Button variant="outline" size="sm" onClick={exportToPDF} className="flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            ייצא PDF
+          </Button>
+        </div>
+      )}
+      
+      <div id="salima-insights-content" className="space-y-8">
       {/* Group Mean SLQ Score at the top */}
       <div className="card">
         <div className="card-content p-6 text-center">
@@ -227,5 +245,6 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
           </div>
         </div>
       </div>
-    </div>;
+    </div>
+  </div>;
 };
