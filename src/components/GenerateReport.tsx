@@ -124,10 +124,18 @@ export const GenerateReport: React.FC = () => {
               <div className="text-red-600">שגיאה: {error}</div>
             ) : hasData ? (
               <div className="space-y-6">
-                <EnhancedSalimaRadarChart data={reportData.salima.scores} />
-                <ArchetypeDistributionChart data={reportData.archetypes.distribution} />
-                <WocaGroupBarChart data={reportData.woca.scores} />
-                <WocaZoneSection zone={reportData.woca.dominantZone} />
+                <EnhancedSalimaRadarChart 
+                  selfData={reportData.salima.scores}
+                  activeDataSource="self" 
+                />
+                <ArchetypeDistributionChart groupNumber={selectedGroupId} />
+                <WocaGroupBarChart groupCategoryScores={reportData.woca.scores} />
+                <WocaZoneSection 
+                  wocaAnalysis={reportData.woca}
+                  showNames={false}
+                  onToggleNames={() => {}}
+                  onExportData={() => {}}
+                />
               </div>
             ) : (
               <div className="text-gray-600">לא נמצאו נתונים לקבוצה זו</div>
