@@ -92,16 +92,16 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
   const dominantZone = wocaData.wocaAnalysis?.groupDominantZoneByCount || 'לא זוהה';
 
   return (
-    <div className="bg-white p-8 font-sans" style={{ minHeight: '297mm', width: '210mm', direction: 'rtl' }}>
+    <div className="bg-white p-6 font-sans" style={{ minHeight: '297mm', width: '210mm', direction: 'rtl' }}>
       {/* Header */}
-      <div className="text-center mb-12 border-b-2 border-blue-200 pb-6">
-        <h1 className="text-4xl font-bold text-blue-800 mb-2">
+      <div className="text-center mb-8 border-b-2 border-blue-200 pb-4">
+        <h1 className="text-3xl font-bold text-blue-800 mb-2">
           דוח תובנות קבוצתי
         </h1>
-        <h2 className="text-2xl font-semibold text-blue-600 mb-4">
+        <h2 className="text-xl font-semibold text-blue-600 mb-3">
           ניתוח SALIMA & WOCA
         </h2>
-        <div className="flex justify-between items-center text-gray-600">
+        <div className="flex justify-between items-center text-gray-600 text-sm">
           <div>
             <strong>קבוצה:</strong> סדנה {groupId}
           </div>
@@ -109,63 +109,63 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
             <strong>תאריך:</strong> {new Date().toLocaleDateString('he-IL')}
           </div>
         </div>
-        <div className="text-center mt-2 text-gray-600">
+        <div className="text-center mt-2 text-gray-600 text-sm">
           <strong>משתתפים:</strong> SALIMA: {salimaData.participant_count} | WOCA: {wocaData.workshopData.participant_count}
         </div>
       </div>
 
       {/* SALIMA Section */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-bold text-blue-800 mb-6 border-r-4 border-blue-500 pr-4">
+      <div className="mb-8">
+        <h2 className="text-xl font-bold text-blue-800 mb-4 border-r-4 border-blue-500 pr-3">
           ניתוח SALIMA - מנהיגות אישית
         </h2>
         
         {/* Overall Score */}
-        <div className="bg-blue-50 rounded-lg p-6 mb-6 text-center">
-          <h3 className="text-xl font-semibold text-blue-800 mb-2">ציון מנהיגות קבוצתי</h3>
-          <div className="text-4xl font-bold text-blue-600">
+        <div className="bg-blue-50 rounded-lg p-4 mb-4 text-center">
+          <h3 className="text-lg font-semibold text-blue-800 mb-1">ציון מנהיגות קבוצתי</h3>
+          <div className="text-3xl font-bold text-blue-600">
             {salimaData.averages.overall.toFixed(2)}
           </div>
-          <p className="text-blue-500 mt-2">
+          <p className="text-blue-500 mt-1 text-sm">
             ממוצע ציוני SLQ של {salimaData.participant_count} משתתפים
           </p>
         </div>
 
         {/* Dimension Insights */}
-        <div className="grid grid-cols-2 gap-6 mb-8">
-          <div className="bg-green-50 border border-green-200 rounded-lg p-6">
-            <h3 className="text-lg font-bold text-green-800 mb-2">הממד החזק ביותר</h3>
-            <div className="text-2xl font-bold text-green-600 mb-1">
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <h3 className="text-base font-bold text-green-800 mb-1">הממד החזק ביותר</h3>
+            <div className="text-xl font-bold text-green-600 mb-1">
               {dimensionInsights.strongest.score.toFixed(1)}
             </div>
-            <div className="text-green-700 font-semibold">
+            <div className="text-green-700 font-semibold text-sm">
               {dimensionInsights.strongest.name}
             </div>
           </div>
           
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-6">
-            <h3 className="text-lg font-bold text-orange-800 mb-2">ממד לפיתוח</h3>
-            <div className="text-2xl font-bold text-orange-600 mb-1">
+          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+            <h3 className="text-base font-bold text-orange-800 mb-1">ממד לפיתוח</h3>
+            <div className="text-xl font-bold text-orange-600 mb-1">
               {dimensionInsights.weakest.score.toFixed(1)}
             </div>
-            <div className="text-orange-700 font-semibold">
+            <div className="text-orange-700 font-semibold text-sm">
               {dimensionInsights.weakest.name}
             </div>
           </div>
         </div>
 
         {/* Charts */}
-        <div className="grid grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="text-center">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">פרופיל קבוצתי ייחודי</h3>
-            <div className="h-64 w-full flex items-center justify-center overflow-hidden">
+            <h3 className="text-base font-semibold text-gray-800 mb-2">פרופיל קבוצתי ייחודי</h3>
+            <div className="h-48 w-full flex items-center justify-center overflow-hidden">
               <SalimaGroupRadarChart averages={salimaData.averages} />
             </div>
           </div>
           
           <div className="text-center">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">חלוקת ארכיטיפים</h3>
-            <div className="h-64 w-full flex items-center justify-center overflow-hidden">
+            <h3 className="text-base font-semibold text-gray-800 mb-2">חלוקת ארכיטיפים</h3>
+            <div className="h-48 w-full flex items-center justify-center overflow-hidden">
               <ArchetypeDistributionChart groupNumber={salimaData.group_number} isPresenterMode={false} />
             </div>
           </div>
@@ -176,31 +176,31 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
       <div style={{ pageBreakBefore: 'always' }}></div>
 
       {/* WOCA Section */}
-      <div className="mb-12">
-        <h2 className="text-2xl font-bold text-purple-800 mb-6 border-r-4 border-purple-500 pr-4">
+      <div className="mb-8">
+        <h2 className="text-xl font-bold text-purple-800 mb-4 border-r-4 border-purple-500 pr-3">
           ניתוח WOCA - תרבות ארגונית
         </h2>
 
         {/* Dominant Zone */}
-        <div className="bg-purple-50 rounded-lg p-6 mb-6 text-center">
-          <h3 className="text-xl font-semibold text-purple-800 mb-2">האזור הדומיננטי</h3>
-          <div className="text-2xl font-bold text-purple-600">
+        <div className="bg-purple-50 rounded-lg p-4 mb-4 text-center">
+          <h3 className="text-lg font-semibold text-purple-800 mb-1">האזור הדומיננטי</h3>
+          <div className="text-xl font-bold text-purple-600">
             {dominantZone === 'opportunity' && 'אזור ההזדמנות'}
             {dominantZone === 'comfort' && 'אזור הנוחות'}
             {dominantZone === 'apathy' && 'אזור האדישות'}
             {dominantZone === 'war' && 'אזור המלחמה'}
             {dominantZone === 'לא זוהה' && 'לא זוהה אזור דומיננטי'}
           </div>
-          <p className="text-purple-500 mt-2">
+          <p className="text-purple-500 mt-1 text-sm">
             בהתבסס על {wocaData.workshopData.participant_count} משתתפים
           </p>
         </div>
 
         {/* Charts */}
-        <div className="grid grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="text-center">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">ציוני אזורים קבוצתיים</h3>
-            <div className="h-64 w-full flex items-center justify-center overflow-hidden">
+            <h3 className="text-base font-semibold text-gray-800 mb-2">ציוני אזורים קבוצתיים</h3>
+            <div className="h-48 w-full flex items-center justify-center overflow-hidden">
               <WocaGroupBarChart 
                 groupCategoryScores={wocaData.wocaAnalysis.groupCategoryScores}
               />
@@ -208,8 +208,8 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
           </div>
           
           <div className="text-center">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">התפלגות משתתפים באזורים</h3>
-            <div className="h-64 w-full flex items-center justify-center overflow-hidden">
+            <h3 className="text-base font-semibold text-gray-800 mb-2">התפלגות משתתפים באזורים</h3>
+            <div className="h-48 w-full flex items-center justify-center overflow-hidden">
               <ZoneDistributionChart 
                 zoneDistribution={zoneDistribution}
               />
