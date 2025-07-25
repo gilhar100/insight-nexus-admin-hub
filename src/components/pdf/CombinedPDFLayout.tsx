@@ -155,17 +155,17 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
         </div>
 
         {/* Charts */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="space-y-6 mb-6">
           <div className="text-center">
             <h3 className="text-base font-semibold text-gray-800 mb-2">פרופיל קבוצתי ייחודי</h3>
-            <div className="h-48 w-full flex items-center justify-center overflow-hidden">
+            <div className="h-40 w-full max-w-md mx-auto flex items-center justify-center overflow-hidden">
               <SalimaGroupRadarChart averages={salimaData.averages} />
             </div>
           </div>
           
           <div className="text-center">
             <h3 className="text-base font-semibold text-gray-800 mb-2">חלוקת ארכיטיפים</h3>
-            <div className="h-48 w-full flex items-center justify-center overflow-hidden">
+            <div className="h-40 w-full max-w-md mx-auto flex items-center justify-center overflow-hidden">
               <ArchetypeDistributionChart groupNumber={salimaData.group_number} isPresenterMode={false} />
             </div>
           </div>
@@ -197,10 +197,10 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
         </div>
 
         {/* Charts */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="space-y-6 mb-6">
           <div className="text-center">
             <h3 className="text-base font-semibold text-gray-800 mb-2">ציוני אזורים קבוצתיים</h3>
-            <div className="h-48 w-full flex items-center justify-center overflow-hidden">
+            <div className="h-40 w-full max-w-md mx-auto flex items-center justify-center overflow-hidden">
               <WocaGroupBarChart 
                 groupCategoryScores={wocaData.wocaAnalysis.groupCategoryScores}
               />
@@ -209,7 +209,7 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
           
           <div className="text-center">
             <h3 className="text-base font-semibold text-gray-800 mb-2">התפלגות משתתפים באזורים</h3>
-            <div className="h-48 w-full flex items-center justify-center overflow-hidden">
+            <div className="h-40 w-full max-w-md mx-auto flex items-center justify-center overflow-hidden">
               <ZoneDistributionChart 
                 zoneDistribution={zoneDistribution}
               />
