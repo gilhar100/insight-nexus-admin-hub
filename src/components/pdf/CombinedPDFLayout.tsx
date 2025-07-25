@@ -62,6 +62,14 @@ const getZoneDistribution = (wocaAnalysis: any) => {
   };
 };
 
+const graphWrapperStyle = {
+  height: '300px',
+  overflow: 'hidden',
+  breakInside: 'avoid',
+  pageBreakInside: 'avoid',
+  WebkitColumnBreakInside: 'avoid',
+};
+
 export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
   groupId,
   salimaData,
@@ -73,7 +81,7 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
 
   return (
     <>
-      {/* Page 1 - Cover */}
+      {/* Cover Page */}
       <div className="bg-white p-6 font-sans" style={{ minHeight: '210mm', width: '297mm', direction: 'rtl' }}>
         <div className="text-center mb-8 border-b-2 border-blue-200 pb-4">
           <h1 className="text-3xl font-bold text-blue-800 mb-2">דוח תובנות קבוצתי</h1>
@@ -88,7 +96,7 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
         </div>
       </div>
 
-      {/* Page 2 - SALIMA Summary */}
+      {/* SALIMA Summary */}
       <div style={{ pageBreakBefore: 'always' }} className="bg-white p-6 font-sans" style={{ minHeight: '210mm', width: '297mm', direction: 'rtl' }}>
         <h2 className="text-xl font-bold text-blue-800 mb-4 border-r-4 border-blue-500 pr-3">ניתוח SALIMA - מנהיגות אישית</h2>
         <div className="bg-blue-50 rounded-lg p-4 mb-4 text-center">
@@ -110,25 +118,25 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
         </div>
       </div>
 
-      {/* Page 3 - SALIMA Charts */}
+      {/* SALIMA Charts */}
       <div style={{ pageBreakBefore: 'always' }} className="bg-white p-6 font-sans" style={{ minHeight: '210mm', width: '297mm', direction: 'rtl' }}>
         <div className="space-y-12">
           <div className="text-center">
             <h3 className="text-base font-semibold text-gray-800 mb-2">פרופיל קבוצתי ייחודי</h3>
-            <div className="w-full h-[300px] flex items-center justify-center">
+            <div className="w-full" style={graphWrapperStyle}>
               <SalimaGroupRadarChart averages={salimaData.averages} />
             </div>
           </div>
           <div className="text-center">
             <h3 className="text-base font-semibold text-gray-800 mb-2">חלוקת ארכיטיפים</h3>
-            <div className="w-full h-[300px] flex items-center justify-center">
+            <div className="w-full" style={graphWrapperStyle}>
               <ArchetypeDistributionChart groupNumber={salimaData.group_number} isPresenterMode={false} />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Page 4 - WOCA Summary */}
+      {/* WOCA Summary */}
       <div style={{ pageBreakBefore: 'always' }} className="bg-white p-6 font-sans" style={{ minHeight: '210mm', width: '297mm', direction: 'rtl' }}>
         <h2 className="text-xl font-bold text-purple-800 mb-4 border-r-4 border-purple-500 pr-3">ניתוח WOCA - תרבות ארגונית</h2>
         <div className="bg-purple-50 rounded-lg p-4 mb-4 text-center">
@@ -144,32 +152,22 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
         </div>
       </div>
 
-      {/* Page 5 - WOCA Charts */}
+      {/* WOCA Charts */}
       <div style={{ pageBreakBefore: 'always' }} className="bg-white p-6 font-sans" style={{ minHeight: '210mm', width: '297mm', direction: 'rtl' }}>
         <div className="space-y-12">
           <div className="text-center">
             <h3 className="text-base font-semibold text-gray-800 mb-2">ציוני אזורים קבוצתיים</h3>
-            <div className="w-full h-[300px] flex items-center justify-center">
+            <div className="w-full" style={graphWrapperStyle}>
               <WocaGroupBarChart groupCategoryScores={wocaData.wocaAnalysis.groupCategoryScores} />
             </div>
           </div>
           <div className="text-center">
             <h3 className="text-base font-semibold text-gray-800 mb-2">התפלגות משתתפים באזורים</h3>
-            <div className="w-full h-[300px] flex items-center justify-center">
+            <div className="w-full" style={graphWrapperStyle}>
               <ZoneDistributionChart zoneDistribution={zoneDistribution} />
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Page 6 - Legend */}
-      <div style={{ pageBreakBefore: 'always' }} className="bg-white p-6 font-sans" style={{ minHeight: '210mm', width: '297mm', direction: 'rtl' }}>
-        {/* Add your legend content here or break it into subpages if needed */}
-      </div>
-
-      {/* Page 7 - Summary */}
-      <div style={{ pageBreakBefore: 'always' }} className="bg-white p-6 font-sans" style={{ minHeight: '210mm', width: '297mm', direction: 'rtl' }}>
-        {/* Add your summary section here */}
       </div>
     </>
   );
