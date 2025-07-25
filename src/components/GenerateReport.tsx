@@ -35,105 +35,101 @@ export const GenerateReport: React.FC = () => {
     }
     
     setIsGenerating(true);
-    console.log("Starting clean PDF generation...");
+    console.log("Starting PDF generation with RTL support...");
     
     try {
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 15;
-      
-      // Wait for all components to render
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Page 1: Title Page
-      pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(28);
-      pdf.text("דוח תובנות קבוצתי", pageWidth / 2, 60, { align: 'center' });
-      
-      pdf.setFontSize(22);
-      pdf.text("SALIMA & WOCA", pageWidth / 2, 80, { align: 'center' });
-      
-      const selectedWorkshop = workshops.find(w => w.id === selectedGroupId);
-      pdf.setFontSize(18);
-      pdf.text(selectedWorkshop?.name || '', pageWidth / 2, 110, { align: 'center' });
-      
-      pdf.setFontSize(14);
-      pdf.text(`תאריך: ${new Date().toLocaleDateString('he-IL')}`, pageWidth / 2, 130, { align: 'center' });
-
-      // Define sections to capture from preview
-      const sections = [
-        { selector: '[data-section="salima-summary"]', title: 'סיכום נתוני SALIMA' },
-        { selector: '[data-section="salima-radar"]', title: 'תרשים רדאר SALIMA' },
-        { selector: '[data-section="archetype-distribution"]', title: 'התפלגות סגנונות ניהול' },
-        { selector: '[data-section="woca-zone"]', title: 'אזור WOCA דומיננטי' },
-        { selector: '[data-section="woca-distribution"]', title: 'התפלגות אזורי WOCA' },
-        { selector: '[data-section="woca-strength"]', title: 'עוצמת אזורי WOCA' },
-        { selector: '[data-section="woca-matrix"]', title: 'מטריצת אזורי WOCA' }
-      ];
-
-      // Capture each section individually
-      for (const section of sections) {
-        const element = document.querySelector(section.selector) as HTMLElement;
-        
-        if (!element) {
-          console.warn(`Section not found: ${section.selector}`);
-          continue;
-        }
-
-        console.log(`Capturing section: ${section.title}`);
-        
-        // Add new page
-        pdf.addPage();
-        
-        // Add section title
-        pdf.setFontSize(20);
-        pdf.text(section.title, pageWidth / 2, 25, { align: 'center' });
-        
-        // Capture the element
-        const canvas = await html2canvas(element, {
-          scale: 2,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#ffffff',
-          logging: false,
-          width: element.offsetWidth,
-          height: element.offsetHeight
-        });
-        
-        const imgData = canvas.toDataURL('image/png', 1.0);
-        
-        // Calculate dimensions to fit on page
-        const maxWidth = pageWidth - (margin * 2);
-        const maxHeight = pageHeight - 50; // Leave space for title
-        
-        let imgWidth = maxWidth;
-        let imgHeight = (canvas.height * imgWidth) / canvas.width;
-        
-        // Scale down if too tall
-        if (imgHeight > maxHeight) {
-          imgHeight = maxHeight;
-          imgWidth = (canvas.width * imgHeight) / canvas.height;
-        }
-        
-        // Center the image on the page
-        const x = (pageWidth - imgWidth) / 2;
-        const y = 35;
-        
-        pdf.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight);
-        
-        console.log(`Section ${section.title} added successfully`);
+      // Get the preview content
+      const previewElement = document.getElementById('insights-pdf-wrapper');
+      if (!previewElement) {
+        throw new Error('Preview content not found');
       }
+
+      // Create PDF container with proper RTL styling
+      const pdfContainer = document.createElement('div');
+      pdfContainer.id = 'pdf-content';
+      pdfContainer.style.cssText = `
+        direction: rtl;
+        font-family: 'Assistant', sans-serif;
+        width: 210mm;
+        min-height: 297mm;
+        position: absolute;
+        top: -9999px;
+        left: 0;
+        background: white;
+        padding: 20px;
+        box-sizing: border-box;
+        line-height: 1.6;
+      `;
+
+      // Clone and simplify the preview content
+      const clonedContent = previewElement.cloneNode(true) as HTMLElement;
       
+      // Simplify layout classes for PDF
+      const elementsWithFlex = clonedContent.querySelectorAll('[class*="flex"], [class*="grid"]');
+      elementsWithFlex.forEach(el => {
+        const htmlEl = el as HTMLElement;
+        htmlEl.style.display = 'block';
+        htmlEl.style.marginBottom = '20px';
+      });
+
+      // Ensure charts have fixed dimensions
+      const chartContainers = clonedContent.querySelectorAll('[class*="h-[400px]"], [class*="h-[500px]"]');
+      chartContainers.forEach(el => {
+        const htmlEl = el as HTMLElement;
+        htmlEl.style.height = '400px';
+        htmlEl.style.width = '100%';
+        htmlEl.style.display = 'block';
+      });
+
+      pdfContainer.appendChild(clonedContent);
+      document.body.appendChild(pdfContainer);
+
+      // Wait for content to render completely
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      // Generate PDF using html2canvas with your specified settings
+      const canvas = await html2canvas(pdfContainer, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: false,
+        backgroundColor: '#ffffff',
+        logging: false
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      // If content is too long, split across multiple pages
+      if (pdfHeight > pdf.internal.pageSize.getHeight()) {
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        let yPosition = 0;
+        
+        while (yPosition < pdfHeight) {
+          if (yPosition > 0) {
+            pdf.addPage();
+          }
+          
+          pdf.addImage(imgData, 'PNG', 0, -yPosition, pdfWidth, pdfHeight);
+          yPosition += pageHeight;
+        }
+      } else {
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      }
+
+      const selectedWorkshop = workshops.find(w => w.id === selectedGroupId);
       const fileName = `דוח-תובנות-${selectedWorkshop?.name || selectedGroupId}-${new Date().toLocaleDateString('he-IL').replace(/\//g, '-')}.pdf`;
       
-      console.log("Saving clean PDF:", fileName);
       pdf.save(fileName);
-      
-      console.log("Clean PDF generation completed successfully!");
+      console.log("PDF generation completed successfully!");
+
+      // Clean up
+      document.body.removeChild(pdfContainer);
       
     } catch (error) {
-      console.error('Clean PDF generation failed:', error);
+      console.error('PDF generation failed:', error);
       alert('שגיאה בהפקת הדוח. אנא נסה שוב.');
     } finally {
       setIsGenerating(false);
