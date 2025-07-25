@@ -9,10 +9,11 @@ import { useWorkshopDetails } from '@/hooks/useWorkshopDetails';
 import { EnhancedSalimaRadarChart } from '@/components/EnhancedSalimaRadarChart';
 import { ArchetypeDistributionChart } from '@/components/ArchetypeDistributionChart';
 import { WocaGroupBarChart } from '@/components/WocaGroupBarChart';
-import { WocaZoneSection } from '@/components/WocaZoneSection';
 import { ZoneDistributionChart } from '@/components/ZoneDistributionChart';
 import { WocaZonesTable } from '@/components/WocaZonesTable';
 import { analyzeWorkshopWoca } from '@/utils/wocaAnalysis';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 export const GenerateReport: React.FC = () => {
   const [selectedGroupId, setSelectedGroupId] = useState<number | undefined>();
@@ -37,7 +38,6 @@ export const GenerateReport: React.FC = () => {
     console.log("Starting PDF generation process...");
     
     try {
-      // First, let's try a simple approach with window.print
       const wrapper = document.getElementById("insights-pdf-wrapper");
       if (!wrapper) {
         console.error("PDF wrapper element not found");
@@ -45,41 +45,20 @@ export const GenerateReport: React.FC = () => {
         return;
       }
 
-      console.log("Found wrapper element");
+      console.log("Found wrapper element, creating canvas...");
 
-      // Try to import the libraries
-      console.log("Importing PDF libraries...");
-      const jsPDFModule = await import("jspdf");
-      const html2canvasModule = await import("html2canvas");
-      
-      const { jsPDF } = jsPDFModule;
-      const html2canvas = html2canvasModule.default;
-      
-      console.log("Libraries imported successfully");
+      // Wait a moment for any animations to complete
+      await new Promise(resolve => setTimeout(resolve, 100));
 
-      // Create a clone of the wrapper for processing
-      const clone = wrapper.cloneNode(true) as HTMLElement;
-      clone.style.width = '800px';
-      clone.style.backgroundColor = 'white';
-      clone.style.padding = '20px';
-      
-      // Temporarily add to document
-      document.body.appendChild(clone);
-      
-      console.log("Creating canvas from content...");
-      
-      const canvas = await html2canvas(clone, {
+      const canvas = await html2canvas(wrapper, {
         scale: 1,
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
-        width: 800,
-        height: clone.scrollHeight,
-        logging: true
+        logging: false,
+        width: wrapper.scrollWidth,
+        height: wrapper.scrollHeight
       });
-      
-      // Remove the clone
-      document.body.removeChild(clone);
       
       console.log("Canvas created successfully, size:", canvas.width, "x", canvas.height);
       
@@ -89,12 +68,30 @@ export const GenerateReport: React.FC = () => {
       
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      const pageHeight = pdf.internal.pageSize.getHeight();
       
-      console.log("Adding image to PDF...");
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      console.log("Adding content to PDF...");
+      
+      if (pdfHeight > pageHeight) {
+        // Multi-page PDF
+        let position = 0;
+        let remainingHeight = pdfHeight;
+
+        while (remainingHeight > 0) {
+          pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+          remainingHeight -= pageHeight;
+          if (remainingHeight > 0) {
+            pdf.addPage();
+            position = -pageHeight;
+          }
+        }
+      } else {
+        // Single page PDF
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      }
       
       const selectedWorkshop = workshops.find(w => w.id === selectedGroupId);
-      const fileName = `דוח-תובנות-${selectedWorkshop?.name || selectedGroupId}-${new Date().toLocaleDateString('he-IL')}.pdf`;
+      const fileName = `דוח-תובנות-${selectedWorkshop?.name || selectedGroupId}-${new Date().toLocaleDateString('he-IL').replace(/\//g, '-')}.pdf`;
       
       console.log("Saving PDF:", fileName);
       pdf.save(fileName);
@@ -103,15 +100,7 @@ export const GenerateReport: React.FC = () => {
       
     } catch (error) {
       console.error('PDF generation failed:', error);
-      
-      // Fallback: show print dialog
-      console.log("Attempting fallback print dialog...");
-      try {
-        window.print();
-      } catch (printError) {
-        console.error("Print fallback also failed:", printError);
-        alert('שגיאה בהפקת הדוח. אנא נסה לרענן את הדף ולנסות שוב, או השתמש בכפתור Print של הדפדפן.');
-      }
+      alert('שגיאה בהפקת הדוח. אנא נסה שוב או השתמש בכפתור Print של הדפדפן.');
     } finally {
       setIsGenerating(false);
     }
