@@ -28,98 +28,90 @@ export const GenerateReport: React.FC = () => {
   };
 
   const handleDownloadPDF = async () => {
-    if (!selectedGroupId) return;
+    if (!selectedGroupId) {
+      alert("אנא בחר קבוצה תחילה");
+      return;
+    }
     
     setIsGenerating(true);
+    console.log("Starting PDF generation process...");
+    
     try {
-      // Import libraries dynamically
-      const { jsPDF } = await import("jspdf");
-      const html2canvas = (await import("html2canvas")).default;
-
-      // Find the content wrapper
+      // First, let's try a simple approach with window.print
       const wrapper = document.getElementById("insights-pdf-wrapper");
       if (!wrapper) {
         console.error("PDF wrapper element not found");
-        alert("לא נמצא תוכן להורדה. אנא נסה שוב.");
+        alert("לא נמצא תוכן להורדה. אנא רענן את הדף ונסה שוב.");
         return;
       }
 
-      console.log("Found wrapper element, generating canvas...");
+      console.log("Found wrapper element");
 
-      // Configure html2canvas options for better compatibility
-      const canvas = await html2canvas(wrapper, { 
-        scale: 1.5, // Reduced scale for better performance
+      // Try to import the libraries
+      console.log("Importing PDF libraries...");
+      const jsPDFModule = await import("jspdf");
+      const html2canvasModule = await import("html2canvas");
+      
+      const { jsPDF } = jsPDFModule;
+      const html2canvas = html2canvasModule.default;
+      
+      console.log("Libraries imported successfully");
+
+      // Create a clone of the wrapper for processing
+      const clone = wrapper.cloneNode(true) as HTMLElement;
+      clone.style.width = '800px';
+      clone.style.backgroundColor = 'white';
+      clone.style.padding = '20px';
+      
+      // Temporarily add to document
+      document.body.appendChild(clone);
+      
+      console.log("Creating canvas from content...");
+      
+      const canvas = await html2canvas(clone, {
+        scale: 1,
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
-        width: wrapper.scrollWidth,
-        height: wrapper.scrollHeight,
-        windowWidth: wrapper.scrollWidth,
-        windowHeight: wrapper.scrollHeight,
-        scrollX: 0,
-        scrollY: 0
+        width: 800,
+        height: clone.scrollHeight,
+        logging: true
       });
       
-      console.log("Canvas generated successfully");
+      // Remove the clone
+      document.body.removeChild(clone);
+      
+      console.log("Canvas created successfully, size:", canvas.width, "x", canvas.height);
       
       // Create PDF
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
-
-      // Calculate dimensions
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgData = canvas.toDataURL('image/png');
+      
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      const pageHeight = pdf.internal.pageSize.getHeight();
-
-      console.log(`PDF dimensions: ${pdfWidth}x${pdfHeight}, Page height: ${pageHeight}`);
-
-      // Add content to PDF
-      if (pdfHeight > pageHeight) {
-        // Multi-page PDF
-        let position = 0;
-        let remainingHeight = pdfHeight;
-
-        while (remainingHeight > 0) {
-          pdf.addImage(imgData, "PNG", 0, position, pdfWidth, pdfHeight);
-          remainingHeight -= pageHeight;
-          if (remainingHeight > 0) {
-            pdf.addPage();
-            position = -pageHeight;
-          }
-        }
-      } else {
-        // Single page PDF
-        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      }
-
-      // Generate filename
+      
+      console.log("Adding image to PDF...");
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      
       const selectedWorkshop = workshops.find(w => w.id === selectedGroupId);
-      const fileName = `group-insights-${selectedWorkshop?.name || selectedGroupId}-${new Date().toISOString().split('T')[0]}.pdf`;
+      const fileName = `דוח-תובנות-${selectedWorkshop?.name || selectedGroupId}-${new Date().toLocaleDateString('he-IL')}.pdf`;
       
-      console.log(`Saving PDF as: ${fileName}`);
-      
-      // Save the PDF
+      console.log("Saving PDF:", fileName);
       pdf.save(fileName);
       
-      console.log("PDF saved successfully");
+      console.log("PDF generation completed successfully!");
       
     } catch (error) {
-      console.error('Detailed PDF generation error:', error);
+      console.error('PDF generation failed:', error);
       
-      // More specific error messages
-      let errorMessage = 'שגיאה בהפקת הדוח.';
-      
-      if (error instanceof Error) {
-        if (error.message.includes('html2canvas')) {
-          errorMessage += ' בעיה ביצירת תמונה מהתוכן.';
-        } else if (error.message.includes('jsPDF')) {
-          errorMessage += ' בעיה ביצירת קובץ PDF.';
-        } else {
-          errorMessage += ` פרטי השגיאה: ${error.message}`;
-        }
+      // Fallback: show print dialog
+      console.log("Attempting fallback print dialog...");
+      try {
+        window.print();
+      } catch (printError) {
+        console.error("Print fallback also failed:", printError);
+        alert('שגיאה בהפקת הדוח. אנא נסה לרענן את הדף ולנסות שוב, או השתמש בכפתור Print של הדפדפן.');
       }
-      
-      alert(errorMessage + ' אנא נסה שוב.');
     } finally {
       setIsGenerating(false);
     }
