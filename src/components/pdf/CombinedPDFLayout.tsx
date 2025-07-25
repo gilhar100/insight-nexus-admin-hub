@@ -64,10 +64,14 @@ const getZoneDistribution = (wocaAnalysis: any) => {
 
 const graphWrapperStyle = {
   height: '300px',
+  width: '100%',
   overflow: 'hidden',
   breakInside: 'avoid',
   pageBreakInside: 'avoid',
   WebkitColumnBreakInside: 'avoid',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center'
 };
 
 export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
@@ -123,13 +127,13 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
         <div className="space-y-12">
           <div className="text-center">
             <h3 className="text-base font-semibold text-gray-800 mb-2">פרופיל קבוצתי ייחודי</h3>
-            <div className="w-full" style={graphWrapperStyle}>
+            <div style={graphWrapperStyle}>
               <SalimaGroupRadarChart averages={salimaData.averages} />
             </div>
           </div>
           <div className="text-center">
             <h3 className="text-base font-semibold text-gray-800 mb-2">חלוקת ארכיטיפים</h3>
-            <div className="w-full" style={graphWrapperStyle}>
+            <div style={graphWrapperStyle}>
               <ArchetypeDistributionChart groupNumber={salimaData.group_number} isPresenterMode={false} />
             </div>
           </div>
@@ -157,13 +161,13 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
         <div className="space-y-12">
           <div className="text-center">
             <h3 className="text-base font-semibold text-gray-800 mb-2">ציוני אזורים קבוצתיים</h3>
-            <div className="w-full" style={graphWrapperStyle}>
+            <div style={graphWrapperStyle}>
               <WocaGroupBarChart groupCategoryScores={wocaData.wocaAnalysis.groupCategoryScores} />
             </div>
           </div>
           <div className="text-center">
             <h3 className="text-base font-semibold text-gray-800 mb-2">התפלגות משתתפים באזורים</h3>
-            <div className="w-full" style={graphWrapperStyle}>
+            <div style={graphWrapperStyle}>
               <ZoneDistributionChart zoneDistribution={zoneDistribution} />
             </div>
           </div>
