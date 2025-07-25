@@ -260,7 +260,7 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
 
         {/* SALIMA Archetypes */}
         <div className="mb-8">
-          <h3 className="text-xl font-semibold text-green-800 mb-4">ארכיטיפי מנהיגות</h3>
+          <h3 className="text-xl font-semibold text-green-800 mb-4">מקרא סגנונות ניהול</h3>
           <div className="grid grid-cols-1 gap-4">
             <div className="bg-green-50 p-4 rounded-lg">
               <h4 className="font-semibold text-green-800">מנהל הזדמנויות</h4>
