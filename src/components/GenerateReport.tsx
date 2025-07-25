@@ -259,8 +259,10 @@ export const GenerateReport: React.FC = () => {
 
                   {/* Archetype Distribution */}
                   <div className="bg-card p-4 rounded-lg border">
-                    <h3 className="text-lg font-semibold text-foreground mb-4">התפלגות ארכיטיפים</h3>
-                    <ArchetypeDistributionChart groupNumber={selectedGroupId} />
+                    <h3 className="text-lg font-semibold text-foreground mb-4">התפלגות סגנונות ניהול</h3>
+                    <div className="w-full overflow-hidden">
+                      <ArchetypeDistributionChart groupNumber={selectedGroupId} isPresenterMode={true} />
+                    </div>
                   </div>
 
                   {/* Archetype Legend */}
