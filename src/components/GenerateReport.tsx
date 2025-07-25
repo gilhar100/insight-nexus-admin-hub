@@ -36,13 +36,17 @@ export const GenerateReport: React.FC = () => {
     
     setIsGenerating(true);
     console.log("Starting PDF generation with RTL support...");
+    console.log("Selected group ID:", selectedGroupId);
     
     try {
+      console.log("Step 1: Getting preview element...");
       // Get the preview content
       const previewElement = document.getElementById('insights-pdf-wrapper');
       if (!previewElement) {
+        console.error("Preview element not found!");
         throw new Error('Preview content not found');
       }
+      console.log("Step 1 complete: Preview element found");
 
       // Create PDF container with proper RTL styling
       const pdfContainer = document.createElement('div');
