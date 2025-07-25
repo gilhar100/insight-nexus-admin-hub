@@ -1,4 +1,66 @@
-// At the top: Keep your imports and interfaces unchanged
+import React from 'react';
+import { SalimaGroupRadarChart } from '@/components/SalimaGroupRadarChart';
+import { ArchetypeDistributionChart } from '@/components/ArchetypeDistributionChart';
+import { WocaGroupBarChart } from '@/components/WocaGroupBarChart';
+import { ZoneDistributionChart } from '@/components/ZoneDistributionChart';
+
+interface GroupData {
+  group_number: number;
+  participant_count: number;
+  averages: {
+    strategy: number;
+    learning: number;
+    inspiration: number;
+    meaning: number;
+    authenticity: number;
+    adaptability: number;
+    overall: number;
+  };
+  participants: Array<{
+    dimension_s: number;
+    dimension_l: number;
+    dimension_i: number;
+    dimension_m: number;
+    dimension_a: number;
+    dimension_a2: number;
+    dominant_archetype?: string;
+  }>;
+}
+
+interface WocaData {
+  workshopData: any;
+  wocaAnalysis: any;
+}
+
+interface CombinedPDFLayoutProps {
+  groupId: number;
+  salimaData: GroupData;
+  wocaData: WocaData;
+}
+
+const getDimensionInsights = (averages: GroupData['averages']) => {
+  const dimensions = [
+    { key: 'strategy', name: 'אסטרטגיה (S)', score: averages.strategy },
+    { key: 'authenticity', name: 'אותנטיות (A2)', score: averages.authenticity },
+    { key: 'learning', name: 'למידה (L)', score: averages.learning },
+    { key: 'inspiration', name: 'השראה (I)', score: averages.inspiration },
+    { key: 'meaning', name: 'משמעות (M)', score: averages.meaning },
+    { key: 'adaptability', name: 'אדפטיביות (A)', score: averages.adaptability }
+  ];
+  const strongest = dimensions.reduce((max, dim) => dim.score > max.score ? dim : max);
+  const weakest = dimensions.reduce((min, dim) => dim.score < min.score ? dim : min);
+  return { strongest, weakest };
+};
+
+const getZoneDistribution = (wocaAnalysis: any) => {
+  if (!wocaAnalysis?.groupZoneCounts) return { opportunity: 0, comfort: 0, apathy: 0, war: 0 };
+  return {
+    opportunity: wocaAnalysis.groupZoneCounts.opportunity,
+    comfort: wocaAnalysis.groupZoneCounts.comfort,
+    apathy: wocaAnalysis.groupZoneCounts.apathy,
+    war: wocaAnalysis.groupZoneCounts.war
+  };
+};
 
 export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
   groupId,
@@ -13,7 +75,6 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
     <>
       {/* Page 1 - Cover */}
       <div className="bg-white p-6 font-sans" style={{ minHeight: '210mm', width: '297mm', direction: 'rtl' }}>
-        {/* Header */}
         <div className="text-center mb-8 border-b-2 border-blue-200 pb-4">
           <h1 className="text-3xl font-bold text-blue-800 mb-2">דוח תובנות קבוצתי</h1>
           <h2 className="text-xl font-semibold text-blue-600 mb-3">ניתוח SALIMA & WOCA</h2>
@@ -30,15 +91,11 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
       {/* Page 2 - SALIMA Summary */}
       <div style={{ pageBreakBefore: 'always' }} className="bg-white p-6 font-sans" style={{ minHeight: '210mm', width: '297mm', direction: 'rtl' }}>
         <h2 className="text-xl font-bold text-blue-800 mb-4 border-r-4 border-blue-500 pr-3">ניתוח SALIMA - מנהיגות אישית</h2>
-
-        {/* Overall Score */}
         <div className="bg-blue-50 rounded-lg p-4 mb-4 text-center">
           <h3 className="text-lg font-semibold text-blue-800 mb-1">ציון מנהיגות קבוצתי</h3>
           <div className="text-3xl font-bold text-blue-600">{salimaData.averages.overall.toFixed(2)}</div>
           <p className="text-blue-500 mt-1 text-sm">ממוצע ציוני SLQ של {salimaData.participant_count} משתתפים</p>
         </div>
-
-        {/* Strongest/Weakest */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="bg-green-50 border border-green-200 rounded-lg p-4">
             <h3 className="text-base font-bold text-green-800 mb-1">הממד החזק ביותר</h3>
@@ -107,13 +164,12 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
 
       {/* Page 6 - Legend */}
       <div style={{ pageBreakBefore: 'always' }} className="bg-white p-6 font-sans" style={{ minHeight: '210mm', width: '297mm', direction: 'rtl' }}>
-        {/* Keep your legend section as-is */}
-        {/* You may optionally break each part (SALIMA, archetypes, WOCA) into separate pages if needed */}
+        {/* Add your legend content here or break it into subpages if needed */}
       </div>
 
       {/* Page 7 - Summary */}
       <div style={{ pageBreakBefore: 'always' }} className="bg-white p-6 font-sans" style={{ minHeight: '210mm', width: '297mm', direction: 'rtl' }}>
-        {/* Keep your summary block as-is */}
+        {/* Add your summary section here */}
       </div>
     </>
   );
