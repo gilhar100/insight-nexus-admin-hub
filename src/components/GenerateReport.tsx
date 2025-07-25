@@ -32,30 +32,50 @@ export const GenerateReport: React.FC = () => {
     
     setIsGenerating(true);
     try {
+      // Import libraries dynamically
       const { jsPDF } = await import("jspdf");
       const html2canvas = (await import("html2canvas")).default;
 
+      // Find the content wrapper
       const wrapper = document.getElementById("insights-pdf-wrapper");
       if (!wrapper) {
-        alert("לא נמצא תוכן להורדה.");
+        console.error("PDF wrapper element not found");
+        alert("לא נמצא תוכן להורדה. אנא נסה שוב.");
         return;
       }
 
+      console.log("Found wrapper element, generating canvas...");
+
+      // Configure html2canvas options for better compatibility
       const canvas = await html2canvas(wrapper, { 
-        scale: 2, 
+        scale: 1.5, // Reduced scale for better performance
         useCORS: true,
         allowTaint: true,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        width: wrapper.scrollWidth,
+        height: wrapper.scrollHeight,
+        windowWidth: wrapper.scrollWidth,
+        windowHeight: wrapper.scrollHeight,
+        scrollX: 0,
+        scrollY: 0
       });
       
+      console.log("Canvas generated successfully");
+      
+      // Create PDF
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF("p", "mm", "a4");
 
+      // Calculate dimensions
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
       const pageHeight = pdf.internal.pageSize.getHeight();
 
+      console.log(`PDF dimensions: ${pdfWidth}x${pdfHeight}, Page height: ${pageHeight}`);
+
+      // Add content to PDF
       if (pdfHeight > pageHeight) {
+        // Multi-page PDF
         let position = 0;
         let remainingHeight = pdfHeight;
 
@@ -68,15 +88,38 @@ export const GenerateReport: React.FC = () => {
           }
         }
       } else {
+        // Single page PDF
         pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
       }
 
+      // Generate filename
       const selectedWorkshop = workshops.find(w => w.id === selectedGroupId);
-      const fileName = `group-insights-${selectedWorkshop?.name || selectedGroupId}.pdf`;
+      const fileName = `group-insights-${selectedWorkshop?.name || selectedGroupId}-${new Date().toISOString().split('T')[0]}.pdf`;
+      
+      console.log(`Saving PDF as: ${fileName}`);
+      
+      // Save the PDF
       pdf.save(fileName);
+      
+      console.log("PDF saved successfully");
+      
     } catch (error) {
-      console.error('Error generating PDF:', error);
-      alert('שגיאה בהפקת הדוח. אנא נסה שוב.');
+      console.error('Detailed PDF generation error:', error);
+      
+      // More specific error messages
+      let errorMessage = 'שגיאה בהפקת הדוח.';
+      
+      if (error instanceof Error) {
+        if (error.message.includes('html2canvas')) {
+          errorMessage += ' בעיה ביצירת תמונה מהתוכן.';
+        } else if (error.message.includes('jsPDF')) {
+          errorMessage += ' בעיה ביצירת קובץ PDF.';
+        } else {
+          errorMessage += ` פרטי השגיאה: ${error.message}`;
+        }
+      }
+      
+      alert(errorMessage + ' אנא נסה שוב.');
     } finally {
       setIsGenerating(false);
     }
