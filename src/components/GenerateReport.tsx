@@ -92,6 +92,36 @@ export const GenerateReport: React.FC = () => {
   const hasData = selectedGroupId && groupData && workshopData && wocaAnalysis;
 
   // Helper functions for calculations
+  const getZoneColor = (zone: string): string => {
+    switch (zone) {
+      case 'war':
+        return '#ef4444';
+      case 'opportunity':
+        return '#22c55e';
+      case 'comfort':
+        return '#3b82f6';
+      case 'apathy':
+        return '#f59e0b';
+      default:
+        return '#6b7280';
+    }
+  };
+
+  const getZoneName = (zone: string): string => {
+    switch (zone) {
+      case 'war':
+        return 'אזור המלחמה';
+      case 'opportunity':
+        return 'אזור ההזדמנות';
+      case 'comfort':
+        return 'אזור הנוחות';
+      case 'apathy':
+        return 'אזור האדישות';
+      default:
+        return 'לא זוהה';
+    }
+  };
+
   const getStrongestWeakestDimensions = () => {
     if (!groupData?.averages) return { strongest: '', weakest: '' };
     
@@ -260,7 +290,7 @@ export const GenerateReport: React.FC = () => {
                   {/* Archetype Distribution */}
                   <div className="bg-card p-4 rounded-lg border">
                     <h3 className="text-lg font-semibold text-foreground mb-4">התפלגות סגנונות ניהול</h3>
-                    <div className="w-full overflow-hidden">
+                    <div className="w-full min-h-[400px]">
                       <ArchetypeDistributionChart groupNumber={selectedGroupId} isPresenterMode={true} />
                     </div>
                   </div>
@@ -283,12 +313,30 @@ export const GenerateReport: React.FC = () => {
                   {/* Analyzed Zone */}
                   <div className="bg-card p-4 rounded-lg border">
                     <h3 className="text-lg font-semibold text-foreground mb-4">אזור דומיננטי</h3>
-                    <WocaZoneSection 
-                      wocaAnalysis={wocaAnalysis}
-                      showNames={false}
-                      onToggleNames={() => {}}
-                      onExportData={() => {}}
-                    />
+                    <div className="text-center">
+                      {wocaAnalysis?.groupIsTieByCount ? (
+                        <div className="inline-block px-6 py-3 rounded-full bg-gray-200">
+                          <span className="text-lg font-semibold text-black">
+                            תיקו בין אזורים
+                          </span>
+                        </div>
+                      ) : wocaAnalysis?.groupDominantZoneByCount ? (
+                        <div 
+                          className="inline-block px-6 py-3 rounded-full" 
+                          style={{ backgroundColor: getZoneColor(wocaAnalysis.groupDominantZoneByCount) }}
+                        >
+                          <span className="font-semibold text-black text-3xl">
+                            {getZoneName(wocaAnalysis.groupDominantZoneByCount)}
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="inline-block px-6 py-3 rounded-full bg-gray-200">
+                          <span className="text-lg font-semibold text-black">
+                            לא זוהה אזור דומיננטי
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {/* Zone Distribution Pie Chart */}
@@ -302,7 +350,9 @@ export const GenerateReport: React.FC = () => {
                   {/* Zone Strength Bar Chart */}
                   <div className="bg-card p-4 rounded-lg border">
                     <h3 className="text-lg font-semibold text-foreground mb-4">עוצמת אזורי WOCA</h3>
-                    <WocaGroupBarChart groupCategoryScores={wocaAnalysis?.groupCategoryScores || { war: 0, opportunity: 0, comfort: 0, apathy: 0 }} />
+                    <div className="w-full min-h-[500px]">
+                      <WocaGroupBarChart groupCategoryScores={wocaAnalysis?.groupCategoryScores || { war: 0, opportunity: 0, comfort: 0, apathy: 0 }} />
+                    </div>
                   </div>
 
                   {/* WOCA Legend */}
@@ -319,12 +369,14 @@ export const GenerateReport: React.FC = () => {
                   {/* WOCA Zone Matrix */}
                   <div className="bg-card p-4 rounded-lg border">
                     <h3 className="text-lg font-semibold text-foreground mb-4">מטריצת אזורי WOCA</h3>
-                    <WocaZonesTable 
-                      dominantZone={wocaAnalysis?.groupDominantZone}
-                      isPresenterMode={false}
-                      isTie={wocaAnalysis?.groupIsTie}
-                      tiedCategories={wocaAnalysis?.groupTiedCategories}
-                    />
+                    <div className="w-full overflow-x-auto">
+                      <WocaZonesTable 
+                        dominantZone={wocaAnalysis?.groupDominantZoneByCount}
+                        isPresenterMode={true}
+                        isTie={wocaAnalysis?.groupIsTieByCount}
+                        tiedCategories={wocaAnalysis?.groupTiedCategoriesByCount}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
