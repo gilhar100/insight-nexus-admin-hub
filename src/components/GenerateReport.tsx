@@ -102,9 +102,10 @@ export const GenerateReport: React.FC = () => {
       const sections = clonedContent.querySelectorAll('[data-section]');
       sections.forEach((section, index) => {
         const htmlSection = section as HTMLElement;
-        if (index > 0 && (
-          htmlSection.getAttribute('data-section')?.includes('woca') ||
-          htmlSection.getAttribute('data-section')?.includes('archetype')
+        const sectionAttr = htmlSection.getAttribute('data-section');
+        if (index > 0 && sectionAttr && (
+          sectionAttr.includes('woca') ||
+          sectionAttr.includes('archetype')
         )) {
           htmlSection.style.pageBreakBefore = 'always';
         }
