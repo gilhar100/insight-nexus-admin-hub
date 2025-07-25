@@ -109,7 +109,7 @@ export const exportCombinedPDFReport = async (data: {
     jsPDF: { 
       unit: 'in', 
       format: 'a4', 
-      orientation: 'portrait',
+      orientation: 'landscape',
       compress: true
     },
     pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }

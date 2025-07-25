@@ -92,7 +92,7 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
   const dominantZone = wocaData.wocaAnalysis?.groupDominantZoneByCount || 'לא זוהה';
 
   return (
-    <div className="bg-white p-6 font-sans" style={{ minHeight: '297mm', width: '210mm', direction: 'rtl' }}>
+    <div className="bg-white p-6 font-sans" style={{ minHeight: '210mm', width: '297mm', direction: 'rtl' }}>
       {/* Header */}
       <div className="text-center mb-8 border-b-2 border-blue-200 pb-4">
         <h1 className="text-3xl font-bold text-blue-800 mb-2">
