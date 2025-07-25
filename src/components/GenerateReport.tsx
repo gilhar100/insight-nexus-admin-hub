@@ -124,7 +124,22 @@ export const GenerateReport: React.FC = () => {
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
       
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      // If content is too long, split across multiple pages
+      if (pdfHeight > pdf.internal.pageSize.getHeight()) {
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        let yPosition = 0;
+        
+        while (yPosition < pdfHeight) {
+          if (yPosition > 0) {
+            pdf.addPage();
+          }
+          
+          pdf.addImage(imgData, 'PNG', 0, -yPosition, pdfWidth, pdfHeight);
+          yPosition += pageHeight;
+        }
+      } else {
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      }
 
       const selectedWorkshop = workshops.find(w => w.id === selectedGroupId);
       const fileName = `Workshop-Insights-${selectedWorkshop?.name || selectedGroupId}-${new Date().toLocaleDateString('he-IL').replace(/\//g, '-')}.pdf`;
