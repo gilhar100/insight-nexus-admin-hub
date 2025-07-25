@@ -155,17 +155,17 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
         </div>
 
         {/* Charts */}
-        <div className="grid grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-2 gap-6 mb-8">
           <div className="text-center">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">פרופיל קבוצתי ייחודי</h3>
-            <div className="h-80 flex items-center justify-center">
+            <div className="h-64 w-full flex items-center justify-center overflow-hidden">
               <SalimaGroupRadarChart averages={salimaData.averages} />
             </div>
           </div>
           
           <div className="text-center">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">חלוקת ארכיטיפים</h3>
-            <div className="h-80 flex items-center justify-center">
+            <div className="h-64 w-full flex items-center justify-center overflow-hidden">
               <ArchetypeDistributionChart groupNumber={salimaData.group_number} isPresenterMode={false} />
             </div>
           </div>
@@ -197,10 +197,10 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
         </div>
 
         {/* Charts */}
-        <div className="grid grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-2 gap-6 mb-8">
           <div className="text-center">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">ציוני אזורים קבוצתיים</h3>
-            <div className="h-80 flex items-center justify-center">
+            <div className="h-64 w-full flex items-center justify-center overflow-hidden">
               <WocaGroupBarChart 
                 groupCategoryScores={wocaData.wocaAnalysis.groupCategoryScores}
               />
@@ -209,7 +209,7 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
           
           <div className="text-center">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">התפלגות משתתפים באזורים</h3>
-            <div className="h-80 flex items-center justify-center">
+            <div className="h-64 w-full flex items-center justify-center overflow-hidden">
               <ZoneDistributionChart 
                 zoneDistribution={zoneDistribution}
               />
