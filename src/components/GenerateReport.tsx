@@ -64,36 +64,58 @@ export const GenerateReport: React.FC = () => {
       // Clone and simplify the preview content
       const clonedContent = previewElement.cloneNode(true) as HTMLElement;
       
-      // Simplify layout classes for PDF
-      const elementsWithFlex = clonedContent.querySelectorAll('[class*="flex"], [class*="grid"]');
-      elementsWithFlex.forEach(el => {
+      // Remove height constraints and fix layout for PDF
+      const elementsToFix = clonedContent.querySelectorAll('*');
+      elementsToFix.forEach(el => {
         const htmlEl = el as HTMLElement;
-        htmlEl.style.display = 'block';
-        htmlEl.style.marginBottom = '20px';
+        const classList = htmlEl.className;
+        
+        // Replace problematic Tailwind classes
+        if (classList.includes('grid')) {
+          htmlEl.style.display = 'block';
+        }
+        if (classList.includes('flex')) {
+          htmlEl.style.display = 'block';
+        }
+        if (classList.includes('h-[400px]') || classList.includes('h-[500px]')) {
+          htmlEl.style.height = 'auto';
+          htmlEl.style.minHeight = '400px';
+        }
+        if (classList.includes('overflow-hidden')) {
+          htmlEl.style.overflow = 'visible';
+        }
+        
+        // Add margins for spacing
+        if (htmlEl.hasAttribute('data-section')) {
+          htmlEl.style.marginBottom = '30px';
+          htmlEl.style.pageBreakInside = 'avoid';
+        }
       });
 
-      // Ensure charts have fixed dimensions
-      const chartContainers = clonedContent.querySelectorAll('[class*="h-[400px]"], [class*="h-[500px]"]');
-      chartContainers.forEach(el => {
-        const htmlEl = el as HTMLElement;
-        htmlEl.style.height = '400px';
-        htmlEl.style.width = '100%';
-        htmlEl.style.display = 'block';
+      // Add page breaks between major sections
+      const sections = clonedContent.querySelectorAll('[data-section]');
+      sections.forEach((section, index) => {
+        const htmlSection = section as HTMLElement;
+        if (index > 0 && (
+          htmlSection.getAttribute('data-section')?.includes('woca') ||
+          htmlSection.getAttribute('data-section')?.includes('archetype')
+        )) {
+          htmlSection.style.pageBreakBefore = 'always';
+        }
       });
 
       pdfContainer.appendChild(clonedContent);
       document.body.appendChild(pdfContainer);
 
-      // Wait for content to render completely
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Force chart redraw and wait for rendering
+      window.dispatchEvent(new Event('resize'));
+      await new Promise(resolve => setTimeout(resolve, 3000));
 
-      // Generate PDF using html2canvas with your specified settings
-      const canvas = await html2canvas(pdfContainer, {
+      // Generate PDF using html2canvas with specified settings
+      const canvas = await html2canvas(document.getElementById('pdf-content')!, {
         scale: 2,
         useCORS: true,
-        allowTaint: false,
-        backgroundColor: '#ffffff',
-        logging: false
+        allowTaint: false
       });
 
       const imgData = canvas.toDataURL('image/png');
@@ -101,26 +123,11 @@ export const GenerateReport: React.FC = () => {
       const imgProps = pdf.getImageProperties(imgData);
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-      // If content is too long, split across multiple pages
-      if (pdfHeight > pdf.internal.pageSize.getHeight()) {
-        const pageHeight = pdf.internal.pageSize.getHeight();
-        let yPosition = 0;
-        
-        while (yPosition < pdfHeight) {
-          if (yPosition > 0) {
-            pdf.addPage();
-          }
-          
-          pdf.addImage(imgData, 'PNG', 0, -yPosition, pdfWidth, pdfHeight);
-          yPosition += pageHeight;
-        }
-      } else {
-        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      }
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
 
       const selectedWorkshop = workshops.find(w => w.id === selectedGroupId);
-      const fileName = `דוח-תובנות-${selectedWorkshop?.name || selectedGroupId}-${new Date().toLocaleDateString('he-IL').replace(/\//g, '-')}.pdf`;
+      const fileName = `Workshop-Insights-${selectedWorkshop?.name || selectedGroupId}-${new Date().toLocaleDateString('he-IL').replace(/\//g, '-')}.pdf`;
       
       pdf.save(fileName);
       console.log("PDF generation completed successfully!");
