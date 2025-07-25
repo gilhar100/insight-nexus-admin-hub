@@ -1,109 +1,161 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Download, FileText, Loader2 } from 'lucide-react';
 import { useWorkshops } from '@/hooks/useWorkshops';
+import { useGroupData } from '@/hooks/useGroupData';
+import { useWorkshopDetails } from '@/hooks/useWorkshopDetails';
 import { EnhancedSalimaRadarChart } from '@/components/EnhancedSalimaRadarChart';
 import { ArchetypeDistributionChart } from '@/components/ArchetypeDistributionChart';
 import { WocaGroupBarChart } from '@/components/WocaGroupBarChart';
 import { WocaZoneSection } from '@/components/WocaZoneSection';
-
-const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxobXJnaGViZHRjYmhtZ3RicWZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxNzU2MTksImV4cCI6MjA2Mzc1MTYxOX0.zipgFg0ZVfyJj6m_Ys7TUwVFj62Myhprm_pOSGizwWU";
+import { ZoneDistributionChart } from '@/components/ZoneDistributionChart';
+import { WocaZonesTable } from '@/components/WocaZonesTable';
+import { analyzeWorkshopWoca } from '@/utils/wocaAnalysis';
 
 export const GenerateReport: React.FC = () => {
   const [selectedGroupId, setSelectedGroupId] = useState<number | undefined>();
   const [isGenerating, setIsGenerating] = useState(false);
-  const [reportData, setReportData] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const { workshops, error: workshopsError } = useWorkshops();
+  const { data: groupData, isLoading: groupLoading } = useGroupData(selectedGroupId || 0);
+  const { workshopData, isLoading: workshopLoading } = useWorkshopDetails(selectedGroupId || 0);
 
   const handleGroupSelect = (value: string) => {
     const groupId = Number(value);
     setSelectedGroupId(groupId);
   };
 
-  useEffect(() => {
-    if (!selectedGroupId) return;
-
-    const fetchReportData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await fetch("https://lhmrghebdtcbhmgtbqfe.supabase.co/functions/v1/getGroupInsights", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${ANON_KEY}`
-          },
-          body: JSON.stringify({ group_number: selectedGroupId })
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.message || 'Failed to fetch report');
-        setReportData(data);
-      } catch (err: any) {
-        setError(err.message || 'Unexpected error');
-        setReportData(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchReportData();
-  }, [selectedGroupId]);
-
   const handleDownloadPDF = async () => {
-    const { jsPDF } = await import("jspdf");
-    const html2canvas = (await import("html2canvas")).default;
+    if (!selectedGroupId) return;
+    
+    setIsGenerating(true);
+    try {
+      const { jsPDF } = await import("jspdf");
+      const html2canvas = (await import("html2canvas")).default;
 
-    const wrapper = document.getElementById("insights-pdf-wrapper");
-    if (!wrapper) {
-      alert("לא נמצא תוכן להורדה.");
-      return;
-    }
+      const wrapper = document.getElementById("insights-pdf-wrapper");
+      if (!wrapper) {
+        alert("לא נמצא תוכן להורדה.");
+        return;
+      }
 
-    const canvas = await html2canvas(wrapper, { scale: 2, useCORS: true });
-    const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF("p", "mm", "a4");
+      const canvas = await html2canvas(wrapper, { 
+        scale: 2, 
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff'
+      });
+      
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
 
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-    if (pdfHeight > pdf.internal.pageSize.getHeight()) {
-      let position = 0;
-      let remainingHeight = pdfHeight;
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
       const pageHeight = pdf.internal.pageSize.getHeight();
 
-      while (remainingHeight > 0) {
-        pdf.addImage(imgData, "PNG", 0, position, pdfWidth, pdfHeight);
-        remainingHeight -= pageHeight;
-        if (remainingHeight > 0) {
-          pdf.addPage();
-          position = -remainingHeight + 10;
-        }
-      }
-    } else {
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-    }
+      if (pdfHeight > pageHeight) {
+        let position = 0;
+        let remainingHeight = pdfHeight;
 
-    pdf.save("group-insights.pdf");
+        while (remainingHeight > 0) {
+          pdf.addImage(imgData, "PNG", 0, position, pdfWidth, pdfHeight);
+          remainingHeight -= pageHeight;
+          if (remainingHeight > 0) {
+            pdf.addPage();
+            position = -pageHeight;
+          }
+        }
+      } else {
+        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      }
+
+      const selectedWorkshop = workshops.find(w => w.id === selectedGroupId);
+      const fileName = `group-insights-${selectedWorkshop?.name || selectedGroupId}.pdf`;
+      pdf.save(fileName);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('שגיאה בהפקת הדוח. אנא נסה שוב.');
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
-  const hasData = reportData && reportData.salima && reportData.archetypes && reportData.woca;
+  const loading = groupLoading || workshopLoading;
+  
+  // Calculate WOCA analysis when we have workshop data
+  const wocaAnalysis = workshopData?.participants 
+    ? analyzeWorkshopWoca(workshopData.participants, selectedGroupId || 0)
+    : null;
+
+  const hasData = selectedGroupId && groupData && workshopData && wocaAnalysis;
+
+  // Helper functions for calculations
+  const getStrongestWeakestDimensions = () => {
+    if (!groupData?.averages) return { strongest: '', weakest: '' };
+    
+    const dimensions = {
+      'אסטרטגיה': groupData.averages.strategy,
+      'הסתגלות': groupData.averages.adaptability,
+      'למידה': groupData.averages.learning,
+      'השראה': groupData.averages.inspiration,
+      'משמעות': groupData.averages.meaning,
+      'אותנטיות': groupData.averages.authenticity
+    };
+
+    const entries = Object.entries(dimensions);
+    const strongest = entries.reduce((a, b) => a[1] > b[1] ? a : b)[0];
+    const weakest = entries.reduce((a, b) => a[1] < b[1] ? a : b)[0];
+
+    return { strongest, weakest };
+  };
+
+  const getZoneDistribution = () => {
+    if (!wocaAnalysis?.groupZoneCounts) return null;
+    return {
+      opportunity: wocaAnalysis.groupZoneCounts.opportunity || 0,
+      comfort: wocaAnalysis.groupZoneCounts.comfort || 0,
+      apathy: wocaAnalysis.groupZoneCounts.apathy || 0,
+      war: wocaAnalysis.groupZoneCounts.war || 0
+    };
+  };
+
+  // Transform group data for radar chart
+  const getSalimaRadarData = () => {
+    if (!groupData?.averages) return {
+      strategy: 0,
+      adaptability: 0,
+      learning: 0,
+      inspiration: 0,
+      meaning: 0,
+      authenticity: 0
+    };
+    return {
+      strategy: groupData.averages.strategy,
+      adaptability: groupData.averages.adaptability,
+      learning: groupData.averages.learning,
+      inspiration: groupData.averages.inspiration,
+      meaning: groupData.averages.meaning,
+      authenticity: groupData.averages.authenticity
+    };
+  };
+
+  const zoneDistribution = getZoneDistribution();
+  const { strongest, weakest } = getStrongestWeakestDimensions();
+  const radarData = getSalimaRadarData();
 
   return (
     <div className="space-y-6" dir="rtl">
       <Card>
         <CardHeader className="text-center">
           <div className="flex items-center justify-center mb-4">
-            <FileText className="h-8 w-8 text-blue-600 mr-3" />
-            <h1 className="text-3xl font-bold text-gray-900">
+            <FileText className="h-8 w-8 text-primary mr-3" />
+            <h1 className="text-3xl font-bold text-foreground">
               דוח תובנות קבוצתי - SALIMA & WOCA
             </h1>
           </div>
-          <p className="text-gray-600 text-lg">
+          <p className="text-muted-foreground text-lg">
             צור דוח PDF מקצועי המשלב ניתוח SALIMA ו-WOCA עבור קבוצה נבחרת
           </p>
         </CardHeader>
@@ -111,8 +163,8 @@ export const GenerateReport: React.FC = () => {
 
       <Card>
         <CardHeader>
-          <h2 className="text-xl font-semibold text-gray-800">בחירת קבוצה</h2>
-          <p className="text-gray-600">בחר קבוצה מהרשימה להפקת דוח מקצועי</p>
+          <h2 className="text-xl font-semibold text-foreground">בחירת קבוצה</h2>
+          <p className="text-muted-foreground">בחר קבוצה מהרשימה להפקת דוח מקצועי</p>
         </CardHeader>
         <CardContent>
           <Select onValueChange={handleGroupSelect}>
@@ -128,7 +180,7 @@ export const GenerateReport: React.FC = () => {
             </SelectContent>
           </Select>
           {workshopsError && (
-            <div className="text-red-600 text-sm mt-2">
+            <div className="text-destructive text-sm mt-2">
               שגיאה בטעינת קבוצות: {workshopsError}
             </div>
           )}
@@ -138,25 +190,146 @@ export const GenerateReport: React.FC = () => {
       {selectedGroupId && (
         <Card>
           <CardHeader>
-            <h2 className="text-xl font-semibold text-gray-800">מצב הנתונים</h2>
+            <h2 className="text-xl font-semibold text-foreground">תצוגה מקדימה של הדוח</h2>
           </CardHeader>
           <CardContent>
             {loading ? (
-              <div className="flex items-center space-x-2 text-blue-600">
+              <div className="flex items-center space-x-2 text-primary">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 <span>טוען נתונים...</span>
               </div>
-            ) : error ? (
-              <div className="text-red-600">שגיאה: {error}</div>
             ) : hasData ? (
-              <div id="insights-pdf-wrapper" className="space-y-6">
-                <EnhancedSalimaRadarChart selfData={reportData.salima.scores} activeDataSource="self" />
-                <ArchetypeDistributionChart groupNumber={selectedGroupId} />
-                <WocaGroupBarChart groupCategoryScores={reportData.woca.scores} />
-                <WocaZoneSection wocaAnalysis={reportData.woca} showNames={false} onToggleNames={() => {}} onExportData={() => {}} />
+              <div id="insights-pdf-wrapper" className="space-y-8 p-6 bg-background">
+                {/* Header */}
+                <div className="text-center border-b pb-6">
+                  <h1 className="text-3xl font-bold text-foreground mb-2">
+                    דוח תובנות קבוצתי - SALIMA & WOCA
+                  </h1>
+                  <p className="text-lg text-muted-foreground">
+                    {workshops.find(w => w.id === selectedGroupId)?.name}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    תאריך: {new Date().toLocaleDateString('he-IL')}
+                  </p>
+                </div>
+
+                {/* SALIMA Section */}
+                <div className="space-y-6">
+                  <h2 className="text-2xl font-bold text-foreground border-b pb-2">ניתוח SALIMA</h2>
+                  
+                  {/* Average Score & Strongest/Weakest */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="text-center p-4 bg-card rounded-lg border">
+                      <h3 className="text-lg font-semibold text-foreground">ציון ממוצע</h3>
+                      <p className="text-3xl font-bold text-primary">
+                        {groupData?.averages?.overall?.toFixed(1) || 'N/A'}
+                      </p>
+                    </div>
+                    <div className="text-center p-4 bg-card rounded-lg border">
+                      <h3 className="text-lg font-semibold text-foreground">מאפיין חזק ביותר</h3>
+                      <p className="text-xl font-bold text-green-600">{strongest}</p>
+                    </div>
+                    <div className="text-center p-4 bg-card rounded-lg border">
+                      <h3 className="text-lg font-semibold text-foreground">מאפיין חלש ביותר</h3>
+                      <p className="text-xl font-bold text-red-600">{weakest}</p>
+                    </div>
+                  </div>
+
+                  {/* SALIMA Radar Chart */}
+                  <div className="bg-card p-4 rounded-lg border">
+                    <h3 className="text-lg font-semibold text-foreground mb-4">תרשים רדאר - מאפייני SALIMA</h3>
+                    <EnhancedSalimaRadarChart 
+                      selfData={radarData}
+                      activeDataSource="self"
+                    />
+                  </div>
+
+                  {/* SALIMA Legend */}
+                  <div className="bg-card p-4 rounded-lg border">
+                    <h3 className="text-lg font-semibold text-foreground mb-4">מקרא מאפייני SALIMA</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                      <div><strong>אסטרטגיה (S):</strong> יכולת לפתח ולבצע אסטרטגיות ארוכות טווח</div>
+                      <div><strong>הסתגלות (A):</strong> יכולת להתמודד עם שינויים ואתגרים</div>
+                      <div><strong>למידה (L):</strong> רצון ויכולת ללמוד ולהתפתח כל הזמן</div>
+                      <div><strong>השראה (I):</strong> יכולת להשפיע ולהניע אחרים</div>
+                      <div><strong>משמעות (M):</strong> יכולת לייצר תחושת משמעות ומטרה</div>
+                      <div><strong>אותנטיות (A2):</strong> יכולת להיות אמיתי ושקוף</div>
+                    </div>
+                  </div>
+
+                  {/* Archetype Distribution */}
+                  <div className="bg-card p-4 rounded-lg border">
+                    <h3 className="text-lg font-semibold text-foreground mb-4">התפלגות ארכיטיפים</h3>
+                    <ArchetypeDistributionChart groupNumber={selectedGroupId} />
+                  </div>
+
+                  {/* Archetype Legend */}
+                  <div className="bg-card p-4 rounded-lg border">
+                    <h3 className="text-lg font-semibold text-foreground mb-4">מקרא ארכיטיפים</h3>
+                    <div className="space-y-2 text-sm">
+                      <div><strong>מנהל הזדמנויות:</strong> מתמחה בזיהוי והטמעת הזדמנויות חדשות</div>
+                      <div><strong>מנהל מעצים:</strong> מתמקד בהעצמת הצוות והפיתוח האישי</div>
+                      <div><strong>מנהל סקרן:</strong> מנהיג המחפש ללמוד ולחקור תמיד</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* WOCA Section */}
+                <div className="space-y-6">
+                  <h2 className="text-2xl font-bold text-foreground border-b pb-2">ניתוח WOCA</h2>
+                  
+                  {/* Analyzed Zone */}
+                  <div className="bg-card p-4 rounded-lg border">
+                    <h3 className="text-lg font-semibold text-foreground mb-4">אזור דומיננטי</h3>
+                    <WocaZoneSection 
+                      wocaAnalysis={wocaAnalysis}
+                      showNames={false}
+                      onToggleNames={() => {}}
+                      onExportData={() => {}}
+                    />
+                  </div>
+
+                  {/* Zone Distribution Pie Chart */}
+                  {zoneDistribution && (
+                    <div className="bg-card p-4 rounded-lg border">
+                      <h3 className="text-lg font-semibold text-foreground mb-4">התפלגות אזורי WOCA</h3>
+                      <ZoneDistributionChart zoneDistribution={zoneDistribution} />
+                    </div>
+                  )}
+
+                  {/* Zone Strength Bar Chart */}
+                  <div className="bg-card p-4 rounded-lg border">
+                    <h3 className="text-lg font-semibold text-foreground mb-4">עוצמת אזורי WOCA</h3>
+                    <WocaGroupBarChart groupCategoryScores={wocaAnalysis?.groupCategoryScores || { war: 0, opportunity: 0, comfort: 0, apathy: 0 }} />
+                  </div>
+
+                  {/* WOCA Legend */}
+                  <div className="bg-card p-4 rounded-lg border">
+                    <h3 className="text-lg font-semibold text-foreground mb-4">מקרא אזורי WOCA</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                      <div><strong>הזדמנות:</strong> אזור של צמיחה, חדשנות ופיתוח</div>
+                      <div><strong>נוחות:</strong> אזור של יציבות ושמירה על הקיים</div>
+                      <div><strong>אדישות:</strong> אזור של חוסר מעורבות ואנרגיה נמוכה</div>
+                      <div><strong>מלחמה:</strong> אזור של קונפליקט ומתח גבוה</div>
+                    </div>
+                  </div>
+
+                  {/* WOCA Zone Matrix */}
+                  <div className="bg-card p-4 rounded-lg border">
+                    <h3 className="text-lg font-semibold text-foreground mb-4">מטריצת אזורי WOCA</h3>
+                    <WocaZonesTable 
+                      dominantZone={wocaAnalysis?.groupDominantZone}
+                      isPresenterMode={false}
+                      isTie={wocaAnalysis?.groupIsTie}
+                      tiedCategories={wocaAnalysis?.groupTiedCategories}
+                    />
+                  </div>
+                </div>
               </div>
             ) : (
-              <div className="text-gray-600">לא נמצאו נתונים לקבוצה זו</div>
+              <div className="text-muted-foreground text-center py-8">
+                לא נמצאו נתונים לקבוצה זו
+              </div>
             )}
           </CardContent>
         </Card>
@@ -165,11 +338,16 @@ export const GenerateReport: React.FC = () => {
       {selectedGroupId && hasData && (
         <Card>
           <CardHeader>
-            <h2 className="text-xl font-semibold text-gray-800">הפקת דוח</h2>
-            <p className="text-gray-600">הדוח יכלול ניתוח SALIMA, ארכיטיפים ו-WOCA</p>
+            <h2 className="text-xl font-semibold text-foreground">הפקת דוח</h2>
+            <p className="text-muted-foreground">הדוח יכלול את כל הניתוחים והתרשימים המוצגים למעלה</p>
           </CardHeader>
           <CardContent>
-            <Button onClick={handleDownloadPDF} disabled={isGenerating} className="w-full h-12 text-lg" size="lg">
+            <Button 
+              onClick={handleDownloadPDF} 
+              disabled={isGenerating || loading} 
+              className="w-full h-12 text-lg" 
+              size="lg"
+            >
               {isGenerating ? (
                 <>
                   <Loader2 className="h-5 w-5 animate-spin mr-2" />
