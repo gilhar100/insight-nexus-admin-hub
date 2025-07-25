@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Download, FileText, Loader2 } from 'lucide-react';
 import { useWorkshops } from '@/hooks/useWorkshops';
-import { exportCombinedPDFReport } from '@/utils/exportUtils';
 import { EnhancedSalimaRadarChart } from '@/components/EnhancedSalimaRadarChart';
 import { ArchetypeDistributionChart } from '@/components/ArchetypeDistributionChart';
 import { WocaGroupBarChart } from '@/components/WocaGroupBarChart';
@@ -37,7 +36,7 @@ export const GenerateReport: React.FC = () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${ANON_KEY}` // ✅ Fix here
+            "Authorization": `Bearer ${ANON_KEY}`
           },
           body: JSON.stringify({ group_number: selectedGroupId })
         });
@@ -55,19 +54,41 @@ export const GenerateReport: React.FC = () => {
     fetchReportData();
   }, [selectedGroupId]);
 
-  const handleGenerateReport = async () => {
-    if (!reportData || !selectedGroupId) return;
-    setIsGenerating(true);
-    try {
-      await exportCombinedPDFReport({
-        groupId: selectedGroupId,
-        ...reportData
-      });
-    } catch (error) {
-      console.error('Error generating PDF report:', error);
-    } finally {
-      setIsGenerating(false);
+  const handleDownloadPDF = async () => {
+    const { jsPDF } = await import("jspdf");
+    const html2canvas = (await import("html2canvas")).default;
+
+    const wrapper = document.getElementById("insights-pdf-wrapper");
+    if (!wrapper) {
+      alert("לא נמצא תוכן להורדה.");
+      return;
     }
+
+    const canvas = await html2canvas(wrapper, { scale: 2, useCORS: true });
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+    if (pdfHeight > pdf.internal.pageSize.getHeight()) {
+      let position = 0;
+      let remainingHeight = pdfHeight;
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      while (remainingHeight > 0) {
+        pdf.addImage(imgData, "PNG", 0, position, pdfWidth, pdfHeight);
+        remainingHeight -= pageHeight;
+        if (remainingHeight > 0) {
+          pdf.addPage();
+          position = -remainingHeight + 10;
+        }
+      }
+    } else {
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+    }
+
+    pdf.save("group-insights.pdf");
   };
 
   const hasData = reportData && reportData.salima && reportData.archetypes && reportData.woca;
@@ -128,7 +149,7 @@ export const GenerateReport: React.FC = () => {
             ) : error ? (
               <div className="text-red-600">שגיאה: {error}</div>
             ) : hasData ? (
-              <div className="space-y-6">
+              <div id="insights-pdf-wrapper" className="space-y-6">
                 <EnhancedSalimaRadarChart selfData={reportData.salima.scores} activeDataSource="self" />
                 <ArchetypeDistributionChart groupNumber={selectedGroupId} />
                 <WocaGroupBarChart groupCategoryScores={reportData.woca.scores} />
@@ -148,7 +169,7 @@ export const GenerateReport: React.FC = () => {
             <p className="text-gray-600">הדוח יכלול ניתוח SALIMA, ארכיטיפים ו-WOCA</p>
           </CardHeader>
           <CardContent>
-            <Button onClick={handleGenerateReport} disabled={isGenerating} className="w-full h-12 text-lg" size="lg">
+            <Button onClick={handleDownloadPDF} disabled={isGenerating} className="w-full h-12 text-lg" size="lg">
               {isGenerating ? (
                 <>
                   <Loader2 className="h-5 w-5 animate-spin mr-2" />
