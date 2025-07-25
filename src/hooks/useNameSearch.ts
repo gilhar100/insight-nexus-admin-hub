@@ -30,22 +30,28 @@ export const useNameSearch = (query: string) => {
         const isNumeric = /^\d+$/.test(query.trim());
 
         const [surveyResult, colleagueResult] = await Promise.all([
-          supabase
-            .from('survey_responses')
-            .select('id, user_name, user_email, group_number')
-            .limit(10)
-            .then(q => isNumeric
-              ? q.eq('group_number', parseInt(query.trim()))
-              : q.or(`user_name.ilike.%${query}%,user_email.ilike.%${query}%`)
-            ),
-          supabase
-            .from('colleague_survey_responses')
-            .select('id, manager_name, evaluator_name, evaluator_email, group_id')
-            .limit(10)
-            .then(q => isNumeric
-              ? q.eq('group_id', parseInt(query.trim()))
-              : q.or(`manager_name.ilike.%${query}%,evaluator_name.ilike.%${query}%,evaluator_email.ilike.%${query}%`)
-            )
+          isNumeric
+            ? supabase
+                .from('survey_responses')
+                .select('id, user_name, user_email, group_number')
+                .eq('group_number', parseInt(query.trim()))
+                .limit(10)
+            : supabase
+                .from('survey_responses')
+                .select('id, user_name, user_email, group_number')
+                .or(`user_name.ilike.%${query}%,user_email.ilike.%${query}%`)
+                .limit(10),
+          isNumeric
+            ? supabase
+                .from('colleague_survey_responses')
+                .select('id, manager_name, evaluator_name, evaluator_email, group_id')
+                .eq('group_id', parseInt(query.trim()))
+                .limit(10)
+            : supabase
+                .from('colleague_survey_responses')
+                .select('id, manager_name, evaluator_name, evaluator_email, group_id')
+                .or(`manager_name.ilike.%${query}%,evaluator_name.ilike.%${query}%,evaluator_email.ilike.%${query}%`)
+                .limit(10)
         ]);
 
         if (surveyResult.error) throw surveyResult.error;
