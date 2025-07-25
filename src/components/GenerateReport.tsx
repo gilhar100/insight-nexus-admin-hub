@@ -35,142 +35,87 @@ export const GenerateReport: React.FC = () => {
     }
     
     setIsGenerating(true);
-    console.log("Starting professional PDF generation...");
+    console.log("Starting PDF generation...");
     
     try {
+      const wrapper = document.getElementById("insights-pdf-wrapper");
+      if (!wrapper) {
+        console.error("PDF wrapper element not found");
+        alert("לא נמצא תוכן להורדה. אנא רענן את הדף ונסה שוב.");
+        return;
+      }
+
+      console.log("Found wrapper element, creating canvas...");
+
+      // Wait for any charts to render
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Create canvas with high quality settings
+      const canvas = await html2canvas(wrapper, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        width: wrapper.scrollWidth,
+        height: wrapper.scrollHeight,
+        windowWidth: 1200,
+        windowHeight: wrapper.scrollHeight
+      });
+      
+      console.log("Canvas created successfully, size:", canvas.width, "x", canvas.height);
+      
+      // Create PDF with A4 dimensions
       const pdf = new jsPDF('p', 'mm', 'a4');
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 20;
+      const imgData = canvas.toDataURL('image/png', 1.0);
       
-      // Page 1: Title Page
-      pdf.setFontSize(24);
-      pdf.text("דוח תובנות קבוצתי", pageWidth / 2, 50, { align: 'center' });
-      pdf.setFontSize(20);
-      pdf.text("SALIMA & WOCA", pageWidth / 2, 70, { align: 'center' });
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
       
-      const selectedWorkshop = workshops.find(w => w.id === selectedGroupId);
-      pdf.setFontSize(16);
-      pdf.text(selectedWorkshop?.name || '', pageWidth / 2, 90, { align: 'center' });
-      pdf.setFontSize(12);
-      pdf.text(`תאריך: ${new Date().toLocaleDateString('he-IL')}`, pageWidth / 2, 110, { align: 'center' });
-
-      // Create individual section pages
-      const sections = [
-        { id: 'salima-summary', title: 'סיכום SALIMA' },
-        { id: 'salima-radar', title: 'תרשים רדאר SALIMA' },
-        { id: 'archetype-distribution', title: 'התפלגות סגנונות ניהול' },
-        { id: 'woca-zone', title: 'אזור WOCA דומיננטי' },
-        { id: 'woca-distribution', title: 'התפלגות אזורי WOCA' },
-        { id: 'woca-strength', title: 'עוצמת אזורי WOCA' },
-        { id: 'woca-matrix', title: 'מטריצת אזורי WOCA' }
-      ];
-
-      for (let i = 0; i < sections.length; i++) {
-        pdf.addPage();
+      // Calculate how to fit the content
+      const imgWidth = pdfWidth - 20; // 10mm margin on each side
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      console.log("Adding content to PDF...");
+      
+      if (imgHeight <= pdfHeight - 20) {
+        // Content fits on one page
+        pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
+      } else {
+        // Content needs multiple pages
+        let yPosition = 0;
+        let remainingHeight = imgHeight;
+        const pageContentHeight = pdfHeight - 20; // Account for margins
         
-        // Add section title
-        pdf.setFontSize(18);
-        pdf.text(sections[i].title, pageWidth / 2, 30, { align: 'center' });
-        
-        // Create individual content for each section
-        const sectionElement = document.createElement('div');
-        sectionElement.style.width = '800px';
-        sectionElement.style.backgroundColor = 'white';
-        sectionElement.style.padding = '20px';
-        sectionElement.style.fontFamily = 'Arial, sans-serif';
-        
-        // Add section-specific content
-        switch (sections[i].id) {
-          case 'salima-summary':
-            sectionElement.innerHTML = `
-              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 30px;">
-                <div style="text-align: center; padding: 20px; border: 2px solid #e5e7eb; border-radius: 10px;">
-                  <h3 style="font-size: 18px; margin-bottom: 10px;">ציון ממוצע</h3>
-                  <p style="font-size: 32px; font-weight: bold; color: #2563eb;">${groupData?.averages?.overall?.toFixed(1) || 'N/A'}</p>
-                </div>
-                <div style="text-align: center; padding: 20px; border: 2px solid #e5e7eb; border-radius: 10px;">
-                  <h3 style="font-size: 18px; margin-bottom: 10px;">מאפיין חזק ביותר</h3>
-                  <p style="font-size: 20px; font-weight: bold; color: #16a34a;">${strongest}</p>
-                </div>
-                <div style="text-align: center; padding: 20px; border: 2px solid #e5e7eb; border-radius: 10px;">
-                  <h3 style="font-size: 18px; margin-bottom: 10px;">מאפיין חלש ביותר</h3>
-                  <p style="font-size: 20px; font-weight: bold; color: #dc2626;">${weakest}</p>
-                </div>
-              </div>
-              <div style="border: 2px solid #e5e7eb; border-radius: 10px; padding: 20px;">
-                <h3 style="font-size: 18px; margin-bottom: 15px;">מקרא מאפייני SALIMA</h3>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 14px;">
-                  <div><strong>אסטרטגיה (S):</strong> יכולת לפתח ולבצע אסטרטגיות ארוכות טווח</div>
-                  <div><strong>הסתגלות (A):</strong> יכולת להתמודד עם שינויים ואתגרים</div>
-                  <div><strong>למידה (L):</strong> רצון ויכולת ללמוד ולהתפתח כל הזמן</div>
-                  <div><strong>השראה (I):</strong> יכולת להשפיע ולהניע אחרים</div>
-                  <div><strong>משמעות (M):</strong> יכולת לייצר תחושת משמעות ומטרה</div>
-                  <div><strong>אותנטיות (A2):</strong> יכולת להיות אמיתי ושקוף</div>
-                </div>
-              </div>
-            `;
-            break;
+        while (remainingHeight > 0) {
+          const currentPageHeight = Math.min(pageContentHeight, remainingHeight);
           
-          case 'salima-radar':
-          case 'archetype-distribution':
-          case 'woca-zone':
-          case 'woca-distribution':
-          case 'woca-strength':
-          case 'woca-matrix':
-            // For charts, we'll capture them from the preview
-            const chartElements = document.querySelectorAll(`[data-section="${sections[i].id}"]`);
-            if (chartElements.length > 0) {
-              const chartElement = chartElements[0] as HTMLElement;
-              const canvas = await html2canvas(chartElement, {
-                scale: 2,
-                backgroundColor: '#ffffff',
-                useCORS: true,
-                allowTaint: true
-              });
-              
-              const imgData = canvas.toDataURL('image/png');
-              const imgWidth = pageWidth - (margin * 2);
-              const imgHeight = (canvas.height * imgWidth) / canvas.width;
-              
-              if (imgHeight <= pageHeight - 80) {
-                pdf.addImage(imgData, 'PNG', margin, 50, imgWidth, imgHeight);
-              } else {
-                // Scale down if too large
-                const scaledHeight = pageHeight - 80;
-                const scaledWidth = (canvas.width * scaledHeight) / canvas.height;
-                pdf.addImage(imgData, 'PNG', (pageWidth - scaledWidth) / 2, 50, scaledWidth, scaledHeight);
-              }
-              continue;
-            }
-            break;
-        }
-        
-        // For text-based sections, add to document and capture
-        if (sections[i].id === 'salima-summary') {
-          document.body.appendChild(sectionElement);
+          // Add content to current page
+          pdf.addImage(
+            imgData, 
+            'PNG', 
+            10, 
+            10 - yPosition, 
+            imgWidth, 
+            imgHeight
+          );
           
-          const canvas = await html2canvas(sectionElement, {
-            scale: 1.5,
-            backgroundColor: '#ffffff',
-            useCORS: true,
-            allowTaint: true
-          });
+          remainingHeight -= pageContentHeight;
+          yPosition += pageContentHeight;
           
-          document.body.removeChild(sectionElement);
-          
-          const imgData = canvas.toDataURL('image/png');
-          const imgWidth = pageWidth - (margin * 2);
-          const imgHeight = (canvas.height * imgWidth) / canvas.width;
-          
-          pdf.addImage(imgData, 'PNG', margin, 50, imgWidth, Math.min(imgHeight, pageHeight - 80));
+          if (remainingHeight > 0) {
+            pdf.addPage();
+          }
         }
       }
       
+      const selectedWorkshop = workshops.find(w => w.id === selectedGroupId);
       const fileName = `דוח-תובנות-${selectedWorkshop?.name || selectedGroupId}-${new Date().toLocaleDateString('he-IL').replace(/\//g, '-')}.pdf`;
+      
+      console.log("Saving PDF:", fileName);
       pdf.save(fileName);
       
-      console.log("Professional PDF generated successfully!");
+      console.log("PDF generation completed successfully!");
       
     } catch (error) {
       console.error('PDF generation failed:', error);
