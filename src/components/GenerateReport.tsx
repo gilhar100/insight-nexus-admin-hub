@@ -72,21 +72,23 @@ export const GenerateReport: React.FC = () => {
       const elementsToFix = clonedContent.querySelectorAll('*');
       elementsToFix.forEach(el => {
         const htmlEl = el as HTMLElement;
-        const classList = htmlEl.className;
+        const classList = htmlEl.className || '';
         
         // Replace problematic Tailwind classes
-        if (classList.includes('grid')) {
-          htmlEl.style.display = 'block';
-        }
-        if (classList.includes('flex')) {
-          htmlEl.style.display = 'block';
-        }
-        if (classList.includes('h-[400px]') || classList.includes('h-[500px]')) {
-          htmlEl.style.height = 'auto';
-          htmlEl.style.minHeight = '400px';
-        }
-        if (classList.includes('overflow-hidden')) {
-          htmlEl.style.overflow = 'visible';
+        if (typeof classList === 'string') {
+          if (classList.includes('grid')) {
+            htmlEl.style.display = 'block';
+          }
+          if (classList.includes('flex')) {
+            htmlEl.style.display = 'block';
+          }
+          if (classList.includes('h-[400px]') || classList.includes('h-[500px]')) {
+            htmlEl.style.height = 'auto';
+            htmlEl.style.minHeight = '400px';
+          }
+          if (classList.includes('overflow-hidden')) {
+            htmlEl.style.overflow = 'visible';
+          }
         }
         
         // Add margins for spacing
