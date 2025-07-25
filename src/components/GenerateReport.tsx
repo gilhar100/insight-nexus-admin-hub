@@ -35,90 +35,105 @@ export const GenerateReport: React.FC = () => {
     }
     
     setIsGenerating(true);
-    console.log("Starting PDF generation...");
+    console.log("Starting clean PDF generation...");
     
     try {
-      const wrapper = document.getElementById("insights-pdf-wrapper");
-      if (!wrapper) {
-        console.error("PDF wrapper element not found");
-        alert("לא נמצא תוכן להורדה. אנא רענן את הדף ונסה שוב.");
-        return;
-      }
-
-      console.log("Found wrapper element, creating canvas...");
-
-      // Wait for any charts to render
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Create canvas with high quality settings
-      const canvas = await html2canvas(wrapper, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff',
-        logging: false,
-        width: wrapper.scrollWidth,
-        height: wrapper.scrollHeight,
-        windowWidth: 1200,
-        windowHeight: wrapper.scrollHeight
-      });
-      
-      console.log("Canvas created successfully, size:", canvas.width, "x", canvas.height);
-      
-      // Create PDF with A4 dimensions
       const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgData = canvas.toDataURL('image/png', 1.0);
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 15;
       
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
+      // Wait for all components to render
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Calculate how to fit the content
-      const imgWidth = pdfWidth - 20; // 10mm margin on each side
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      // Page 1: Title Page
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(28);
+      pdf.text("דוח תובנות קבוצתי", pageWidth / 2, 60, { align: 'center' });
       
-      console.log("Adding content to PDF...");
-      
-      if (imgHeight <= pdfHeight - 20) {
-        // Content fits on one page
-        pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-      } else {
-        // Content needs multiple pages
-        let yPosition = 0;
-        let remainingHeight = imgHeight;
-        const pageContentHeight = pdfHeight - 20; // Account for margins
-        
-        while (remainingHeight > 0) {
-          const currentPageHeight = Math.min(pageContentHeight, remainingHeight);
-          
-          // Add content to current page
-          pdf.addImage(
-            imgData, 
-            'PNG', 
-            10, 
-            10 - yPosition, 
-            imgWidth, 
-            imgHeight
-          );
-          
-          remainingHeight -= pageContentHeight;
-          yPosition += pageContentHeight;
-          
-          if (remainingHeight > 0) {
-            pdf.addPage();
-          }
-        }
-      }
+      pdf.setFontSize(22);
+      pdf.text("SALIMA & WOCA", pageWidth / 2, 80, { align: 'center' });
       
       const selectedWorkshop = workshops.find(w => w.id === selectedGroupId);
+      pdf.setFontSize(18);
+      pdf.text(selectedWorkshop?.name || '', pageWidth / 2, 110, { align: 'center' });
+      
+      pdf.setFontSize(14);
+      pdf.text(`תאריך: ${new Date().toLocaleDateString('he-IL')}`, pageWidth / 2, 130, { align: 'center' });
+
+      // Define sections to capture from preview
+      const sections = [
+        { selector: '[data-section="salima-summary"]', title: 'סיכום נתוני SALIMA' },
+        { selector: '[data-section="salima-radar"]', title: 'תרשים רדאר SALIMA' },
+        { selector: '[data-section="archetype-distribution"]', title: 'התפלגות סגנונות ניהול' },
+        { selector: '[data-section="woca-zone"]', title: 'אזור WOCA דומיננטי' },
+        { selector: '[data-section="woca-distribution"]', title: 'התפלגות אזורי WOCA' },
+        { selector: '[data-section="woca-strength"]', title: 'עוצמת אזורי WOCA' },
+        { selector: '[data-section="woca-matrix"]', title: 'מטריצת אזורי WOCA' }
+      ];
+
+      // Capture each section individually
+      for (const section of sections) {
+        const element = document.querySelector(section.selector) as HTMLElement;
+        
+        if (!element) {
+          console.warn(`Section not found: ${section.selector}`);
+          continue;
+        }
+
+        console.log(`Capturing section: ${section.title}`);
+        
+        // Add new page
+        pdf.addPage();
+        
+        // Add section title
+        pdf.setFontSize(20);
+        pdf.text(section.title, pageWidth / 2, 25, { align: 'center' });
+        
+        // Capture the element
+        const canvas = await html2canvas(element, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#ffffff',
+          logging: false,
+          width: element.offsetWidth,
+          height: element.offsetHeight
+        });
+        
+        const imgData = canvas.toDataURL('image/png', 1.0);
+        
+        // Calculate dimensions to fit on page
+        const maxWidth = pageWidth - (margin * 2);
+        const maxHeight = pageHeight - 50; // Leave space for title
+        
+        let imgWidth = maxWidth;
+        let imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        // Scale down if too tall
+        if (imgHeight > maxHeight) {
+          imgHeight = maxHeight;
+          imgWidth = (canvas.width * imgHeight) / canvas.height;
+        }
+        
+        // Center the image on the page
+        const x = (pageWidth - imgWidth) / 2;
+        const y = 35;
+        
+        pdf.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight);
+        
+        console.log(`Section ${section.title} added successfully`);
+      }
+      
       const fileName = `דוח-תובנות-${selectedWorkshop?.name || selectedGroupId}-${new Date().toLocaleDateString('he-IL').replace(/\//g, '-')}.pdf`;
       
-      console.log("Saving PDF:", fileName);
+      console.log("Saving clean PDF:", fileName);
       pdf.save(fileName);
       
-      console.log("PDF generation completed successfully!");
+      console.log("Clean PDF generation completed successfully!");
       
     } catch (error) {
-      console.error('PDF generation failed:', error);
+      console.error('Clean PDF generation failed:', error);
       alert('שגיאה בהפקת הדוח. אנא נסה שוב.');
     } finally {
       setIsGenerating(false);
