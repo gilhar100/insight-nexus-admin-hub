@@ -10,8 +10,6 @@ import { ArchetypeDistributionChart } from '@/components/ArchetypeDistributionCh
 import { WocaGroupBarChart } from '@/components/WocaGroupBarChart';
 import { WocaZoneSection } from '@/components/WocaZoneSection';
 
-const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxobXJnaGViZHRjYmhtZ3RicWZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgxNzU2MTksImV4cCI6MjA2Mzc1MTYxOX0.zipgFg0ZVfyJj6m_Ys7TUwVFj62Myhprm_pOSGizwWU";
-
 export const GenerateReport: React.FC = () => {
   const [selectedGroupId, setSelectedGroupId] = useState<number | undefined>();
   const [isGenerating, setIsGenerating] = useState(false);
@@ -36,8 +34,7 @@ export const GenerateReport: React.FC = () => {
         const res = await fetch("https://lhmrghebdtcbhmgtbqfe.supabase.co/functions/v1/getGroupInsights", {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
-            "apikey": ANON_KEY
+            "Content-Type": "application/json" // ✅ no 'apikey'
           },
           body: JSON.stringify({ group_number: selectedGroupId })
         });
