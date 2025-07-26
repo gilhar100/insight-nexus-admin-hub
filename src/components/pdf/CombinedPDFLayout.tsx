@@ -66,13 +66,10 @@ const graphWrapperStyle = {
   height: '300px',
   width: '100%',
   overflow: 'hidden',
-  breakInside: 'avoid',
-  pageBreakInside: 'avoid',
-  WebkitColumnBreakInside: 'avoid',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center'
-};
+} as React.CSSProperties;
 
 export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
   groupId,
@@ -101,7 +98,7 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
       </div>
 
       {/* SALIMA Summary */}
-      <div style={{ pageBreakBefore: 'always' }} className="bg-white p-6 font-sans" style={{ minHeight: '210mm', width: '297mm', direction: 'rtl' }}>
+      <div className="bg-white p-6 font-sans" style={{ pageBreakBefore: 'always', minHeight: '210mm', width: '297mm', direction: 'rtl' }}>
         <h2 className="text-xl font-bold text-blue-800 mb-4 border-r-4 border-blue-500 pr-3">ניתוח SALIMA - מנהיגות אישית</h2>
         <div className="bg-blue-50 rounded-lg p-4 mb-4 text-center">
           <h3 className="text-lg font-semibold text-blue-800 mb-1">ציון מנהיגות קבוצתי</h3>
@@ -123,7 +120,7 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
       </div>
 
       {/* SALIMA Charts */}
-      <div style={{ pageBreakBefore: 'always' }} className="bg-white p-6 font-sans" style={{ minHeight: '210mm', width: '297mm', direction: 'rtl' }}>
+      <div className="bg-white p-6 font-sans" style={{ pageBreakBefore: 'always', minHeight: '210mm', width: '297mm', direction: 'rtl' }}>
         <div className="space-y-12">
           <div className="text-center">
             <h3 className="text-base font-semibold text-gray-800 mb-2">פרופיל קבוצתי ייחודי</h3>
@@ -141,7 +138,7 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
       </div>
 
       {/* WOCA Summary */}
-      <div style={{ pageBreakBefore: 'always' }} className="bg-white p-6 font-sans" style={{ minHeight: '210mm', width: '297mm', direction: 'rtl' }}>
+      <div className="bg-white p-6 font-sans" style={{ pageBreakBefore: 'always', minHeight: '210mm', width: '297mm', direction: 'rtl' }}>
         <h2 className="text-xl font-bold text-purple-800 mb-4 border-r-4 border-purple-500 pr-3">ניתוח WOCA - תרבות ארגונית</h2>
         <div className="bg-purple-50 rounded-lg p-4 mb-4 text-center">
           <h3 className="text-lg font-semibold text-purple-800 mb-1">האזור הדומיננטי</h3>
@@ -157,7 +154,7 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
       </div>
 
       {/* WOCA Charts */}
-      <div style={{ pageBreakBefore: 'always' }} className="bg-white p-6 font-sans" style={{ minHeight: '210mm', width: '297mm', direction: 'rtl' }}>
+      <div className="bg-white p-6 font-sans" style={{ pageBreakBefore: 'always', minHeight: '210mm', width: '297mm', direction: 'rtl' }}>
         <div className="space-y-12">
           <div className="text-center">
             <h3 className="text-base font-semibold text-gray-800 mb-2">ציוני אזורים קבוצתיים</h3>
