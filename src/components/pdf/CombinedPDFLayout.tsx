@@ -62,13 +62,20 @@ const getZoneDistribution = (wocaAnalysis: any) => {
   };
 };
 
-const graphWrapperStyle = {
-  height: '300px',
-  width: '100%',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center'
+const chartStyle = {
+  maxWidth: '90%',
+  maxHeight: '280px',
+  margin: '0 auto',
 } as React.CSSProperties;
+
+const pageStyle: React.CSSProperties = {
+  minHeight: '210mm',
+  width: '297mm',
+  direction: 'rtl',
+  padding: '24px',
+  fontFamily: 'sans-serif',
+  backgroundColor: 'white',
+};
 
 export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
   groupId,
@@ -82,7 +89,7 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
   return (
     <>
       {/* Cover Page */}
-      <div className="bg-white p-6 font-sans" style={{ minHeight: '297mm', width: '210mm', direction: 'rtl' }}>
+      <div style={pageStyle}>
         <div className="text-center mb-8 border-b-2 border-blue-200 pb-4">
           <h1 className="text-3xl font-bold text-blue-800 mb-2">דוח תובנות קבוצתי</h1>
           <h2 className="text-xl font-semibold text-blue-600 mb-3">ניתוח SALIMA & WOCA</h2>
@@ -97,7 +104,7 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
       </div>
 
       {/* SALIMA Summary */}
-      <div className="bg-white p-6 font-sans" style={{ pageBreakBefore: 'always', minHeight: '297mm', width: '210mm', direction: 'rtl' }}>
+      <div style={{ ...pageStyle, pageBreakBefore: 'always' }}>
         <h2 className="text-xl font-bold text-blue-800 mb-4 border-r-4 border-blue-500 pr-3">ניתוח SALIMA - מנהיגות אישית</h2>
         <div className="bg-blue-50 rounded-lg p-4 mb-4 text-center">
           <h3 className="text-lg font-semibold text-blue-800 mb-1">ציון מנהיגות קבוצתי</h3>
@@ -119,17 +126,17 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
       </div>
 
       {/* SALIMA Charts */}
-      <div className="bg-white p-6 font-sans" style={{ pageBreakBefore: 'always', minHeight: '297mm', width: '210mm', direction: 'rtl' }}>
+      <div style={{ ...pageStyle, pageBreakBefore: 'always' }}>
         <div className="space-y-12">
           <div className="text-center">
             <h3 className="text-base font-semibold text-gray-800 mb-2">פרופיל קבוצתי ייחודי</h3>
-            <div style={graphWrapperStyle}>
+            <div style={chartStyle}>
               <SalimaGroupRadarChart averages={salimaData.averages} />
             </div>
           </div>
-          <div className="text-center">
+          <div className="text-center mt-12">
             <h3 className="text-base font-semibold text-gray-800 mb-2">חלוקת ארכיטיפים</h3>
-            <div style={graphWrapperStyle}>
+            <div style={chartStyle}>
               <ArchetypeDistributionChart groupNumber={salimaData.group_number} isPresenterMode={false} />
             </div>
           </div>
@@ -137,7 +144,7 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
       </div>
 
       {/* WOCA Summary */}
-      <div className="bg-white p-6 font-sans" style={{ pageBreakBefore: 'always', minHeight: '297mm', width: '210mm', direction: 'rtl' }}>
+      <div style={{ ...pageStyle, pageBreakBefore: 'always' }}>
         <h2 className="text-xl font-bold text-purple-800 mb-4 border-r-4 border-purple-500 pr-3">ניתוח WOCA - תרבות ארגונית</h2>
         <div className="bg-purple-50 rounded-lg p-4 mb-4 text-center">
           <h3 className="text-lg font-semibold text-purple-800 mb-1">האזור הדומיננטי</h3>
@@ -153,21 +160,21 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
       </div>
 
       {/* WOCA Charts */}
-      <div className="bg-white p-6 font-sans" style={{ pageBreakBefore: 'always', minHeight: '297mm', width: '210mm', direction: 'rtl' }}>
+      <div style={{ ...pageStyle, pageBreakBefore: 'always' }}>
         <div className="space-y-12">
           <div className="text-center">
             <h3 className="text-base font-semibold text-gray-800 mb-2">ציוני אזורים קבוצתיים</h3>
-            <div style={graphWrapperStyle}>
+            <div style={chartStyle}>
               {wocaData.wocaAnalysis?.groupCategoryScores ? (
                 <WocaGroupBarChart groupCategoryScores={wocaData.wocaAnalysis.groupCategoryScores} />
               ) : (
-                <div>לא קיימים נתוני ציונים לפי אזור</div>
+                <div>אין נתונים להצגה</div>
               )}
             </div>
           </div>
-          <div className="text-center">
+          <div className="text-center mt-12">
             <h3 className="text-base font-semibold text-gray-800 mb-2">התפלגות משתתפים באזורים</h3>
-            <div style={graphWrapperStyle}>
+            <div style={chartStyle}>
               <ZoneDistributionChart zoneDistribution={zoneDistribution} />
             </div>
           </div>
