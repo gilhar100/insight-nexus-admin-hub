@@ -12,11 +12,14 @@ import { WocaZonesTable } from '@/components/WocaZonesTable';
 import { GroupSelector } from '@/components/GroupSelector';
 import { GroupInsightsHeader } from '@/components/GroupInsightsHeader';
 import { InsufficientDataWarning } from '@/components/InsufficientDataWarning';
+import { exportWocaGroupPDFReport } from '@/utils/exportUtils';
+import { useToast } from '@/hooks/use-toast';
 
 export const GroupWorkshopInsights: React.FC = () => {
   const [selectedGroupId, setSelectedGroupId] = useState<number | undefined>();
   const [showNames, setShowNames] = useState(false);
   const [isPresenterMode, setIsPresenterMode] = useState(false);
+  const { toast } = useToast();
   
   const {
     workshopData,
@@ -73,7 +76,36 @@ export const GroupWorkshopInsights: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
-  console.log('🔍 WOCA Analysis results:', wocaAnalysis);
+  const handleDownloadPDF = async () => {
+    if (!workshopData || !wocaAnalysis) {
+      toast({
+        title: "אין נתוני סדנה",
+        description: "אנא בחר סדנה תחילה",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const wocaData = {
+        workshopData,
+        wocaAnalysis
+      };
+      await exportWocaGroupPDFReport(wocaData);
+      toast({
+        title: "הדוח הופק בהצלחה",
+        description: "קובץ ה-PDF נשמר במחשב שלך",
+        variant: "default"
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({
+        title: "שגיאה ביצירת הדוח",
+        description: "נכשל ביצירת קובץ ה-PDF",
+        variant: "destructive"
+      });
+    }
+  };
 
   const hasMinimumData = workshopData && workshopData.participants.length >= 3;
 
@@ -158,6 +190,8 @@ export const GroupWorkshopInsights: React.FC = () => {
     <PresenterMode 
       isPresenterMode={isPresenterMode} 
       onToggle={() => setIsPresenterMode(!isPresenterMode)}
+      onDownloadPDF={workshopData && wocaAnalysis ? handleDownloadPDF : undefined}
+      pdfButtonText="הורד דוח WOCA"
     >
       {renderContent()}
     </PresenterMode>

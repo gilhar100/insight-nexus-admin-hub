@@ -8,6 +8,7 @@ import { GroupSearch } from '@/components/GroupSearch';
 import { IndividualSearch } from '@/components/IndividualSearch';
 import { GroupResults } from '@/components/GroupResults';
 import { IndividualResults } from '@/components/IndividualResults';
+import { exportSalimaGroupPDFReport } from '@/utils/exportUtils';
 interface GroupData {
   group_number: number;
   participant_count: number;
@@ -132,6 +133,33 @@ export const IndividualInsights: React.FC = () => {
     };
     fetchGroupData();
   }, [selectedGroup, toast]);
+
+  const handleDownloadPDF = async () => {
+    if (!groupData) {
+      toast({
+        title: "אין נתוני קבוצה",
+        description: "אנא בחר קבוצה תחילה",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      await exportSalimaGroupPDFReport(groupData);
+      toast({
+        title: "הדוח הופק בהצלחה",
+        description: "קובץ ה-PDF נשמר במחשב שלך",
+        variant: "default"
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({
+        title: "שגיאה ביצירת הדוח",
+        description: "נכשל ביצירת קובץ ה-PDF",
+        variant: "destructive"
+      });
+    }
+  };
   const content = <div className={`space-y-8${isPresenterMode ? ' presenter-mode' : ''}`} dir="rtl">
       {/* Page Header */}
       <div className="bg-white rounded-lg shadow-sm border p-8">
@@ -157,7 +185,12 @@ export const IndividualInsights: React.FC = () => {
       {/* Individual Results Section */}
       {respondentData && <IndividualResults respondentData={respondentData} isPresenterMode={isPresenterMode} activeDataSource={activeDataSource} onDataSourceChange={setActiveDataSource} />}
     </div>;
-  return <PresenterMode isPresenterMode={isPresenterMode} onToggle={() => setIsPresenterMode(!isPresenterMode)}>
+  return <PresenterMode 
+    isPresenterMode={isPresenterMode} 
+    onToggle={() => setIsPresenterMode(!isPresenterMode)}
+    onDownloadPDF={groupData ? handleDownloadPDF : undefined}
+    pdfButtonText="הורד דוח SALIMA"
+  >
       {content}
     </PresenterMode>;
 };
