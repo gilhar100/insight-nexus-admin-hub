@@ -65,7 +65,6 @@ const getZoneDistribution = (wocaAnalysis: any) => {
 const graphWrapperStyle = {
   height: '300px',
   width: '100%',
-  overflow: 'hidden',
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center'
@@ -83,7 +82,7 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
   return (
     <>
       {/* Cover Page */}
-      <div className="bg-white p-6 font-sans" style={{ minHeight: '210mm', width: '297mm', direction: 'rtl' }}>
+      <div className="bg-white p-6 font-sans" style={{ minHeight: '297mm', width: '210mm', direction: 'rtl' }}>
         <div className="text-center mb-8 border-b-2 border-blue-200 pb-4">
           <h1 className="text-3xl font-bold text-blue-800 mb-2">דוח תובנות קבוצתי</h1>
           <h2 className="text-xl font-semibold text-blue-600 mb-3">ניתוח SALIMA & WOCA</h2>
@@ -92,13 +91,13 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
             <div><strong>תאריך:</strong> {new Date().toLocaleDateString('he-IL')}</div>
           </div>
           <div className="text-center mt-2 text-gray-600 text-sm">
-            <strong>משתתפים:</strong> SALIMA: {salimaData.participant_count} | WOCA: {wocaData.workshopData.participant_count}
+            <strong>משתתפים:</strong> SALIMA: {salimaData.participant_count} | WOCA: {wocaData.workshopData?.participant_count || 0}
           </div>
         </div>
       </div>
 
       {/* SALIMA Summary */}
-      <div className="bg-white p-6 font-sans" style={{ pageBreakBefore: 'always', minHeight: '210mm', width: '297mm', direction: 'rtl' }}>
+      <div className="bg-white p-6 font-sans" style={{ pageBreakBefore: 'always', minHeight: '297mm', width: '210mm', direction: 'rtl' }}>
         <h2 className="text-xl font-bold text-blue-800 mb-4 border-r-4 border-blue-500 pr-3">ניתוח SALIMA - מנהיגות אישית</h2>
         <div className="bg-blue-50 rounded-lg p-4 mb-4 text-center">
           <h3 className="text-lg font-semibold text-blue-800 mb-1">ציון מנהיגות קבוצתי</h3>
@@ -120,7 +119,7 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
       </div>
 
       {/* SALIMA Charts */}
-      <div className="bg-white p-6 font-sans" style={{ pageBreakBefore: 'always', minHeight: '210mm', width: '297mm', direction: 'rtl' }}>
+      <div className="bg-white p-6 font-sans" style={{ pageBreakBefore: 'always', minHeight: '297mm', width: '210mm', direction: 'rtl' }}>
         <div className="space-y-12">
           <div className="text-center">
             <h3 className="text-base font-semibold text-gray-800 mb-2">פרופיל קבוצתי ייחודי</h3>
@@ -138,7 +137,7 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
       </div>
 
       {/* WOCA Summary */}
-      <div className="bg-white p-6 font-sans" style={{ pageBreakBefore: 'always', minHeight: '210mm', width: '297mm', direction: 'rtl' }}>
+      <div className="bg-white p-6 font-sans" style={{ pageBreakBefore: 'always', minHeight: '297mm', width: '210mm', direction: 'rtl' }}>
         <h2 className="text-xl font-bold text-purple-800 mb-4 border-r-4 border-purple-500 pr-3">ניתוח WOCA - תרבות ארגונית</h2>
         <div className="bg-purple-50 rounded-lg p-4 mb-4 text-center">
           <h3 className="text-lg font-semibold text-purple-800 mb-1">האזור הדומיננטי</h3>
@@ -149,17 +148,21 @@ export const CombinedPDFLayout: React.FC<CombinedPDFLayoutProps> = ({
             {dominantZone === 'war' && 'אזור המלחמה'}
             {dominantZone === 'לא זוהה' && 'לא זוהה אזור דומיננטי'}
           </div>
-          <p className="text-purple-500 mt-1 text-sm">בהתבסס על {wocaData.workshopData.participant_count} משתתפים</p>
+          <p className="text-purple-500 mt-1 text-sm">בהתבסס על {wocaData.workshopData?.participant_count || 0} משתתפים</p>
         </div>
       </div>
 
       {/* WOCA Charts */}
-      <div className="bg-white p-6 font-sans" style={{ pageBreakBefore: 'always', minHeight: '210mm', width: '297mm', direction: 'rtl' }}>
+      <div className="bg-white p-6 font-sans" style={{ pageBreakBefore: 'always', minHeight: '297mm', width: '210mm', direction: 'rtl' }}>
         <div className="space-y-12">
           <div className="text-center">
             <h3 className="text-base font-semibold text-gray-800 mb-2">ציוני אזורים קבוצתיים</h3>
             <div style={graphWrapperStyle}>
-              <WocaGroupBarChart groupCategoryScores={wocaData.wocaAnalysis.groupCategoryScores} />
+              {wocaData.wocaAnalysis?.groupCategoryScores ? (
+                <WocaGroupBarChart groupCategoryScores={wocaData.wocaAnalysis.groupCategoryScores} />
+              ) : (
+                <div>לא קיימים נתוני ציונים לפי אזור</div>
+              )}
             </div>
           </div>
           <div className="text-center">
