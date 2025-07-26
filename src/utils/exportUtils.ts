@@ -133,9 +133,14 @@ export const exportSalimaGroupPDFReport = async (groupData: any) => {
 
   // Create a temporary container
   const container = document.createElement('div');
-  container.style.position = 'absolute';
-  container.style.left = '-9999px';
-  container.style.top = '-9999px';
+  container.style.position = 'fixed';
+  container.style.left = '0';
+  container.style.top = '0';
+  container.style.width = '210mm';
+  container.style.height = '297mm';
+  container.style.zIndex = '-1000';
+  container.style.backgroundColor = 'white';
+  container.style.visibility = 'hidden';
   document.body.appendChild(container);
 
   // Render the PDF layout
@@ -146,31 +151,36 @@ export const exportSalimaGroupPDFReport = async (groupData: any) => {
     })
   );
 
-  // Wait for rendering
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  // Wait longer for rendering and ensure charts are loaded
+  await new Promise(resolve => setTimeout(resolve, 3000));
 
   const opt = {
-    margin: [0.5, 0.5, 0.5, 0.5],
+    margin: [0.3, 0.3, 0.3, 0.3],
     filename: `salima-group-report-${groupData.group_number}-${new Date().toISOString().split('T')[0]}.pdf`,
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: { 
-      scale: 2,
+      scale: 1.5,
       useCORS: true,
       allowTaint: true,
       backgroundColor: '#ffffff',
-      letterRendering: true
+      letterRendering: true,
+      logging: true,
+      width: 794, // A4 width in pixels at 96 DPI
+      height: 1123 // A4 height in pixels at 96 DPI
     },
     jsPDF: { 
-      unit: 'in', 
+      unit: 'mm', 
       format: 'a4', 
       orientation: 'portrait',
       compress: true
     },
-    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    pagebreak: { mode: 'avoid-all' }
   };
 
   try {
+    console.log('Starting PDF generation for SALIMA group:', groupData.group_number);
     await html2pdf().set(opt).from(container).save();
+    console.log('PDF generation completed');
   } finally {
     // Clean up
     root.unmount();
@@ -187,9 +197,14 @@ export const exportWocaGroupPDFReport = async (wocaData: any) => {
 
   // Create a temporary container
   const container = document.createElement('div');
-  container.style.position = 'absolute';
-  container.style.left = '-9999px';
-  container.style.top = '-9999px';
+  container.style.position = 'fixed';
+  container.style.left = '0';
+  container.style.top = '0';
+  container.style.width = '210mm';
+  container.style.height = '297mm';
+  container.style.zIndex = '-1000';
+  container.style.backgroundColor = 'white';
+  container.style.visibility = 'hidden';
   document.body.appendChild(container);
 
   // Render the PDF layout
@@ -200,31 +215,36 @@ export const exportWocaGroupPDFReport = async (wocaData: any) => {
     })
   );
 
-  // Wait for rendering
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  // Wait longer for rendering and ensure charts are loaded
+  await new Promise(resolve => setTimeout(resolve, 3000));
 
   const opt = {
-    margin: [0.5, 0.5, 0.5, 0.5],
+    margin: [0.3, 0.3, 0.3, 0.3],
     filename: `woca-group-report-${wocaData.workshopData.workshop_id}-${new Date().toISOString().split('T')[0]}.pdf`,
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: { 
-      scale: 2,
+      scale: 1.5,
       useCORS: true,
       allowTaint: true,
       backgroundColor: '#ffffff',
-      letterRendering: true
+      letterRendering: true,
+      logging: true,
+      width: 794, // A4 width in pixels at 96 DPI
+      height: 1123 // A4 height in pixels at 96 DPI
     },
     jsPDF: { 
-      unit: 'in', 
+      unit: 'mm', 
       format: 'a4', 
       orientation: 'portrait',
       compress: true
     },
-    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    pagebreak: { mode: 'avoid-all' }
   };
 
   try {
+    console.log('Starting PDF generation for WOCA workshop:', wocaData.workshopData.workshop_id);
     await html2pdf().set(opt).from(container).save();
+    console.log('PDF generation completed');
   } finally {
     // Clean up
     root.unmount();

@@ -43,12 +43,13 @@ const getDimensionInsights = (averages: GroupData['averages']) => {
 };
 
 const graphWrapperStyle = {
-  height: '400px',
+  height: '350px',
   width: '100%',
-  overflow: 'hidden',
   display: 'flex',
   justifyContent: 'center',
-  alignItems: 'center'
+  alignItems: 'center',
+  border: '1px solid #e5e5e5',
+  backgroundColor: '#fafafa'
 } as React.CSSProperties;
 
 export const SalimaPDFLayout: React.FC<SalimaPDFLayoutProps> = ({ groupData }) => {
@@ -56,55 +57,37 @@ export const SalimaPDFLayout: React.FC<SalimaPDFLayoutProps> = ({ groupData }) =
 
   return (
     <>
-      {/* Cover Page */}
-      <div className="bg-white p-8 font-sans" style={{ minHeight: '297mm', width: '210mm', direction: 'rtl' }}>
-        <div className="text-center mb-12 border-b-2 border-blue-200 pb-6">
-          <h1 className="text-4xl font-bold text-blue-800 mb-4">דוח תובנות קבוצתי</h1>
-          <h2 className="text-2xl font-semibold text-blue-600 mb-4">ניתוח SALIMA - מנהיגות אישית</h2>
-          <div className="flex justify-between items-center text-gray-600 text-lg mt-6">
-            <div><strong>קבוצה:</strong> {groupData.group_number}</div>
-            <div><strong>תאריך:</strong> {new Date().toLocaleDateString('he-IL')}</div>
+      {/* Basic test content */}
+      <div className="bg-white p-8" style={{ width: '210mm', minHeight: '100px', direction: 'rtl', fontSize: '16px' }}>
+        <h1 style={{ fontSize: '24px', color: '#1e40af', marginBottom: '20px' }}>דוח SALIMA - קבוצה {groupData.group_number}</h1>
+        <p style={{ marginBottom: '10px' }}>ציון כללי: {groupData.averages.overall.toFixed(2)}</p>
+        <p style={{ marginBottom: '10px' }}>מספר משתתפים: {groupData.participant_count}</p>
+        <p style={{ marginBottom: '20px' }}>תאריך: {new Date().toLocaleDateString('he-IL')}</p>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '40px' }}>
+          <div style={{ padding: '15px', backgroundColor: '#f0f9ff', border: '1px solid #0ea5e9', borderRadius: '8px' }}>
+            <h3 style={{ fontSize: '18px', color: '#0369a1', marginBottom: '10px' }}>ממד חזק</h3>
+            <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#0ea5e9' }}>{dimensionInsights.strongest.name}</p>
+            <p style={{ fontSize: '16px' }}>{dimensionInsights.strongest.score.toFixed(1)}</p>
           </div>
-          <div className="text-center mt-4 text-gray-600 text-lg">
-            <strong>משתתפים:</strong> {groupData.participant_count}
+          <div style={{ padding: '15px', backgroundColor: '#fef3c7', border: '1px solid #f59e0b', borderRadius: '8px' }}>
+            <h3 style={{ fontSize: '18px', color: '#92400e', marginBottom: '10px' }}>ממד לפיתוח</h3>
+            <p style={{ fontSize: '20px', fontWeight: 'bold', color: '#f59e0b' }}>{dimensionInsights.weakest.name}</p>
+            <p style={{ fontSize: '16px' }}>{dimensionInsights.weakest.score.toFixed(1)}</p>
           </div>
         </div>
 
-        <div className="bg-blue-50 rounded-lg p-8 mb-8 text-center">
-          <h3 className="text-2xl font-semibold text-blue-800 mb-4">ציון מנהיגות קבוצתי</h3>
-          <div className="text-5xl font-bold text-blue-600 mb-2">{groupData.averages.overall.toFixed(2)}</div>
-          <p className="text-blue-500 text-xl">ממוצע ציוני SLQ של {groupData.participant_count} משתתפים</p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-8 mb-8">
-          <div className="bg-green-50 border border-green-200 rounded-lg p-6">
-            <h3 className="text-xl font-bold text-green-800 mb-3">הממד החזק ביותר</h3>
-            <div className="text-3xl font-bold text-green-600 mb-2">{dimensionInsights.strongest.score.toFixed(1)}</div>
-            <div className="text-green-700 font-semibold text-lg">{dimensionInsights.strongest.name}</div>
-          </div>
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-6">
-            <h3 className="text-xl font-bold text-orange-800 mb-3">ממד לפיתוח</h3>
-            <div className="text-3xl font-bold text-orange-600 mb-2">{dimensionInsights.weakest.score.toFixed(1)}</div>
-            <div className="text-orange-700 font-semibold text-lg">{dimensionInsights.weakest.name}</div>
+        <div style={{ marginBottom: '40px' }}>
+          <h3 style={{ fontSize: '20px', textAlign: 'center', marginBottom: '15px' }}>פרופיל קבוצתי</h3>
+          <div style={graphWrapperStyle}>
+            <SalimaGroupRadarChart averages={groupData.averages} />
           </div>
         </div>
-      </div>
 
-      {/* Charts Page */}
-      <div className="bg-white p-8 font-sans" style={{ pageBreakBefore: 'always', minHeight: '297mm', width: '210mm', direction: 'rtl' }}>
-        <div className="space-y-12">
-          <div className="text-center">
-            <h3 className="text-2xl font-semibold text-gray-800 mb-6">פרופיל קבוצתי ייחודי</h3>
-            <div style={graphWrapperStyle}>
-              <SalimaGroupRadarChart averages={groupData.averages} />
-            </div>
-          </div>
-          
-          <div className="text-center">
-            <h3 className="text-2xl font-semibold text-gray-800 mb-6">מקרא סגנונות ניהול</h3>
-            <div style={graphWrapperStyle}>
-              <ArchetypeDistributionChart groupNumber={groupData.group_number} isPresenterMode={true} />
-            </div>
+        <div>
+          <h3 style={{ fontSize: '20px', textAlign: 'center', marginBottom: '15px' }}>סגנונות ניהול</h3>
+          <div style={graphWrapperStyle}>
+            <ArchetypeDistributionChart groupNumber={groupData.group_number} isPresenterMode={true} />
           </div>
         </div>
       </div>
