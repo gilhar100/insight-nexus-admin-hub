@@ -1,7 +1,30 @@
 
-import { GroupData } from '@/hooks/useGroupData';
 import { WorkshopData } from '@/types/workshopTypes';
 import { analyzeWorkshopWoca } from '@/utils/wocaAnalysis';
+
+// Define the GroupData interface locally since it's not exported from the hook
+interface GroupData {
+  group_number: number;
+  participant_count: number;
+  averages: {
+    strategy: number;
+    learning: number;
+    inspiration: number;
+    meaning: number;
+    authenticity: number;
+    adaptability: number;
+    overall: number;
+  };
+  participants: Array<{
+    dimension_s: number;
+    dimension_l: number;
+    dimension_i: number;
+    dimension_m: number;
+    dimension_a: number;
+    dimension_a2: number;
+    dominant_archetype?: string;
+  }>;
+}
 
 export interface GroupPDFData {
   groupNumber: number;
