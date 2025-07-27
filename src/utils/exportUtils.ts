@@ -1,4 +1,5 @@
 import { RespondentData } from '@/hooks/useRespondentData';
+import { DataSourceType } from '@/hooks/useEnhancedRespondentData';
 
 export const exportSalimaReport = (respondentData: RespondentData) => {
   const reportData = {
@@ -254,7 +255,7 @@ export const exportWocaGroupPDFReport = async (wocaData: any) => {
 // Individual SALIMA PDF Report Export
 export const exportIndividualSalimaPDFReport = async (
   respondentData: any,
-  activeDataSource: string
+  activeDataSource: DataSourceType
 ) => {
   const { default: html2pdf } = await import('html2pdf.js');
   const { IndividualSalimaPDFLayout } = await import('@/components/pdf/IndividualSalimaPDFLayout');
