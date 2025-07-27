@@ -90,6 +90,27 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
     }
   };
 
+  // Helper function to parse insight text and extract preserve/improve sections
+  const parseInsightText = (insightText: string | null | undefined) => {
+    if (!insightText) return { preserve: '', improve: '' };
+    
+    const lines = insightText.split('\n').filter(line => line.trim());
+    
+    // If there are at least 2 lines, assume first is preserve, second is improve
+    if (lines.length >= 2) {
+      return {
+        preserve: lines[0].trim(),
+        improve: lines[1].trim()
+      };
+    }
+    
+    // If only one line, put it in preserve
+    return {
+      preserve: lines[0] || '',
+      improve: ''
+    };
+  };
+
   const currentDimensions = getCurrentDimensions();
   const radarChartData = [
     { dimension: 'אסטרטגיה', score: currentDimensions.strategy, color: '#3B82F6' },
@@ -242,7 +263,7 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
               </div>
             </div>
 
-            {/* Individual Insights Section with Static Labels */}
+            {/* Individual Insights Section with Preserve and Improve */}
             {respondentData.rawData && (
               <div className="mt-8 space-y-6">
                 {/* Strategy Insights */}
@@ -252,18 +273,29 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
                       תובנות אסטרטגיה
                     </h4>
                     <div className="space-y-4 text-right">
-                      <div>
-                        <h5 className="font-medium text-green-700 mb-2">שימור</h5>
-                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                          {respondentData.rawData.insight_strategy.split('\n')[0]}
-                        </p>
-                      </div>
-                      <div>
-                        <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
-                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                          {respondentData.rawData.insight_strategy.split('\n')[1]}
-                        </p>
-                      </div>
+                      {(() => {
+                        const parsed = parseInsightText(respondentData.rawData.insight_strategy);
+                        return (
+                          <>
+                            {parsed.preserve && (
+                              <div>
+                                <h5 className="font-medium text-green-700 mb-2">שימור</h5>
+                                <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                                  {parsed.preserve}
+                                </p>
+                              </div>
+                            )}
+                            {parsed.improve && (
+                              <div>
+                                <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
+                                <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                                  {parsed.improve}
+                                </p>
+                              </div>
+                            )}
+                          </>
+                        );
+                      })()}
                     </div>
                   </div>
                 )}
@@ -275,18 +307,29 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
                       תובנות אדפטיביות
                     </h4>
                     <div className="space-y-4 text-right">
-                      <div>
-                        <h5 className="font-medium text-green-700 mb-2">שימור</h5>
-                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                          {respondentData.rawData.insight_adaptive.split('\n')[0]}
-                        </p>
-                      </div>
-                      <div>
-                        <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
-                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                          {respondentData.rawData.insight_adaptive.split('\n')[1]}
-                        </p>
-                      </div>
+                      {(() => {
+                        const parsed = parseInsightText(respondentData.rawData.insight_adaptive);
+                        return (
+                          <>
+                            {parsed.preserve && (
+                              <div>
+                                <h5 className="font-medium text-green-700 mb-2">שימור</h5>
+                                <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                                  {parsed.preserve}
+                                </p>
+                              </div>
+                            )}
+                            {parsed.improve && (
+                              <div>
+                                <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
+                                <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                                  {parsed.improve}
+                                </p>
+                              </div>
+                            )}
+                          </>
+                        );
+                      })()}
                     </div>
                   </div>
                 )}
@@ -298,18 +341,29 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
                       תובנות למידה
                     </h4>
                     <div className="space-y-4 text-right">
-                      <div>
-                        <h5 className="font-medium text-green-700 mb-2">שימור</h5>
-                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                          {respondentData.rawData.insight_learning.split('\n')[0]}
-                        </p>
-                      </div>
-                      <div>
-                        <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
-                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                          {respondentData.rawData.insight_learning.split('\n')[1]}
-                        </p>
-                      </div>
+                      {(() => {
+                        const parsed = parseInsightText(respondentData.rawData.insight_learning);
+                        return (
+                          <>
+                            {parsed.preserve && (
+                              <div>
+                                <h5 className="font-medium text-green-700 mb-2">שימור</h5>
+                                <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                                  {parsed.preserve}
+                                </p>
+                              </div>
+                            )}
+                            {parsed.improve && (
+                              <div>
+                                <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
+                                <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                                  {parsed.improve}
+                                </p>
+                              </div>
+                            )}
+                          </>
+                        );
+                      })()}
                     </div>
                   </div>
                 )}
@@ -321,18 +375,29 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
                       תובנות השראה
                     </h4>
                     <div className="space-y-4 text-right">
-                      <div>
-                        <h5 className="font-medium text-green-700 mb-2">שימור</h5>
-                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                          {respondentData.rawData.insight_inspiration.split('\n')[0]}
-                        </p>
-                      </div>
-                      <div>
-                        <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
-                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                          {respondentData.rawData.insight_inspiration.split('\n')[1]}
-                        </p>
-                      </div>
+                      {(() => {
+                        const parsed = parseInsightText(respondentData.rawData.insight_inspiration);
+                        return (
+                          <>
+                            {parsed.preserve && (
+                              <div>
+                                <h5 className="font-medium text-green-700 mb-2">שימור</h5>
+                                <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                                  {parsed.preserve}
+                                </p>
+                              </div>
+                            )}
+                            {parsed.improve && (
+                              <div>
+                                <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
+                                <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                                  {parsed.improve}
+                                </p>
+                              </div>
+                            )}
+                          </>
+                        );
+                      })()}
                     </div>
                   </div>
                 )}
@@ -344,18 +409,29 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
                       תובנות משמעות
                     </h4>
                     <div className="space-y-4 text-right">
-                      <div>
-                        <h5 className="font-medium text-green-700 mb-2">שימור</h5>
-                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                          {respondentData.rawData.insight_meaning.split('\n')[0]}
-                        </p>
-                      </div>
-                      <div>
-                        <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
-                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                          {respondentData.rawData.insight_meaning.split('\n')[1]}
-                        </p>
-                      </div>
+                      {(() => {
+                        const parsed = parseInsightText(respondentData.rawData.insight_meaning);
+                        return (
+                          <>
+                            {parsed.preserve && (
+                              <div>
+                                <h5 className="font-medium text-green-700 mb-2">שימור</h5>
+                                <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                                  {parsed.preserve}
+                                </p>
+                              </div>
+                            )}
+                            {parsed.improve && (
+                              <div>
+                                <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
+                                <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                                  {parsed.improve}
+                                </p>
+                              </div>
+                            )}
+                          </>
+                        );
+                      })()}
                     </div>
                   </div>
                 )}
@@ -367,18 +443,29 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
                       תובנות אותנטיות
                     </h4>
                     <div className="space-y-4 text-right">
-                      <div>
-                        <h5 className="font-medium text-green-700 mb-2">שימור</h5>
-                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                          {respondentData.rawData.insight_authentic.split('\n')[0]}
-                        </p>
-                      </div>
-                      <div>
-                        <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
-                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                          {respondentData.rawData.insight_authentic.split('\n')[1]}
-                        </p>
-                      </div>
+                      {(() => {
+                        const parsed = parseInsightText(respondentData.rawData.insight_authentic);
+                        return (
+                          <>
+                            {parsed.preserve && (
+                              <div>
+                                <h5 className="font-medium text-green-700 mb-2">שימור</h5>
+                                <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                                  {parsed.preserve}
+                                </p>
+                              </div>
+                            )}
+                            {parsed.improve && (
+                              <div>
+                                <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
+                                <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                                  {parsed.improve}
+                                </p>
+                              </div>
+                            )}
+                          </>
+                        );
+                      })()}
                     </div>
                   </div>
                 )}
