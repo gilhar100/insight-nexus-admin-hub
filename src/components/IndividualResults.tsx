@@ -1,10 +1,11 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { EnhancedSalimaRadarChart } from '@/components/EnhancedSalimaRadarChart';
 import { SalimaIntensityBar } from '@/components/SalimaIntensityBar';
 import { DataSourceToggle, DataSourceType } from '@/components/DataSourceToggle';
-import { exportSalimaReport, exportSalimaReportCSV, exportIndividualSalimaPDFReport } from '@/utils/exportUtils';
+import { exportSalimaReport, exportSalimaReportCSV } from '@/utils/exportUtils';
 import { useToast } from '@/hooks/use-toast';
 import {
   DropdownMenu,
@@ -62,33 +63,6 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
     });
   };
 
-  const handleDownloadPDF = async () => {
-    if (!respondentData) {
-      toast({
-        title: "אין נתונים לייצוא",
-        description: "אנא נתח נבדק קודם",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      await exportIndividualSalimaPDFReport(respondentData, activeDataSource);
-      toast({
-        title: "הדוח הופק בהצלחה",
-        description: "קובץ ה-PDF נשמר במחשב שלך",
-        variant: "default"
-      });
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-      toast({
-        title: "שגיאה ביצירת הדוח",
-        description: "נכשל ביצירת קובץ ה-PDF",
-        variant: "destructive"
-      });
-    }
-  };
-
   const getCurrentDimensions = () => {
     switch (activeDataSource) {
       case 'colleague':
@@ -114,27 +88,6 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
       default:
         return 'דוח עצמי';
     }
-  };
-
-  // Helper function to parse insight text and extract preserve/improve sections
-  const parseInsightText = (insightText: string | null | undefined) => {
-    if (!insightText) return { preserve: '', improve: '' };
-    
-    const lines = insightText.split('\n').filter(line => line.trim());
-    
-    // If there are at least 2 lines, assume first is preserve, second is improve
-    if (lines.length >= 2) {
-      return {
-        preserve: lines[0].trim(),
-        improve: lines[1].trim()
-      };
-    }
-    
-    // If only one line, put it in preserve
-    return {
-      preserve: lines[0] || '',
-      improve: ''
-    };
   };
 
   const currentDimensions = getCurrentDimensions();
@@ -171,33 +124,22 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
                 ציון SALIMA כללי (SLQ) - {getDataSourceLabel()}
               </span>
               {!isPresenterMode && (
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleDownloadPDF}
-                    className="text-right"
-                  >
-                    <Download className="h-4 w-4 ml-2" />
-                    הורד דוח PDF
-                  </Button>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="outline" size="sm">
-                        <Download className="h-4 w-4 ml-2" />
-                        ייצא נתונים
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem onClick={() => handleExport('json')}>
-                        ייצא כ-JSON
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleExport('csv')}>
-                        ייצא כ-CSV
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Download className="h-4 w-4 ml-2" />
+                      ייצא דוח
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={() => handleExport('json')}>
+                      ייצא כ-JSON
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleExport('csv')}>
+                      ייצא כ-CSV
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
             </div>
           </div>
@@ -300,7 +242,7 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
               </div>
             </div>
 
-            {/* Individual Insights Section with Preserve and Improve */}
+            {/* Individual Insights Section with Static Labels */}
             {respondentData.rawData && (
               <div className="mt-8 space-y-6">
                 {/* Strategy Insights */}
@@ -310,29 +252,18 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
                       תובנות אסטרטגיה
                     </h4>
                     <div className="space-y-4 text-right">
-                      {(() => {
-                        const parsed = parseInsightText(respondentData.rawData.insight_strategy);
-                        return (
-                          <>
-                            {parsed.preserve && (
-                              <div>
-                                <h5 className="font-medium text-green-700 mb-2">שימור</h5>
-                                <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                                  {parsed.preserve}
-                                </p>
-                              </div>
-                            )}
-                            {parsed.improve && (
-                              <div>
-                                <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
-                                <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                                  {parsed.improve}
-                                </p>
-                              </div>
-                            )}
-                          </>
-                        );
-                      })()}
+                      <div>
+                        <h5 className="font-medium text-green-700 mb-2">שימור</h5>
+                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                          {respondentData.rawData.insight_strategy.split('\n')[0]}
+                        </p>
+                      </div>
+                      <div>
+                        <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
+                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                          {respondentData.rawData.insight_strategy.split('\n')[1]}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -344,29 +275,18 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
                       תובנות אדפטיביות
                     </h4>
                     <div className="space-y-4 text-right">
-                      {(() => {
-                        const parsed = parseInsightText(respondentData.rawData.insight_adaptive);
-                        return (
-                          <>
-                            {parsed.preserve && (
-                              <div>
-                                <h5 className="font-medium text-green-700 mb-2">שימור</h5>
-                                <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                                  {parsed.preserve}
-                                </p>
-                              </div>
-                            )}
-                            {parsed.improve && (
-                              <div>
-                                <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
-                                <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                                  {parsed.improve}
-                                </p>
-                              </div>
-                            )}
-                          </>
-                        );
-                      })()}
+                      <div>
+                        <h5 className="font-medium text-green-700 mb-2">שימור</h5>
+                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                          {respondentData.rawData.insight_adaptive.split('\n')[0]}
+                        </p>
+                      </div>
+                      <div>
+                        <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
+                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                          {respondentData.rawData.insight_adaptive.split('\n')[1]}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -378,29 +298,18 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
                       תובנות למידה
                     </h4>
                     <div className="space-y-4 text-right">
-                      {(() => {
-                        const parsed = parseInsightText(respondentData.rawData.insight_learning);
-                        return (
-                          <>
-                            {parsed.preserve && (
-                              <div>
-                                <h5 className="font-medium text-green-700 mb-2">שימור</h5>
-                                <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                                  {parsed.preserve}
-                                </p>
-                              </div>
-                            )}
-                            {parsed.improve && (
-                              <div>
-                                <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
-                                <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                                  {parsed.improve}
-                                </p>
-                              </div>
-                            )}
-                          </>
-                        );
-                      })()}
+                      <div>
+                        <h5 className="font-medium text-green-700 mb-2">שימור</h5>
+                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                          {respondentData.rawData.insight_learning.split('\n')[0]}
+                        </p>
+                      </div>
+                      <div>
+                        <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
+                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                          {respondentData.rawData.insight_learning.split('\n')[1]}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -412,29 +321,18 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
                       תובנות השראה
                     </h4>
                     <div className="space-y-4 text-right">
-                      {(() => {
-                        const parsed = parseInsightText(respondentData.rawData.insight_inspiration);
-                        return (
-                          <>
-                            {parsed.preserve && (
-                              <div>
-                                <h5 className="font-medium text-green-700 mb-2">שימור</h5>
-                                <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                                  {parsed.preserve}
-                                </p>
-                              </div>
-                            )}
-                            {parsed.improve && (
-                              <div>
-                                <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
-                                <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                                  {parsed.improve}
-                                </p>
-                              </div>
-                            )}
-                          </>
-                        );
-                      })()}
+                      <div>
+                        <h5 className="font-medium text-green-700 mb-2">שימור</h5>
+                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                          {respondentData.rawData.insight_inspiration.split('\n')[0]}
+                        </p>
+                      </div>
+                      <div>
+                        <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
+                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                          {respondentData.rawData.insight_inspiration.split('\n')[1]}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -446,29 +344,18 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
                       תובנות משמעות
                     </h4>
                     <div className="space-y-4 text-right">
-                      {(() => {
-                        const parsed = parseInsightText(respondentData.rawData.insight_meaning);
-                        return (
-                          <>
-                            {parsed.preserve && (
-                              <div>
-                                <h5 className="font-medium text-green-700 mb-2">שימור</h5>
-                                <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                                  {parsed.preserve}
-                                </p>
-                              </div>
-                            )}
-                            {parsed.improve && (
-                              <div>
-                                <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
-                                <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                                  {parsed.improve}
-                                </p>
-                              </div>
-                            )}
-                          </>
-                        );
-                      })()}
+                      <div>
+                        <h5 className="font-medium text-green-700 mb-2">שימור</h5>
+                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                          {respondentData.rawData.insight_meaning.split('\n')[0]}
+                        </p>
+                      </div>
+                      <div>
+                        <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
+                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                          {respondentData.rawData.insight_meaning.split('\n')[1]}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -480,29 +367,18 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
                       תובנות אותנטיות
                     </h4>
                     <div className="space-y-4 text-right">
-                      {(() => {
-                        const parsed = parseInsightText(respondentData.rawData.insight_authentic);
-                        return (
-                          <>
-                            {parsed.preserve && (
-                              <div>
-                                <h5 className="font-medium text-green-700 mb-2">שימור</h5>
-                                <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                                  {parsed.preserve}
-                                </p>
-                              </div>
-                            )}
-                            {parsed.improve && (
-                              <div>
-                                <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
-                                <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
-                                  {parsed.improve}
-                                </p>
-                              </div>
-                            )}
-                          </>
-                        );
-                      })()}
+                      <div>
+                        <h5 className="font-medium text-green-700 mb-2">שימור</h5>
+                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                          {respondentData.rawData.insight_authentic.split('\n')[0]}
+                        </p>
+                      </div>
+                      <div>
+                        <h5 className="font-medium text-orange-700 mb-2">שיפור</h5>
+                        <p className={`text-gray-700 leading-relaxed ${isPresenterMode ? 'text-lg' : 'text-sm'}`}>
+                          {respondentData.rawData.insight_authentic.split('\n')[1]}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 )}
