@@ -27,6 +27,8 @@ interface GroupData {
 
 export const exportGroupSalimaPDF = async (groupData: GroupData) => {
   try {
+    console.log('Starting PDF export for group:', groupData.group_number);
+    
     // Create a temporary container for the PDF layout
     const container = document.createElement('div');
     container.style.position = 'absolute';
@@ -34,12 +36,15 @@ export const exportGroupSalimaPDF = async (groupData: GroupData) => {
     container.style.top = '0';
     container.style.width = '210mm'; // A4 width
     container.style.backgroundColor = 'white';
+    container.style.fontFamily = 'Arial, sans-serif';
     document.body.appendChild(container);
 
-    // Import the PDF layout component dynamically
-    const { GroupSalimaPDFLayout } = await import('@/components/pdf/GroupSalimaPDFLayout');
+    // Import React and ReactDOM
     const React = await import('react');
     const ReactDOM = await import('react-dom/client');
+    
+    // Import the PDF layout component
+    const { GroupSalimaPDFLayout } = await import('@/components/pdf/GroupSalimaPDFLayout');
 
     // Create the PDF layout
     const pdfElement = React.createElement(GroupSalimaPDFLayout, { groupData });
@@ -49,27 +54,33 @@ export const exportGroupSalimaPDF = async (groupData: GroupData) => {
     root.render(pdfElement);
 
     // Wait for rendering to complete
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 3000));
 
     // Wait for charts to render
     await new Promise(resolve => {
       const checkCharts = () => {
-        const charts = container.querySelectorAll('svg');
+        const charts = container.querySelectorAll('svg, canvas');
         if (charts.length > 0) {
+          console.log('Charts found:', charts.length);
           resolve(true);
         } else {
-          setTimeout(checkCharts, 100);
+          setTimeout(checkCharts, 200);
         }
       };
       checkCharts();
     });
 
     // Additional wait for complete rendering
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
-    // Get all pages
-    const pages = container.querySelectorAll('[style*="pageBreakAfter"]');
+    // Get all page elements
+    const pages = container.querySelectorAll('[data-page]');
+    console.log('Found pages:', pages.length);
     
+    if (pages.length === 0) {
+      throw new Error('No pages found in PDF layout');
+    }
+
     // Create PDF
     const pdf = new jsPDF({
       orientation: 'portrait',
@@ -83,13 +94,10 @@ export const exportGroupSalimaPDF = async (groupData: GroupData) => {
     // Process each page
     for (let i = 0; i < pages.length; i++) {
       const page = pages[i] as HTMLElement;
+      console.log(`Processing page ${i + 1}/${pages.length}`);
       
-      // Add new page for each section (except the first)
-      if (i > 0) {
-        pdf.addPage();
-      } else {
-        pdf.addPage();
-      }
+      // Add new page
+      pdf.addPage();
 
       // Capture the page
       const canvas = await html2canvas(page, {
@@ -99,13 +107,7 @@ export const exportGroupSalimaPDF = async (groupData: GroupData) => {
         backgroundColor: '#ffffff',
         width: page.scrollWidth,
         height: page.scrollHeight,
-        onclone: (clonedDoc) => {
-          // Ensure all styles are applied
-          const clonedPage = clonedDoc.querySelector('[style*="pageBreakAfter"]');
-          if (clonedPage) {
-            (clonedPage as HTMLElement).style.pageBreakAfter = 'auto';
-          }
-        }
+        logging: false
       });
 
       // Calculate dimensions to fit A4
@@ -124,10 +126,10 @@ export const exportGroupSalimaPDF = async (groupData: GroupData) => {
 
       // Add image to PDF
       pdf.addImage(
-        canvas.toDataURL('image/jpeg', 0.9),
+        canvas.toDataURL('image/jpeg', 0.8),
         'JPEG',
         (210 - finalWidth) / 2, // Center horizontally
-        0,
+        10, // Small top margin
         finalWidth,
         finalHeight
       );
@@ -138,7 +140,8 @@ export const exportGroupSalimaPDF = async (groupData: GroupData) => {
     root.unmount();
 
     // Download the PDF
-    const fileName = `salima-group-${groupData.group_number}-insights-${new Date().toISOString().split('T')[0]}.pdf`;
+    const fileName = `salima-group-${groupData.group_number}-report-${new Date().toISOString().split('T')[0]}.pdf`;
+    console.log('Downloading PDF:', fileName);
     pdf.save(fileName);
 
     return true;

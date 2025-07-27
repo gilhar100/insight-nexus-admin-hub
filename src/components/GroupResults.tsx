@@ -94,6 +94,7 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
         description: "אנא המתן בזמן שהדוח נוצר",
       });
 
+      console.log('Starting PDF export with data:', groupData);
       await exportGroupSalimaPDF(groupData);
       
       toast({

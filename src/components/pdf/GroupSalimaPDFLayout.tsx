@@ -66,9 +66,9 @@ export const GroupSalimaPDFLayout: React.FC<GroupSalimaPDFLayoutProps> = ({ grou
   const { dimensions, strongest, weakest } = getDimensionInsights(groupData.averages);
 
   return (
-    <div className="bg-white text-black" style={{ fontFamily: 'Arial, sans-serif' }}>
+    <div className="bg-white text-black" style={{ fontFamily: 'Arial, sans-serif', direction: 'rtl' }}>
       {/* Page 1 - Header and Overview */}
-      <div className="min-h-screen p-8 flex flex-col" style={{ pageBreakAfter: 'always' }}>
+      <div data-page="1" className="min-h-screen p-8 flex flex-col bg-white">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-blue-800 mb-4">
             דוח תובנות קבוצתי SALIMA
@@ -128,7 +128,7 @@ export const GroupSalimaPDFLayout: React.FC<GroupSalimaPDFLayoutProps> = ({ grou
       </div>
 
       {/* Page 2 - Radar Chart */}
-      <div className="min-h-screen p-8 flex flex-col" style={{ pageBreakAfter: 'always' }}>
+      <div data-page="2" className="min-h-screen p-8 flex flex-col bg-white">
         <h2 className="text-3xl font-bold text-center text-blue-800 mb-8">
           פרופיל קבוצתי ייחודי - שישה ממדים
         </h2>
@@ -141,7 +141,7 @@ export const GroupSalimaPDFLayout: React.FC<GroupSalimaPDFLayoutProps> = ({ grou
       </div>
 
       {/* Page 3 - Dimension Insights */}
-      <div className="min-h-screen p-8" style={{ pageBreakAfter: 'always' }}>
+      <div data-page="3" className="min-h-screen p-8 bg-white">
         <h2 className="text-3xl font-bold text-center text-blue-800 mb-8">
           תובנות לפי ממדים
         </h2>
@@ -166,7 +166,7 @@ export const GroupSalimaPDFLayout: React.FC<GroupSalimaPDFLayoutProps> = ({ grou
       </div>
 
       {/* Page 4 - Archetype Distribution */}
-      <div className="min-h-screen p-8 flex flex-col" style={{ pageBreakAfter: 'always' }}>
+      <div data-page="4" className="min-h-screen p-8 flex flex-col bg-white">
         <h2 className="text-3xl font-bold text-center text-blue-800 mb-8">
           התפלגות סגנון מנהיגות
         </h2>
@@ -196,11 +196,6 @@ export const GroupSalimaPDFLayout: React.FC<GroupSalimaPDFLayoutProps> = ({ grou
             ))}
           </div>
         </div>
-      </div>
-
-      {/* Footer */}
-      <div className="text-center text-gray-500 text-sm p-4 border-t">
-        דוח נוצר בתאריך: {new Date().toLocaleDateString('he-IL')} | מערכת ניתוח SALIMA
       </div>
     </div>
   );
