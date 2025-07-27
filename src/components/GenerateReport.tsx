@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,11 +8,13 @@ import { useWorkshops } from '@/hooks/useWorkshops';
 import { useWorkshopDetails } from '@/hooks/useWorkshopDetails';
 import { useGroupData } from '@/hooks/useGroupData';
 import { exportCombinedPDFReport } from '@/utils/exportUtils';
+import { exportGroupInsightsPDF } from '@/utils/groupPDFExport';
 import { analyzeWorkshopWoca } from '@/utils/wocaAnalysis';
 
 export const GenerateReport: React.FC = () => {
   const [selectedGroupId, setSelectedGroupId] = useState<number | undefined>();
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isGeneratingInsights, setIsGeneratingInsights] = useState(false);
   
   const { workshops, error: workshopsError } = useWorkshops();
   const { workshopData, isLoading: isLoadingWorkshop } = useWorkshopDetails(selectedGroupId);
@@ -43,8 +46,31 @@ export const GenerateReport: React.FC = () => {
     }
   };
 
+  const handleGenerateInsightsPDF = async () => {
+    if (!selectedGroupId) return;
+    
+    setIsGeneratingInsights(true);
+    try {
+      const wocaAnalysis = workshopData ? analyzeWorkshopWoca(workshopData.participants, workshopData.workshop_id) : null;
+      
+      await exportGroupInsightsPDF({
+        groupNumber: selectedGroupId,
+        salimaData: salimaGroupData || undefined,
+        wocaData: workshopData && wocaAnalysis ? {
+          workshopData,
+          wocaAnalysis
+        } : undefined
+      });
+    } catch (error) {
+      console.error('Error generating insights PDF:', error);
+    } finally {
+      setIsGeneratingInsights(false);
+    }
+  };
+
   const isLoading = isLoadingWorkshop || isLoadingSalima;
   const hasData = workshopData && salimaGroupData && workshopData.participants.length >= 3 && salimaGroupData.participants.length > 0;
+  const hasSomeData = salimaGroupData || (workshopData && workshopData.participants.length >= 3);
 
   return (
     <div className="space-y-6" dir="rtl">
@@ -110,19 +136,23 @@ export const GenerateReport: React.FC = () => {
                 <Loader2 className="h-4 w-4 animate-spin" />
                 <span>טוען נתונים...</span>
               </div>
-            ) : hasData ? (
+            ) : hasSomeData ? (
               <div className="space-y-3">
-                <div className="flex items-center space-x-2 text-green-600">
-                  <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-                  <span>נתוני SALIMA זמינים ({salimaGroupData?.participant_count} משתתפים)</span>
-                </div>
-                <div className="flex items-center space-x-2 text-green-600">
-                  <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-                  <span>נתוני WOCA זמינים ({workshopData?.participant_count} משתתפים)</span>
-                </div>
+                {salimaGroupData && (
+                  <div className="flex items-center space-x-2 text-green-600">
+                    <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                    <span>נתוני SALIMA זמינים ({salimaGroupData?.participant_count} משתתפים)</span>
+                  </div>
+                )}
+                {workshopData && workshopData.participants.length >= 3 && (
+                  <div className="flex items-center space-x-2 text-green-600">
+                    <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                    <span>נתוני WOCA זמינים ({workshopData?.participant_count} משתתפים)</span>
+                  </div>
+                )}
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-4">
                   <p className="text-green-800 font-medium">
-                    ✓ הנתונים מוכנים להפקת דוח מקצועי
+                    ✓ נתונים זמינים להפקת דוח
                   </p>
                 </div>
               </div>
@@ -151,39 +181,80 @@ export const GenerateReport: React.FC = () => {
         </Card>
       )}
 
-      {/* Generate Report */}
-      {selectedGroupId && hasData && (
+      {/* Generate Reports */}
+      {selectedGroupId && hasSomeData && (
         <Card>
           <CardHeader>
-            <h2 className="text-xl font-semibold text-gray-800">הפקת דוח</h2>
-            <p className="text-gray-600">הדוח יכלול:</p>
-            <ul className="list-disc list-inside text-sm text-gray-600 space-y-1 mt-2">
-              <li>ניתוח ממדי SALIMA וארכיטיפים</li>
-              <li>ניתוח אזורי WOCA וחלוקה ארגונית</li>
-              <li>תרשימים וויזואליזציות צבעוניות</li>
-              <li>מקרא מפורט לכל הממדים והמושגים</li>
-              <li>סיכום והמלצות</li>
-            </ul>
+            <h2 className="text-xl font-semibold text-gray-800">הפקת דוחות</h2>
           </CardHeader>
           <CardContent>
-            <Button
-              onClick={handleGenerateReport}
-              disabled={isGenerating}
-              className="w-full h-12 text-lg"
-              size="lg"
-            >
-              {isGenerating ? (
-                <>
-                  <Loader2 className="h-5 w-5 animate-spin mr-2" />
-                  מפיק דוח PDF...
-                </>
-              ) : (
-                <>
-                  <Download className="h-5 w-5 mr-2" />
-                  הורד דוח PDF מקצועי
-                </>
+            <div className="space-y-4">
+              {/* Comprehensive Insights Report */}
+              <div className="border rounded-lg p-4">
+                <h3 className="font-semibold text-gray-800 mb-2">דוח תובנות מקיף</h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  דוח מקיף רב-עמודים המכיל כיסוי מלא, תרשימים, ניתוחים והמלצות
+                </p>
+                <ul className="list-disc list-inside text-xs text-gray-600 space-y-1 mb-4">
+                  <li>עמוד כיסוי עם פרטי הקבוצה</li>
+                  <li>ניתוח SALIMA עם תרשים רדאר ותובנות</li>
+                  <li>התפלגות ארכיטיפים והסברים</li>
+                  <li>ניתוח WOCA עם תרשימי אזורים</li>
+                  <li>תובנות מרכזיות והמלצות לפעולה</li>
+                </ul>
+                <Button
+                  onClick={handleGenerateInsightsPDF}
+                  disabled={isGeneratingInsights}
+                  className="w-full"
+                  variant="outline"
+                >
+                  {isGeneratingInsights ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      מפיק דוח תובנות מקיף...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="h-4 w-4 mr-2" />
+                      הורד דוח תובנות מקיף
+                    </>
+                  )}
+                </Button>
+              </div>
+
+              {/* Combined Technical Report (existing) */}
+              {hasData && (
+                <div className="border rounded-lg p-4">
+                  <h3 className="font-semibold text-gray-800 mb-2">דוח טכני משולב</h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    דוח קומפקטי המכיל תרשימים וניתוחים בסיסיים
+                  </p>
+                  <ul className="list-disc list-inside text-xs text-gray-600 space-y-1 mb-4">
+                    <li>ניתוח ממדי SALIMA וארכיטיפים</li>
+                    <li>ניתוח אזורי WOCA וחלוקה ארגונית</li>
+                    <li>תרשימים וויזואליזציות בסיסיות</li>
+                    <li>מקרא מפורט לכל הממדים והמושגים</li>
+                  </ul>
+                  <Button
+                    onClick={handleGenerateReport}
+                    disabled={isGenerating}
+                    className="w-full"
+                  >
+                    {isGenerating ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        מפיק דוח טכני...
+                      </>
+                    ) : (
+                      <>
+                        <Download className="h-4 w-4 mr-2" />
+                        הורד דוח טכני משולב
+                      </>
+                    )}
+                  </Button>
+                </div>
               )}
-            </Button>
+            </div>
           </CardContent>
         </Card>
       )}
