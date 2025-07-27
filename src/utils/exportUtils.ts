@@ -1,4 +1,3 @@
-
 import { RespondentData } from '@/hooks/useRespondentData';
 
 export const exportSalimaReport = (respondentData: RespondentData) => {
@@ -243,6 +242,74 @@ export const exportWocaGroupPDFReport = async (wocaData: any) => {
 
   try {
     console.log('Starting PDF generation for WOCA workshop:', wocaData.workshopData.workshop_id);
+    await html2pdf().set(opt).from(container).save();
+    console.log('PDF generation completed');
+  } finally {
+    // Clean up
+    root.unmount();
+    document.body.removeChild(container);
+  }
+};
+
+// Individual SALIMA PDF Report Export
+export const exportIndividualSalimaPDFReport = async (
+  respondentData: any,
+  activeDataSource: string
+) => {
+  const { default: html2pdf } = await import('html2pdf.js');
+  const { IndividualSalimaPDFLayout } = await import('@/components/pdf/IndividualSalimaPDFLayout');
+  const { createRoot } = await import('react-dom/client');
+  const React = await import('react');
+
+  // Create a temporary container
+  const container = document.createElement('div');
+  container.style.position = 'fixed';
+  container.style.left = '0';
+  container.style.top = '0';
+  container.style.width = '210mm';
+  container.style.height = '297mm';
+  container.style.zIndex = '-1000';
+  container.style.backgroundColor = 'white';
+  container.style.visibility = 'hidden';
+  document.body.appendChild(container);
+
+  // Render the PDF layout
+  const root = createRoot(container);
+  root.render(
+    React.createElement(IndividualSalimaPDFLayout, {
+      respondentData: respondentData,
+      activeDataSource: activeDataSource
+    })
+  );
+
+  // Wait for rendering
+  await new Promise(resolve => setTimeout(resolve, 2000));
+
+  const opt = {
+    margin: [0.3, 0.3, 0.3, 0.3],
+    filename: `salima-individual-insights-${respondentData.name.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.pdf`,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { 
+      scale: 1.5,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      letterRendering: true,
+      logging: false,
+      width: 794,
+      height: 1123
+    },
+    jsPDF: { 
+      unit: 'mm', 
+      format: 'a4', 
+      orientation: 'portrait',
+      compress: true
+    },
+    pagebreak: { mode: ['avoid-all', 'css'] }
+  };
+
+  try {
+    console.log('Starting PDF generation for individual SALIMA insights:', respondentData.name);
     await html2pdf().set(opt).from(container).save();
     console.log('PDF generation completed');
   } finally {

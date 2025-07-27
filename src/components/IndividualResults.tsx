@@ -1,11 +1,10 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { EnhancedSalimaRadarChart } from '@/components/EnhancedSalimaRadarChart';
 import { SalimaIntensityBar } from '@/components/SalimaIntensityBar';
 import { DataSourceToggle, DataSourceType } from '@/components/DataSourceToggle';
-import { exportSalimaReport, exportSalimaReportCSV } from '@/utils/exportUtils';
+import { exportSalimaReport, exportSalimaReportCSV, exportIndividualSalimaPDFReport } from '@/utils/exportUtils';
 import { useToast } from '@/hooks/use-toast';
 import {
   DropdownMenu,
@@ -61,6 +60,33 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
       title: "ייצוא הושלם בהצלחה",
       description: `הדוח יוצא כקובץ ${format.toUpperCase()}`,
     });
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!respondentData) {
+      toast({
+        title: "אין נתונים לייצוא",
+        description: "אנא נתח נבדק קודם",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      await exportIndividualSalimaPDFReport(respondentData, activeDataSource);
+      toast({
+        title: "הדוח הופק בהצלחה",
+        description: "קובץ ה-PDF נשמר במחשב שלך",
+        variant: "default"
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({
+        title: "שגיאה ביצירת הדוח",
+        description: "נכשל ביצירת קובץ ה-PDF",
+        variant: "destructive"
+      });
+    }
   };
 
   const getCurrentDimensions = () => {
@@ -145,22 +171,33 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
                 ציון SALIMA כללי (SLQ) - {getDataSourceLabel()}
               </span>
               {!isPresenterMode && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm">
-                      <Download className="h-4 w-4 ml-2" />
-                      ייצא דוח
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuItem onClick={() => handleExport('json')}>
-                      ייצא כ-JSON
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleExport('csv')}>
-                      ייצא כ-CSV
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleDownloadPDF}
+                    className="text-right"
+                  >
+                    <Download className="h-4 w-4 ml-2" />
+                    הורד דוח PDF
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm">
+                        <Download className="h-4 w-4 ml-2" />
+                        ייצא נתונים
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem onClick={() => handleExport('json')}>
+                        ייצא כ-JSON
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleExport('csv')}>
+                        ייצא כ-CSV
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               )}
             </div>
           </div>
