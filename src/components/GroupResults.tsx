@@ -1,6 +1,10 @@
 import React from 'react';
 import { SalimaGroupRadarChart } from '@/components/SalimaGroupRadarChart';
 import { ArchetypeDistributionChart } from '@/components/ArchetypeDistributionChart';
+import { Button } from '@/components/ui/button';
+import { Download } from 'lucide-react';
+import { exportGroupSalimaPDF } from '@/utils/groupSalimaPDFExport';
+import { useToast } from '@/hooks/use-toast';
 
 interface GroupData {
   group_number: number;
@@ -81,6 +85,31 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
   groupData,
   isPresenterMode
 }) => {
+  const { toast } = useToast();
+
+  const handlePDFExport = async () => {
+    try {
+      toast({
+        title: "מייצר דוח PDF...",
+        description: "אנא המתן בזמן שהדוח נוצר",
+      });
+
+      await exportGroupSalimaPDF(groupData);
+      
+      toast({
+        title: "הדוח יוצא בהצלחה!",
+        description: "הדוח הועבר להורדה",
+      });
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+      toast({
+        title: "שגיאה בייצוא הדוח",
+        description: "נסה שוב מאוחר יותר",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (!groupData || !groupData.participants || groupData.participants.length === 0) {
     return <div className="card">
         <div className="card-content p-8 text-center">
@@ -119,9 +148,22 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
       {/* Group Mean SLQ Score at the top */}
       <div className="card">
         <div className="card-content p-6 text-center">
-          <h2 className={`font-bold text-blue-800 mb-2 ${isPresenterMode ? 'text-3xl' : 'text-xl'}`}>
-            ציון מנהיגות קבוצתי
-          </h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className={`font-bold text-blue-800 ${isPresenterMode ? 'text-3xl' : 'text-xl'}`}>
+              ציון מנהיגות קבוצתי
+            </h2>
+            {!isPresenterMode && (
+              <Button 
+                onClick={handlePDFExport}
+                variant="outline" 
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <Download className="h-4 w-4" />
+                הורד דוח PDF
+              </Button>
+            )}
+          </div>
           <div className={`font-bold text-blue-600 ${isPresenterMode ? 'text-6xl' : 'text-4xl'}`}>
             {groupData.averages.overall.toFixed(2)}
           </div>
