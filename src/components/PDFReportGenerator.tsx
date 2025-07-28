@@ -442,16 +442,16 @@ export const PDFReportGenerator: React.FC = () => {
               boxSizing: 'border-box'
             }}
           >
-            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-              <h2 style={{ fontSize: '28px', color: '#1f2937', marginBottom: '24px' }}>
+            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+              <h2 style={{ fontSize: '28px', color: '#1f2937', marginBottom: '32px' }}>
                 התפלגות סגנון מנהיגות
               </h2>
               <div style={{ 
                 width: '100%', 
-                maxHeight: '450px', 
-                objectFit: 'contain',
-                display: 'block',
-                margin: '24px auto'
+                height: '500px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}>
                 <ArchetypeDistributionChart 
                   groupNumber={salimaData.group_number} 
@@ -459,17 +459,10 @@ export const PDFReportGenerator: React.FC = () => {
                 />
               </div>
             </div>
-
-            <div style={{ marginTop: '32px', padding: '0 32px', fontSize: '16px', lineHeight: '1.7' }}>
-              <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px' }}>הסבר על סגנונות המנהיגות</h3>
-              <p style={{ marginBottom: '12px' }}><strong>המנהל הסקרן:</strong> מנהל שמוביל דרך סקרנות, חיפוש מתמיד אחר ידע, והשראה.</p>
-              <p style={{ marginBottom: '12px' }}><strong>המנהל המעצים:</strong> מנהל שפועל מתוך כנות, הקשבה ותחושת שליחות.</p>
-              <p style={{ marginBottom: '12px' }}><strong>מנהל ההזדמנות:</strong> מנהל שחושב קדימה, מזהה מגמות, ופועל בזריזות.</p>
-            </div>
           </div>
         )}
 
-        {/* Page 3: WOCA Summary */}
+        {/* Page 3: WOCA Bar Chart */}
         {wocaData && (
           <div
             style={{
@@ -483,49 +476,53 @@ export const PDFReportGenerator: React.FC = () => {
               boxSizing: 'border-box'
             }}
           >
-            {/* Title Section */}
-            <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-              <h2 style={{ fontSize: '32px', color: '#1f2937', marginBottom: '16px' }}>
+            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+              <h2 style={{ fontSize: '28px', color: '#1f2937', marginBottom: '32px' }}>
                 ניתוח WOCA - אזורי שינוי
               </h2>
-              <p style={{ fontSize: '16px', color: '#6b7280', marginBottom: '0' }}>
-                {wocaData.participant_count} משתתפים | ציון ממוצע: {wocaData.average_score.toFixed(2)}
-              </p>
-            </div>
-
-            {/* Chart Section */}
-            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
               <div style={{ 
                 width: '100%', 
-                maxHeight: '350px', 
-                objectFit: 'contain',
-                margin: '0 auto',
-                display: 'block'
+                height: '500px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}>
                 <WocaGroupBarChart 
                   groupCategoryScores={wocaData.groupCategoryScores!}
                 />
               </div>
             </div>
+          </div>
+        )}
 
-            {/* Explanation Section */}
-            <div style={{ padding: '0 32px', fontSize: '16px', lineHeight: '1.6' }}>
-              <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '20px' }}>הסבר על אזורי השינוי</h3>
-              <p style={{ marginBottom: '12px' }}><strong>הזדמנות:</strong> אזור בו קיים פוטנציאל גבוה לשינוי חיובי.</p>
-              <p style={{ marginBottom: '12px' }}><strong>נוחות:</strong> אזור יציב שמספק ביטחון אך עלול להגביל צמיחה.</p>
-              <p style={{ marginBottom: '12px' }}><strong>אדישות:</strong> אזור של חוסר מעורבות הדורש התערבות.</p>
-              <p style={{ marginBottom: '20px' }}><strong>מלחמה:</strong> אזור של התנגדות פעילה לשינוי.</p>
-
+        {/* Page 4: WOCA Pie Chart */}
+        {wocaData && (
+          <div
+            style={{
+              width: '794px',
+              height: '1123px',
+              padding: '48px',
+              direction: 'rtl',
+              fontFamily: 'Arial, sans-serif',
+              pageBreakAfter: 'always',
+              backgroundColor: '#fff',
+              boxSizing: 'border-box'
+            }}
+          >
+            <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+              <h2 style={{ fontSize: '28px', color: '#1f2937', marginBottom: '32px' }}>
+                התפלגות אזורי תודעה
+              </h2>
               <div style={{ 
-                backgroundColor: '#fff8e1', 
-                border: '1px solid #fbc02d', 
-                padding: '16px', 
-                marginTop: '24px', 
-                fontSize: '14px', 
-                textAlign: 'center',
-                borderRadius: '8px'
+                width: '100%', 
+                height: '500px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}>
-                ⚠️ הערה: גרף זה מציג ציונים ממוצעים, לא התפלגות אזורי תודעה בין המשתתפים
+                <WocaCategoryRadarChart 
+                  categoryScores={wocaData.groupCategoryScores!}
+                />
               </div>
             </div>
           </div>
