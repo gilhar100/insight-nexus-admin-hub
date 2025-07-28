@@ -473,12 +473,11 @@ export const PDFReportGenerator: React.FC = () => {
           <div className="pdf-capture" id="woca-bar" style={{ width: '800px', height: '600px' }}>
             <WocaGroupBarChart 
               groupCategoryScores={wocaData.groupCategoryScores}
-              totalParticipants={wocaData.participant_count}
             />
           </div>
           <div className="pdf-capture" id="woca-radar" style={{ width: '800px', height: '600px' }}>
             <WocaCategoryRadarChart 
-              groupCategoryScores={wocaData.groupCategoryScores}
+              categoryScores={wocaData.groupCategoryScores}
             />
           </div>
         </div>
