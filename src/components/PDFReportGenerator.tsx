@@ -346,7 +346,7 @@ export const PDFReportGenerator: React.FC = () => {
               justifyContent: 'center'
             }}>
               <WocaCategoryRadarChart 
-                groupCategoryScores={wocaData.groupCategoryScores!}
+                categoryScores={wocaData.groupCategoryScores!}
               />
             </div>
           </div>
