@@ -1,126 +1,259 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useGroupData } from '@/hooks/useGroupData';
+import { useWorkshopData } from '@/hooks/useWorkshopData';
+import { SalimaGroupRadarChart } from '@/components/SalimaGroupRadarChart';
+import { SalimaArchetypeDistributionChart } from '@/components/SalimaArchetypeDistributionChart';
+import { WocaGroupBarChart } from '@/components/WocaGroupBarChart';
+import { ZoneDistributionChart } from '@/components/ZoneDistributionChart';
+import { WocaCategoryRadarChart } from '@/components/WocaCategoryRadarChart';
+import { GroupPDFExportLayout } from '@/components/GroupPDFExportLayout';
+import { analyzeWorkshopWoca } from '@/utils/wocaAnalysis';
+import { downloadGroupReportPDF } from '@/utils/downloadGroupReportPDF';
+import html2canvas from 'html2canvas';
 
-interface GroupPDFExportLayoutProps {
-  pdfImages: Record<string, string>;
-  groupNumber: number;
-  participantCount: number;
-  salimaScore: number;
-  strongestDimension: { name: string; score: number };
-  weakestDimension: { name: string; score: number };
-  archetypeLegendText?: string;
-  wocaZoneLabel: string;
-  wocaScore: number;
-  wocaParticipantCount: number;
-}
+export const PDFReportGenerator: React.FC = () => {
+  const [groupNumber, setGroupNumber] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [pdfImages, setPdfImages] = useState<Record<string, string>>({});
+  const [showPDFLayout, setShowPDFLayout] = useState(false);
 
-export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
-  pdfImages,
-  groupNumber,
-  participantCount,
-  salimaScore,
-  strongestDimension,
-  weakestDimension,
-  archetypeLegendText,
-  wocaZoneLabel,
-  wocaScore,
-  wocaParticipantCount
-}) => {
-  const pageStyle: React.CSSProperties = {
-    width: '794px',
-    height: '1123px',
-    padding: '40px',
-    fontFamily: 'Arial, sans-serif',
-    direction: 'rtl',
-    backgroundColor: '#ffffff',
-    color: '#1f2937',
-    pageBreakAfter: 'always',
-    boxSizing: 'border-box',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center'
+  const chartsContainerRef = useRef<HTMLDivElement>(null);
+  const pdfLayoutRef = useRef<HTMLDivElement>(null);
+
+  const { data: groupData, isLoading: salimaLoading, error: salimaError } = useGroupData(groupNumber || 0);
+  const { workshopData, isLoading: wocaLoading, error: wocaError } = useWorkshopData(groupNumber || 0);
+
+  const loadGroupData = async () => {
+    if (!groupNumber) {
+      setError('Please enter a group number');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      console.log('Loading data for group:', groupNumber);
+    } catch (err) {
+      console.error('Error loading group data:', err);
+      setError('Failed to load group data');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const chartImageStyle: React.CSSProperties = {
-    maxWidth: '100%',
-    height: 'auto',
-    border: '1px solid hsl(var(--border))',
-    borderRadius: '8px',
-    display: 'block',
-    margin: '0 auto'
+  const captureChartAsImage = async (elementId: string): Promise<string> => {
+    const element = document.getElementById(elementId);
+    if (!element) throw new Error(`Element with id "${elementId}" not found`);
+
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    const canvas = await html2canvas(element, {
+      backgroundColor: '#ffffff',
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      height: element.offsetHeight,
+      width: element.offsetWidth,
+      scrollX: 0,
+      scrollY: 0
+    });
+
+    const base64Image = canvas.toDataURL('image/png');
+
+    if (base64Image === 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==') {
+      throw new Error(`Captured image for ${elementId} is blank`);
+    }
+
+    return base64Image;
   };
 
-  const headerStyle: React.CSSProperties = {
-    textAlign: 'center',
-    marginBottom: '30px',
-    borderBottom: '3px solid hsl(var(--primary))',
-    paddingBottom: '20px',
-    width: '100%'
+  const exportGroupPDF = async () => {
+    if (!groupData && !workshopData) {
+      setError('No data available for export');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const chartImages: Record<string, string> = {};
+
+      if (groupData) {
+        chartImages['radar-chart'] = await captureChartAsImage('radar-chart');
+        chartImages['archetype-chart'] = await captureChartAsImage('archetype-chart');
+      }
+
+      if (workshopData) {
+        chartImages['woca-bar'] = await captureChartAsImage('woca-bar');
+        chartImages['woca-pie'] = await captureChartAsImage('woca-pie');
+        chartImages['woca-matrix'] = await captureChartAsImage('woca-matrix');
+      }
+
+      setPdfImages(chartImages);
+      setShowPDFLayout(true);
+
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      const pdfElement = document.getElementById('pdf-export-root');
+      if (!pdfElement) throw new Error('PDF export element not found');
+
+      const pdfHtml = pdfElement.outerHTML;
+      const filename = `Group_Report_${groupNumber || 'Unknown'}.pdf`;
+
+      await downloadGroupReportPDF(pdfHtml, filename);
+    } catch (err) {
+      console.error('❌ PDF Export Error:', err);
+      setError(`Failed to generate PDF: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const titleStyle: React.CSSProperties = {
-    fontSize: '28px',
-    fontWeight: 'bold',
-    color: 'hsl(var(--primary))',
-    marginBottom: '10px'
+  const getPDFLayoutData = () => {
+    if (!groupData || !workshopData) return null;
+
+    const wocaAnalysis = analyzeWorkshopWoca(workshopData.participants, workshopData.workshop_id);
+    const strongestDimension = Object.entries(groupData.averages)
+      .filter(([key]) => key !== 'overall')
+      .reduce((max, [key, value]) =>
+        value > max.score ? { name: key, score: value } : max,
+        { name: '', score: 0 }
+      );
+
+    const weakestDimension = Object.entries(groupData.averages)
+      .filter(([key]) => key !== 'overall')
+      .reduce((min, [key, value]) =>
+        value < min.score ? { name: key, score: value } : min,
+        { name: '', score: 5 }
+      );
+
+    return {
+      groupNumber: groupData.group_number,
+      participantCount: groupData.participant_count,
+      salimaScore: groupData.averages.overall,
+      strongestDimension,
+      weakestDimension,
+      wocaZoneLabel: wocaAnalysis.groupDominantZoneByCount || 'לא זוהה',
+      wocaScore: workshopData.average_score,
+      wocaParticipantCount: workshopData.participant_count,
+      wocaAnalysis,
+    };
   };
 
-  const subtitleStyle: React.CSSProperties = {
-    fontSize: '16px',
-    color: 'hsl(var(--muted-foreground))',
-    marginBottom: '20px'
-  };
-
-  const currentDate = new Date().toLocaleDateString('he-IL');
+  const pdfLayoutData = getPDFLayoutData();
 
   return (
-    <div
-      id="pdf-export-root"
-      style={{
-        width: '794px',
-        margin: '0 auto',
-        direction: 'rtl',
-        fontFamily: 'Arial, sans-serif',
-        backgroundColor: '#fff'
-      }}
-    >
-      {/* Page 1 - SALIMA Overview */}
-      <div style={pageStyle}>
-        <div style={headerStyle}>
-          <h1 style={titleStyle}>דוח תובנות קבוצתי SALIMA</h1>
-          <p style={subtitleStyle}>קבוצה {groupNumber} • {currentDate} • {participantCount} משתתפים</p>
-        </div>
-
-        <div style={{ textAlign: 'center', marginBottom: '30px' }}>
-          <h2 style={{ fontSize: '22px', color: 'hsl(var(--primary))' }}>ציון SLQ קבוצתי</h2>
-          <div style={{ fontSize: '42px', fontWeight: 'bold' }}>{salimaScore.toFixed(2)}</div>
-        </div>
-
-        <div style={{ display: 'flex', justifyContent: 'space-around', width: '100%', marginBottom: '30px' }}>
-          <div style={{ textAlign: 'center' }}>
-            <h3 style={{ color: 'hsl(var(--primary))' }}>מימד חזק ביותר</h3>
-            <p>{strongestDimension.name}</p>
-            <strong>{strongestDimension.score.toFixed(2)}</strong>
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            <h3 style={{ color: 'hsl(var(--destructive))' }}>מימד חלש ביותר</h3>
-            <p>{weakestDimension.name}</p>
-            <strong>{weakestDimension.score.toFixed(2)}</strong>
-          </div>
-        </div>
-
-        <div style={{ marginBottom: '40px', textAlign: 'center' }}>
-          <h3>תרשים רדאר קבוצתי</h3>
-          {pdfImages['radar-chart'] && <img src={pdfImages['radar-chart']} alt="Radar" style={chartImageStyle} />}
-        </div>
-
-        <div style={{ marginBottom: '40px', textAlign: 'center' }}>
-          <h3>תרשים ארכיטיפים</h3>
-          {pdfImages['archetype-chart'] && <img src={pdfImages['archetype-chart']} alt="Archetypes" style={chartImageStyle} />}
-        </div>
+    <div className="space-y-6 p-6">
+      <div className="text-center">
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">
+          יצירת דוח PDF קבוצתי
+        </h1>
+        <p className="text-gray-600">
+          צור דוח מקיף המשלב תובנות SALIMA ו-WOCA עבור קבוצה
+        </p>
       </div>
 
-      {/* Additional pages restored hereafter... */}
-      {/* You can paste your other four original pages below this point if needed */}
+      <div className="flex gap-4 items-center justify-center">
+        <Input
+          type="number"
+          placeholder="הזן מספר קבוצה"
+          value={groupNumber || ''}
+          onChange={(e) => setGroupNumber(Number(e.target.value))}
+          className="w-48"
+        />
+        <Button
+          onClick={loadGroupData}
+          disabled={isLoading || salimaLoading || wocaLoading}
+        >
+          {isLoading || salimaLoading || wocaLoading ? 'טוען...' : 'טען קבוצה'}
+        </Button>
+      </div>
+
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {(salimaError || wocaError) && (
+        <Alert variant="destructive">
+          <AlertDescription>
+            {salimaError || wocaError}
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {(groupData || workshopData) && (
+        <div className="text-center">
+          <Button
+            onClick={exportGroupPDF}
+            disabled={isLoading}
+            className="text-lg px-8 py-4"
+          >
+            {isLoading ? '🔄 מכין דוח...' : '📄 הורד דוח קבוצתי (SALIMA + WOCA)'}
+          </Button>
+        </div>
+      )}
+
+      <div
+        ref={chartsContainerRef}
+        className="fixed -top-[10000px] left-0 bg-white"
+        style={{ width: '794px', padding: '16px' }}
+      >
+        {groupData && (
+          <>
+            <div id="radar-chart" className="w-full h-96 bg-white p-4">
+              <SalimaGroupRadarChart averages={groupData.averages} />
+            </div>
+            <div id="archetype-chart" className="w-full h-96 bg-white p-4">
+              <SalimaArchetypeDistributionChart participants={groupData.participants} />
+            </div>
+          </>
+        )}
+
+        {workshopData && pdfLayoutData?.wocaAnalysis && (
+          <>
+            <div id="woca-bar" className="w-full h-96 bg-white p-4">
+              <WocaGroupBarChart groupCategoryScores={pdfLayoutData.wocaAnalysis.groupCategoryScores} />
+            </div>
+            <div id="woca-pie" className="w-full h-96 bg-white p-4">
+              <ZoneDistributionChart
+                zoneDistribution={{
+                  opportunity: pdfLayoutData.wocaAnalysis.groupZoneCounts.opportunity,
+                  comfort: pdfLayoutData.wocaAnalysis.groupZoneCounts.comfort,
+                  apathy: pdfLayoutData.wocaAnalysis.groupZoneCounts.apathy,
+                  war: pdfLayoutData.wocaAnalysis.groupZoneCounts.war,
+                }}
+              />
+            </div>
+            <div id="woca-matrix" className="w-full h-96 bg-white p-4">
+              <WocaCategoryRadarChart categoryScores={pdfLayoutData.wocaAnalysis.groupCategoryScores} />
+            </div>
+          </>
+        )}
+      </div>
+
+      {showPDFLayout && pdfLayoutData && (
+        <div id="pdf-export-root" ref={pdfLayoutRef} style={{ width: '794px', margin: '0 auto' }}>
+          <GroupPDFExportLayout
+            pdfImages={pdfImages}
+            groupNumber={pdfLayoutData.groupNumber}
+            participantCount={pdfLayoutData.participantCount}
+            salimaScore={pdfLayoutData.salimaScore}
+            strongestDimension={pdfLayoutData.strongestDimension}
+            weakestDimension={pdfLayoutData.weakestDimension}
+            wocaZoneLabel={pdfLayoutData.wocaZoneLabel}
+            wocaScore={pdfLayoutData.wocaScore}
+            wocaParticipantCount={pdfLayoutData.wocaParticipantCount}
+          />
+        </div>
+      )}
     </div>
   );
 };
