@@ -12,6 +12,7 @@ import { ZoneDistributionChart } from '@/components/ZoneDistributionChart';
 import { WocaCategoryRadarChart } from '@/components/WocaCategoryRadarChart';
 import { GroupPDFExportLayout } from '@/components/GroupPDFExportLayout';
 import { analyzeWorkshopWoca } from '@/utils/wocaAnalysis';
+import { downloadGroupReportPDF } from '@/utils/downloadGroupReportPDF';
 import html2canvas from 'html2canvas';
 
 export const PDFReportGenerator: React.FC = () => {
@@ -22,6 +23,7 @@ export const PDFReportGenerator: React.FC = () => {
   const [showPDFLayout, setShowPDFLayout] = useState(false);
   
   const chartsContainerRef = useRef<HTMLDivElement>(null);
+  const pdfLayoutRef = useRef<HTMLDivElement>(null);
 
   const { data: groupData, isLoading: salimaLoading, error: salimaError } = useGroupData(groupNumber || 0);
   const { workshopData, isLoading: wocaLoading, error: wocaError } = useWorkshopData(groupNumber || 0);
@@ -109,6 +111,24 @@ export const PDFReportGenerator: React.FC = () => {
       // Store images and show PDF layout
       setPdfImages(chartImages);
       setShowPDFLayout(true);
+      
+      // Wait for PDF layout to render
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Get the PDF layout HTML
+      const pdfElement = document.getElementById('pdf-export-root');
+      if (!pdfElement) {
+        throw new Error('PDF export element not found');
+      }
+      
+      const pdfHtml = pdfElement.outerHTML;
+      console.log('📄 PDF HTML generated, length:', pdfHtml.length);
+      
+      // Generate filename
+      const filename = `Group_Report_${groupNumber || 'Unknown'}.pdf`;
+      
+      // Download the PDF
+      await downloadGroupReportPDF(pdfHtml, filename);
       
       console.log('✅ PDF export completed successfully!');
     } catch (err) {
@@ -201,7 +221,7 @@ export const PDFReportGenerator: React.FC = () => {
             disabled={isLoading}
             className="text-lg px-8 py-4"
           >
-            📄 הורד דוח קבוצתי (SALIMA + WOCA)
+            {isLoading ? '🔄 מכין דוח...' : '📄 הורד דוח קבוצתי (SALIMA + WOCA)'}
           </Button>
         </div>
       )}
@@ -247,7 +267,7 @@ export const PDFReportGenerator: React.FC = () => {
 
       {/* PDF Layout */}
       {showPDFLayout && pdfLayoutData && (
-        <div id="pdf-export-root">
+        <div id="pdf-export-root" ref={pdfLayoutRef}>
           <GroupPDFExportLayout
             pdfImages={pdfImages}
             groupNumber={pdfLayoutData.groupNumber}
