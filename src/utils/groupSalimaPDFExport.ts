@@ -34,9 +34,11 @@ export const exportGroupSalimaPDF = async (groupData: GroupData) => {
     container.style.position = 'absolute';
     container.style.left = '-9999px';
     container.style.top = '0';
-    container.style.width = '210mm'; // A4 width
+    container.style.width = '794px'; // A4 width in pixels at 96 DPI
+    container.style.height = 'auto';
     container.style.backgroundColor = 'white';
     container.style.fontFamily = 'Arial, sans-serif';
+    container.style.overflow = 'visible';
     document.body.appendChild(container);
 
     // Import React and ReactDOM
@@ -53,8 +55,8 @@ export const exportGroupSalimaPDF = async (groupData: GroupData) => {
     const root = ReactDOM.createRoot(container);
     root.render(pdfElement);
 
-    // Wait for rendering to complete
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    // Wait for initial rendering
+    await new Promise(resolve => setTimeout(resolve, 2000));
 
     // Wait for charts to render
     await new Promise(resolve => {
@@ -62,16 +64,17 @@ export const exportGroupSalimaPDF = async (groupData: GroupData) => {
         const charts = container.querySelectorAll('svg, canvas');
         if (charts.length > 0) {
           console.log('Charts found:', charts.length);
-          resolve(true);
+          // Additional wait for chart animations
+          setTimeout(resolve, 1000);
         } else {
-          setTimeout(checkCharts, 200);
+          setTimeout(checkCharts, 300);
         }
       };
       checkCharts();
     });
 
     // Additional wait for complete rendering
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 1500));
 
     // Get all page elements
     const pages = container.querySelectorAll('[data-page]');
@@ -99,39 +102,33 @@ export const exportGroupSalimaPDF = async (groupData: GroupData) => {
       // Add new page
       pdf.addPage();
 
-      // Capture the page
+      // Capture the page with better settings
       const canvas = await html2canvas(page, {
-        scale: 2,
+        scale: 1.5,
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
-        width: page.scrollWidth,
-        height: page.scrollHeight,
+        width: 794,
+        height: 1123,
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: 794,
+        windowHeight: 1123,
         logging: false
       });
 
-      // Calculate dimensions to fit A4
+      // Calculate dimensions for A4
       const imgWidth = 210; // A4 width in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const imgHeight = 297; // A4 height in mm
       
-      // If content is too tall, scale it down
-      const maxHeight = 297; // A4 height in mm
-      let finalWidth = imgWidth;
-      let finalHeight = imgHeight;
-      
-      if (imgHeight > maxHeight) {
-        finalHeight = maxHeight;
-        finalWidth = (canvas.width * maxHeight) / canvas.height;
-      }
-
-      // Add image to PDF
+      // Add image to PDF, fitting to A4
       pdf.addImage(
-        canvas.toDataURL('image/jpeg', 0.8),
-        'JPEG',
-        (210 - finalWidth) / 2, // Center horizontally
-        10, // Small top margin
-        finalWidth,
-        finalHeight
+        canvas.toDataURL('image/png', 1.0),
+        'PNG',
+        0,
+        0,
+        imgWidth,
+        imgHeight
       );
     }
 

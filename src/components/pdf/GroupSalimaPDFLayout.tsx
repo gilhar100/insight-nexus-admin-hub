@@ -68,15 +68,15 @@ export const GroupSalimaPDFLayout: React.FC<GroupSalimaPDFLayoutProps> = ({ grou
   return (
     <div className="bg-white text-black" style={{ fontFamily: 'Arial, sans-serif', direction: 'rtl' }}>
       {/* Page 1 - Header and Overview */}
-      <div data-page="1" className="min-h-screen p-8 flex flex-col bg-white">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-blue-800 mb-4">
+      <div data-page="1" className="p-12 bg-white" style={{ width: '794px', height: '1123px', pageBreakAfter: 'always' }}>
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-bold text-blue-800 mb-6">
             דוח תובנות קבוצתי SALIMA
           </h1>
-          <div className="text-2xl text-gray-700 mb-2">
+          <div className="text-3xl text-gray-700 mb-4">
             קבוצה מספר: {groupData.group_number}
           </div>
-          <div className="text-xl text-gray-600 mb-6">
+          <div className="text-2xl text-gray-600 mb-8">
             {groupData.participant_count} משתתפים
           </div>
           <div className="text-lg text-gray-500">
@@ -85,42 +85,42 @@ export const GroupSalimaPDFLayout: React.FC<GroupSalimaPDFLayoutProps> = ({ grou
         </div>
 
         {/* Overall Score */}
-        <div className="text-center mb-8">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 inline-block">
-            <h2 className="text-2xl font-bold text-blue-800 mb-2">
+        <div className="text-center mb-16">
+          <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-10 inline-block">
+            <h2 className="text-3xl font-bold text-blue-800 mb-4">
               ציון מנהיגות קבוצתי
             </h2>
-            <div className="text-5xl font-bold text-blue-600 mb-2">
+            <div className="text-7xl font-bold text-blue-600 mb-4">
               {groupData.averages.overall.toFixed(2)}
             </div>
-            <div className="text-blue-500">
+            <div className="text-xl text-blue-500">
               ממוצע ציוני SLQ
             </div>
           </div>
         </div>
 
         {/* Key Insights */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1">
-          <div className="bg-green-50 border border-green-200 rounded-lg p-6">
-            <h3 className="text-xl font-bold text-green-800 mb-3">
+        <div className="grid grid-cols-2 gap-8">
+          <div className="bg-green-50 border-2 border-green-200 rounded-xl p-8">
+            <h3 className="text-2xl font-bold text-green-800 mb-6 text-center">
               הממד החזק ביותר
             </h3>
-            <div className="text-3xl font-bold text-green-600 mb-2">
+            <div className="text-5xl font-bold text-green-600 mb-4 text-center">
               {strongest.score.toFixed(1)}
             </div>
-            <div className="text-lg text-green-700 font-semibold">
+            <div className="text-xl text-green-700 font-semibold text-center">
               {strongest.name}
             </div>
           </div>
 
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-6">
-            <h3 className="text-xl font-bold text-orange-800 mb-3">
+          <div className="bg-orange-50 border-2 border-orange-200 rounded-xl p-8">
+            <h3 className="text-2xl font-bold text-orange-800 mb-6 text-center">
               ממד לפיתוח
             </h3>
-            <div className="text-3xl font-bold text-orange-600 mb-2">
+            <div className="text-5xl font-bold text-orange-600 mb-4 text-center">
               {weakest.score.toFixed(1)}
             </div>
-            <div className="text-lg text-orange-700 font-semibold">
+            <div className="text-xl text-orange-700 font-semibold text-center">
               {weakest.name}
             </div>
           </div>
@@ -128,36 +128,36 @@ export const GroupSalimaPDFLayout: React.FC<GroupSalimaPDFLayoutProps> = ({ grou
       </div>
 
       {/* Page 2 - Radar Chart */}
-      <div data-page="2" className="min-h-screen p-8 flex flex-col bg-white">
-        <h2 className="text-3xl font-bold text-center text-blue-800 mb-8">
+      <div data-page="2" className="p-12 bg-white" style={{ width: '794px', height: '1123px', pageBreakAfter: 'always' }}>
+        <h2 className="text-4xl font-bold text-center text-blue-800 mb-12">
           פרופיל קבוצתי ייחודי - שישה ממדים
         </h2>
         
-        <div className="flex-1 flex items-center justify-center">
-          <div className="w-full max-w-4xl" style={{ height: '600px' }}>
+        <div className="flex items-center justify-center" style={{ height: '750px' }}>
+          <div className="w-full max-w-4xl h-full">
             <SalimaGroupRadarChart averages={groupData.averages} />
           </div>
         </div>
       </div>
 
       {/* Page 3 - Dimension Insights */}
-      <div data-page="3" className="min-h-screen p-8 bg-white">
-        <h2 className="text-3xl font-bold text-center text-blue-800 mb-8">
+      <div data-page="3" className="p-12 bg-white" style={{ width: '794px', height: '1123px', pageBreakAfter: 'always' }}>
+        <h2 className="text-4xl font-bold text-center text-blue-800 mb-12">
           תובנות לפי ממדים
         </h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-2 gap-8">
           {dimensions.map((dimension) => (
-            <div key={dimension.key} className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-              <div className="flex items-center justify-between mb-3">
+            <div key={dimension.key} className="bg-gray-50 border-2 border-gray-200 rounded-xl p-6">
+              <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold text-gray-800">
                   {dimension.name}
                 </h3>
-                <div className="text-2xl font-bold text-blue-600">
+                <div className="text-3xl font-bold text-blue-600">
                   {dimension.score.toFixed(1)}
                 </div>
               </div>
-              <p className="text-sm text-gray-700 leading-relaxed">
+              <p className="text-base text-gray-700 leading-relaxed">
                 {getDimensionExplanation(dimension.key)}
               </p>
             </div>
@@ -166,35 +166,33 @@ export const GroupSalimaPDFLayout: React.FC<GroupSalimaPDFLayoutProps> = ({ grou
       </div>
 
       {/* Page 4 - Archetype Distribution */}
-      <div data-page="4" className="min-h-screen p-8 flex flex-col bg-white">
-        <h2 className="text-3xl font-bold text-center text-blue-800 mb-8">
+      <div data-page="4" className="p-12 bg-white" style={{ width: '794px', height: '1123px' }}>
+        <h2 className="text-4xl font-bold text-center text-blue-800 mb-12">
           התפלגות סגנון מנהיגות
         </h2>
         
-        <div className="flex-1">
-          <div className="h-96 mb-8">
-            <ArchetypeDistributionChart 
-              groupNumber={groupData.group_number} 
-              isPresenterMode={false}
-            />
-          </div>
+        <div className="mb-12" style={{ height: '400px' }}>
+          <ArchetypeDistributionChart 
+            groupNumber={groupData.group_number} 
+            isPresenterMode={false}
+          />
+        </div>
+        
+        <div className="space-y-8">
+          <h3 className="text-3xl font-bold text-center text-gray-800 mb-8">
+            תיאור הארכיטיפים
+          </h3>
           
-          <div className="space-y-6">
-            <h3 className="text-2xl font-bold text-center text-gray-800 mb-6">
-              תיאור הארכיטיפים
-            </h3>
-            
-            {Object.entries(archetypeDescriptions).map(([archetype, description]) => (
-              <div key={archetype} className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                <h4 className="text-xl font-bold text-blue-800 mb-3">
-                  {archetype}
-                </h4>
-                <p className="text-gray-700 leading-relaxed">
-                  {description}
-                </p>
-              </div>
-            ))}
-          </div>
+          {Object.entries(archetypeDescriptions).map(([archetype, description]) => (
+            <div key={archetype} className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6">
+              <h4 className="text-2xl font-bold text-blue-800 mb-4">
+                {archetype}
+              </h4>
+              <p className="text-lg text-gray-700 leading-relaxed">
+                {description}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
     </div>
