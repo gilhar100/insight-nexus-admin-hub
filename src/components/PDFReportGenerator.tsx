@@ -428,7 +428,40 @@ export const PDFReportGenerator: React.FC = () => {
           </div>
         )}
 
-        {/* Page 2: SALIMA Archetype Distribution */}
+        {/* Page 2: Radar Chart */}
+        {salimaData && (
+          <div
+            style={{
+              width: '794px',
+              height: '1123px',
+              padding: '48px',
+              direction: 'rtl',
+              fontFamily: 'Arial, sans-serif',
+              pageBreakAfter: 'always',
+              backgroundColor: '#fff',
+              boxSizing: 'border-box'
+            }}
+          >
+            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+              <h2 style={{ fontSize: '28px', color: '#1f2937', marginBottom: '24px' }}>
+                גרף מכ"ם - פרופיל קבוצתי
+              </h2>
+              <div style={{ 
+                width: '100%', 
+                maxHeight: '550px', 
+                objectFit: 'contain',
+                margin: '0 auto',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <SalimaGroupRadarChart averages={salimaData.averages} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Page 3: Archetype Chart */}
         {salimaData && (
           <div
             style={{
@@ -448,12 +481,10 @@ export const PDFReportGenerator: React.FC = () => {
               </h2>
               <div style={{ 
                 width: '100%', 
-                height: '500px', 
-                border: '1px solid #e5e7eb',
-                backgroundColor: '#f9fafb',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
+                maxHeight: '450px', 
+                objectFit: 'contain',
+                display: 'block',
+                margin: '24px auto'
               }}>
                 <ArchetypeDistributionChart 
                   groupNumber={salimaData.group_number} 
@@ -462,26 +493,16 @@ export const PDFReportGenerator: React.FC = () => {
               </div>
             </div>
 
-            <div style={{ marginTop: '40px' }}>
-              <h3 style={{ fontSize: '20px', color: '#1f2937', marginBottom: '16px' }}>
-                הסבר על סגנונות המנהיגות
-              </h3>
-              <div style={{ fontSize: '14px', lineHeight: '1.6', color: '#374151' }}>
-                <p style={{ marginBottom: '16px' }}>
-                  <strong>המנהל הסקרן:</strong> מנהל שמוביל דרך סקרנות, חיפוש מתמיד אחר ידע, והשראה.
-                </p>
-                <p style={{ marginBottom: '16px' }}>
-                  <strong>המנהל המעצים:</strong> מנהל שפועל מתוך כנות, הקשבה ותחושת שליחות.
-                </p>
-                <p style={{ marginBottom: '16px' }}>
-                  <strong>מנהל ההזדמנות:</strong> מנהל שמזהה מגמות, חושב קדימה, ופועל בזריזות.
-                </p>
-              </div>
+            <div style={{ marginTop: '24px', padding: '0 32px', fontSize: '16px', lineHeight: '1.7' }}>
+              <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '8px' }}>הסבר על סגנונות המנהיגות</h3>
+              <p><strong>המנהל הסקרן:</strong> מנהל שמוביל דרך סקרנות, חיפוש מתמיד אחר ידע, והשראה.</p>
+              <p><strong>המנהל המעצים:</strong> מנהל שפועל מתוך כנות, הקשבה ותחושת שליחות.</p>
+              <p><strong>מנהל ההזדמנות:</strong> מנהל שחושב קדימה, מזהה מגמות, ופועל בזריזות.</p>
             </div>
           </div>
         )}
 
-        {/* Page 3: WOCA Analysis */}
+        {/* Page 4: WOCA Summary */}
         {wocaData && (
           <div
             style={{
@@ -496,7 +517,7 @@ export const PDFReportGenerator: React.FC = () => {
             }}
           >
             <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-              <h2 style={{ fontSize: '28px', color: '#1f2937', marginBottom: '16px' }}>
+              <h2 style={{ fontSize: '32px', color: '#1f2937', marginBottom: '16px' }}>
                 ניתוח WOCA - אזורי שינוי
               </h2>
               <p style={{ fontSize: '16px', color: '#6b7280' }}>
@@ -504,15 +525,13 @@ export const PDFReportGenerator: React.FC = () => {
               </p>
             </div>
 
-            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+            <div style={{ textAlign: 'center', marginBottom: '32px' }}>
               <div style={{ 
                 width: '100%', 
-                height: '400px', 
-                border: '1px solid #e5e7eb',
-                backgroundColor: '#f9fafb',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
+                maxHeight: '400px', 
+                objectFit: 'contain',
+                margin: '32px auto',
+                display: 'block'
               }}>
                 <WocaGroupBarChart 
                   groupCategoryScores={wocaData.groupCategoryScores!}
@@ -520,23 +539,15 @@ export const PDFReportGenerator: React.FC = () => {
               </div>
             </div>
 
-            <div style={{ marginTop: '40px' }}>
-              <h3 style={{ fontSize: '20px', color: '#1f2937', marginBottom: '16px' }}>
-                הסבר על אזורי השינוי
-              </h3>
-              <div style={{ fontSize: '14px', lineHeight: '1.6', color: '#374151' }}>
-                <p style={{ marginBottom: '16px' }}>
-                  <strong>הזדמנות:</strong> אזור בו קיים פוטנציאל גבוה לשינוי חיובי.
-                </p>
-                <p style={{ marginBottom: '16px' }}>
-                  <strong>נוחות:</strong> אזור יציב שמספק ביטחון אך עלול להגביל צמיחה.
-                </p>
-                <p style={{ marginBottom: '16px' }}>
-                  <strong>אדישות:</strong> אזור של חוסר מעורבות הדורש התערבות.
-                </p>
-                <p style={{ marginBottom: '16px' }}>
-                  <strong>מלחמה:</strong> אזור של התנגדות פעילה לשינוי.
-                </p>
+            <div style={{ padding: '0 32px', fontSize: '16px', lineHeight: '1.6' }}>
+              <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '12px' }}>הסבר על אזורי השינוי</h3>
+              <p><strong>הזדמנות:</strong> אזור בו קיים פוטנציאל גבוה לשינוי חיובי.</p>
+              <p><strong>נוחות:</strong> אזור יציב שמספק ביטחון אך עלול להגביל צמיחה.</p>
+              <p><strong>אדישות:</strong> אזור של חוסר מעורבות הדורש התערבות.</p>
+              <p><strong>מלחמה:</strong> אזור של התנגדות פעילה לשינוי.</p>
+
+              <div style={{ backgroundColor: '#fff8e1', border: '1px solid #fbc02d', padding: '12px', marginTop: '24px', fontSize: '14px', textAlign: 'center' }}>
+                ⚠️ הערה: גרף זה מציג ציונים ממוצעים, לא התפלגות אזורי תודעה בין המשתתפים
               </div>
             </div>
           </div>
