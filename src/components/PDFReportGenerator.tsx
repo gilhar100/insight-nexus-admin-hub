@@ -1,4 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useGroupData } from '@/hooks/useGroupData';
+import { useWorkshopDetails } from '@/hooks/useWorkshopDetails';
+import { useWorkshops } from '@/hooks/useWorkshops';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import { toast } from 'sonner';
 
 interface GroupPDFExportLayoutProps {
   pdfImages: Record<string, string>;
@@ -103,6 +112,201 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
         </div>
       </div>
 
+    </div>
+  );
+};
+
+// Helper function to get dimension insights
+const getDimensionInsights = (averages: any) => {
+  const dimensions = [
+    { name: 'אסטרטגיה', score: averages.strategy, key: 'strategy' },
+    { name: 'למידה', score: averages.learning, key: 'learning' },
+    { name: 'השראה', score: averages.inspiration, key: 'inspiration' },
+    { name: 'משמעות', score: averages.meaning, key: 'meaning' },
+    { name: 'אותנטיות', score: averages.authenticity, key: 'authenticity' },
+    { name: 'הסתגלות', score: averages.adaptability, key: 'adaptability' }
+  ];
+
+  const strongest = dimensions.reduce((max, dim) => 
+    dim.score > max.score ? dim : max
+  );
+  
+  const weakest = dimensions.reduce((min, dim) => 
+    dim.score < min.score ? dim : min
+  );
+
+  return { strongest, weakest };
+};
+
+// Main PDFReportGenerator component
+export const PDFReportGenerator: React.FC = () => {
+  const [selectedGroup, setSelectedGroup] = useState<number | null>(null);
+  const [pdfImages, setPdfImages] = useState<Record<string, string>>({});
+  const [isExporting, setIsExporting] = useState(false);
+
+  const { workshops } = useWorkshops();
+  const { data: salimaData, isLoading: salimaLoading, error: salimaError } = useGroupData(selectedGroup);
+  const { workshopData: wocaData, isLoading: wocaLoading, error: wocaError } = useWorkshopDetails(selectedGroup);
+
+  const captureAllVisualizations = async (): Promise<Record<string, string>> => {
+    const images: Record<string, string> = {};
+    
+    // Capture radar chart
+    const radarElement = document.querySelector('[data-chart="radar"]');
+    if (radarElement) {
+      const canvas = await html2canvas(radarElement as HTMLElement, { 
+        useCORS: true, 
+        backgroundColor: '#ffffff',
+        scale: 2 
+      });
+      images['radar-chart'] = canvas.toDataURL('image/jpeg', 0.8);
+    }
+
+    // Capture archetype chart
+    const archetypeElement = document.querySelector('[data-chart="archetype"]');
+    if (archetypeElement) {
+      const canvas = await html2canvas(archetypeElement as HTMLElement, { 
+        useCORS: true, 
+        backgroundColor: '#ffffff',
+        scale: 2 
+      });
+      images['archetype-chart'] = canvas.toDataURL('image/jpeg', 0.8);
+    }
+
+    // Capture WOCA bar chart
+    const wocaElement = document.querySelector('[data-chart="woca-bar"]');
+    if (wocaElement) {
+      const canvas = await html2canvas(wocaElement as HTMLElement, { 
+        useCORS: true, 
+        backgroundColor: '#ffffff',
+        scale: 2 
+      });
+      images['woca-bar'] = canvas.toDataURL('image/jpeg', 0.8);
+    }
+
+    return images;
+  };
+
+  const exportGroupPDF = async () => {
+    if (!salimaData || !wocaData) {
+      toast.error('נתונים לא זמינים לייצוא');
+      return;
+    }
+
+    setIsExporting(true);
+    
+    try {
+      // Capture visualizations first
+      const captured = await captureAllVisualizations();
+      setPdfImages(captured);
+
+      // Small delay to ensure images are set
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      const element = document.getElementById('pdf-export-root');
+      if (!element) {
+        throw new Error('PDF export element not found');
+      }
+
+      // Temporarily show the element
+      element.style.display = 'block';
+      
+      const canvas = await html2canvas(element, {
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        scale: 1.5,
+        width: 794,
+        height: 1123 * 4 // 4 pages
+      });
+
+      // Hide the element again
+      element.style.display = 'none';
+
+      const imgData = canvas.toDataURL('image/jpeg', 0.8);
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      
+      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight * 4);
+      
+      pdf.save(`דוח-קבוצתי-${selectedGroup}-${new Date().toLocaleDateString('he-IL')}.pdf`);
+      toast.success('הדוח יוצא בהצלחה!');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast.error('שגיאה ביצירת הדוח');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  return (
+    <div className="container mx-auto p-6 space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>יצירת דוח PDF קבוצתי</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">בחר קבוצה לייצוא דוח</label>
+            <Select value={selectedGroup?.toString()} onValueChange={(value) => setSelectedGroup(Number(value))}>
+              <SelectTrigger>
+                <SelectValue placeholder="בחר קבוצה" />
+              </SelectTrigger>
+              <SelectContent>
+                {workshops.map(workshop => (
+                  <SelectItem key={workshop.id} value={workshop.id.toString()}>
+                    <div className="flex flex-col text-right">
+                      <span className="font-medium">{workshop.name}</span>
+                      <span className="text-sm text-muted-foreground">
+                        {workshop.participant_count} משתתפים • {new Date(workshop.date).toLocaleDateString('he-IL')}
+                      </span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          {selectedGroup && (
+            <div className="space-y-4">
+              {(salimaLoading || wocaLoading) && <p>טוען נתונים...</p>}
+              {(salimaError || wocaError) && <p className="text-red-500">שגיאה בטעינת הנתונים</p>}
+              
+              {salimaData && wocaData && (
+                <div className="space-y-4">
+                  <div className="text-sm text-muted-foreground">
+                    קבוצה {selectedGroup} • {salimaData.participant_count} משתתפים SALIMA • {wocaData.participant_count} משתתפים WOCA
+                  </div>
+                  
+                  <Button 
+                    onClick={exportGroupPDF}
+                    disabled={isExporting}
+                    className="w-full"
+                  >
+                    {isExporting ? 'מייצא דוח...' : 'ייצא דוח PDF'}
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {salimaData && wocaData && (
+        <div id="pdf-export-root" style={{ display: 'none' }}>
+          <GroupPDFExportLayout
+            pdfImages={pdfImages}
+            groupNumber={selectedGroup!}
+            participantCount={salimaData.participant_count}
+            salimaScore={salimaData.averages.overall}
+            strongestDimension={getDimensionInsights(salimaData.averages).strongest}
+            weakestDimension={getDimensionInsights(salimaData.averages).weakest}
+            wocaScore={wocaData.average_score}
+            wocaParticipantCount={wocaData.participant_count}
+          />
+        </div>
+      )}
     </div>
   );
 };
