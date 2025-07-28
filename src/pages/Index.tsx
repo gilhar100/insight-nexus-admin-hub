@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { IndividualInsights } from '@/components/IndividualInsights';
 import { GroupWorkshopInsights } from '@/components/GroupWorkshopInsights';
-import { PDFReportGenerator } from '@/components/PDFReportGenerator';
+import PDFReportGenerator from '@/components/PDFReportGenerator';
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<'individual' | 'group' | 'pdf-report'>('individual');
