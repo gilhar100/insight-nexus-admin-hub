@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -92,6 +91,119 @@ export const PDFReportGenerator: React.FC = () => {
     }
   }, [workshopData]);
 
+  const waitForChartRender = async (element: HTMLElement, maxWait: number = 3000) => {
+    return new Promise<void>((resolve) => {
+      let waited = 0;
+      const checkInterval = 100;
+      
+      const checkRender = () => {
+        // Check if Recharts SVG elements are present and have content
+        const svgElements = element.querySelectorAll('svg');
+        const hasValidSvg = svgElements.length > 0 && 
+          Array.from(svgElements).some(svg => svg.children.length > 0);
+        
+        if (hasValidSvg || waited >= maxWait) {
+          resolve();
+        } else {
+          waited += checkInterval;
+          setTimeout(checkRender, checkInterval);
+        }
+      };
+      
+      checkRender();
+    });
+  };
+
+  const captureChartElement = async (element: HTMLElement, id: string): Promise<string | null> => {
+    try {
+      console.log(`📸 Starting capture for ${id}`);
+      
+      // Make element visible and properly positioned
+      const originalStyles = {
+        position: element.style.position,
+        top: element.style.top,
+        left: element.style.left,
+        zIndex: element.style.zIndex,
+        visibility: element.style.visibility,
+        display: element.style.display
+      };
+
+      // Position element visibly but off-screen
+      element.style.position = 'fixed';
+      element.style.top = '0px';
+      element.style.left = '0px';
+      element.style.zIndex = '9999';
+      element.style.visibility = 'visible';
+      element.style.display = 'block';
+
+      // Wait for chart to render
+      await waitForChartRender(element);
+      
+      // Additional wait for stability
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      console.log(`📸 Capturing ${id} with html2canvas`);
+      
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        width: 800,
+        height: 600,
+        windowWidth: 1200,
+        windowHeight: 800,
+        removeContainer: false,
+        imageTimeout: 10000,
+        onclone: (clonedDoc) => {
+          // Ensure all SVG elements are properly rendered in the clone
+          const svgElements = clonedDoc.querySelectorAll('svg');
+          svgElements.forEach(svg => {
+            svg.style.backgroundColor = '#ffffff';
+          });
+        }
+      });
+
+      // Restore original styles
+      Object.assign(element.style, originalStyles);
+
+      // Validate canvas
+      if (!canvas || canvas.width === 0 || canvas.height === 0) {
+        console.error(`❌ Invalid canvas for ${id}: ${canvas?.width}x${canvas?.height}`);
+        return null;
+      }
+
+      // Convert to PNG and validate
+      const dataUrl = canvas.toDataURL('image/png', 1.0);
+      
+      if (!dataUrl || dataUrl.length < 1000 || !dataUrl.startsWith('data:image/png;base64,')) {
+        console.error(`❌ Invalid PNG data for ${id}: length=${dataUrl?.length}`);
+        return null;
+      }
+
+      // Additional validation: try to create an image to verify PNG is valid
+      const testImg = new Image();
+      const isValidPng = await new Promise<boolean>((resolve) => {
+        testImg.onload = () => resolve(true);
+        testImg.onerror = () => resolve(false);
+        testImg.src = dataUrl;
+      });
+
+      if (!isValidPng) {
+        console.error(`❌ PNG validation failed for ${id}`);
+        return null;
+      }
+
+      console.log(`✅ Successfully captured ${id}: ${dataUrl.length} chars`);
+      return dataUrl;
+      
+    } catch (err) {
+      console.error(`❌ Error capturing ${id}:`, err);
+      return null;
+    }
+  };
+
   const captureAllVisualizations = async () => {
     const elements = document.querySelectorAll('.pdf-capture');
     const capturedImages: Record<string, string> = {};
@@ -102,56 +214,13 @@ export const PDFReportGenerator: React.FC = () => {
       const id = el.id;
       if (!id) continue;
 
-      try {
-        console.log(`📸 Capturing chart: ${id}`);
-        
-        // Temporarily show the element for capturing
-        const element = el as HTMLElement;
-        const originalDisplay = element.style.display;
-        element.style.display = 'block';
-        element.style.position = 'fixed';
-        element.style.top = '0px';
-        element.style.left = '0px';
-        element.style.zIndex = '9999';
-        element.style.visibility = 'visible';
-
-        // Wait longer for chart to render
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        const canvas = await html2canvas(element, {
-          scale: 1.5,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#ffffff',
-          logging: true,
-          width: 800,
-          height: 600
-        });
-
-        console.log(`✅ Successfully captured ${id}, canvas size: ${canvas.width}x${canvas.height}`);
-        
-        const dataUrl = canvas.toDataURL('image/png', 0.9);
-        if (dataUrl && dataUrl.length > 100) {
-          capturedImages[id] = dataUrl;
-          console.log(`✅ ${id} PNG generated successfully, size: ${dataUrl.length} chars`);
-        } else {
-          console.error(`❌ ${id} PNG is too small or invalid`);
-        }
-
-        // Restore original display
-        element.style.display = originalDisplay;
-        element.style.position = 'absolute';
-        element.style.top = '-9999px';
-        element.style.left = '-9999px';
-        element.style.zIndex = '-1';
-        element.style.visibility = 'hidden';
-
-      } catch (err) {
-        console.error(`❌ Error capturing ${id}:`, err);
+      const imageData = await captureChartElement(el as HTMLElement, id);
+      if (imageData) {
+        capturedImages[id] = imageData;
       }
     }
 
-    console.log('📸 Chart capture complete. Captured images:', Object.keys(capturedImages));
+    console.log('📸 Chart capture complete. Successfully captured:', Object.keys(capturedImages));
     return capturedImages;
   };
 
@@ -182,25 +251,25 @@ export const PDFReportGenerator: React.FC = () => {
     
     try {
       console.log('🚀 Starting PDF export for group:', groupNumber);
-      console.log('📊 Available data - SALIMA:', !!salimaData, 'WOCA:', !!wocaData);
       
-      // Wait for charts to render
+      // Wait longer for charts to render
       console.log('⏳ Waiting for charts to render...');
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
       console.log('📸 Starting chart capture...');
       const images = await captureAllVisualizations();
-      console.log('📸 Captured images:', Object.keys(images));
       
-      // Validate that we have at least one image
-      if (Object.keys(images).length === 0) {
-        throw new Error('No charts were captured successfully');
+      // Check if we have any valid images
+      const validImages = Object.keys(images).filter(key => images[key]);
+      if (validImages.length === 0) {
+        throw new Error('No charts were captured successfully. Please try again.');
       }
       
+      console.log('📸 Using images:', validImages);
       setPdfImages(images);
 
-      // Small delay to ensure images are set
-      await new Promise(resolve => setTimeout(resolve, 200));
+      // Wait for state to update
+      await new Promise(resolve => setTimeout(resolve, 300));
 
       const input = document.getElementById('pdf-export-root');
       if (!input) {
@@ -213,14 +282,24 @@ export const PDFReportGenerator: React.FC = () => {
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
-        logging: true,
-        scrollY: -window.scrollY
+        logging: false,
+        scrollY: -window.scrollY,
+        windowWidth: 1200,
+        windowHeight: 1600
       });
 
-      console.log('📄 Creating PDF document...');
-      const imgData = canvas.toDataURL('image/png', 0.9);
-      const pdf = new jsPDF('p', 'pt', 'a4');
+      if (!canvas || canvas.width === 0 || canvas.height === 0) {
+        throw new Error('Failed to generate PDF canvas');
+      }
 
+      console.log('📄 Creating PDF document...');
+      const imgData = canvas.toDataURL('image/png', 0.95);
+      
+      if (!imgData || imgData.length < 1000) {
+        throw new Error('Failed to generate valid PDF image data');
+      }
+
+      const pdf = new jsPDF('p', 'pt', 'a4');
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       const imgHeight = (canvas.height * pageWidth) / canvas.width;
