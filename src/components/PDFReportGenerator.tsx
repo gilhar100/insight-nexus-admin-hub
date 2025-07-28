@@ -101,13 +101,31 @@ export const PDFReportGenerator: React.FC = () => {
       if (!id) continue;
 
       try {
-        const canvas = await html2canvas(el as HTMLElement, {
+        // Temporarily show the element for capturing
+        const element = el as HTMLElement;
+        const originalDisplay = element.style.display;
+        element.style.display = 'block';
+        element.style.position = 'fixed';
+        element.style.top = '-9999px';
+        element.style.left = '-9999px';
+        element.style.zIndex = '-1';
+
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        const canvas = await html2canvas(element, {
           scale: 2,
           useCORS: true,
           scrollY: -window.scrollY,
+          backgroundColor: '#ffffff',
+          logging: false,
+          allowTaint: true
         });
 
         capturedImages[id] = canvas.toDataURL('image/png');
+
+        // Restore original display
+        element.style.display = originalDisplay;
+        element.style.position = 'absolute';
       } catch (err) {
         console.error(`Error capturing ${id}:`, err);
       }
@@ -138,10 +156,8 @@ export const PDFReportGenerator: React.FC = () => {
       return;
     }
 
-    const input = document.getElementById('pdf-export-root');
-    if (!input) return;
-
     setIsLoading(true);
+    setError(null);
     
     try {
       // Wait for charts to render
@@ -152,10 +168,18 @@ export const PDFReportGenerator: React.FC = () => {
       // Small delay to ensure images are set
       await new Promise(resolve => setTimeout(resolve, 100));
 
+      const input = document.getElementById('pdf-export-root');
+      if (!input) {
+        throw new Error('PDF export root element not found');
+      }
+
       const canvas = await html2canvas(input, {
         scale: 2,
         useCORS: true,
         scrollY: -window.scrollY,
+        backgroundColor: '#ffffff',
+        logging: false,
+        allowTaint: true
       });
 
       const imgData = canvas.toDataURL('image/png');
@@ -181,7 +205,7 @@ export const PDFReportGenerator: React.FC = () => {
       pdf.save(`Group_Report_${groupNumber}.pdf`);
     } catch (err) {
       console.error('Error generating PDF:', err);
-      setError('Failed to generate PDF');
+      setError(`Failed to generate PDF: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setIsLoading(false);
     }
@@ -456,10 +480,10 @@ export const PDFReportGenerator: React.FC = () => {
       {/* Charts for capturing - hidden but rendered */}
       {salimaData && (
         <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
-          <div className="pdf-capture" id="radar-chart" style={{ width: '800px', height: '600px' }}>
+          <div className="pdf-capture" id="radar-chart" style={{ width: '800px', height: '600px', backgroundColor: '#ffffff' }}>
             <SalimaGroupRadarChart averages={salimaData.averages} />
           </div>
-          <div className="pdf-capture" id="archetype-chart" style={{ width: '800px', height: '600px' }}>
+          <div className="pdf-capture" id="archetype-chart" style={{ width: '800px', height: '600px', backgroundColor: '#ffffff' }}>
             <ArchetypeDistributionChart 
               groupNumber={salimaData.group_number} 
               isPresenterMode={false} 
@@ -468,14 +492,14 @@ export const PDFReportGenerator: React.FC = () => {
         </div>
       )}
 
-      {wocaData && (
+      {wocaData?.groupCategoryScores && (
         <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
-          <div className="pdf-capture" id="woca-bar" style={{ width: '800px', height: '600px' }}>
+          <div className="pdf-capture" id="woca-bar" style={{ width: '800px', height: '600px', backgroundColor: '#ffffff' }}>
             <WocaGroupBarChart 
               groupCategoryScores={wocaData.groupCategoryScores}
             />
           </div>
-          <div className="pdf-capture" id="woca-radar" style={{ width: '800px', height: '600px' }}>
+          <div className="pdf-capture" id="woca-radar" style={{ width: '800px', height: '600px', backgroundColor: '#ffffff' }}>
             <WocaCategoryRadarChart 
               categoryScores={wocaData.groupCategoryScores}
             />
