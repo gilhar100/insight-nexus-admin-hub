@@ -96,41 +96,62 @@ export const PDFReportGenerator: React.FC = () => {
     const elements = document.querySelectorAll('.pdf-capture');
     const capturedImages: Record<string, string> = {};
 
+    console.log('📸 Starting chart capture, found elements:', elements.length);
+
     for (const el of elements) {
       const id = el.id;
       if (!id) continue;
 
       try {
+        console.log(`📸 Capturing chart: ${id}`);
+        
         // Temporarily show the element for capturing
         const element = el as HTMLElement;
         const originalDisplay = element.style.display;
         element.style.display = 'block';
         element.style.position = 'fixed';
-        element.style.top = '-9999px';
-        element.style.left = '-9999px';
-        element.style.zIndex = '-1';
+        element.style.top = '0px';
+        element.style.left = '0px';
+        element.style.zIndex = '9999';
+        element.style.visibility = 'visible';
 
-        await new Promise(resolve => setTimeout(resolve, 100));
+        // Wait longer for chart to render
+        await new Promise(resolve => setTimeout(resolve, 500));
 
         const canvas = await html2canvas(element, {
-          scale: 2,
+          scale: 1.5,
           useCORS: true,
-          scrollY: -window.scrollY,
+          allowTaint: true,
           backgroundColor: '#ffffff',
-          logging: false,
-          allowTaint: true
+          logging: true,
+          width: 800,
+          height: 600
         });
 
-        capturedImages[id] = canvas.toDataURL('image/png');
+        console.log(`✅ Successfully captured ${id}, canvas size: ${canvas.width}x${canvas.height}`);
+        
+        const dataUrl = canvas.toDataURL('image/png', 0.9);
+        if (dataUrl && dataUrl.length > 100) {
+          capturedImages[id] = dataUrl;
+          console.log(`✅ ${id} PNG generated successfully, size: ${dataUrl.length} chars`);
+        } else {
+          console.error(`❌ ${id} PNG is too small or invalid`);
+        }
 
         // Restore original display
         element.style.display = originalDisplay;
         element.style.position = 'absolute';
+        element.style.top = '-9999px';
+        element.style.left = '-9999px';
+        element.style.zIndex = '-1';
+        element.style.visibility = 'hidden';
+
       } catch (err) {
-        console.error(`Error capturing ${id}:`, err);
+        console.error(`❌ Error capturing ${id}:`, err);
       }
     }
 
+    console.log('📸 Chart capture complete. Captured images:', Object.keys(capturedImages));
     return capturedImages;
   };
 
@@ -160,29 +181,44 @@ export const PDFReportGenerator: React.FC = () => {
     setError(null);
     
     try {
+      console.log('🚀 Starting PDF export for group:', groupNumber);
+      console.log('📊 Available data - SALIMA:', !!salimaData, 'WOCA:', !!wocaData);
+      
       // Wait for charts to render
-      await new Promise(resolve => setTimeout(resolve, 500));
+      console.log('⏳ Waiting for charts to render...');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      console.log('📸 Starting chart capture...');
       const images = await captureAllVisualizations();
+      console.log('📸 Captured images:', Object.keys(images));
+      
+      // Validate that we have at least one image
+      if (Object.keys(images).length === 0) {
+        throw new Error('No charts were captured successfully');
+      }
+      
       setPdfImages(images);
 
       // Small delay to ensure images are set
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise(resolve => setTimeout(resolve, 200));
 
       const input = document.getElementById('pdf-export-root');
       if (!input) {
         throw new Error('PDF export root element not found');
       }
 
+      console.log('🖼️ Generating PDF canvas...');
       const canvas = await html2canvas(input, {
-        scale: 2,
+        scale: 1.5,
         useCORS: true,
-        scrollY: -window.scrollY,
+        allowTaint: true,
         backgroundColor: '#ffffff',
-        logging: false,
-        allowTaint: true
+        logging: true,
+        scrollY: -window.scrollY
       });
 
-      const imgData = canvas.toDataURL('image/png');
+      console.log('📄 Creating PDF document...');
+      const imgData = canvas.toDataURL('image/png', 0.9);
       const pdf = new jsPDF('p', 'pt', 'a4');
 
       const pageWidth = pdf.internal.pageSize.getWidth();
@@ -202,9 +238,12 @@ export const PDFReportGenerator: React.FC = () => {
         heightLeft -= pageHeight;
       }
 
+      console.log('💾 Saving PDF...');
       pdf.save(`Group_Report_${groupNumber}.pdf`);
+      console.log('✅ PDF export completed successfully!');
+      
     } catch (err) {
-      console.error('Error generating PDF:', err);
+      console.error('❌ PDF Export Error:', err);
       setError(`Failed to generate PDF: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setIsLoading(false);
@@ -477,13 +516,25 @@ export const PDFReportGenerator: React.FC = () => {
         </div>
       )}
 
-      {/* Charts for capturing - hidden but rendered */}
+      {/* Charts for capturing - positioned for capture */}
       {salimaData && (
-        <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
-          <div className="pdf-capture" id="radar-chart" style={{ width: '800px', height: '600px', backgroundColor: '#ffffff' }}>
+        <div style={{ position: 'absolute', left: '-9999px', top: '-9999px', visibility: 'hidden' }}>
+          <div className="pdf-capture" id="radar-chart" style={{ 
+            width: '800px', 
+            height: '600px', 
+            backgroundColor: '#ffffff',
+            border: '1px solid #e5e7eb',
+            padding: '20px'
+          }}>
             <SalimaGroupRadarChart averages={salimaData.averages} />
           </div>
-          <div className="pdf-capture" id="archetype-chart" style={{ width: '800px', height: '600px', backgroundColor: '#ffffff' }}>
+          <div className="pdf-capture" id="archetype-chart" style={{ 
+            width: '800px', 
+            height: '600px', 
+            backgroundColor: '#ffffff',
+            border: '1px solid #e5e7eb',
+            padding: '20px'
+          }}>
             <ArchetypeDistributionChart 
               groupNumber={salimaData.group_number} 
               isPresenterMode={false} 
@@ -493,13 +544,25 @@ export const PDFReportGenerator: React.FC = () => {
       )}
 
       {wocaData?.groupCategoryScores && (
-        <div style={{ position: 'absolute', left: '-9999px', top: '-9999px' }}>
-          <div className="pdf-capture" id="woca-bar" style={{ width: '800px', height: '600px', backgroundColor: '#ffffff' }}>
+        <div style={{ position: 'absolute', left: '-9999px', top: '-9999px', visibility: 'hidden' }}>
+          <div className="pdf-capture" id="woca-bar" style={{ 
+            width: '800px', 
+            height: '600px', 
+            backgroundColor: '#ffffff',
+            border: '1px solid #e5e7eb',
+            padding: '20px'
+          }}>
             <WocaGroupBarChart 
               groupCategoryScores={wocaData.groupCategoryScores}
             />
           </div>
-          <div className="pdf-capture" id="woca-radar" style={{ width: '800px', height: '600px', backgroundColor: '#ffffff' }}>
+          <div className="pdf-capture" id="woca-radar" style={{ 
+            width: '800px', 
+            height: '600px', 
+            backgroundColor: '#ffffff',
+            border: '1px solid #e5e7eb',
+            padding: '20px'
+          }}>
             <WocaCategoryRadarChart 
               categoryScores={wocaData.groupCategoryScores}
             />
