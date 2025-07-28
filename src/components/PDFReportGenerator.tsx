@@ -1,15 +1,26 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useGroupData } from '@/hooks/useGroupData';
 import { useWorkshopData } from '@/hooks/useWorkshopData';
+import { SalimaGroupRadarChart } from '@/components/SalimaGroupRadarChart';
+import { SalimaArchetypeDistributionChart } from '@/components/SalimaArchetypeDistributionChart';
+import { WocaChartsRow } from '@/components/WocaChartsRow';
+import { ZoneDistributionChart } from '@/components/ZoneDistributionChart';
+import { GroupPDFExportLayout } from '@/components/GroupPDFExportLayout';
+import { analyzeWorkshopWoca } from '@/utils/wocaAnalysis';
+import html2canvas from 'html2canvas';
 
 export const PDFReportGenerator: React.FC = () => {
   const [groupNumber, setGroupNumber] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pdfImages, setPdfImages] = useState<Record<string, string>>({});
+  const [showPDFLayout, setShowPDFLayout] = useState(false);
+  
+  const chartsContainerRef = useRef<HTMLDivElement>(null);
 
   const { data: groupData, isLoading: salimaLoading, error: salimaError } = useGroupData(groupNumber || 0);
   const { workshopData, isLoading: wocaLoading, error: wocaError } = useWorkshopData(groupNumber || 0);
@@ -33,6 +44,37 @@ export const PDFReportGenerator: React.FC = () => {
     }
   };
 
+  const captureChartAsImage = async (elementId: string): Promise<string> => {
+    const element = document.getElementById(elementId);
+    if (!element) {
+      throw new Error(`Element with id "${elementId}" not found`);
+    }
+
+    console.log(`📸 Capturing chart: ${elementId}`);
+    
+    // Wait a bit for the chart to fully render
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    const canvas = await html2canvas(element, {
+      backgroundColor: '#ffffff',
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      height: element.offsetHeight,
+      width: element.offsetWidth,
+    });
+
+    const base64Image = canvas.toDataURL('image/png');
+    
+    // Verify the image is not blank
+    if (base64Image === 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==') {
+      throw new Error(`Captured image for ${elementId} is blank`);
+    }
+    
+    console.log(`✅ Successfully captured ${elementId}`);
+    return base64Image;
+  };
+
   const exportGroupPDF = async () => {
     if (!groupData && !workshopData) {
       setError('No data available for export');
@@ -44,7 +86,29 @@ export const PDFReportGenerator: React.FC = () => {
     
     try {
       console.log('🚀 Starting PDF export for group:', groupNumber);
-      // PDF generation logic will be implemented here
+      
+      // Capture all required charts
+      const chartImages: Record<string, string> = {};
+      
+      // Capture SALIMA radar chart
+      if (groupData) {
+        chartImages['radar-chart'] = await captureChartAsImage('radar-chart');
+        chartImages['archetype-chart'] = await captureChartAsImage('archetype-chart');
+      }
+      
+      // Capture WOCA charts
+      if (workshopData) {
+        chartImages['woca-bar'] = await captureChartAsImage('woca-bar');
+        chartImages['woca-pie'] = await captureChartAsImage('woca-pie');
+        chartImages['woca-matrix'] = await captureChartAsImage('woca-matrix');
+      }
+      
+      console.log('📊 All charts captured successfully:', Object.keys(chartImages));
+      
+      // Store images and show PDF layout
+      setPdfImages(chartImages);
+      setShowPDFLayout(true);
+      
       console.log('✅ PDF export completed successfully!');
     } catch (err) {
       console.error('❌ PDF Export Error:', err);
@@ -53,6 +117,39 @@ export const PDFReportGenerator: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  // Calculate required data for PDF layout
+  const getPDFLayoutData = () => {
+    if (!groupData || !workshopData) return null;
+
+    const wocaAnalysis = analyzeWorkshopWoca(workshopData.participants, workshopData.workshop_id);
+    const strongestDimension = Object.entries(groupData.averages)
+      .filter(([key]) => key !== 'overall')
+      .reduce((max, [key, value]) => 
+        value > max.score ? { name: key, score: value } : max, 
+        { name: '', score: 0 }
+      );
+    
+    const weakestDimension = Object.entries(groupData.averages)
+      .filter(([key]) => key !== 'overall')
+      .reduce((min, [key, value]) => 
+        value < min.score ? { name: key, score: value } : min, 
+        { name: '', score: 5 }
+      );
+
+    return {
+      groupNumber: groupData.group_number,
+      participantCount: groupData.participant_count,
+      salimaScore: groupData.averages.overall,
+      strongestDimension,
+      weakestDimension,
+      wocaZoneLabel: wocaAnalysis.dominantZone,
+      wocaScore: workshopData.average_score,
+      wocaParticipantCount: workshopData.participant_count,
+    };
+  };
+
+  const pdfLayoutData = getPDFLayoutData();
 
   return (
     <div className="space-y-6 p-6">
@@ -105,6 +202,63 @@ export const PDFReportGenerator: React.FC = () => {
             📄 הורד דוח קבוצתי (SALIMA + WOCA)
           </Button>
         </div>
+      )}
+
+      {/* Hidden charts container for capturing */}
+      <div 
+        ref={chartsContainerRef}
+        className="fixed -top-[10000px] left-0 bg-white"
+        style={{ width: '800px', height: 'auto' }}
+      >
+        {groupData && (
+          <>
+            <div id="radar-chart" className="w-full h-96 bg-white p-4">
+              <SalimaGroupRadarChart averages={groupData.averages} />
+            </div>
+            <div id="archetype-chart" className="w-full h-96 bg-white p-4">
+              <SalimaArchetypeDistributionChart participants={groupData.participants} />
+            </div>
+          </>
+        )}
+        
+        {workshopData && (
+          <>
+            <div id="woca-bar" className="w-full h-96 bg-white p-4">
+              <WocaChartsRow 
+                participants={workshopData.participants}
+                workshopId={workshopData.workshop_id}
+                showOnlyBar={true}
+              />
+            </div>
+            <div id="woca-pie" className="w-full h-96 bg-white p-4">
+              <ZoneDistributionChart 
+                zoneDistribution={analyzeWorkshopWoca(workshopData.participants, workshopData.workshop_id).zoneDistribution}
+              />
+            </div>
+            <div id="woca-matrix" className="w-full h-96 bg-white p-4">
+              <WocaChartsRow 
+                participants={workshopData.participants}
+                workshopId={workshopData.workshop_id}
+                showOnlyMatrix={true}
+              />
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* PDF Layout */}
+      {showPDFLayout && pdfLayoutData && (
+        <GroupPDFExportLayout
+          pdfImages={pdfImages}
+          groupNumber={pdfLayoutData.groupNumber}
+          participantCount={pdfLayoutData.participantCount}
+          salimaScore={pdfLayoutData.salimaScore}
+          strongestDimension={pdfLayoutData.strongestDimension}
+          weakestDimension={pdfLayoutData.weakestDimension}
+          wocaZoneLabel={pdfLayoutData.wocaZoneLabel}
+          wocaScore={pdfLayoutData.wocaScore}
+          wocaParticipantCount={pdfLayoutData.wocaParticipantCount}
+        />
       )}
 
       {groupData && (
