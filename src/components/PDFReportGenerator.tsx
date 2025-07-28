@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useGroupData } from '@/hooks/useGroupData';
 import { useWorkshopData } from '@/hooks/useWorkshopData';
 import { SalimaGroupRadarChart } from '@/components/SalimaGroupRadarChart';
@@ -57,23 +54,6 @@ export const PDFReportGenerator: React.FC = () => {
   const [pdfImages, setPdfImages] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Section toggles
-  const [includeSalima, setIncludeSalima] = useState(true);
-  const [includeRadar, setIncludeRadar] = useState(true);
-  const [includeArchetypes, setIncludeArchetypes] = useState(true);
-  const [includeWoca, setIncludeWoca] = useState(true);
-  const [includeCustomText, setIncludeCustomText] = useState(false);
-
-  // Section ordering
-  const [salimaOrder, setSalimaOrder] = useState(1);
-  const [radarOrder, setRadarOrder] = useState(2);
-  const [archetypesOrder, setArchetypesOrder] = useState(3);
-  const [wocaOrder, setWocaOrder] = useState(4);
-  const [customTextOrder, setCustomTextOrder] = useState(5);
-
-  // Custom text
-  const [customText, setCustomText] = useState('');
 
   const { data: groupData, isLoading: salimaLoading, error: salimaError } = useGroupData(groupNumber || 0);
   const { workshopData, isLoading: wocaLoading, error: wocaError } = useWorkshopData(groupNumber || 0);
@@ -347,210 +327,209 @@ export const PDFReportGenerator: React.FC = () => {
     }
   };
 
-  // Component renderers for sections
-  const renderSalimaOverview = () => {
-    if (!salimaData) return null;
-    const currentDate = new Date().toLocaleDateString('he-IL');
-    const insights = getDimensionInsights(salimaData.averages);
-
-    return (
-      <>
-        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <h1 style={{ fontSize: '32px', color: '#1f2937', marginBottom: '16px' }}>
-            דוח קבוצתי - SALIMA
-          </h1>
-          <p style={{ fontSize: '18px', color: '#6b7280' }}>
-            קבוצה {groupNumber} | {currentDate} | {salimaData.participant_count} משתתפים
-          </p>
-        </div>
-
-        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <h2 style={{ fontSize: '24px', color: '#2563eb', marginBottom: '16px' }}>
-            ציון מנהיגות קבוצתי
-          </h2>
-          <div style={{ fontSize: '72px', color: '#2563eb', fontWeight: 'bold' }}>
-            {salimaData.averages.overall.toFixed(2)}
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '40px' }}>
-          <div style={{
-            width: '47%',
-            border: '2px solid #10b981',
-            borderRadius: '16px',
-            padding: '24px',
-            backgroundColor: '#ecfdf5',
-            textAlign: 'center'
-          }}>
-            <div style={{ fontSize: '20px', color: '#047857', fontWeight: 'bold', marginBottom: '8px' }}>
-              הממד החזק ביותר
-            </div>
-            <div style={{ fontSize: '48px', color: '#047857', fontWeight: 'bold', marginBottom: '8px' }}>
-              {insights.strongest.score.toFixed(1)}
-            </div>
-            <div style={{ fontSize: '16px', color: '#047857' }}>
-              {insights.strongest.name}
-            </div>
-          </div>
-
-          <div style={{
-            width: '47%',
-            border: '2px solid #f59e0b',
-            borderRadius: '16px',
-            padding: '24px',
-            backgroundColor: '#fffbeb',
-            textAlign: 'center'
-          }}>
-            <div style={{ fontSize: '20px', color: '#d97706', fontWeight: 'bold', marginBottom: '8px' }}>
-              ממד לפיתוח
-            </div>
-            <div style={{ fontSize: '48px', color: '#d97706', fontWeight: 'bold', marginBottom: '8px' }}>
-              {insights.weakest.score.toFixed(1)}
-            </div>
-            <div style={{ fontSize: '16px', color: '#d97706' }}>
-              {insights.weakest.name}
-            </div>
-          </div>
-        </div>
-
-        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <h3 style={{ fontSize: '20px', color: '#1f2937', marginBottom: '16px' }}>
-            פרופיל קבוצתי ייחודי
-          </h3>
-          <div style={{ 
-            width: '100%', 
-            height: '400px', 
-            border: '1px solid #e5e7eb',
-            backgroundColor: '#f9fafb',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <SalimaGroupRadarChart averages={salimaData.averages} />
-          </div>
-        </div>
-      </>
-    );
-  };
-
-  const renderRadarChart = () => {
-    if (!salimaData) return null;
-    return (
-      <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-        <h2 style={{ fontSize: '28px', color: '#1f2937', marginBottom: '32px' }}>
-          גרף מכ"ם - פרופיל קבוצתי
-        </h2>
-        <div style={{ 
-          width: '100%', 
-          height: '500px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          <SalimaGroupRadarChart averages={salimaData.averages} />
-        </div>
-      </div>
-    );
-  };
-
-  const renderArchetypeChart = () => {
-    if (!salimaData) return null;
-    return (
-      <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-        <h2 style={{ fontSize: '28px', color: '#1f2937', marginBottom: '32px' }}>
-          התפלגות סגנון מנהיגות
-        </h2>
-        <div style={{ 
-          width: '100%', 
-          height: '500px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          <ArchetypeDistributionChart 
-            groupNumber={salimaData.group_number} 
-            isPresenterMode={false} 
-          />
-        </div>
-      </div>
-    );
-  };
-
-  const renderWocaChart = () => {
-    if (!wocaData) return null;
-    return (
-      <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-        <h2 style={{ fontSize: '28px', color: '#1f2937', marginBottom: '32px' }}>
-          ניתוח WOCA - אזורי שינוי
-        </h2>
-        <div style={{ 
-          width: '100%', 
-          height: '500px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          <WocaGroupBarChart 
-            groupCategoryScores={wocaData.groupCategoryScores!}
-          />
-        </div>
-      </div>
-    );
-  };
-
-  const renderCustomText = () => {
-    if (!customText.trim()) return null;
-    return (
-      <div style={{ padding: '48px 0' }}>
-        <h2 style={{ fontSize: '28px', color: '#1f2937', marginBottom: '32px', textAlign: 'center' }}>
-          טקסט אישי
-        </h2>
-        <div style={{ 
-          fontSize: '16px', 
-          lineHeight: '1.6', 
-          color: '#374151',
-          whiteSpace: 'pre-wrap'
-        }}>
-          {customText}
-        </div>
-      </div>
-    );
-  };
-
   const renderPDFLayout = () => {
     if (!salimaData && !wocaData) return null;
 
-    const sections = [
-      { section: 'salima', order: salimaOrder, enabled: includeSalima, content: renderSalimaOverview() },
-      { section: 'radar', order: radarOrder, enabled: includeRadar, content: renderRadarChart() },
-      { section: 'archetypes', order: archetypesOrder, enabled: includeArchetypes, content: renderArchetypeChart() },
-      { section: 'woca', order: wocaOrder, enabled: includeWoca, content: renderWocaChart() },
-      { section: 'custom', order: customTextOrder, enabled: includeCustomText, content: renderCustomText() }
-    ]
-    .filter(s => s.enabled && s.content)
-    .sort((a, b) => a.order - b.order);
+    const currentDate = new Date().toLocaleDateString('he-IL');
+    const insights = salimaData ? getDimensionInsights(salimaData.averages) : null;
 
     return (
       <div id="pdf-export-root" style={{ display: 'none' }}>
-        {sections.map((s, idx) => (
-          <div 
-            key={s.section} 
+        {/* Page 1: SALIMA Overview */}
+        {salimaData && (
+          <div
             style={{
               width: '794px',
               height: '1123px',
               padding: '48px',
-              pageBreakAfter: idx < sections.length - 1 ? 'always' : 'auto',
-              backgroundColor: '#fff',
               direction: 'rtl',
               fontFamily: 'Arial, sans-serif',
-              boxSizing: 'border-box',
-              position: 'relative',
-              overflow: 'hidden'
+              pageBreakAfter: 'always',
+              backgroundColor: '#fff',
+              boxSizing: 'border-box'
             }}
           >
-            {s.content}
+            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+              <h1 style={{ fontSize: '32px', color: '#1f2937', marginBottom: '16px' }}>
+                דוח קבוצתי - SALIMA
+              </h1>
+              <p style={{ fontSize: '18px', color: '#6b7280' }}>
+                קבוצה {groupNumber} | {currentDate} | {salimaData.participant_count} משתתפים
+              </p>
+            </div>
+
+            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+              <h2 style={{ fontSize: '24px', color: '#2563eb', marginBottom: '16px' }}>
+                ציון מנהיגות קבוצתי
+              </h2>
+              <div style={{ fontSize: '72px', color: '#2563eb', fontWeight: 'bold' }}>
+                {salimaData.averages.overall.toFixed(2)}
+              </div>
+            </div>
+
+            {insights && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '40px' }}>
+                <div style={{
+                  width: '47%',
+                  border: '2px solid #10b981',
+                  borderRadius: '16px',
+                  padding: '24px',
+                  backgroundColor: '#ecfdf5',
+                  textAlign: 'center'
+                }}>
+                  <div style={{ fontSize: '20px', color: '#047857', fontWeight: 'bold', marginBottom: '8px' }}>
+                    הממד החזק ביותר
+                  </div>
+                  <div style={{ fontSize: '48px', color: '#047857', fontWeight: 'bold', marginBottom: '8px' }}>
+                    {insights.strongest.score.toFixed(1)}
+                  </div>
+                  <div style={{ fontSize: '16px', color: '#047857' }}>
+                    {insights.strongest.name}
+                  </div>
+                </div>
+
+                <div style={{
+                  width: '47%',
+                  border: '2px solid #f59e0b',
+                  borderRadius: '16px',
+                  padding: '24px',
+                  backgroundColor: '#fffbeb',
+                  textAlign: 'center'
+                }}>
+                  <div style={{ fontSize: '20px', color: '#d97706', fontWeight: 'bold', marginBottom: '8px' }}>
+                    ממד לפיתוח
+                  </div>
+                  <div style={{ fontSize: '48px', color: '#d97706', fontWeight: 'bold', marginBottom: '8px' }}>
+                    {insights.weakest.score.toFixed(1)}
+                  </div>
+                  <div style={{ fontSize: '16px', color: '#d97706' }}>
+                    {insights.weakest.name}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+              <h3 style={{ fontSize: '20px', color: '#1f2937', marginBottom: '16px' }}>
+                פרופיל קבוצתי ייחודי
+              </h3>
+              <div style={{ 
+                width: '100%', 
+                height: '400px', 
+                border: '1px solid #e5e7eb',
+                backgroundColor: '#f9fafb',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <SalimaGroupRadarChart averages={salimaData.averages} />
+              </div>
+            </div>
           </div>
-        ))}
+        )}
+
+        {/* Page 2: Archetype Chart */}
+        {salimaData && (
+          <div
+            style={{
+              width: '794px',
+              height: '1123px',
+              padding: '48px',
+              direction: 'rtl',
+              fontFamily: 'Arial, sans-serif',
+              pageBreakAfter: 'always',
+              backgroundColor: '#fff',
+              boxSizing: 'border-box'
+            }}
+          >
+            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+              <h2 style={{ fontSize: '28px', color: '#1f2937', marginBottom: '24px' }}>
+                התפלגות סגנון מנהיגות
+              </h2>
+              <div style={{ 
+                width: '100%', 
+                maxHeight: '450px', 
+                objectFit: 'contain',
+                display: 'block',
+                margin: '24px auto'
+              }}>
+                <ArchetypeDistributionChart 
+                  groupNumber={salimaData.group_number} 
+                  isPresenterMode={false} 
+                />
+              </div>
+            </div>
+
+            <div style={{ marginTop: '32px', padding: '0 32px', fontSize: '16px', lineHeight: '1.7' }}>
+              <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px' }}>הסבר על סגנונות המנהיגות</h3>
+              <p style={{ marginBottom: '12px' }}><strong>המנהל הסקרן:</strong> מנהל שמוביל דרך סקרנות, חיפוש מתמיד אחר ידע, והשראה.</p>
+              <p style={{ marginBottom: '12px' }}><strong>המנהל המעצים:</strong> מנהל שפועל מתוך כנות, הקשבה ותחושת שליחות.</p>
+              <p style={{ marginBottom: '12px' }}><strong>מנהל ההזדמנות:</strong> מנהל שחושב קדימה, מזהה מגמות, ופועל בזריזות.</p>
+            </div>
+          </div>
+        )}
+
+        {/* Page 3: WOCA Summary */}
+        {wocaData && (
+          <div
+            style={{
+              width: '794px',
+              height: '1123px',
+              padding: '48px',
+              direction: 'rtl',
+              fontFamily: 'Arial, sans-serif',
+              pageBreakAfter: 'always',
+              backgroundColor: '#fff',
+              boxSizing: 'border-box'
+            }}
+          >
+            {/* Title Section */}
+            <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+              <h2 style={{ fontSize: '32px', color: '#1f2937', marginBottom: '16px' }}>
+                ניתוח WOCA - אזורי שינוי
+              </h2>
+              <p style={{ fontSize: '16px', color: '#6b7280', marginBottom: '0' }}>
+                {wocaData.participant_count} משתתפים | ציון ממוצע: {wocaData.average_score.toFixed(2)}
+              </p>
+            </div>
+
+            {/* Chart Section */}
+            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+              <div style={{ 
+                width: '100%', 
+                maxHeight: '350px', 
+                objectFit: 'contain',
+                margin: '0 auto',
+                display: 'block'
+              }}>
+                <WocaGroupBarChart 
+                  groupCategoryScores={wocaData.groupCategoryScores!}
+                />
+              </div>
+            </div>
+
+            {/* Explanation Section */}
+            <div style={{ padding: '0 32px', fontSize: '16px', lineHeight: '1.6' }}>
+              <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '20px' }}>הסבר על אזורי השינוי</h3>
+              <p style={{ marginBottom: '12px' }}><strong>הזדמנות:</strong> אזור בו קיים פוטנציאל גבוה לשינוי חיובי.</p>
+              <p style={{ marginBottom: '12px' }}><strong>נוחות:</strong> אזור יציב שמספק ביטחון אך עלול להגביל צמיחה.</p>
+              <p style={{ marginBottom: '12px' }}><strong>אדישות:</strong> אזור של חוסר מעורבות הדורש התערבות.</p>
+              <p style={{ marginBottom: '20px' }}><strong>מלחמה:</strong> אזור של התנגדות פעילה לשינוי.</p>
+
+              <div style={{ 
+                backgroundColor: '#fff8e1', 
+                border: '1px solid #fbc02d', 
+                padding: '16px', 
+                marginTop: '24px', 
+                fontSize: '14px', 
+                textAlign: 'center',
+                borderRadius: '8px'
+              }}>
+                ⚠️ הערה: גרף זה מציג ציונים ממוצעים, לא התפלגות אזורי תודעה בין המשתתפים
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   };
@@ -558,11 +537,11 @@ export const PDFReportGenerator: React.FC = () => {
   return (
     <div className="space-y-6 p-6">
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-center mb-4">
-          עורך דוחות PDF מותאם אישית
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">
+          יצירת דוח PDF קבוצתי
         </h1>
-        <p className="text-center text-gray-600 mb-8">
-          בחר אילו חלקים להוסיף לדוח, סדר אותם, והוסף טקסט חופשי אם תרצה
+        <p className="text-gray-600">
+          צור דוח מקיף המשלב תובנות SALIMA ו-WOCA עבור קבוצה
         </p>
       </div>
 
@@ -597,128 +576,15 @@ export const PDFReportGenerator: React.FC = () => {
       )}
 
       {(salimaData || wocaData) && (
-        <>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-center">בחר אילו חלקים לכלול בדוח</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex items-center space-x-3 space-x-reverse">
-                  <Checkbox 
-                    id="salima"
-                    checked={includeSalima} 
-                    onCheckedChange={(checked) => setIncludeSalima(checked === true)}
-                  />
-                  <label htmlFor="salima" className="flex-1">סקירת SALIMA</label>
-                  <Input 
-                    type="number" 
-                    min="1" 
-                    max="5" 
-                    value={salimaOrder} 
-                    onChange={(e) => setSalimaOrder(Number(e.target.value))}
-                    className="w-16"
-                    disabled={!includeSalima}
-                  />
-                </div>
-
-                <div className="flex items-center space-x-3 space-x-reverse">
-                  <Checkbox 
-                    id="radar"
-                    checked={includeRadar} 
-                    onCheckedChange={(checked) => setIncludeRadar(checked === true)}
-                  />
-                  <label htmlFor="radar" className="flex-1">גרף מכ״ם</label>
-                  <Input 
-                    type="number" 
-                    min="1" 
-                    max="5" 
-                    value={radarOrder} 
-                    onChange={(e) => setRadarOrder(Number(e.target.value))}
-                    className="w-16"
-                    disabled={!includeRadar}
-                  />
-                </div>
-
-                <div className="flex items-center space-x-3 space-x-reverse">
-                  <Checkbox 
-                    id="archetypes"
-                    checked={includeArchetypes} 
-                    onCheckedChange={(checked) => setIncludeArchetypes(checked === true)}
-                  />
-                  <label htmlFor="archetypes" className="flex-1">סגנונות מנהיגות (ארכיטיפים)</label>
-                  <Input 
-                    type="number" 
-                    min="1" 
-                    max="5" 
-                    value={archetypesOrder} 
-                    onChange={(e) => setArchetypesOrder(Number(e.target.value))}
-                    className="w-16"
-                    disabled={!includeArchetypes}
-                  />
-                </div>
-
-                <div className="flex items-center space-x-3 space-x-reverse">
-                  <Checkbox 
-                    id="woca"
-                    checked={includeWoca} 
-                    onCheckedChange={(checked) => setIncludeWoca(checked === true)}
-                  />
-                  <label htmlFor="woca" className="flex-1">WOCA – אזורי שינוי</label>
-                  <Input 
-                    type="number" 
-                    min="1" 
-                    max="5" 
-                    value={wocaOrder} 
-                    onChange={(e) => setWocaOrder(Number(e.target.value))}
-                    className="w-16"
-                    disabled={!includeWoca}
-                  />
-                </div>
-
-                <div className="flex items-center space-x-3 space-x-reverse">
-                  <Checkbox 
-                    id="custom"
-                    checked={includeCustomText} 
-                    onCheckedChange={(checked) => setIncludeCustomText(checked === true)}
-                  />
-                  <label htmlFor="custom" className="flex-1">טקסט חופשי / סיכום מותאם אישית</label>
-                  <Input 
-                    type="number" 
-                    min="1" 
-                    max="5" 
-                    value={customTextOrder} 
-                    onChange={(e) => setCustomTextOrder(Number(e.target.value))}
-                    className="w-16"
-                    disabled={!includeCustomText}
-                  />
-                </div>
-              </div>
-
-              {includeCustomText && (
-                <div className="mt-4">
-                  <Textarea
-                    placeholder="כתוב כאן סיכום אישי, המלצות לפעולה או כל טקסט שתרצה שיופיע בדוח"
-                    value={customText}
-                    onChange={(e) => setCustomText(e.target.value)}
-                    rows={6}
-                    className="w-full"
-                  />
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <div className="text-center">
-            <Button 
-              onClick={exportGroupPDF}
-              disabled={isLoading}
-              className="text-lg px-8 py-4"
-            >
-              📄 הורד דוח PDF מותאם אישית
-            </Button>
-          </div>
-        </>
+        <div className="text-center">
+          <Button 
+            onClick={exportGroupPDF}
+            disabled={isLoading}
+            className="text-lg px-8 py-4"
+          >
+            📄 הורד דוח קבוצתי (SALIMA + WOCA)
+          </Button>
+        </div>
       )}
 
 
