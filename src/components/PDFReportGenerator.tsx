@@ -420,9 +420,11 @@ export const PDFReportGenerator: React.FC = () => {
                 backgroundColor: '#f9fafb',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                fontSize: '16px',
+                color: '#6b7280'
               }}>
-                <SalimaGroupRadarChart averages={salimaData.averages} />
+                גרף מכ"ם מפורט בעמוד הבא
               </div>
             </div>
           </div>
@@ -609,59 +611,6 @@ export const PDFReportGenerator: React.FC = () => {
         </div>
       )}
 
-      {/* Charts for capturing - positioned for capture */}
-      {salimaData && (
-        <div style={{ position: 'absolute', left: '-9999px', top: '-9999px', visibility: 'hidden' }}>
-          <div className="pdf-capture" id="radar-chart" style={{ 
-            width: '800px', 
-            height: '600px', 
-            backgroundColor: '#ffffff',
-            border: '1px solid #e5e7eb',
-            padding: '20px'
-          }}>
-            <SalimaGroupRadarChart averages={salimaData.averages} />
-          </div>
-          <div className="pdf-capture" id="archetype-chart" style={{ 
-            width: '800px', 
-            height: '600px', 
-            backgroundColor: '#ffffff',
-            border: '1px solid #e5e7eb',
-            padding: '20px'
-          }}>
-            <ArchetypeDistributionChart 
-              groupNumber={salimaData.group_number} 
-              isPresenterMode={false} 
-            />
-          </div>
-        </div>
-      )}
-
-      {wocaData?.groupCategoryScores && (
-        <div style={{ position: 'absolute', left: '-9999px', top: '-9999px', visibility: 'hidden' }}>
-          <div className="pdf-capture" id="woca-bar" style={{ 
-            width: '800px', 
-            height: '600px', 
-            backgroundColor: '#ffffff',
-            border: '1px solid #e5e7eb',
-            padding: '20px'
-          }}>
-            <WocaGroupBarChart 
-              groupCategoryScores={wocaData.groupCategoryScores}
-            />
-          </div>
-          <div className="pdf-capture" id="woca-radar" style={{ 
-            width: '800px', 
-            height: '600px', 
-            backgroundColor: '#ffffff',
-            border: '1px solid #e5e7eb',
-            padding: '20px'
-          }}>
-            <WocaCategoryRadarChart 
-              categoryScores={wocaData.groupCategoryScores}
-            />
-          </div>
-        </div>
-      )}
 
       {renderPDFLayout()}
 
