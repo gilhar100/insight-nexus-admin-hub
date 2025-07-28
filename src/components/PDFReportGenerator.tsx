@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,8 +9,7 @@ import { SalimaGroupRadarChart } from '@/components/SalimaGroupRadarChart';
 import { ArchetypeDistributionChart } from '@/components/ArchetypeDistributionChart';
 import { WocaGroupBarChart } from '@/components/WocaGroupBarChart';
 import { WocaCategoryRadarChart } from '@/components/WocaCategoryRadarChart';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+import { downloadGroupReportPDF } from '@/utils/downloadGroupReportPDF';
 
 interface SalimaGroupData {
   group_number: number;
@@ -51,7 +51,6 @@ export const PDFReportGenerator: React.FC = () => {
   const [groupNumber, setGroupNumber] = useState<number | null>(null);
   const [salimaData, setSalimaData] = useState<SalimaGroupData | null>(null);
   const [wocaData, setWocaData] = useState<WocaGroupData | null>(null);
-  const [pdfImages, setPdfImages] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -91,139 +90,6 @@ export const PDFReportGenerator: React.FC = () => {
     }
   }, [workshopData]);
 
-  const waitForChartRender = async (element: HTMLElement, maxWait: number = 3000) => {
-    return new Promise<void>((resolve) => {
-      let waited = 0;
-      const checkInterval = 100;
-      
-      const checkRender = () => {
-        // Check if Recharts SVG elements are present and have content
-        const svgElements = element.querySelectorAll('svg');
-        const hasValidSvg = svgElements.length > 0 && 
-          Array.from(svgElements).some(svg => svg.children.length > 0);
-        
-        if (hasValidSvg || waited >= maxWait) {
-          resolve();
-        } else {
-          waited += checkInterval;
-          setTimeout(checkRender, checkInterval);
-        }
-      };
-      
-      checkRender();
-    });
-  };
-
-  const captureChartElement = async (element: HTMLElement, id: string): Promise<string | null> => {
-    try {
-      console.log(`📸 Starting capture for ${id}`);
-      
-      // Make element visible and properly positioned
-      const originalStyles = {
-        position: element.style.position,
-        top: element.style.top,
-        left: element.style.left,
-        zIndex: element.style.zIndex,
-        visibility: element.style.visibility,
-        display: element.style.display
-      };
-
-      // Position element visibly but off-screen
-      element.style.position = 'fixed';
-      element.style.top = '0px';
-      element.style.left = '0px';
-      element.style.zIndex = '9999';
-      element.style.visibility = 'visible';
-      element.style.display = 'block';
-
-      // Wait for chart to render
-      await waitForChartRender(element);
-      
-      // Additional wait for stability
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      console.log(`📸 Capturing ${id} with html2canvas`);
-      
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff',
-        logging: false,
-        width: 800,
-        height: 600,
-        windowWidth: 1200,
-        windowHeight: 800,
-        removeContainer: false,
-        imageTimeout: 10000,
-        onclone: (clonedDoc) => {
-          // Ensure all SVG elements are properly rendered in the clone
-          const svgElements = clonedDoc.querySelectorAll('svg');
-          svgElements.forEach(svg => {
-            svg.style.backgroundColor = '#ffffff';
-          });
-        }
-      });
-
-      // Restore original styles
-      Object.assign(element.style, originalStyles);
-
-      // Validate canvas
-      if (!canvas || canvas.width === 0 || canvas.height === 0) {
-        console.error(`❌ Invalid canvas for ${id}: ${canvas?.width}x${canvas?.height}`);
-        return null;
-      }
-
-      // Convert to PNG and validate
-      const dataUrl = canvas.toDataURL('image/png', 1.0);
-      
-      if (!dataUrl || dataUrl.length < 1000 || !dataUrl.startsWith('data:image/png;base64,')) {
-        console.error(`❌ Invalid PNG data for ${id}: length=${dataUrl?.length}`);
-        return null;
-      }
-
-      // Additional validation: try to create an image to verify PNG is valid
-      const testImg = new Image();
-      const isValidPng = await new Promise<boolean>((resolve) => {
-        testImg.onload = () => resolve(true);
-        testImg.onerror = () => resolve(false);
-        testImg.src = dataUrl;
-      });
-
-      if (!isValidPng) {
-        console.error(`❌ PNG validation failed for ${id}`);
-        return null;
-      }
-
-      console.log(`✅ Successfully captured ${id}: ${dataUrl.length} chars`);
-      return dataUrl;
-      
-    } catch (err) {
-      console.error(`❌ Error capturing ${id}:`, err);
-      return null;
-    }
-  };
-
-  const captureAllVisualizations = async () => {
-    const elements = document.querySelectorAll('.pdf-capture');
-    const capturedImages: Record<string, string> = {};
-
-    console.log('📸 Starting chart capture, found elements:', elements.length);
-
-    for (const el of elements) {
-      const id = el.id;
-      if (!id) continue;
-
-      const imageData = await captureChartElement(el as HTMLElement, id);
-      if (imageData) {
-        capturedImages[id] = imageData;
-      }
-    }
-
-    console.log('📸 Chart capture complete. Successfully captured:', Object.keys(capturedImages));
-    return capturedImages;
-  };
-
   const getDimensionInsights = (averages: SalimaGroupData['averages']) => {
     const dimensions = [
       { key: 'strategy', name: 'אסטרטגיה (S)', score: averages.strategy },
@@ -252,71 +118,25 @@ export const PDFReportGenerator: React.FC = () => {
     try {
       console.log('🚀 Starting PDF export for group:', groupNumber);
       
-      // Use a simpler approach - generate PDF directly from visible content
-      const input = document.getElementById('pdf-export-root');
-      if (!input) {
-        throw new Error('PDF export root element not found');
+      const htmlElement = document.getElementById('pdf-export-root');
+      if (!htmlElement) {
+        throw new Error('PDF export container not found');
       }
 
-      // Show the PDF content temporarily
-      input.style.display = 'block';
-      input.style.position = 'absolute';
-      input.style.top = '0px';
-      input.style.left = '0px';
-      input.style.zIndex = '9999';
-      input.style.backgroundColor = '#ffffff';
-
-      // Wait for content to render
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      console.log('🖼️ Generating PDF canvas...');
-      const canvas = await html2canvas(input, {
-        scale: 1.2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff',
-        logging: false,
-        scrollY: 0,
-        windowWidth: 1200,
-        windowHeight: 1600,
-        removeContainer: false
-      });
-
-      // Hide the content again
-      input.style.display = 'none';
-
-      if (!canvas || canvas.width === 0 || canvas.height === 0) {
-        throw new Error('Failed to generate PDF canvas');
-      }
-
-      console.log('📄 Creating PDF document...');
-      const imgData = canvas.toDataURL('image/jpeg', 0.85);
+      // Make the PDF content visible temporarily for proper rendering
+      htmlElement.style.display = 'block';
       
-      if (!imgData || imgData.length < 1000) {
-        throw new Error('Failed to generate valid PDF image data');
-      }
-
-      const pdf = new jsPDF('p', 'pt', 'a4');
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const imgHeight = (canvas.height * pageWidth) / canvas.width;
-
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      // Use JPEG format instead of PNG to avoid corruption issues
-      pdf.addImage(imgData, 'JPEG', 0, position, pageWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'JPEG', 0, position, pageWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
-
-      console.log('💾 Saving PDF...');
-      pdf.save(`Group_Report_${groupNumber}.pdf`);
+      // Wait for content to render properly
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const htmlContent = htmlElement.outerHTML;
+      
+      // Hide the content again
+      htmlElement.style.display = 'none';
+      
+      console.log('📄 Sending HTML to backend PDF service...');
+      await downloadGroupReportPDF(htmlContent, `Group_Report_${groupNumber}.pdf`);
+      
       console.log('✅ PDF export completed successfully!');
       
     } catch (err) {
@@ -448,10 +268,10 @@ export const PDFReportGenerator: React.FC = () => {
               </h2>
               <div style={{ 
                 width: '100%', 
-                maxHeight: '450px', 
-                objectFit: 'contain',
-                display: 'block',
-                margin: '24px auto'
+                height: '450px', 
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}>
                 <ArchetypeDistributionChart 
                   groupNumber={salimaData.group_number} 
@@ -459,17 +279,10 @@ export const PDFReportGenerator: React.FC = () => {
                 />
               </div>
             </div>
-
-            <div style={{ marginTop: '32px', padding: '0 32px', fontSize: '16px', lineHeight: '1.7' }}>
-              <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px' }}>הסבר על סגנונות המנהיגות</h3>
-              <p style={{ marginBottom: '12px' }}><strong>המנהל הסקרן:</strong> מנהל שמוביל דרך סקרנות, חיפוש מתמיד אחר ידע, והשראה.</p>
-              <p style={{ marginBottom: '12px' }}><strong>המנהל המעצים:</strong> מנהל שפועל מתוך כנות, הקשבה ותחושת שליחות.</p>
-              <p style={{ marginBottom: '12px' }}><strong>מנהל ההזדמנות:</strong> מנהל שחושב קדימה, מזהה מגמות, ופועל בזריזות.</p>
-            </div>
           </div>
         )}
 
-        {/* Page 3: WOCA Summary */}
+        {/* Page 3: WOCA Bar Chart */}
         {wocaData && (
           <div
             style={{
@@ -483,7 +296,6 @@ export const PDFReportGenerator: React.FC = () => {
               boxSizing: 'border-box'
             }}
           >
-            {/* Title Section */}
             <div style={{ textAlign: 'center', marginBottom: '32px' }}>
               <h2 style={{ fontSize: '32px', color: '#1f2937', marginBottom: '16px' }}>
                 ניתוח WOCA - אזורי שינוי
@@ -493,40 +305,49 @@ export const PDFReportGenerator: React.FC = () => {
               </p>
             </div>
 
-            {/* Chart Section */}
-            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-              <div style={{ 
-                width: '100%', 
-                maxHeight: '350px', 
-                objectFit: 'contain',
-                margin: '0 auto',
-                display: 'block'
-              }}>
-                <WocaGroupBarChart 
-                  groupCategoryScores={wocaData.groupCategoryScores!}
-                />
-              </div>
+            <div style={{ 
+              width: '100%', 
+              height: '450px', 
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <WocaGroupBarChart 
+                groupCategoryScores={wocaData.groupCategoryScores!}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Page 4: WOCA Category Radar Chart */}
+        {wocaData && (
+          <div
+            style={{
+              width: '794px',
+              height: '1123px',
+              padding: '48px',
+              direction: 'rtl',
+              fontFamily: 'Arial, sans-serif',
+              backgroundColor: '#fff',
+              boxSizing: 'border-box'
+            }}
+          >
+            <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+              <h2 style={{ fontSize: '32px', color: '#1f2937', marginBottom: '16px' }}>
+                אזורי תודעה - התפלגות קטגוריאלית
+              </h2>
             </div>
 
-            {/* Explanation Section */}
-            <div style={{ padding: '0 32px', fontSize: '16px', lineHeight: '1.6' }}>
-              <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '20px' }}>הסבר על אזורי השינוי</h3>
-              <p style={{ marginBottom: '12px' }}><strong>הזדמנות:</strong> אזור בו קיים פוטנציאל גבוה לשינוי חיובי.</p>
-              <p style={{ marginBottom: '12px' }}><strong>נוחות:</strong> אזור יציב שמספק ביטחון אך עלול להגביל צמיחה.</p>
-              <p style={{ marginBottom: '12px' }}><strong>אדישות:</strong> אזור של חוסר מעורבות הדורש התערבות.</p>
-              <p style={{ marginBottom: '20px' }}><strong>מלחמה:</strong> אזור של התנגדות פעילה לשינוי.</p>
-
-              <div style={{ 
-                backgroundColor: '#fff8e1', 
-                border: '1px solid #fbc02d', 
-                padding: '16px', 
-                marginTop: '24px', 
-                fontSize: '14px', 
-                textAlign: 'center',
-                borderRadius: '8px'
-              }}>
-                ⚠️ הערה: גרף זה מציג ציונים ממוצעים, לא התפלגות אזורי תודעה בין המשתתפים
-              </div>
+            <div style={{ 
+              width: '100%', 
+              height: '450px', 
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <WocaCategoryRadarChart 
+                groupCategoryScores={wocaData.groupCategoryScores!}
+              />
             </div>
           </div>
         )}
@@ -586,7 +407,6 @@ export const PDFReportGenerator: React.FC = () => {
           </Button>
         </div>
       )}
-
 
       {renderPDFLayout()}
 
