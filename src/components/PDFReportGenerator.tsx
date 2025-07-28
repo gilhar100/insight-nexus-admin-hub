@@ -7,8 +7,9 @@ import { useGroupData } from '@/hooks/useGroupData';
 import { useWorkshopData } from '@/hooks/useWorkshopData';
 import { SalimaGroupRadarChart } from '@/components/SalimaGroupRadarChart';
 import { SalimaArchetypeDistributionChart } from '@/components/SalimaArchetypeDistributionChart';
-import { WocaChartsRow } from '@/components/WocaChartsRow';
+import { WocaGroupBarChart } from '@/components/WocaGroupBarChart';
 import { ZoneDistributionChart } from '@/components/ZoneDistributionChart';
+import { WocaCategoryRadarChart } from '@/components/WocaCategoryRadarChart';
 import { GroupPDFExportLayout } from '@/components/GroupPDFExportLayout';
 import { analyzeWorkshopWoca } from '@/utils/wocaAnalysis';
 import html2canvas from 'html2canvas';
@@ -143,9 +144,10 @@ export const PDFReportGenerator: React.FC = () => {
       salimaScore: groupData.averages.overall,
       strongestDimension,
       weakestDimension,
-      wocaZoneLabel: wocaAnalysis.dominantZone,
+      wocaZoneLabel: wocaAnalysis.groupDominantZoneByCount || 'לא זוהה',
       wocaScore: workshopData.average_score,
       wocaParticipantCount: workshopData.participant_count,
+      wocaAnalysis,
     };
   };
 
@@ -221,26 +223,23 @@ export const PDFReportGenerator: React.FC = () => {
           </>
         )}
         
-        {workshopData && (
+        {workshopData && pdfLayoutData?.wocaAnalysis && (
           <>
             <div id="woca-bar" className="w-full h-96 bg-white p-4">
-              <WocaChartsRow 
-                participants={workshopData.participants}
-                workshopId={workshopData.workshop_id}
-                showOnlyBar={true}
-              />
+              <WocaGroupBarChart groupCategoryScores={pdfLayoutData.wocaAnalysis.groupCategoryScores} />
             </div>
             <div id="woca-pie" className="w-full h-96 bg-white p-4">
               <ZoneDistributionChart 
-                zoneDistribution={analyzeWorkshopWoca(workshopData.participants, workshopData.workshop_id).zoneDistribution}
+                zoneDistribution={{
+                  opportunity: pdfLayoutData.wocaAnalysis.groupZoneCounts.opportunity,
+                  comfort: pdfLayoutData.wocaAnalysis.groupZoneCounts.comfort,
+                  apathy: pdfLayoutData.wocaAnalysis.groupZoneCounts.apathy,
+                  war: pdfLayoutData.wocaAnalysis.groupZoneCounts.war,
+                }}
               />
             </div>
             <div id="woca-matrix" className="w-full h-96 bg-white p-4">
-              <WocaChartsRow 
-                participants={workshopData.participants}
-                workshopId={workshopData.workshop_id}
-                showOnlyMatrix={true}
-              />
+              <WocaCategoryRadarChart categoryScores={pdfLayoutData.wocaAnalysis.groupCategoryScores} />
             </div>
           </>
         )}
@@ -248,17 +247,19 @@ export const PDFReportGenerator: React.FC = () => {
 
       {/* PDF Layout */}
       {showPDFLayout && pdfLayoutData && (
-        <GroupPDFExportLayout
-          pdfImages={pdfImages}
-          groupNumber={pdfLayoutData.groupNumber}
-          participantCount={pdfLayoutData.participantCount}
-          salimaScore={pdfLayoutData.salimaScore}
-          strongestDimension={pdfLayoutData.strongestDimension}
-          weakestDimension={pdfLayoutData.weakestDimension}
-          wocaZoneLabel={pdfLayoutData.wocaZoneLabel}
-          wocaScore={pdfLayoutData.wocaScore}
-          wocaParticipantCount={pdfLayoutData.wocaParticipantCount}
-        />
+        <div id="pdf-export-root">
+          <GroupPDFExportLayout
+            pdfImages={pdfImages}
+            groupNumber={pdfLayoutData.groupNumber}
+            participantCount={pdfLayoutData.participantCount}
+            salimaScore={pdfLayoutData.salimaScore}
+            strongestDimension={pdfLayoutData.strongestDimension}
+            weakestDimension={pdfLayoutData.weakestDimension}
+            wocaZoneLabel={pdfLayoutData.wocaZoneLabel}
+            wocaScore={pdfLayoutData.wocaScore}
+            wocaParticipantCount={pdfLayoutData.wocaParticipantCount}
+          />
+        </div>
       )}
 
       {groupData && (
