@@ -420,41 +420,6 @@ export const PDFReportGenerator: React.FC = () => {
                 backgroundColor: '#f9fafb',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '16px',
-                color: '#6b7280'
-              }}>
-                גרף מכ"ם מפורט בעמוד הבא
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Page 2: Radar Chart */}
-        {salimaData && (
-          <div
-            style={{
-              width: '794px',
-              height: '1123px',
-              padding: '48px',
-              direction: 'rtl',
-              fontFamily: 'Arial, sans-serif',
-              pageBreakAfter: 'always',
-              backgroundColor: '#fff',
-              boxSizing: 'border-box'
-            }}
-          >
-            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-              <h2 style={{ fontSize: '28px', color: '#1f2937', marginBottom: '24px' }}>
-                גרף מכ"ם - פרופיל קבוצתי
-              </h2>
-              <div style={{ 
-                width: '100%', 
-                maxHeight: '550px', 
-                objectFit: 'contain',
-                margin: '0 auto',
-                display: 'flex',
-                alignItems: 'center',
                 justifyContent: 'center'
               }}>
                 <SalimaGroupRadarChart averages={salimaData.averages} />
@@ -463,7 +428,7 @@ export const PDFReportGenerator: React.FC = () => {
           </div>
         )}
 
-        {/* Page 3: Archetype Chart */}
+        {/* Page 2: Archetype Chart */}
         {salimaData && (
           <div
             style={{
@@ -478,7 +443,7 @@ export const PDFReportGenerator: React.FC = () => {
             }}
           >
             <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-              <h2 style={{ fontSize: '28px', color: '#1f2937', marginBottom: '16px' }}>
+              <h2 style={{ fontSize: '28px', color: '#1f2937', marginBottom: '24px' }}>
                 התפלגות סגנון מנהיגות
               </h2>
               <div style={{ 
@@ -495,16 +460,16 @@ export const PDFReportGenerator: React.FC = () => {
               </div>
             </div>
 
-            <div style={{ marginTop: '24px', padding: '0 32px', fontSize: '16px', lineHeight: '1.7' }}>
-              <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '8px' }}>הסבר על סגנונות המנהיגות</h3>
-              <p><strong>המנהל הסקרן:</strong> מנהל שמוביל דרך סקרנות, חיפוש מתמיד אחר ידע, והשראה.</p>
-              <p><strong>המנהל המעצים:</strong> מנהל שפועל מתוך כנות, הקשבה ותחושת שליחות.</p>
-              <p><strong>מנהל ההזדמנות:</strong> מנהל שחושב קדימה, מזהה מגמות, ופועל בזריזות.</p>
+            <div style={{ marginTop: '32px', padding: '0 32px', fontSize: '16px', lineHeight: '1.7' }}>
+              <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px' }}>הסבר על סגנונות המנהיגות</h3>
+              <p style={{ marginBottom: '12px' }}><strong>המנהל הסקרן:</strong> מנהל שמוביל דרך סקרנות, חיפוש מתמיד אחר ידע, והשראה.</p>
+              <p style={{ marginBottom: '12px' }}><strong>המנהל המעצים:</strong> מנהל שפועל מתוך כנות, הקשבה ותחושת שליחות.</p>
+              <p style={{ marginBottom: '12px' }}><strong>מנהל ההזדמנות:</strong> מנהל שחושב קדימה, מזהה מגמות, ופועל בזריזות.</p>
             </div>
           </div>
         )}
 
-        {/* Page 4: WOCA Summary */}
+        {/* Page 3: WOCA Summary */}
         {wocaData && (
           <div
             style={{
@@ -518,21 +483,23 @@ export const PDFReportGenerator: React.FC = () => {
               boxSizing: 'border-box'
             }}
           >
-            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+            {/* Title Section */}
+            <div style={{ textAlign: 'center', marginBottom: '32px' }}>
               <h2 style={{ fontSize: '32px', color: '#1f2937', marginBottom: '16px' }}>
                 ניתוח WOCA - אזורי שינוי
               </h2>
-              <p style={{ fontSize: '16px', color: '#6b7280' }}>
+              <p style={{ fontSize: '16px', color: '#6b7280', marginBottom: '0' }}>
                 {wocaData.participant_count} משתתפים | ציון ממוצע: {wocaData.average_score.toFixed(2)}
               </p>
             </div>
 
-            <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+            {/* Chart Section */}
+            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
               <div style={{ 
                 width: '100%', 
-                maxHeight: '400px', 
+                maxHeight: '350px', 
                 objectFit: 'contain',
-                margin: '32px auto',
+                margin: '0 auto',
                 display: 'block'
               }}>
                 <WocaGroupBarChart 
@@ -541,14 +508,23 @@ export const PDFReportGenerator: React.FC = () => {
               </div>
             </div>
 
+            {/* Explanation Section */}
             <div style={{ padding: '0 32px', fontSize: '16px', lineHeight: '1.6' }}>
-              <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '12px' }}>הסבר על אזורי השינוי</h3>
-              <p><strong>הזדמנות:</strong> אזור בו קיים פוטנציאל גבוה לשינוי חיובי.</p>
-              <p><strong>נוחות:</strong> אזור יציב שמספק ביטחון אך עלול להגביל צמיחה.</p>
-              <p><strong>אדישות:</strong> אזור של חוסר מעורבות הדורש התערבות.</p>
-              <p><strong>מלחמה:</strong> אזור של התנגדות פעילה לשינוי.</p>
+              <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '20px' }}>הסבר על אזורי השינוי</h3>
+              <p style={{ marginBottom: '12px' }}><strong>הזדמנות:</strong> אזור בו קיים פוטנציאל גבוה לשינוי חיובי.</p>
+              <p style={{ marginBottom: '12px' }}><strong>נוחות:</strong> אזור יציב שמספק ביטחון אך עלול להגביל צמיחה.</p>
+              <p style={{ marginBottom: '12px' }}><strong>אדישות:</strong> אזור של חוסר מעורבות הדורש התערבות.</p>
+              <p style={{ marginBottom: '20px' }}><strong>מלחמה:</strong> אזור של התנגדות פעילה לשינוי.</p>
 
-              <div style={{ backgroundColor: '#fff8e1', border: '1px solid #fbc02d', padding: '12px', marginTop: '24px', fontSize: '14px', textAlign: 'center' }}>
+              <div style={{ 
+                backgroundColor: '#fff8e1', 
+                border: '1px solid #fbc02d', 
+                padding: '16px', 
+                marginTop: '24px', 
+                fontSize: '14px', 
+                textAlign: 'center',
+                borderRadius: '8px'
+              }}>
                 ⚠️ הערה: גרף זה מציג ציונים ממוצעים, לא התפלגות אזורי תודעה בין המשתתפים
               </div>
             </div>
