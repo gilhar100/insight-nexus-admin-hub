@@ -252,48 +252,45 @@ export const PDFReportGenerator: React.FC = () => {
     try {
       console.log('🚀 Starting PDF export for group:', groupNumber);
       
-      // Wait longer for charts to render
-      console.log('⏳ Waiting for charts to render...');
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      console.log('📸 Starting chart capture...');
-      const images = await captureAllVisualizations();
-      
-      // Check if we have any valid images
-      const validImages = Object.keys(images).filter(key => images[key]);
-      if (validImages.length === 0) {
-        throw new Error('No charts were captured successfully. Please try again.');
-      }
-      
-      console.log('📸 Using images:', validImages);
-      setPdfImages(images);
-
-      // Wait for state to update
-      await new Promise(resolve => setTimeout(resolve, 300));
-
+      // Use a simpler approach - generate PDF directly from visible content
       const input = document.getElementById('pdf-export-root');
       if (!input) {
         throw new Error('PDF export root element not found');
       }
 
+      // Show the PDF content temporarily
+      input.style.display = 'block';
+      input.style.position = 'absolute';
+      input.style.top = '0px';
+      input.style.left = '0px';
+      input.style.zIndex = '9999';
+      input.style.backgroundColor = '#ffffff';
+
+      // Wait for content to render
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
       console.log('🖼️ Generating PDF canvas...');
       const canvas = await html2canvas(input, {
-        scale: 1.5,
+        scale: 1.2,
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
         logging: false,
-        scrollY: -window.scrollY,
+        scrollY: 0,
         windowWidth: 1200,
-        windowHeight: 1600
+        windowHeight: 1600,
+        removeContainer: false
       });
+
+      // Hide the content again
+      input.style.display = 'none';
 
       if (!canvas || canvas.width === 0 || canvas.height === 0) {
         throw new Error('Failed to generate PDF canvas');
       }
 
       console.log('📄 Creating PDF document...');
-      const imgData = canvas.toDataURL('image/png', 0.95);
+      const imgData = canvas.toDataURL('image/jpeg', 0.85);
       
       if (!imgData || imgData.length < 1000) {
         throw new Error('Failed to generate valid PDF image data');
@@ -307,13 +304,14 @@ export const PDFReportGenerator: React.FC = () => {
       let heightLeft = imgHeight;
       let position = 0;
 
-      pdf.addImage(imgData, 'PNG', 0, position, pageWidth, imgHeight);
+      // Use JPEG format instead of PNG to avoid corruption issues
+      pdf.addImage(imgData, 'JPEG', 0, position, pageWidth, imgHeight);
       heightLeft -= pageHeight;
 
       while (heightLeft > 0) {
         position = heightLeft - imgHeight;
         pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, pageWidth, imgHeight);
+        pdf.addImage(imgData, 'JPEG', 0, position, pageWidth, imgHeight);
         heightLeft -= pageHeight;
       }
 
@@ -415,17 +413,17 @@ export const PDFReportGenerator: React.FC = () => {
               <h3 style={{ fontSize: '20px', color: '#1f2937', marginBottom: '16px' }}>
                 פרופיל קבוצתי ייחודי
               </h3>
-              <img
-                src={pdfImages['radar-chart']}
-                alt="Radar Chart"
-                style={{
-                  width: '100%',
-                  maxHeight: '400px',
-                  objectFit: 'contain',
-                  display: 'block',
-                  margin: '0 auto'
-                }}
-              />
+              <div style={{ 
+                width: '100%', 
+                height: '400px', 
+                border: '1px solid #e5e7eb',
+                backgroundColor: '#f9fafb',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <SalimaGroupRadarChart averages={salimaData.averages} />
+              </div>
             </div>
           </div>
         )}
@@ -448,17 +446,20 @@ export const PDFReportGenerator: React.FC = () => {
               <h2 style={{ fontSize: '28px', color: '#1f2937', marginBottom: '16px' }}>
                 התפלגות סגנון מנהיגות
               </h2>
-              <img
-                src={pdfImages['archetype-chart']}
-                alt="Archetype Chart"
-                style={{
-                  width: '100%',
-                  maxHeight: '600px',
-                  objectFit: 'contain',
-                  display: 'block',
-                  margin: '0 auto'
-                }}
-              />
+              <div style={{ 
+                width: '100%', 
+                height: '500px', 
+                border: '1px solid #e5e7eb',
+                backgroundColor: '#f9fafb',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <ArchetypeDistributionChart 
+                  groupNumber={salimaData.group_number} 
+                  isPresenterMode={false} 
+                />
+              </div>
             </div>
 
             <div style={{ marginTop: '40px' }}>
@@ -504,17 +505,19 @@ export const PDFReportGenerator: React.FC = () => {
             </div>
 
             <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-              <img
-                src={pdfImages['woca-bar']}
-                alt="WOCA Bar Chart"
-                style={{
-                  width: '100%',
-                  maxHeight: '400px',
-                  objectFit: 'contain',
-                  display: 'block',
-                  margin: '0 auto'
-                }}
-              />
+              <div style={{ 
+                width: '100%', 
+                height: '400px', 
+                border: '1px solid #e5e7eb',
+                backgroundColor: '#f9fafb',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <WocaGroupBarChart 
+                  groupCategoryScores={wocaData.groupCategoryScores!}
+                />
+              </div>
             </div>
 
             <div style={{ marginTop: '40px' }}>
