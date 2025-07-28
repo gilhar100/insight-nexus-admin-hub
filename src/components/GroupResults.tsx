@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { SalimaGroupRadarChart } from '@/components/SalimaGroupRadarChart';
 import { ArchetypeDistributionChart } from '@/components/ArchetypeDistributionChart';
@@ -109,50 +108,6 @@ const captureAllVisualizations = async () => {
   return capturedImages;
 };
 
-const exportGroupSalimaPDF = async (groupData: GroupData, pdfImages: Record<string, string>) => {
-  const input = document.getElementById('pdf-export-root');
-  if (!input) {
-    throw new Error('PDF export container not found');
-  }
-
-  // Make the container visible temporarily for capture
-  input.style.display = 'block';
-  input.style.visibility = 'visible';
-
-  const canvas = await html2canvas(input, {
-    scale: 2,
-    useCORS: true,
-    scrollY: -window.scrollY,
-  });
-
-  // Hide the container again
-  input.style.display = 'none';
-  input.style.visibility = 'hidden';
-
-  const imgData = canvas.toDataURL('image/png');
-  const pdf = new jsPDF('p', 'pt', 'a4');
-
-  const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
-  const imgHeight = (canvas.height * pageWidth) / canvas.width;
-
-  let heightLeft = imgHeight;
-  let position = 0;
-
-  pdf.addImage(imgData, 'PNG', 0, position, pageWidth, imgHeight);
-  heightLeft -= pageHeight;
-
-  while (heightLeft > 0) {
-    position = heightLeft - imgHeight;
-    pdf.addPage();
-    pdf.addImage(imgData, 'PNG', 0, position, pageWidth, imgHeight);
-    heightLeft -= pageHeight;
-  }
-
-  const fileName = `salima-group-${groupData.group_number}-report-${new Date().toISOString().split('T')[0]}.pdf`;
-  pdf.save(fileName);
-};
-
 export const GroupResults: React.FC<GroupResultsProps> = ({
   groupData,
   isPresenterMode
@@ -161,14 +116,12 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
   const [pdfImages, setPdfImages] = useState<Record<string, string>>({});
 
   const preparePDF = async () => {
-    // Wait for charts to render
-    await new Promise(resolve => setTimeout(resolve, 300));
     const images = await captureAllVisualizations();
     setPdfImages(images);
     return images;
   };
 
-  const handlePDFExport = async () => {
+  const exportGroupSalimaPDF = async () => {
     try {
       toast({
         title: "מייצר דוח PDF...",
@@ -181,7 +134,51 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
       // Wait for state to update
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      await exportGroupSalimaPDF(groupData, images);
+      const input = document.getElementById('pdf-export-root');
+      if (!input) {
+        throw new Error('PDF export container not found');
+      }
+
+      // Make the container visible temporarily for capture
+      input.style.display = 'block';
+      input.style.visibility = 'visible';
+
+      const canvas = await html2canvas(input, {
+        scale: 1.5,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        scrollY: -window.scrollY,
+        logging: false,
+        width: 794,
+        height: input.scrollHeight
+      });
+
+      // Hide the container again
+      input.style.display = 'none';
+      input.style.visibility = 'hidden';
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'pt', 'a4');
+
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const imgHeight = (canvas.height * pageWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, pageWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, pageWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      const fileName = `salima-group-${groupData.group_number}-report-${new Date().toISOString().split('T')[0]}.pdf`;
+      pdf.save(fileName);
 
       toast({
         title: "הדוח יוצא בהצלחה!",
@@ -243,7 +240,7 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
               </h2>
               {!isPresenterMode && (
                 <Button 
-                  onClick={handlePDFExport}
+                  onClick={exportGroupSalimaPDF}
                   variant="outline" 
                   size="sm"
                   className="flex items-center gap-2"
@@ -371,210 +368,132 @@ export const GroupResults: React.FC<GroupResultsProps> = ({
         id="pdf-export-root" 
         style={{ 
           display: 'none', 
-          visibility: 'hidden'
+          visibility: 'hidden',
+          direction: 'rtl', 
+          fontFamily: 'Arial, sans-serif',
+          backgroundColor: 'white',
+          width: '794px',
+          minHeight: '1123px'
         }}
       >
         <PDFLayout 
           groupData={groupData} 
           pdfImages={pdfImages} 
-          strongest={strongest}
-          weakest={weakest}
-          isSameDimension={isSameDimension}
         />
       </div>
     </>
   );
 };
 
-// PDF Layout Component with Fixed A4 Pages
-const PDFLayout: React.FC<{ 
-  groupData: GroupData; 
-  pdfImages: Record<string, string>;
-  strongest: any;
-  weakest: any;
-  isSameDimension: boolean;
-}> = ({ groupData, pdfImages, strongest, weakest, isSameDimension }) => {
+// PDF Layout Component
+const PDFLayout: React.FC<{ groupData: GroupData; pdfImages: Record<string, string> }> = ({ groupData, pdfImages }) => {
+  const dimensionInsights = getDimensionInsights(groupData.averages);
+  const { strongest, weakest } = dimensionInsights;
+
   return (
-    <div>
-      {/* Page 1: Header + Overall Score + Key Insights */}
-      <div
-        style={{
-          width: '794px',
-          height: '1123px',
-          padding: '48px',
-          direction: 'rtl',
-          fontFamily: 'Arial, sans-serif',
-          backgroundColor: '#fff',
-          pageBreakAfter: 'always',
-          boxSizing: 'border-box',
-        }}
-      >
-        {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-          <h1 style={{ fontSize: '36px', fontWeight: 'bold', color: '#1e40af', marginBottom: '16px', margin: '0' }}>
-            דוח תובנות קבוצתי SALIMA
-          </h1>
-          <div style={{ fontSize: '24px', color: '#374151', marginBottom: '12px' }}>
-            קבוצה מספר: {groupData.group_number}
-          </div>
-          <div style={{ fontSize: '18px', color: '#6b7280', marginBottom: '12px' }}>
-            {groupData.participant_count} משתתפים
-          </div>
-          <div style={{ fontSize: '16px', color: '#9ca3af' }}>
-            {new Date().toLocaleDateString('he-IL')}
-          </div>
+    <div style={{ padding: '48px', lineHeight: '1.6' }}>
+      {/* Header */}
+      <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+        <h1 style={{ fontSize: '36px', fontWeight: 'bold', color: '#1e40af', marginBottom: '16px' }}>
+          דוח תובנות קבוצתי SALIMA
+        </h1>
+        <div style={{ fontSize: '24px', color: '#374151', marginBottom: '12px' }}>
+          קבוצה מספר: {groupData.group_number}
         </div>
-
-        {/* Overall Score */}
-        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-          <div style={{ 
-            border: '2px solid #93c5fd',
-            borderRadius: '16px',
-            padding: '32px',
-            backgroundColor: '#dbeafe',
-            display: 'inline-block',
-            minWidth: '300px'
-          }}>
-            <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#1e40af', marginBottom: '16px', margin: '0 0 16px 0' }}>
-              ציון מנהיגות קבוצתי
-            </h2>
-            <div style={{ fontSize: '48px', fontWeight: 'bold', color: '#2563eb', marginBottom: '8px' }}>
-              {groupData.averages.overall.toFixed(2)}
-            </div>
-            <div style={{ fontSize: '16px', color: '#3b82f6' }}>
-              ממוצע ציוני SLQ
-            </div>
-          </div>
+        <div style={{ fontSize: '18px', color: '#6b7280', marginBottom: '12px' }}>
+          {groupData.participant_count} משתתפים
         </div>
-
-        {/* Key Insights */}
-        {!isSameDimension && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '48px' }}>
-            <div style={{
-              width: '47%',
-              border: '2px solid #bbf7d0',
-              borderRadius: '16px',
-              padding: '24px',
-              backgroundColor: '#f0fdf4',
-              textAlign: 'center'
-            }}>
-              <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#166534', marginBottom: '16px', margin: '0 0 16px 0' }}>
-                הממד החזק ביותר
-              </h3>
-              <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#16a34a', marginBottom: '8px' }}>
-                {strongest.score.toFixed(1)}
-              </div>
-              <div style={{ fontSize: '16px', color: '#15803d', fontWeight: '600' }}>
-                {strongest.name}
-              </div>
-            </div>
-
-            <div style={{
-              width: '47%',
-              border: '2px solid #fed7aa',
-              borderRadius: '16px',
-              padding: '24px',
-              backgroundColor: '#fff7ed',
-              textAlign: 'center'
-            }}>
-              <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#9a3412', marginBottom: '16px', margin: '0 0 16px 0' }}>
-                ממד לפיתוח
-              </h3>
-              <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#ea580c', marginBottom: '8px' }}>
-                {weakest.score.toFixed(1)}
-              </div>
-              <div style={{ fontSize: '16px', color: '#c2410c', fontWeight: '600' }}>
-                {weakest.name}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {isSameDimension && (
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '48px' }}>
-            <div style={{
-              width: '60%',
-              border: '2px solid #fbbf24',
-              borderRadius: '16px',
-              padding: '24px',
-              backgroundColor: '#fef3c7',
-              textAlign: 'center'
-            }}>
-              <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#92400e', marginBottom: '16px', margin: '0 0 16px 0' }}>
-                ממד דומיננטי
-              </h3>
-              <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#d97706', marginBottom: '8px' }}>
-                {strongest.score.toFixed(1)}
-              </div>
-              <div style={{ fontSize: '16px', color: '#b45309', fontWeight: '600' }}>
-                {strongest.name}
-              </div>
-            </div>
-          </div>
-        )}
+        <div style={{ fontSize: '16px', color: '#9ca3af' }}>
+          {new Date().toLocaleDateString('he-IL')}
+        </div>
       </div>
 
-      {/* Page 2: Radar Chart */}
-      <div
-        style={{
-          width: '794px',
-          height: '1123px',
-          padding: '48px',
-          direction: 'rtl',
-          fontFamily: 'Arial, sans-serif',
-          backgroundColor: '#fff',
-          pageBreakAfter: 'always',
-          boxSizing: 'border-box',
-        }}
-      >
-        <h2 style={{ fontSize: '28px', fontWeight: 'bold', textAlign: 'center', color: '#1e40af', marginBottom: '40px', margin: '0 0 40px 0' }}>
+      {/* Overall Score */}
+      <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+        <div style={{ 
+          backgroundColor: '#dbeafe', 
+          border: '2px solid #93c5fd',
+          borderRadius: '12px',
+          padding: '32px',
+          display: 'inline-block'
+        }}>
+          <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#1e40af', marginBottom: '16px' }}>
+            ציון מנהיגות קבוצתי
+          </h2>
+          <div style={{ fontSize: '48px', fontWeight: 'bold', color: '#2563eb', marginBottom: '8px' }}>
+            {groupData.averages.overall.toFixed(2)}
+          </div>
+          <div style={{ fontSize: '16px', color: '#3b82f6' }}>
+            ממוצע ציוני SLQ
+          </div>
+        </div>
+      </div>
+
+      {/* Key Insights */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px', marginBottom: '48px' }}>
+        <div style={{ 
+          backgroundColor: '#f0fdf4', 
+          border: '2px solid #bbf7d0',
+          borderRadius: '12px',
+          padding: '24px',
+          textAlign: 'center'
+        }}>
+          <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#166534', marginBottom: '16px' }}>
+            הממד החזק ביותר
+          </h3>
+          <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#16a34a', marginBottom: '8px' }}>
+            {strongest.score.toFixed(1)}
+          </div>
+          <div style={{ fontSize: '16px', color: '#15803d', fontWeight: '600' }}>
+            {strongest.name}
+          </div>
+        </div>
+
+        <div style={{ 
+          backgroundColor: '#fff7ed', 
+          border: '2px solid #fed7aa',
+          borderRadius: '12px',
+          padding: '24px',
+          textAlign: 'center'
+        }}>
+          <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#9a3412', marginBottom: '16px' }}>
+            ממד לפיתוח
+          </h3>
+          <div style={{ fontSize: '36px', fontWeight: 'bold', color: '#ea580c', marginBottom: '8px' }}>
+            {weakest.score.toFixed(1)}
+          </div>
+          <div style={{ fontSize: '16px', color: '#c2410c', fontWeight: '600' }}>
+            {weakest.name}
+          </div>
+        </div>
+      </div>
+
+      {/* Charts */}
+      <div style={{ marginBottom: '48px' }}>
+        <h2 style={{ fontSize: '28px', fontWeight: 'bold', textAlign: 'center', color: '#1e40af', marginBottom: '24px' }}>
           פרופיל קבוצתי ייחודי - שישה ממדים
         </h2>
         {pdfImages['radar-chart'] && (
-          <div style={{ textAlign: 'center' }}>
+          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
             <img 
               src={pdfImages['radar-chart']} 
+              style={{ maxWidth: '100%', height: 'auto' }}
               alt="Radar Chart"
-              style={{
-                width: '100%',
-                maxHeight: '600px',
-                objectFit: 'contain',
-                display: 'block',
-                margin: '0 auto'
-              }}
             />
           </div>
         )}
       </div>
 
-      {/* Page 3: Archetype Distribution Chart */}
-      <div
-        style={{
-          width: '794px',
-          height: '1123px',
-          padding: '48px',
-          direction: 'rtl',
-          fontFamily: 'Arial, sans-serif',
-          backgroundColor: '#fff',
-          pageBreakAfter: 'always',
-          boxSizing: 'border-box',
-        }}
-      >
-        <h2 style={{ fontSize: '28px', fontWeight: 'bold', textAlign: 'center', color: '#1e40af', marginBottom: '40px', margin: '0 0 40px 0' }}>
+      <div style={{ marginBottom: '48px' }}>
+        <h2 style={{ fontSize: '28px', fontWeight: 'bold', textAlign: 'center', color: '#1e40af', marginBottom: '24px' }}>
           התפלגות סגנון מנהיגות
         </h2>
         {pdfImages['archetype-chart'] && (
           <div style={{ textAlign: 'center' }}>
             <img 
               src={pdfImages['archetype-chart']} 
+              style={{ maxWidth: '100%', height: 'auto' }}
               alt="Archetype Distribution Chart"
-              style={{
-                width: '100%',
-                maxHeight: '600px',
-                objectFit: 'contain',
-                display: 'block',
-                margin: '0 auto'
-              }}
             />
           </div>
         )}
