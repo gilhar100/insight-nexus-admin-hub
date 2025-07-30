@@ -3,9 +3,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@import './styles/presenter-mode.css';
-@import './styles/chart-styles.css';
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -150,4 +147,40 @@
   .border-war {
     border-color: #EF4444;
   }
+}
+
+/* Chart styles */
+.recharts-wrapper {
+  direction: ltr !important;
+}
+
+.recharts-surface {
+  overflow: visible;
+}
+
+/* Presenter mode styles */
+.presenter-mode {
+  background: #1a1a1a;
+  color: white;
+}
+
+.presenter-mode .bg-white {
+  background: #2a2a2a !important;
+}
+
+.presenter-mode .bg-gray-50 {
+  background: #1a1a1a !important;
+}
+
+.presenter-mode .text-gray-800,
+.presenter-mode .text-gray-900 {
+  color: white !important;
+}
+
+.presenter-mode .text-gray-600 {
+  color: #ccc !important;
+}
+
+.presenter-mode .border-gray-200 {
+  border-color: #444 !important;
 }
