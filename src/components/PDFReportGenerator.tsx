@@ -147,3 +147,12 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
     </div>
   );
 };
+
+export const PDFReportGenerator: React.FC = () => {
+  return (
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-4">PDF Report Generator</h2>
+      <p className="text-gray-600">PDF report generation functionality will be implemented here.</p>
+    </div>
+  );
+};
