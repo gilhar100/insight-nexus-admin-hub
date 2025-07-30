@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { DashboardLayout } from '@/components/DashboardLayout';
 import { IndividualInsights } from '@/components/IndividualInsights';
