@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 interface GroupPDFExportLayoutProps {
@@ -26,45 +27,44 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
 }) => {
   const basePageStyle: React.CSSProperties = {
     width: '100%',
-    maxWidth: '794px',
-    height: '1123px',
+    maxWidth: '210mm',
+    minHeight: '297mm',
     margin: '0 auto',
-    padding: '40px',
+    padding: '20mm',
     fontFamily: 'Arial, sans-serif',
     backgroundColor: '#fff',
     color: '#1f2937',
     boxSizing: 'border-box',
-    direction: 'rtl',
     pageBreakAfter: 'always',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-start'
+    display: 'block'
   };
 
   const sectionStyle: React.CSSProperties = {
     width: '100%',
-    marginBottom: '30px',
+    marginBottom: '20px',
     textAlign: 'right'
   };
 
   const imageStyle: React.CSSProperties = {
     maxWidth: '100%',
+    height: 'auto',
     border: '1px solid #ccc',
     borderRadius: '8px',
-    marginBottom: '20px',
+    marginBottom: '15px',
     display: 'block',
-    marginInline: 'auto'
+    margin: '0 auto 15px auto'
   };
 
   const legendBoxStyle: React.CSSProperties = {
     textAlign: 'right',
-    fontSize: '13px',
-    lineHeight: 1.6,
+    fontSize: '12px',
+    lineHeight: 1.5,
     backgroundColor: '#f9f9f9',
     borderRadius: '8px',
-    padding: '16px',
-    marginTop: '20px',
-    width: '100%'
+    padding: '15px',
+    marginTop: '15px',
+    width: '100%',
+    boxSizing: 'border-box'
   };
 
   const currentDate = new Date().toLocaleDateString('he-IL');
@@ -75,34 +75,77 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
         <meta charSet="UTF-8" />
         <style>
           {`
+            * {
+              box-sizing: border-box;
+            }
             body {
               direction: rtl;
               font-family: Arial, sans-serif;
-              width: 794px;
-              margin: 0 auto;
-              padding: 40px;
-              box-sizing: border-box;
+              margin: 0;
+              padding: 0;
               color: #1f2937;
+              width: 210mm;
+              background: white;
             }
             .page {
               page-break-after: always;
               width: 100%;
+              max-width: 210mm;
+              min-height: 297mm;
+              padding: 20mm;
+              margin: 0 auto;
+              background: white;
+              box-sizing: border-box;
+            }
+            .page:last-child {
+              page-break-after: auto;
             }
             h1, h2, h3, p {
               text-align: right;
+              margin: 10px 0;
+            }
+            h1 {
+              font-size: 24px;
+              margin-bottom: 15px;
+            }
+            h2 {
+              font-size: 20px;
+              margin-bottom: 12px;
+            }
+            h3 {
+              font-size: 16px;
+              margin-bottom: 10px;
             }
             img {
               max-width: 100%;
               height: auto;
               display: block;
-              margin: 0 auto;
+              margin: 0 auto 15px auto;
+              border: 1px solid #ccc;
+              border-radius: 8px;
             }
             .legendBox {
               background: #f9f9f9;
               border-radius: 8px;
-              padding: 16px;
-              font-size: 14px;
+              padding: 15px;
+              font-size: 12px;
+              line-height: 1.5;
               width: 100%;
+              box-sizing: border-box;
+              text-align: right;
+            }
+            @media print {
+              body {
+                width: 210mm;
+                margin: 0;
+                padding: 0;
+              }
+              .page {
+                page-break-after: always;
+                margin: 0;
+                width: 210mm;
+                min-height: 297mm;
+              }
             }
           `}
         </style>
@@ -110,7 +153,7 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
       <body>
         <div id="pdf-export-root">
           {/* Page 1: SALIMA Overview */}
-          <div style={basePageStyle}>
+          <div className="page" style={basePageStyle}>
             <div style={sectionStyle}>
               <h1>דוח תובנות קבוצתי SALIMA</h1>
               <p>קבוצה {groupNumber} • {currentDate} • {participantCount} משתתפים</p>
@@ -119,7 +162,7 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
               <p><strong>מימד חלש:</strong> {weakestDimension.name} ({weakestDimension.score.toFixed(2)})</p>
             </div>
 
-            <div style={legendBoxStyle}>
+            <div style={legendBoxStyle} className="legendBox">
               <h3>מימדי SALIMA</h3>
               <p><strong>אסטרטגיה:</strong> ראיה רחבה וחשיבה מערכתית</p>
               <p><strong>למידה:</strong> פתיחות להתפתחות ולמידה</p>
@@ -131,7 +174,7 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
           </div>
 
           {/* Page 2: SALIMA Charts */}
-          <div style={basePageStyle}>
+          <div className="page" style={basePageStyle}>
             <div style={sectionStyle}>
               <h2>תרשים רדאר קבוצתי</h2>
               {pdfImages['radar-chart'] && <img src={pdfImages['radar-chart']} alt="Radar Chart" style={imageStyle} />}
@@ -139,7 +182,7 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
             <div style={sectionStyle}>
               <h2>חלוקת ארכיטיפים</h2>
               {pdfImages['archetype-chart'] && <img src={pdfImages['archetype-chart']} alt="Archetype Chart" style={imageStyle} />}
-              <div style={legendBoxStyle}>
+              <div style={legendBoxStyle} className="legendBox">
                 <h3>ארכיטיפי מנהיגות</h3>
                 <p><strong>המנהל הסקרן:</strong> סקרנות והתפתחות</p>
                 <p><strong>המנהל המעצים:</strong> חיבור ומשמעות</p>
@@ -149,7 +192,7 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
           </div>
 
           {/* Page 3: WOCA Summary */}
-          <div style={basePageStyle}>
+          <div className="page" style={basePageStyle}>
             <div style={sectionStyle}>
               <h1>סיכום WOCA</h1>
               <p>אזור מוביל: <strong>{wocaZoneLabel}</strong></p>
@@ -159,7 +202,7 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
           </div>
 
           {/* Page 4: WOCA Visuals */}
-          <div style={basePageStyle}>
+          <div className="page" style={basePageStyle}>
             <div style={sectionStyle}>
               <h2>תרשים עוגה - חלוקת אזורים</h2>
               {pdfImages['woca-pie'] && <img src={pdfImages['woca-pie']} alt="WOCA Pie" style={imageStyle} />}
@@ -175,8 +218,8 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
           </div>
 
           {/* Page 5: WOCA Legend */}
-          <div style={{ ...basePageStyle, pageBreakAfter: 'auto' }}>
-            <div style={legendBoxStyle}>
+          <div className="page" style={{ ...basePageStyle, pageBreakAfter: 'auto' }}>
+            <div style={legendBoxStyle} className="legendBox">
               <h2>מדריך אזורי WOCA</h2>
               <p><strong>אזור הזדמנות:</strong> השפעה גבוהה ועניין גבוה – אידיאלי לפעולה</p>
               <p><strong>אזור נוחות:</strong> עניין גבוה אך השפעה נמוכה – צריך לחזק השפעה</p>
