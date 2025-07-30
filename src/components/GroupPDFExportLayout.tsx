@@ -49,7 +49,7 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
               page-break-after: always;
               width: 210mm;
               min-height: 297mm;
-              padding: 40px;
+              padding: 20mm;
               margin: 0 auto;
               background: white;
               box-sizing: border-box;
@@ -61,150 +61,217 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
             .page:last-child {
               page-break-after: auto;
             }
-            h1 {
-              font-size: 24px;
-              margin-bottom: 8px;
+            .page-title {
+              font-size: 28px;
               font-weight: bold;
               color: #1f2937;
               text-align: center;
+              margin-bottom: 40px;
+              border-bottom: 2px solid #e5e7eb;
+              padding-bottom: 20px;
             }
-            h2 {
-              font-size: 20px;
-              margin-bottom: 10px;
-              font-weight: 600;
-              color: #374151;
-              text-align: center;
-            }
-            h3 {
-              font-size: 16px;
-              margin-bottom: 8px;
-              font-weight: 600;
-              color: #4b5563;
-              text-align: center;
-            }
-            p {
-              margin: 4px 0;
-              font-size: 13px;
-            }
-            .header {
+            .section-title {
+              font-size: 24px;
+              font-weight: bold;
+              color: #3b82f6;
               text-align: center;
               margin-bottom: 30px;
-              padding-bottom: 20px;
-              border-bottom: 2px solid #e5e7eb;
             }
-            .section {
+            .subsection-title {
+              font-size: 20px;
+              font-weight: 600;
+              color: #1f2937;
+              text-align: center;
               margin-bottom: 20px;
-              text-align: center;
             }
-            .compact-section {
-              margin-bottom: 15px;
+            .group-info {
               text-align: center;
+              font-size: 16px;
+              color: #6b7280;
+              margin-bottom: 40px;
             }
-            .image-container {
-              display: block;
+            .main-score {
               text-align: center;
-              margin: 10px 0;
-              width: 100%;
+              margin-bottom: 40px;
             }
-            .compact-image {
-              max-width: 90%;
-              width: auto;
-              height: auto;
-              display: block;
-              margin: 0 auto;
-              border: 1px solid #d1d5db;
+            .main-score .score-value {
+              font-size: 36px;
+              font-weight: bold;
+              color: #059669;
+              margin-bottom: 10px;
+            }
+            .dimensions-grid {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 40px;
+              margin-bottom: 40px;
+              max-width: 600px;
+              margin-left: auto;
+              margin-right: auto;
+            }
+            .dimension-box {
+              background: #f9fafb;
+              border: 1px solid #e5e7eb;
               border-radius: 8px;
+              padding: 20px;
+              text-align: center;
             }
-            .full-image {
-              max-width: 85%;
-              width: auto;
-              height: auto;
-              display: block;
-              margin: 0 auto;
-              border: 1px solid #d1d5db;
-              border-radius: 8px;
+            .dimension-label {
+              font-size: 16px;
+              font-weight: 600;
+              color: #374151;
+              margin-bottom: 8px;
+            }
+            .dimension-name {
+              font-size: 18px;
+              font-weight: bold;
+              margin-bottom: 8px;
+            }
+            .dimension-score {
+              font-size: 24px;
+              font-weight: bold;
+            }
+            .strong-dimension .dimension-name,
+            .strong-dimension .dimension-score {
+              color: #059669;
+            }
+            .weak-dimension .dimension-name,
+            .weak-dimension .dimension-score {
+              color: #dc2626;
             }
             .legend-box {
               background: #f9f9f9;
               border: 1px solid #e2e8f0;
               border-radius: 8px;
-              padding: 15px;
-              font-size: 12px;
-              line-height: 1.5;
-              margin: 15px auto;
-              max-width: 100%;
-              text-align: center;
-            }
-            .zone-box {
-              background: #f9f9f9;
-              border: 1px solid #e2e8f0;
-              border-radius: 8px;
-              padding: 16px;
-              margin-bottom: 12px;
-              max-width: 100%;
-              text-align: center;
-            }
-            .archetype-box {
-              background: #f9f9f9;
-              border-radius: 8px;
-              padding: 16px;
-              margin-bottom: 12px;
-              text-align: center;
-            }
-            .overview-row {
-              margin-bottom: 25px;
-              text-align: center;
-            }
-            .score-display {
-              font-size: 28px;
-              font-weight: bold;
-              color: #059669;
-              margin: 20px 0;
-            }
-            .dimensions-container {
-              display: flex;
-              justify-content: center;
-              gap: 40px;
-              margin: 20px 0;
-            }
-            .dimension-block {
-              background: #f9fafb;
-              border-radius: 8px;
               padding: 20px;
-              text-align: center;
-              min-width: 200px;
-            }
-            .stats-row {
-              display: grid;
-              grid-template-columns: 1fr 1fr;
-              gap: 20px;
-              margin: 20px 0;
+              font-size: 14px;
+              line-height: 1.6;
+              margin: 30px auto;
+              max-width: 600px;
               text-align: center;
             }
-            .stat-item {
-              background-color: #f9fafb;
-              border-radius: 8px;
-              padding: 15px;
-              text-align: center;
-            }
-            .numeric-value {
+            .legend-title {
+              font-size: 18px;
               font-weight: bold;
-              font-size: 16px;
+              color: #1f2937;
+              margin-bottom: 15px;
             }
-            .two-column {
-              display: grid;
-              grid-template-columns: 1fr 1fr;
-              gap: 20px;
+            .legend-item {
+              margin-bottom: 8px;
+            }
+            .chart-container {
+              margin: 20px auto;
+              text-align: center;
+              max-width: 100%;
+            }
+            .chart-image {
+              max-width: 100%;
+              height: auto;
+              display: block;
+              margin: 0 auto;
+              border: 1px solid #e5e7eb;
+              border-radius: 8px;
+            }
+            .compact-chart {
+              max-width: 80%;
+            }
+            .full-chart {
+              max-width: 90%;
+            }
+            .woca-summary {
+              text-align: center;
               margin-bottom: 30px;
             }
-            .column {
+            .woca-zone {
+              background: #f0f9ff;
+              border: 1px solid #bfdbfe;
+              border-radius: 8px;
+              padding: 20px;
+              margin-bottom: 20px;
               text-align: center;
             }
-            .fill-space {
-              flex-grow: 1;
-              display: flex;
-              flex-direction: column;
-              justify-content: space-between;
+            .woca-zone-name {
+              font-size: 24px;
+              font-weight: bold;
+              color: #059669;
+              margin-bottom: 10px;
+            }
+            .woca-stats {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 20px;
+              margin-top: 20px;
+              max-width: 400px;
+              margin-left: auto;
+              margin-right: auto;
+            }
+            .woca-stat {
+              background: #f9fafb;
+              border-radius: 8px;
+              padding: 15px;
+              text-align: center;
+            }
+            .woca-stat-label {
+              font-size: 14px;
+              color: #6b7280;
+              margin-bottom: 5px;
+            }
+            .woca-stat-value {
+              font-size: 20px;
+              font-weight: bold;
+              color: #1f2937;
+            }
+            .archetype-descriptions {
+              margin-top: 20px;
+            }
+            .archetype-item {
+              background: #f9f9f9;
+              border-radius: 8px;
+              padding: 15px;
+              margin-bottom: 10px;
+              text-align: center;
+              font-size: 14px;
+            }
+            .archetype-name {
+              font-weight: bold;
+              color: #1f2937;
+            }
+            .zone-explanation {
+              background: #f9fafb;
+              border: 1px solid #e5e7eb;
+              border-radius: 8px;
+              padding: 20px;
+              margin-bottom: 15px;
+              text-align: center;
+            }
+            .zone-name {
+              font-size: 18px;
+              font-weight: bold;
+              margin-bottom: 10px;
+            }
+            .zone-description {
+              font-size: 14px;
+              color: #4b5563;
+              line-height: 1.5;
+            }
+            .opportunity { color: #059669; }
+            .comfort { color: #3b82f6; }
+            .apathy { color: #f59e0b; }
+            .war { color: #ef4444; }
+            .charts-grid {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 30px;
+              margin-bottom: 30px;
+            }
+            .chart-section {
+              text-align: center;
+            }
+            .chart-section h3 {
+              font-size: 16px;
+              font-weight: 600;
+              color: #374151;
+              margin-bottom: 15px;
             }
             @media print {
               body {
@@ -217,7 +284,7 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
                 margin: 0;
                 width: 210mm;
                 min-height: 297mm;
-                padding: 12mm;
+                padding: 20mm;
               }
               .page:last-child {
                 page-break-after: auto;
@@ -228,179 +295,158 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
       </head>
       <body>
         <div id="pdf-export-root">
-          {/* Page 1: SALIMA Overview with WOCA Summary */}
+          {/* Page 1: SALIMA Overview */}
           <div className="page">
-            <div className="header">
-              <h1>דוח תובנות קבוצתי SALIMA</h1>
+            <div className="page-title">
+              דוח תובנות קבוצתי SALIMA
             </div>
 
-            {/* Row 1: Group info */}
-            <div className="overview-row">
-              <p style={{ fontSize: '14px', color: '#6b7280' }}>
-                קבוצה {groupNumber} • {currentDate} • {participantCount} משתתפים
-              </p>
+            <div className="group-info">
+              קבוצה {groupNumber} • {currentDate} • {participantCount} משתתפים
             </div>
 
-            {/* Row 2: SLQ Score */}
-            <div className="overview-row">
-              <div className="score-display">
+            <div className="main-score">
+              <div className="score-value">
                 ציון SLQ קבוצתי: {salimaScore.toFixed(2)} / 5
               </div>
             </div>
 
-            {/* Row 3: Strongest/Weakest Dimensions */}
-            <div className="overview-row">
-              <div className="dimensions-container">
-                <div className="dimension-block">
-                  <p><strong>מימד חזק:</strong></p>
-                  <p style={{ color: '#059669', fontSize: '16px', fontWeight: 'bold' }}>
-                    {strongestDimension.name}
-                  </p>
-                  <p style={{ color: '#059669', fontSize: '18px', fontWeight: 'bold' }}>
-                    {strongestDimension.score.toFixed(2)}
-                  </p>
-                </div>
-                <div className="dimension-block">
-                  <p><strong>מימד חלש:</strong></p>
-                  <p style={{ color: '#dc2626', fontSize: '16px', fontWeight: 'bold' }}>
-                    {weakestDimension.name}
-                  </p>
-                  <p style={{ color: '#dc2626', fontSize: '18px', fontWeight: 'bold' }}>
-                    {weakestDimension.score.toFixed(2)}
-                  </p>
-                </div>
+            <div className="dimensions-grid">
+              <div className="dimension-box strong-dimension">
+                <div className="dimension-label">מימד חזק</div>
+                <div className="dimension-name">{strongestDimension.name}</div>
+                <div className="dimension-score">{strongestDimension.score.toFixed(2)}</div>
+              </div>
+              <div className="dimension-box weak-dimension">
+                <div className="dimension-label">מימד חלש</div>
+                <div className="dimension-name">{weakestDimension.name}</div>
+                <div className="dimension-score">{weakestDimension.score.toFixed(2)}</div>
               </div>
             </div>
 
             <div className="legend-box">
-              <h3 style={{ textAlign: 'center', marginBottom: '12px', color: '#1f2937' }}>
-                מימדי SALIMA
-              </h3>
-              <p><strong>אסטרטגיה:</strong> ראיה רחבה וחשיבה מערכתית</p>
-              <p><strong>למידה:</strong> פתיחות להתפתחות ולמידה</p>
-              <p><strong>השראה:</strong> הנעת אנשים ואנרגיה חיובית</p>
-              <p><strong>אדפטיביות:</strong> גמישות והתאמה לשינויים</p>
-              <p><strong>אותנטיות:</strong> כנות והתנהלות בהתאם לערכים</p>
-              <p><strong>משמעות:</strong> חיבור עמוק לתכלית העבודה</p>
-            </div>
-
-            {/* WOCA Summary integrated into first page */}
-            <div className="section">
-              <h2 style={{ color: '#3b82f6', marginBottom: '15px' }}>סיכום WOCA</h2>
-              
-              <div className="stats-row" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
-                <div className="stat-item">
-                  <p><strong>אזור מוביל:</strong></p>
-                  <p className="numeric-value" style={{ color: '#059669' }}>{wocaZoneLabel}</p>
-                </div>
-                <div className="stat-item">
-                  <p><strong>ציון כללי:</strong></p>
-                  <p className="numeric-value">{wocaScore.toFixed(2)} מתוך 5</p>
-                </div>
-                <div className="stat-item">
-                  <p><strong>משתתפים:</strong></p>
-                  <p className="numeric-value">{wocaParticipantCount}</p>
-                </div>
-              </div>
+              <div className="legend-title">מימדי SALIMA</div>
+              <div className="legend-item"><strong>אסטרטגיה:</strong> ראיה רחבה וחשיבה מערכתית</div>
+              <div className="legend-item"><strong>למידה:</strong> פתיחות להתפתחות ולמידה</div>
+              <div className="legend-item"><strong>השראה:</strong> הנעת אנשים ואנרגיה חיובית</div>
+              <div className="legend-item"><strong>אדפטיביות:</strong> גמישות והתאמה לשינויים</div>
+              <div className="legend-item"><strong>אותנטיות:</strong> כנות והתנהלות בהתאם לערכים</div>
+              <div className="legend-item"><strong>משמעות:</strong> חיבור עמוק לתכלית העבודה</div>
             </div>
           </div>
 
           {/* Page 2: SALIMA Charts */}
           <div className="page">
-            <div className="header">
-              <h2>תרשימי SALIMA</h2>
-            </div>
+            <div className="subsection-title">תרשימי SALIMA</div>
             
-            <div className="section">
-              <h3 style={{ marginBottom: '12px' }}>תרשים רדאר קבוצתי</h3>
-              <div className="image-container">
+            <div className="chart-section">
+              <h3>תרשים רדאר קבוצתי</h3>
+              <div className="chart-container">
                 {pdfImages['radar-chart'] && (
-                  <img src={pdfImages['radar-chart']} alt="Radar Chart" className="full-image" />
+                  <img src={pdfImages['radar-chart']} alt="Radar Chart" className="chart-image full-chart" />
                 )}
               </div>
             </div>
             
-            <div className="section">
-              <h3 style={{ marginBottom: '12px' }}>חלוקת ארכיטיפים</h3>
-              <div className="image-container">
+            <div className="chart-section">
+              <h3>חלוקת ארכיטיפים</h3>
+              <div className="chart-container">
                 {pdfImages['archetype-chart'] && (
-                  <img src={pdfImages['archetype-chart']} alt="Archetype Chart" className="full-image" />
+                  <img src={pdfImages['archetype-chart']} alt="Archetype Chart" className="chart-image full-chart" />
                 )}
               </div>
               
-              <div className="archetype-box">
-                <p><strong>המנהל הסקרן:</strong> סקרנות והתפתחות</p>
-              </div>
-              <div className="archetype-box">
-                <p><strong>המנהל המעצים:</strong> חיבור ומשמעות</p>
-              </div>
-              <div className="archetype-box">
-                <p><strong>מנהל ההזדמנות:</strong> חזון ותגובה מהירה</p>
+              <div className="archetype-descriptions">
+                <div className="archetype-item">
+                  <span className="archetype-name">המנהל הסקרן:</span> סקרנות והתפתחות
+                </div>
+                <div className="archetype-item">
+                  <span className="archetype-name">המנהל המעצים:</span> חיבור ומשמעות
+                </div>
+                <div className="archetype-item">
+                  <span className="archetype-name">מנהל ההזדמנות:</span> חזון ותגובה מהירה
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Page 3: WOCA Charts - Multiple charts on one page */}
+          {/* Page 3: WOCA Summary */}
           <div className="page">
-            <div className="header">
-              <h2>תרשימי WOCA</h2>
-            </div>
+            <div className="section-title">סיכום WOCA</div>
             
-            {/* Two column layout for pie and bar charts */}
-            <div className="two-column">
-              <div className="column">
-                <h3 style={{ marginBottom: '8px' }}>חלוקת אזורים</h3>
-                <div className="image-container">
+            <div className="woca-summary">
+              <div className="woca-zone">
+                <div className="woca-zone-name">אזור מוביל: {wocaZoneLabel}</div>
+                <div className="woca-stats">
+                  <div className="woca-stat">
+                    <div className="woca-stat-label">ציון כללי</div>
+                    <div className="woca-stat-value">{wocaScore.toFixed(2)} מתוך 5</div>
+                  </div>
+                  <div className="woca-stat">
+                    <div className="woca-stat-label">משתתפים</div>
+                    <div className="woca-stat-value">{wocaParticipantCount}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Page 4: WOCA Charts */}
+          <div className="page">
+            <div className="subsection-title">תרשימי WOCA</div>
+            
+            <div className="charts-grid">
+              <div className="chart-section">
+                <h3>חלוקת אזורים</h3>
+                <div className="chart-container">
                   {pdfImages['woca-pie'] && (
-                    <img src={pdfImages['woca-pie']} alt="WOCA Pie" className="compact-image" />
+                    <img src={pdfImages['woca-pie']} alt="WOCA Pie" className="chart-image compact-chart" />
                   )}
                 </div>
               </div>
               
-              <div className="column">
-                <h3 style={{ marginBottom: '8px' }}>חוזק אזורים</h3>
-                <div className="image-container">
+              <div className="chart-section">
+                <h3>חוזק אזורים</h3>
+                <div className="chart-container">
                   {pdfImages['woca-bar'] && (
-                    <img src={pdfImages['woca-bar']} alt="WOCA Bar" className="compact-image" />
+                    <img src={pdfImages['woca-bar']} alt="WOCA Bar" className="chart-image compact-chart" />
                   )}
                 </div>
               </div>
             </div>
             
-            <div className="section">
-              <h3 style={{ marginBottom: '8px' }}>מטריצת WOCA</h3>
-              <div className="image-container">
+            <div className="chart-section">
+              <h3>מטריצת WOCA</h3>
+              <div className="chart-container">
                 {pdfImages['woca-matrix'] && (
-                  <img src={pdfImages['woca-matrix']} alt="WOCA Matrix" className="compact-image" />
+                  <img src={pdfImages['woca-matrix']} alt="WOCA Matrix" className="chart-image full-chart" />
                 )}
               </div>
             </div>
           </div>
 
-          {/* Page 4: WOCA Legend */}
-          <div className="page" style={{ pageBreakAfter: 'auto' }}>
-            <div className="header">
-              <h2>מדריך אזורי WOCA</h2>
+          {/* Page 5: WOCA Zone Legend */}
+          <div className="page">
+            <div className="subsection-title">מדריך אזורי WOCA</div>
+            
+            <div className="zone-explanation">
+              <div className="zone-name opportunity">אזור הזדמנות</div>
+              <div className="zone-description">השפעה גבוהה ועניין גבוה – אידיאלי לפעולה</div>
             </div>
             
-            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-              <h3 style={{ color: '#1f2937' }}>הסבר על אזורי WOCA</h3>
+            <div className="zone-explanation">
+              <div className="zone-name comfort">אזור נוחות</div>
+              <div className="zone-description">עניין גבוה אך השפעה נמוכה – צריך לחזק השפעה</div>
             </div>
             
-            <div className="zone-box">
-              <p><strong style={{ color: '#009E73' }}>אזור הזדמנות:</strong> השפעה גבוהה ועניין גבוה – אידיאלי לפעולה</p>
+            <div className="zone-explanation">
+              <div className="zone-name apathy">אזור אדישות</div>
+              <div className="zone-description">השפעה גבוהה אך עניין נמוך – דרוש חיבור רגשי</div>
             </div>
             
-            <div className="zone-box">
-              <p><strong style={{ color: '#F0E442' }}>אזור נוחות:</strong> עניין גבוה אך השפעה נמוכה – צריך לחזק השפעה</p>
-            </div>
-            
-            <div className="zone-box">
-              <p><strong style={{ color: '#E69F00' }}>אזור אדישות:</strong> השפעה גבוהה אך עניין נמוך – דרוש חיבור רגשי</p>
-            </div>
-            
-            <div className="zone-box">
-              <p><strong style={{ color: '#0072B2' }}>אזור מלחמה:</strong> עניין והשפעה נמוכים – דרושה התערבות משמעותית</p>
+            <div className="zone-explanation">
+              <div className="zone-name war">אזור מלחמה</div>
+              <div className="zone-description">עניין והשפעה נמוכים – דרושה התערבות משמעותית</div>
             </div>
           </div>
         </div>
