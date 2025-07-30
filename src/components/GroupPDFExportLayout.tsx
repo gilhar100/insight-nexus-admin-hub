@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface GroupPDFExportLayoutProps {
@@ -45,17 +44,19 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
               background: white;
               line-height: 1.4;
             }
+            /* Base page styles.  Reduce padding and use justify-content to distribute children evenly. */
             .page {
               page-break-after: always;
               width: 210mm;
               min-height: 297mm;
-              padding: 20mm;
+              padding: 10mm;
               margin: 0 auto;
               background: white;
               box-sizing: border-box;
               position: relative;
               display: flex;
               flex-direction: column;
+              justify-content: space-between;
               max-width: 794px;
             }
             .page:last-child {
@@ -100,10 +101,11 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
               color: #059669;
               margin-bottom: 10px;
             }
+            /* Use flex with wrapping instead of grid for the dimension boxes */
             .dimensions-grid {
-              display: grid;
-              grid-template-columns: 1fr 1fr;
-              gap: 40px;
+              display: flex;
+              flex-wrap: wrap;
+              gap: 20px;
               margin-bottom: 40px;
               max-width: 600px;
               margin-left: auto;
@@ -115,6 +117,7 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
               border-radius: 8px;
               padding: 20px;
               text-align: center;
+              flex: 1 1 48%;
             }
             .dimension-label {
               font-size: 16px;
@@ -196,9 +199,10 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
               color: #059669;
               margin-bottom: 10px;
             }
+            /* Use flex instead of a grid for WOCA stats */
             .woca-stats {
-              display: grid;
-              grid-template-columns: 1fr 1fr;
+              display: flex;
+              flex-wrap: wrap;
               gap: 20px;
               margin-top: 20px;
               max-width: 400px;
@@ -210,6 +214,7 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
               border-radius: 8px;
               padding: 15px;
               text-align: center;
+              flex: 1 1 45%;
             }
             .woca-stat-label {
               font-size: 14px;
@@ -258,14 +263,16 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
             .comfort { color: #3b82f6; }
             .apathy { color: #f59e0b; }
             .war { color: #ef4444; }
+            /* Use flex for charts instead of grid */
             .charts-grid {
-              display: grid;
-              grid-template-columns: 1fr 1fr;
+              display: flex;
+              flex-wrap: wrap;
               gap: 30px;
               margin-bottom: 30px;
             }
             .chart-section {
               text-align: center;
+              flex: 1 1 48%;
             }
             .chart-section h3 {
               font-size: 16px;
@@ -284,7 +291,7 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
                 margin: 0;
                 width: 210mm;
                 min-height: 297mm;
-                padding: 20mm;
+                padding: 10mm;
               }
               .page:last-child {
                 page-break-after: auto;
