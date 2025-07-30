@@ -20,337 +20,130 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
   salimaScore,
   strongestDimension,
   weakestDimension,
-  archetypeLegendText,
   wocaZoneLabel,
   wocaScore,
   wocaParticipantCount
 }) => {
-  const pageStyle: React.CSSProperties = {
-    width: '794px',
+  const basePageStyle: React.CSSProperties = {
+    width: '100%',
+    maxWidth: '794px',
     height: '1123px',
-    padding: '60px',
+    margin: '0 auto',
+    padding: '40px',
     fontFamily: 'Arial, sans-serif',
-    direction: 'rtl',
-    backgroundColor: '#ffffff',
+    backgroundColor: '#fff',
     color: '#1f2937',
+    boxSizing: 'border-box',
+    direction: 'rtl',
     pageBreakAfter: 'always',
-    boxSizing: 'border-box'
-  };
-
-  const headerStyle: React.CSSProperties = {
-    textAlign: 'center',
-    marginBottom: '40px',
-    borderBottom: '3px solid hsl(var(--primary))',
-    paddingBottom: '20px'
-  };
-
-  const titleStyle: React.CSSProperties = {
-    fontSize: '32px',
-    fontWeight: 'bold',
-    color: 'hsl(var(--primary))',
-    marginBottom: '10px'
-  };
-
-  const subtitleStyle: React.CSSProperties = {
-    fontSize: '16px',
-    color: 'hsl(var(--muted-foreground))',
-    marginBottom: '20px'
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start'
   };
 
   const sectionStyle: React.CSSProperties = {
-    marginBottom: '30px'
+    width: '100%',
+    marginBottom: '30px',
+    textAlign: 'right'
   };
 
-  const scoreBoxStyle: React.CSSProperties = {
-    backgroundColor: 'hsl(var(--accent))',
-    border: '2px solid hsl(var(--primary))',
-    borderRadius: '12px',
-    padding: '24px',
-    textAlign: 'center',
-    marginBottom: '30px'
-  };
-
-  const dimensionBoxStyle: React.CSSProperties = {
-    backgroundColor: 'hsl(var(--muted))',
-    border: '1px solid hsl(var(--border))',
-    borderRadius: '8px',
-    padding: '20px',
-    margin: '10px',
-    flex: '1'
-  };
-
-  const chartContainerStyle: React.CSSProperties = {
-    textAlign: 'center',
-    marginBottom: '30px'
-  };
-
-  const chartImageStyle: React.CSSProperties = {
+  const imageStyle: React.CSSProperties = {
     maxWidth: '100%',
-    height: 'auto',
-    border: '1px solid hsl(var(--border))',
-    borderRadius: '8px'
-  };
-
-  const legendStyle: React.CSSProperties = {
-    backgroundColor: 'hsl(var(--muted))',
-    padding: '20px',
+    border: '1px solid #ccc',
     borderRadius: '8px',
-    marginTop: '20px'
+    marginBottom: '20px',
+    display: 'block',
+    marginInline: 'auto'
   };
 
-  const legendItemStyle: React.CSSProperties = {
-    marginBottom: '12px',
-    fontSize: '14px',
-    lineHeight: '1.4'
+  const legendBoxStyle: React.CSSProperties = {
+    textAlign: 'right',
+    fontSize: '13px',
+    lineHeight: 1.6,
+    backgroundColor: '#f9f9f9',
+    borderRadius: '8px',
+    padding: '16px',
+    marginTop: '20px',
+    width: '100%'
   };
 
   const currentDate = new Date().toLocaleDateString('he-IL');
 
   return (
-    <div id="pdf-export-root">
-      {/* Page 1 - SALIMA Overview */}
-      <div style={pageStyle}>
-        <div style={headerStyle}>
-          <h1 style={titleStyle}>דוח תובנות קבוצתי SALIMA</h1>
-          <p style={subtitleStyle}>קבוצה {groupNumber} • {currentDate} • {participantCount} משתתפים</p>
+    <div id="pdf-export-root" style={{ width: '794px', margin: '0 auto', direction: 'rtl' }}>
+      {/* Page 1: SALIMA Overview */}
+      <div style={basePageStyle}>
+        <div style={sectionStyle}>
+          <h1>דוח תובנות קבוצתי SALIMA</h1>
+          <p>קבוצה {groupNumber} • {currentDate} • {participantCount} משתתפים</p>
+          <h2>ציון SLQ קבוצתי: {salimaScore.toFixed(2)} / 5</h2>
+          <p><strong>מימד חזק:</strong> {strongestDimension.name} ({strongestDimension.score.toFixed(2)})</p>
+          <p><strong>מימד חלש:</strong> {weakestDimension.name} ({weakestDimension.score.toFixed(2)})</p>
         </div>
 
-        <div style={scoreBoxStyle}>
-          <h2 style={{ fontSize: '24px', marginBottom: '10px', color: 'hsl(var(--primary))' }}>
-            ציון SLQ קבוצתי
-          </h2>
-          <div style={{ fontSize: '48px', fontWeight: 'bold', color: 'hsl(var(--primary))' }}>
-            {salimaScore.toFixed(2)}
-          </div>
-          <p style={{ fontSize: '14px', color: 'hsl(var(--muted-foreground))', marginTop: '8px' }}>
-            מתוך 5.0
-          </p>
-        </div>
-
-        <div style={{ display: 'flex', gap: '20px', marginBottom: '30px' }}>
-          <div style={dimensionBoxStyle}>
-            <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '12px', color: 'hsl(var(--primary))' }}>
-              מימד חזק ביותר
-            </h3>
-            <p style={{ fontSize: '16px', fontWeight: 'bold' }}>{strongestDimension.name}</p>
-            <p style={{ fontSize: '24px', fontWeight: 'bold', color: 'hsl(var(--primary))' }}>
-              {strongestDimension.score.toFixed(2)}
-            </p>
-          </div>
-          <div style={dimensionBoxStyle}>
-            <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '12px', color: 'hsl(var(--destructive))' }}>
-              מימד חלש ביותר
-            </h3>
-            <p style={{ fontSize: '16px', fontWeight: 'bold' }}>{weakestDimension.name}</p>
-            <p style={{ fontSize: '24px', fontWeight: 'bold', color: 'hsl(var(--destructive))' }}>
-              {weakestDimension.score.toFixed(2)}
-            </p>
-          </div>
-        </div>
-
-        <div style={legendStyle}>
-          <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '16px', color: 'hsl(var(--primary))' }}>
-            מימדי SALIMA
-          </h3>
-          <div style={legendItemStyle}><strong>אסטרטגיה:</strong> יכולת לראות את התמונה הרחבה ולתכנן לטווח ארוך</div>
-          <div style={legendItemStyle}><strong>למידה:</strong> פתיחות לרכישת ידע חדש ולפיתוח מתמיד</div>
-          <div style={legendItemStyle}><strong>השראה:</strong> יכולת להניע ולעורר מוטיבציה באחרים</div>
-          <div style={legendItemStyle}><strong>אדפטיביות:</strong> גמישות והסתגלות לשינויים ואתגרים</div>
-          <div style={legendItemStyle}><strong>אותנטיות:</strong> נאמנות לערכים האישיים והארגוניים</div>
-          <div style={legendItemStyle}><strong>משמעות:</strong> יצירת תחושת מטרה ומשמעות בעבודה</div>
+        <div style={legendBoxStyle}>
+          <h3>מימדי SALIMA</h3>
+          <p><strong>אסטרטגיה:</strong> ראיה רחבה וחשיבה מערכתית</p>
+          <p><strong>למידה:</strong> פתיחות להתפתחות ולמידה</p>
+          <p><strong>השראה:</strong> הנעת אנשים ואנרגיה חיובית</p>
+          <p><strong>אדפטיביות:</strong> גמישות והתאמה לשינויים</p>
+          <p><strong>אותנטיות:</strong> כנות והתנהלות בהתאם לערכים</p>
+          <p><strong>משמעות:</strong> חיבור עמוק לתכלית העבודה</p>
         </div>
       </div>
 
-      {/* Page 2 - SALIMA Visuals */}
-      <div style={pageStyle}>
-        <div style={headerStyle}>
-          <h1 style={titleStyle}>תרשימי SALIMA</h1>
-          <p style={subtitleStyle}>ייצוג חזותי של תוצאות הקבוצה</p>
-        </div>
-
+      {/* Page 2: SALIMA Charts */}
+      <div style={basePageStyle}>
         <div style={sectionStyle}>
-          <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px', color: 'hsl(var(--primary))' }}>
-            תרשים רדאר קבוצתי
-          </h2>
-          <div style={chartContainerStyle}>
-            {pdfImages['radar-chart'] && (
-              <img src={pdfImages['radar-chart']} alt="Group Radar Chart" style={chartImageStyle} />
-            )}
-          </div>
+          <h2>תרשים רדאר קבוצתי</h2>
+          {pdfImages['radar-chart'] && <img src={pdfImages['radar-chart']} alt="Radar Chart" style={imageStyle} />}
         </div>
-
         <div style={sectionStyle}>
-          <h2 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px', color: 'hsl(var(--primary))' }}>
-            חלוקת ארכיטיפים
-          </h2>
-          <div style={chartContainerStyle}>
-            {pdfImages['archetype-chart'] && (
-              <img src={pdfImages['archetype-chart']} alt="Archetype Distribution" style={chartImageStyle} />
-            )}
-          </div>
-        </div>
-
-        <div style={legendStyle}>
-          <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '16px', color: 'hsl(var(--primary))' }}>
-            ארכיטיפי מנהיגות
-          </h3>
-          <div style={legendItemStyle}><strong>המנהל הסקרן:</strong> מתמחה בלמידה ופיתוח אישי ומקצועי</div>
-          <div style={legendItemStyle}><strong>המנהל המעצים:</strong> מתמחה באותנטיות ויצירת משמעות</div>
-          <div style={legendItemStyle}><strong>מנהל ההזדמנות:</strong> מתמחה באסטרטגיה, השראה ואדפטיביות</div>
-        </div>
-      </div>
-
-      {/* Page 3 - WOCA Summary */}
-      <div style={pageStyle}>
-        <div style={headerStyle}>
-          <h1 style={titleStyle}>סיכום WOCA</h1>
-          <p style={subtitleStyle}>תוצאות אזור מוביל וציון כללי</p>
-        </div>
-
-        <div style={scoreBoxStyle}>
-          <h2 style={{ fontSize: '24px', marginBottom: '20px', color: 'hsl(var(--primary))' }}>
-            אזור מוביל
-          </h2>
-          <div style={{ fontSize: '36px', fontWeight: 'bold', color: 'hsl(var(--primary))', marginBottom: '16px' }}>
-            {wocaZoneLabel}
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', gap: '20px', marginBottom: '30px' }}>
-          <div style={dimensionBoxStyle}>
-            <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '12px', color: 'hsl(var(--primary))' }}>
-              ציון WOCA כללי
-            </h3>
-            <p style={{ fontSize: '32px', fontWeight: 'bold', color: 'hsl(var(--primary))' }}>
-              {wocaScore.toFixed(2)}
-            </p>
-            <p style={{ fontSize: '14px', color: 'hsl(var(--muted-foreground))' }}>
-              מתוך 5.0
-            </p>
-          </div>
-          <div style={dimensionBoxStyle}>
-            <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '12px', color: 'hsl(var(--primary))' }}>
-              משתתפי WOCA
-            </h3>
-            <p style={{ fontSize: '32px', fontWeight: 'bold', color: 'hsl(var(--primary))' }}>
-              {wocaParticipantCount}
-            </p>
-            <p style={{ fontSize: '14px', color: 'hsl(var(--muted-foreground))' }}>
-              משתתפים
-            </p>
-          </div>
-        </div>
-
-        <div style={legendStyle}>
-          <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '16px', color: 'hsl(var(--primary))' }}>
-            על מדד WOCA
-          </h3>
-          <p style={{ fontSize: '14px', lineHeight: '1.6' }}>
-            מדד WOCA מודד את רמת המעורבות וההשפעה של הצוות בארגון. 
-            האזור המוביל מציין את האזור בו הקבוצה מרוכזת ביותר והוא משקף את הדינמיקה הקבוצתית 
-            ואת יכולות ההשפעה של הצוות בהקשרים ארגוניים שונים.
-          </p>
-        </div>
-      </div>
-
-      {/* Page 4 - WOCA Visuals */}
-      <div style={pageStyle}>
-        <div style={headerStyle}>
-          <h1 style={titleStyle}>תרשימי WOCA</h1>
-          <p style={subtitleStyle}>ייצוג חזותי של חלוקת האזורים</p>
-        </div>
-
-        <div style={sectionStyle}>
-          <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '12px', color: 'hsl(var(--primary))' }}>
-            תרשים עוגה - חלוקת קטגוריות
-          </h2>
-          <div style={chartContainerStyle}>
-            {pdfImages['woca-pie'] && (
-              <img src={pdfImages['woca-pie']} alt="WOCA Pie Chart" style={chartImageStyle} />
-            )}
-          </div>
-        </div>
-
-        <div style={sectionStyle}>
-          <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '12px', color: 'hsl(var(--primary))' }}>
-            תרשים עמודות - חוזק אזורים
-          </h2>
-          <div style={chartContainerStyle}>
-            {pdfImages['woca-bar'] && (
-              <img src={pdfImages['woca-bar']} alt="WOCA Bar Chart" style={chartImageStyle} />
-            )}
-          </div>
-        </div>
-
-        <div style={sectionStyle}>
-          <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '12px', color: 'hsl(var(--primary))' }}>
-            מטריצת WOCA
-          </h2>
-          <div style={chartContainerStyle}>
-            {pdfImages['woca-matrix'] && (
-              <img src={pdfImages['woca-matrix']} alt="WOCA Matrix Chart" style={chartImageStyle} />
-            )}
+          <h2>חלוקת ארכיטיפים</h2>
+          {pdfImages['archetype-chart'] && <img src={pdfImages['archetype-chart']} alt="Archetype Chart" style={imageStyle} />}
+          <div style={legendBoxStyle}>
+            <h3>ארכיטיפי מנהיגות</h3>
+            <p><strong>המנהל הסקרן:</strong> סקרנות והתפתחות</p>
+            <p><strong>המנהל המעצים:</strong> חיבור ומשמעות</p>
+            <p><strong>מנהל ההזדמנות:</strong> חזון ותגובה מהירה</p>
           </div>
         </div>
       </div>
 
-      {/* Page 5 - WOCA Zone Legend */}
-      <div style={{ ...pageStyle, pageBreakAfter: 'auto' }}>
-        <div style={headerStyle}>
-          <h1 style={titleStyle}>מדריך אזורי WOCA</h1>
-          <p style={subtitleStyle}>הסבר על כל אזור ומשמעותו</p>
-        </div>
-
+      {/* Page 3: WOCA Summary */}
+      <div style={basePageStyle}>
         <div style={sectionStyle}>
-          <div style={{ ...dimensionBoxStyle, marginBottom: '20px', backgroundColor: 'hsl(142 76% 36% / 0.1)' }}>
-            <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '12px', color: '#009E73' }}>
-              🎯 אזור הזדמנות
-            </h3>
-            <p style={{ fontSize: '14px', lineHeight: '1.6' }}>
-              אזור של השפעה גבוהה ועניין רב. כאן הצוות מרגיש מעורב ובעל יכולת השפעה משמעותית על התוצאות.
-              זהו האזור האידיאלי לפעילות ויוזמות חשובות.
-            </p>
-          </div>
-
-          <div style={{ ...dimensionBoxStyle, marginBottom: '20px', backgroundColor: 'hsl(54 91% 62% / 0.1)' }}>
-            <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '12px', color: '#F0E442' }}>
-              😌 אזור נוחות
-            </h3>
-            <p style={{ fontSize: '14px', lineHeight: '1.6' }}>
-              אזור של השפעה נמוכה אך עניין גבוה. הצוות מתעניין בנושא אך חש שיש לו השפעה מוגבלת על התוצאות.
-              יש פוטנציאל לשיפור דרך הגדלת ההשפעה.
-            </p>
-          </div>
-
-          <div style={{ ...dimensionBoxStyle, marginBottom: '20px', backgroundColor: 'hsl(36 100% 50% / 0.1)' }}>
-            <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '12px', color: '#E69F00' }}>
-              😐 אזור אדישות
-            </h3>
-            <p style={{ fontSize: '14px', lineHeight: '1.6' }}>
-              אזור של השפעה גבוהה אך עניין נמוך. הצוות יכול להשפיע אך לא מתעניין מספיק בנושא.
-              דרוש חיזוק המוטיבציה והעניין.
-            </p>
-          </div>
-
-          <div style={{ ...dimensionBoxStyle, marginBottom: '20px', backgroundColor: 'hsl(204 100% 35% / 0.1)' }}>
-            <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '12px', color: '#0072B2' }}>
-              ⚔️ אזור מלחמה
-            </h3>
-            <p style={{ fontSize: '14px', lineHeight: '1.6' }}>
-              אזור של השפעה נמוכה ועניין נמוך. זהו האזור המאתגר ביותר בו הצוות לא מרגיש מעורב ולא מסוגל להשפיע.
-              דרושה התערבות משמעותית לשיפור המצב.
-            </p>
-          </div>
+          <h1>סיכום WOCA</h1>
+          <p>אזור מוביל: <strong>{wocaZoneLabel}</strong></p>
+          <p>ציון כללי: {wocaScore.toFixed(2)} מתוך 5</p>
+          <p>משתתפים: {wocaParticipantCount}</p>
         </div>
+      </div>
 
-        <div style={legendStyle}>
-          <h3 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '12px', color: 'hsl(var(--primary))' }}>
-            💡 המלצות לפעולה
-          </h3>
-          <p style={{ fontSize: '14px', lineHeight: '1.6' }}>
-            זהו את האזור המוביל של הקבוצה ובחן אילו אסטרטגיות יעזרו להעביר נושאים חשובים לאזור ההזדמנות.
-            התמקד בפיתוח כישורי השפעה באזורים בעלי עניין גבוה, ובחיזוק המוטיבציה באזורים בעלי השפעה גבוהה.
-          </p>
+      {/* Page 4: WOCA Visuals */}
+      <div style={basePageStyle}>
+        <div style={sectionStyle}>
+          <h2>תרשים עוגה - חלוקת אזורים</h2>
+          {pdfImages['woca-pie'] && <img src={pdfImages['woca-pie']} alt="WOCA Pie" style={imageStyle} />}
+        </div>
+        <div style={sectionStyle}>
+          <h2>תרשים עמודות - חוזק אזורים</h2>
+          {pdfImages['woca-bar'] && <img src={pdfImages['woca-bar']} alt="WOCA Bar" style={imageStyle} />}
+        </div>
+        <div style={sectionStyle}>
+          <h2>מטריצת WOCA</h2>
+          {pdfImages['woca-matrix'] && <img src={pdfImages['woca-matrix']} alt="WOCA Matrix" style={imageStyle} />}
+        </div>
+      </div>
+
+      {/* Page 5: WOCA Legend */}
+      <div style={{ ...basePageStyle, pageBreakAfter: 'auto' }}>
+        <div style={legendBoxStyle}>
+          <h2>מדריך אזורי WOCA</h2>
+          <p><strong>אזור הזדמנות:</strong> השפעה גבוהה ועניין גבוה – אידיאלי לפעולה</p>
+          <p><strong>אזור נוחות:</strong> עניין גבוה אך השפעה נמוכה – צריך לחזק השפעה</p>
+          <p><strong>אזור אדישות:</strong> השפעה גבוהה אך עניין נמוך – דרוש חיבור רגשי</p>
+          <p><strong>אזור מלחמה:</strong> עניין והשפעה נמוכים – דרושה התערבות משמעותית</p>
         </div>
       </div>
     </div>
