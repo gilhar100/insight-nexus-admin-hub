@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 interface GroupPDFExportLayoutProps {
@@ -43,21 +44,19 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
               color: #1f2937;
               background: white;
               line-height: 1.4;
+              width: 210mm;
+              margin: 0;
+              padding: 0;
             }
-            /* Base page styles.  Reduce padding and use justify-content to distribute children evenly. */
             .page {
               page-break-after: always;
               width: 210mm;
-              min-height: 297mm;
-              padding: 10mm;
-              margin: 0 auto;
+              height: 297mm;
+              padding: 15mm;
+              margin: 0;
               background: white;
               box-sizing: border-box;
               position: relative;
-              display: flex;
-              flex-direction: column;
-              justify-content: space-between;
-              max-width: 794px;
             }
             .page:last-child {
               page-break-after: auto;
@@ -67,57 +66,68 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
               font-weight: bold;
               color: #1f2937;
               text-align: center;
-              margin-bottom: 40px;
+              margin: 0 auto 30px auto;
               border-bottom: 2px solid #e5e7eb;
-              padding-bottom: 20px;
+              padding-bottom: 15px;
+              width: 100%;
             }
             .section-title {
               font-size: 24px;
               font-weight: bold;
               color: #3b82f6;
               text-align: center;
-              margin-bottom: 30px;
+              margin: 0 auto 25px auto;
+              width: 100%;
             }
             .subsection-title {
               font-size: 20px;
               font-weight: 600;
               color: #1f2937;
               text-align: center;
-              margin-bottom: 20px;
+              margin: 0 auto 20px auto;
+              width: 100%;
             }
             .group-info {
               text-align: center;
               font-size: 16px;
               color: #6b7280;
-              margin-bottom: 40px;
+              margin: 0 auto 30px auto;
+              width: 100%;
             }
             .main-score {
               text-align: center;
-              margin-bottom: 40px;
+              margin: 0 auto 30px auto;
+              width: 100%;
             }
             .main-score .score-value {
               font-size: 36px;
               font-weight: bold;
               color: #059669;
               margin-bottom: 10px;
+              display: block;
             }
-            /* Use flex with wrapping instead of grid for the dimension boxes */
             .dimensions-grid {
-              display: flex;
-              flex-wrap: wrap;
-              gap: 20px;
-              margin-bottom: 40px;
-              max-width: 600px;
-              margin-left: auto;
-              margin-right: auto;
+              width: 100%;
+              max-width: 500px;
+              margin: 0 auto 30px auto;
+            }
+            .dimension-row {
+              display: table;
+              width: 100%;
+              margin-bottom: 15px;
             }
             .dimension-box {
+              display: table-cell;
+              width: 48%;
               background: #f9fafb;
               border: 1px solid #e5e7eb;
               border-radius: 8px;
               padding: 20px;
               text-align: center;
-              flex: 1 1 48%;
+              vertical-align: top;
+            }
+            .dimension-box:first-child {
+              margin-left: 4%;
             }
             .dimension-label {
               font-size: 16px;
@@ -149,7 +159,7 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
               padding: 20px;
               font-size: 14px;
               line-height: 1.6;
-              margin: 30px auto;
+              margin: 20px auto;
               max-width: 600px;
               text-align: center;
             }
@@ -163,9 +173,9 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
               margin-bottom: 8px;
             }
             .chart-container {
-              margin: 20px auto;
+              margin: 15px auto;
               text-align: center;
-              max-width: 100%;
+              width: 100%;
             }
             .chart-image {
               max-width: 100%;
@@ -176,45 +186,51 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
               border-radius: 8px;
             }
             .compact-chart {
-              max-width: 80%;
+              max-width: 70%;
             }
             .full-chart {
-              max-width: 90%;
+              max-width: 85%;
             }
             .woca-summary {
               text-align: center;
-              margin-bottom: 30px;
+              margin: 0 auto 25px auto;
+              width: 100%;
             }
             .woca-zone {
               background: #f0f9ff;
               border: 1px solid #bfdbfe;
               border-radius: 8px;
               padding: 20px;
-              margin-bottom: 20px;
+              margin: 0 auto 20px auto;
               text-align: center;
+              max-width: 400px;
             }
             .woca-zone-name {
               font-size: 24px;
               font-weight: bold;
               color: #059669;
-              margin-bottom: 10px;
+              margin-bottom: 15px;
             }
-            /* Use flex instead of a grid for WOCA stats */
             .woca-stats {
-              display: flex;
-              flex-wrap: wrap;
-              gap: 20px;
-              margin-top: 20px;
-              max-width: 400px;
-              margin-left: auto;
-              margin-right: auto;
+              width: 100%;
+              max-width: 350px;
+              margin: 15px auto 0 auto;
+            }
+            .woca-stats-row {
+              display: table;
+              width: 100%;
             }
             .woca-stat {
+              display: table-cell;
+              width: 48%;
               background: #f9fafb;
               border-radius: 8px;
               padding: 15px;
               text-align: center;
-              flex: 1 1 45%;
+              vertical-align: top;
+            }
+            .woca-stat:first-child {
+              margin-left: 4%;
             }
             .woca-stat-label {
               font-size: 14px;
@@ -228,6 +244,10 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
             }
             .archetype-descriptions {
               margin-top: 20px;
+              width: 100%;
+              max-width: 600px;
+              margin-left: auto;
+              margin-right: auto;
             }
             .archetype-item {
               background: #f9f9f9;
@@ -246,8 +266,9 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
               border: 1px solid #e5e7eb;
               border-radius: 8px;
               padding: 20px;
-              margin-bottom: 15px;
+              margin: 0 auto 15px auto;
               text-align: center;
+              max-width: 600px;
             }
             .zone-name {
               font-size: 18px;
@@ -263,22 +284,34 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
             .comfort { color: #3b82f6; }
             .apathy { color: #f59e0b; }
             .war { color: #ef4444; }
-            /* Use flex for charts instead of grid */
             .charts-grid {
-              display: flex;
-              flex-wrap: wrap;
-              gap: 30px;
-              margin-bottom: 30px;
+              width: 100%;
+              margin: 0 auto 25px auto;
+            }
+            .charts-row {
+              display: table;
+              width: 100%;
+              margin-bottom: 20px;
             }
             .chart-section {
+              display: table-cell;
+              width: 48%;
               text-align: center;
-              flex: 1 1 48%;
+              vertical-align: top;
+            }
+            .chart-section:first-child {
+              margin-left: 4%;
             }
             .chart-section h3 {
               font-size: 16px;
               font-weight: 600;
               color: #374151;
               margin-bottom: 15px;
+            }
+            .full-width-chart {
+              width: 100%;
+              text-align: center;
+              margin: 20px auto;
             }
             @media print {
               body {
@@ -290,8 +323,8 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
                 page-break-after: always;
                 margin: 0;
                 width: 210mm;
-                min-height: 297mm;
-                padding: 10mm;
+                height: 297mm;
+                padding: 15mm;
               }
               .page:last-child {
                 page-break-after: auto;
@@ -319,15 +352,17 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
             </div>
 
             <div className="dimensions-grid">
-              <div className="dimension-box strong-dimension">
-                <div className="dimension-label">מימד חזק</div>
-                <div className="dimension-name">{strongestDimension.name}</div>
-                <div className="dimension-score">{strongestDimension.score.toFixed(2)}</div>
-              </div>
-              <div className="dimension-box weak-dimension">
-                <div className="dimension-label">מימד חלש</div>
-                <div className="dimension-name">{weakestDimension.name}</div>
-                <div className="dimension-score">{weakestDimension.score.toFixed(2)}</div>
+              <div className="dimension-row">
+                <div className="dimension-box strong-dimension">
+                  <div className="dimension-label">מימד חזק</div>
+                  <div className="dimension-name">{strongestDimension.name}</div>
+                  <div className="dimension-score">{strongestDimension.score.toFixed(2)}</div>
+                </div>
+                <div className="dimension-box weak-dimension">
+                  <div className="dimension-label">מימד חלש</div>
+                  <div className="dimension-name">{weakestDimension.name}</div>
+                  <div className="dimension-score">{weakestDimension.score.toFixed(2)}</div>
+                </div>
               </div>
             </div>
 
@@ -385,13 +420,15 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
               <div className="woca-zone">
                 <div className="woca-zone-name">אזור מוביל: {wocaZoneLabel}</div>
                 <div className="woca-stats">
-                  <div className="woca-stat">
-                    <div className="woca-stat-label">ציון כללי</div>
-                    <div className="woca-stat-value">{wocaScore.toFixed(2)} מתוך 5</div>
-                  </div>
-                  <div className="woca-stat">
-                    <div className="woca-stat-label">משתתפים</div>
-                    <div className="woca-stat-value">{wocaParticipantCount}</div>
+                  <div className="woca-stats-row">
+                    <div className="woca-stat">
+                      <div className="woca-stat-label">ציון כללי</div>
+                      <div className="woca-stat-value">{wocaScore.toFixed(2)} מתוך 5</div>
+                    </div>
+                    <div className="woca-stat">
+                      <div className="woca-stat-label">משתתפים</div>
+                      <div className="woca-stat-value">{wocaParticipantCount}</div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -403,26 +440,28 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
             <div className="subsection-title">תרשימי WOCA</div>
             
             <div className="charts-grid">
-              <div className="chart-section">
-                <h3>חלוקת אזורים</h3>
-                <div className="chart-container">
-                  {pdfImages['woca-pie'] && (
-                    <img src={pdfImages['woca-pie']} alt="WOCA Pie" className="chart-image compact-chart" />
-                  )}
+              <div className="charts-row">
+                <div className="chart-section">
+                  <h3>חלוקת אזורים</h3>
+                  <div className="chart-container">
+                    {pdfImages['woca-pie'] && (
+                      <img src={pdfImages['woca-pie']} alt="WOCA Pie" className="chart-image compact-chart" />
+                    )}
+                  </div>
                 </div>
-              </div>
-              
-              <div className="chart-section">
-                <h3>חוזק אזורים</h3>
-                <div className="chart-container">
-                  {pdfImages['woca-bar'] && (
-                    <img src={pdfImages['woca-bar']} alt="WOCA Bar" className="chart-image compact-chart" />
-                  )}
+                
+                <div className="chart-section">
+                  <h3>חוזק אזורים</h3>
+                  <div className="chart-container">
+                    {pdfImages['woca-bar'] && (
+                      <img src={pdfImages['woca-bar']} alt="WOCA Bar" className="chart-image compact-chart" />
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
             
-            <div className="chart-section">
+            <div className="full-width-chart">
               <h3>מטריצת WOCA</h3>
               <div className="chart-container">
                 {pdfImages['woca-matrix'] && (
