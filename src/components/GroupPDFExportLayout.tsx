@@ -139,10 +139,40 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
               background: #f9f9f9;
               border: 1px solid #e2e8f0;
               border-radius: 8px;
-              padding: 15px;
-              margin: 15px auto;
+              padding: 16px;
+              margin-bottom: 12px;
               max-width: 100%;
               text-align: center;
+            }
+            .archetype-box {
+              background: #f9f9f9;
+              border-radius: 8px;
+              padding: 16px;
+              margin-bottom: 12px;
+              text-align: center;
+            }
+            .overview-row {
+              margin-bottom: 25px;
+              text-align: center;
+            }
+            .score-display {
+              font-size: 28px;
+              font-weight: bold;
+              color: #059669;
+              margin: 20px 0;
+            }
+            .dimensions-container {
+              display: flex;
+              justify-content: center;
+              gap: 40px;
+              margin: 20px 0;
+            }
+            .dimension-block {
+              background: #f9fafb;
+              border-radius: 8px;
+              padding: 20px;
+              text-align: center;
+              min-width: 200px;
             }
             .stats-row {
               display: grid;
@@ -202,63 +232,75 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
           <div className="page">
             <div className="header">
               <h1>דוח תובנות קבוצתי SALIMA</h1>
-              <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px' }}>
+            </div>
+
+            {/* Row 1: Group info */}
+            <div className="overview-row">
+              <p style={{ fontSize: '14px', color: '#6b7280' }}>
                 קבוצה {groupNumber} • {currentDate} • {participantCount} משתתפים
               </p>
             </div>
 
-            <div className="fill-space">
-              <div className="section">
-                <h2 style={{ color: '#059669', marginBottom: '15px' }}>
-                  ציון SLQ קבוצתי: {salimaScore.toFixed(2)} / 5
-                </h2>
-                
-                <div className="stats-row">
-                  <div className="stat-item">
-                    <p><strong>מימד חזק:</strong></p>
-                    <p style={{ color: '#059669', fontSize: '14px' }}>
-                      {strongestDimension.name} ({strongestDimension.score.toFixed(2)})
-                    </p>
-                  </div>
-                  <div className="stat-item">
-                    <p><strong>מימד חלש:</strong></p>
-                    <p style={{ color: '#dc2626', fontSize: '14px' }}>
-                      {weakestDimension.name} ({weakestDimension.score.toFixed(2)})
-                    </p>
-                  </div>
+            {/* Row 2: SLQ Score */}
+            <div className="overview-row">
+              <div className="score-display">
+                ציון SLQ קבוצתי: {salimaScore.toFixed(2)} / 5
+              </div>
+            </div>
+
+            {/* Row 3: Strongest/Weakest Dimensions */}
+            <div className="overview-row">
+              <div className="dimensions-container">
+                <div className="dimension-block">
+                  <p><strong>מימד חזק:</strong></p>
+                  <p style={{ color: '#059669', fontSize: '16px', fontWeight: 'bold' }}>
+                    {strongestDimension.name}
+                  </p>
+                  <p style={{ color: '#059669', fontSize: '18px', fontWeight: 'bold' }}>
+                    {strongestDimension.score.toFixed(2)}
+                  </p>
+                </div>
+                <div className="dimension-block">
+                  <p><strong>מימד חלש:</strong></p>
+                  <p style={{ color: '#dc2626', fontSize: '16px', fontWeight: 'bold' }}>
+                    {weakestDimension.name}
+                  </p>
+                  <p style={{ color: '#dc2626', fontSize: '18px', fontWeight: 'bold' }}>
+                    {weakestDimension.score.toFixed(2)}
+                  </p>
                 </div>
               </div>
+            </div>
 
-              <div className="legend-box">
-                <h3 style={{ textAlign: 'center', marginBottom: '12px', color: '#1f2937' }}>
-                  מימדי SALIMA
-                </h3>
-                <p><strong>אסטרטגיה:</strong> ראיה רחבה וחשיבה מערכתית</p>
-                <p><strong>למידה:</strong> פתיחות להתפתחות ולמידה</p>
-                <p><strong>השראה:</strong> הנעת אנשים ואנרגיה חיובית</p>
-                <p><strong>אדפטיביות:</strong> גמישות והתאמה לשינויים</p>
-                <p><strong>אותנטיות:</strong> כנות והתנהלות בהתאם לערכים</p>
-                <p><strong>משמעות:</strong> חיבור עמוק לתכלית העבודה</p>
-              </div>
+            <div className="legend-box">
+              <h3 style={{ textAlign: 'center', marginBottom: '12px', color: '#1f2937' }}>
+                מימדי SALIMA
+              </h3>
+              <p><strong>אסטרטגיה:</strong> ראיה רחבה וחשיבה מערכתית</p>
+              <p><strong>למידה:</strong> פתיחות להתפתחות ולמידה</p>
+              <p><strong>השראה:</strong> הנעת אנשים ואנרגיה חיובית</p>
+              <p><strong>אדפטיביות:</strong> גמישות והתאמה לשינויים</p>
+              <p><strong>אותנטיות:</strong> כנות והתנהלות בהתאם לערכים</p>
+              <p><strong>משמעות:</strong> חיבור עמוק לתכלית העבודה</p>
+            </div>
 
-              {/* WOCA Summary integrated into first page */}
-              <div className="section">
-                <h2 style={{ color: '#3b82f6', marginBottom: '15px' }}>סיכום WOCA</h2>
-                
-                 <div className="stats-row" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
-                   <div className="stat-item">
-                     <p><strong>אזור מוביל:</strong></p>
-                     <p className="numeric-value" style={{ color: '#059669' }}>{wocaZoneLabel}</p>
-                   </div>
-                   <div className="stat-item">
-                     <p><strong>ציון כללי:</strong></p>
-                     <p className="numeric-value">{wocaScore.toFixed(2)} מתוך 5</p>
-                   </div>
-                   <div className="stat-item">
-                     <p><strong>משתתפים:</strong></p>
-                     <p className="numeric-value">{wocaParticipantCount}</p>
-                   </div>
-                 </div>
+            {/* WOCA Summary integrated into first page */}
+            <div className="section">
+              <h2 style={{ color: '#3b82f6', marginBottom: '15px' }}>סיכום WOCA</h2>
+              
+              <div className="stats-row" style={{ gridTemplateColumns: '1fr 1fr 1fr' }}>
+                <div className="stat-item">
+                  <p><strong>אזור מוביל:</strong></p>
+                  <p className="numeric-value" style={{ color: '#059669' }}>{wocaZoneLabel}</p>
+                </div>
+                <div className="stat-item">
+                  <p><strong>ציון כללי:</strong></p>
+                  <p className="numeric-value">{wocaScore.toFixed(2)} מתוך 5</p>
+                </div>
+                <div className="stat-item">
+                  <p><strong>משתתפים:</strong></p>
+                  <p className="numeric-value">{wocaParticipantCount}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -286,10 +328,13 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
                 )}
               </div>
               
-              <div className="legend-box">
-                <h3 style={{ textAlign: 'center', marginBottom: '8px' }}>ארכיטיפי מנהיגות</h3>
+              <div className="archetype-box">
                 <p><strong>המנהל הסקרן:</strong> סקרנות והתפתחות</p>
+              </div>
+              <div className="archetype-box">
                 <p><strong>המנהל המעצים:</strong> חיבור ומשמעות</p>
+              </div>
+              <div className="archetype-box">
                 <p><strong>מנהל ההזדמנות:</strong> חזון ותגובה מהירה</p>
               </div>
             </div>
