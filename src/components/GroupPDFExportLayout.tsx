@@ -93,22 +93,22 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
               border-bottom: 2px solid #e5e7eb;
             }
             .section {
-              margin-bottom: 30px;
-              text-align: center;
-            }
-            .compact-section {
               margin-bottom: 20px;
               text-align: center;
             }
+            .compact-section {
+              margin-bottom: 15px;
+              text-align: center;
+            }
             .image-container {
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              margin: 20px auto;
+              display: block;
+              text-align: center;
+              margin: 10px 0;
               width: 100%;
             }
             .compact-image {
-              max-width: 100%;
+              max-width: 90%;
+              width: auto;
               height: auto;
               display: block;
               margin: 0 auto;
@@ -116,7 +116,8 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
               border-radius: 8px;
             }
             .full-image {
-              max-width: 100%;
+              max-width: 85%;
+              width: auto;
               height: auto;
               display: block;
               margin: 0 auto;
@@ -127,10 +128,10 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
               background: #f9f9f9;
               border: 1px solid #e2e8f0;
               border-radius: 8px;
-              padding: 20px;
+              padding: 15px;
               font-size: 12px;
               line-height: 1.5;
-              margin: 20px auto;
+              margin: 15px auto;
               max-width: 100%;
               text-align: center;
             }
