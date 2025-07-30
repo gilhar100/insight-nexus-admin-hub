@@ -158,10 +158,42 @@
   overflow: visible;
 }
 
+.recharts-legend-wrapper {
+  direction: rtl;
+}
+
+.recharts-cartesian-axis-tick-value {
+  font-size: 12px;
+}
+
+.recharts-tooltip-wrapper {
+  direction: rtl;
+}
+
+/* Custom chart colors and styling */
+.chart-container {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive chart sizing */
+@media (max-width: 768px) {
+  .recharts-wrapper {
+    font-size: 10px;
+  }
+}
+
 /* Presenter mode styles */
 .presenter-mode {
-  background: #1a1a1a;
-  color: white;
+  background: #1a1a1a !important;
+  color: white !important;
+  min-height: 100vh;
+}
+
+.presenter-mode * {
+  color: white !important;
 }
 
 .presenter-mode .bg-white {
@@ -172,15 +204,26 @@
   background: #1a1a1a !important;
 }
 
+.presenter-mode .bg-gray-100 {
+  background: #333 !important;
+}
+
 .presenter-mode .text-gray-800,
 .presenter-mode .text-gray-900 {
   color: white !important;
 }
 
-.presenter-mode .text-gray-600 {
+.presenter-mode .text-gray-600,
+.presenter-mode .text-gray-700 {
   color: #ccc !important;
 }
 
-.presenter-mode .border-gray-200 {
+.presenter-mode .border-gray-200,
+.presenter-mode .border-gray-300 {
   border-color: #444 !important;
+}
+
+.presenter-mode .shadow-sm,
+.presenter-mode .shadow {
+  box-shadow: 0 1px 3px 0 rgba(255, 255, 255, 0.1) !important;
 }
