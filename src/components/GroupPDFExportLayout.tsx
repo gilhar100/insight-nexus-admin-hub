@@ -364,16 +364,9 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
               </div>
             </div>
             
-          </div>
-
-          {/* Page 4: WOCA Legend */}
-          <div className="page" style={{ pageBreakAfter: 'auto' }}>
-            <div className="header">
-              <h2>מדריך אזורי WOCA</h2>
-            </div>
-            
+            {/* WOCA Legend moved here */}
             <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-              <h3 style={{ color: '#1f2937' }}>הסבר על אזורי WOCA</h3>
+              <h3 style={{ color: '#1f2937', marginBottom: '15px' }}>הסבר על אזורי WOCA</h3>
             </div>
             
             <div className="zone-box">
@@ -391,7 +384,9 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
             <div className="zone-box">
               <p><strong style={{ color: '#1E88E5' }}>אזור מלחמה:</strong> עניין והשפעה נמוכים – דרושה התערבות משמעותית</p>
             </div>
+            
           </div>
+
         </div>
       </body>
     </html>
