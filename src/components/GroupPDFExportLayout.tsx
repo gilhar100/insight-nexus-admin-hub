@@ -378,19 +378,19 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
             </div>
             
             <div className="zone-box">
-              <p><strong style={{ color: '#009E73' }}>אזור הזדמנות:</strong> השפעה גבוהה ועניין גבוה – אידיאלי לפעולה</p>
+              <p><strong style={{ color: '#00CC88' }}>אזור הזדמנות:</strong> השפעה גבוהה ועניין גבוה – אידיאלי לפעולה</p>
             </div>
             
             <div className="zone-box">
-              <p><strong style={{ color: '#F0E442' }}>אזור נוחות:</strong> עניין גבוה אך השפעה נמוכה – צריך לחזק השפעה</p>
+              <p><strong style={{ color: '#FFE135' }}>אזור נוחות:</strong> עניין גבוה אך השפעה נמוכה – צריך לחזק השפעה</p>
             </div>
             
             <div className="zone-box">
-              <p><strong style={{ color: '#E69F00' }}>אזור אדישות:</strong> השפעה גבוהה אך עניין נמוך – דרוש חיבור רגשי</p>
+              <p><strong style={{ color: '#FF8C00' }}>אזור אדישות:</strong> השפעה גבוהה אך עניין נמוך – דרוש חיבור רגשי</p>
             </div>
             
             <div className="zone-box">
-              <p><strong style={{ color: '#0072B2' }}>אזור מלחמה:</strong> עניין והשפעה נמוכים – דרושה התערבות משמעותית</p>
+              <p><strong style={{ color: '#1E88E5' }}>אזור מלחמה:</strong> עניין והשפעה נמוכים – דרושה התערבות משמעותית</p>
             </div>
           </div>
         </div>

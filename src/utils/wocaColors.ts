@@ -1,17 +1,17 @@
 
-// WOCA category colors - Colorblind-friendly palette (Color Universal Design)
+// WOCA category colors - More vivid palette for better PDF visibility
 export const WOCA_COLORS = {
-  'הזדמנות': '#009E73', // Green - Opportunity
-  'נוחות': '#F0E442',   // Yellow - Comfort  
-  'אדישות': '#E69F00',  // Orange - Apathy
-  'מלחמה': '#0072B2'    // Blue - War
+  'הזדמנות': '#00CC88', // Brighter Green - Opportunity
+  'נוחות': '#FFE135',   // Brighter Yellow - Comfort  
+  'אדישות': '#FF8C00',  // Brighter Orange - Apathy
+  'מלחמה': '#1E88E5'    // Brighter Blue - War
 };
 
 export const WOCA_ZONE_COLORS = {
-  opportunity: '#009E73', // Green
-  comfort: '#F0E442',     // Yellow
-  apathy: '#E69F00',      // Orange
-  war: '#0072B2'          // Blue
+  opportunity: '#00CC88', // Brighter Green
+  comfort: '#FFE135',     // Brighter Yellow
+  apathy: '#FF8C00',      // Brighter Orange
+  war: '#1E88E5'          // Brighter Blue
 };
 
 export const getWocaZoneColor = (score: number): string => {
