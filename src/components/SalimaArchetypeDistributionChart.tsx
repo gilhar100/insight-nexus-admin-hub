@@ -220,7 +220,7 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
         </div>
       </div>
 
-      <ChartContainer config={chartConfig} className="h-96 w-full" dir="rtl">
+      <ChartContainer config={chartConfig} className="h-[500px] w-full" dir="rtl">
         <ResponsiveContainer width="100%" height="100%">
           {chartType === 'bar' ? (
             <BarChart 
