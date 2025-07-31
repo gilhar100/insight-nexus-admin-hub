@@ -10,9 +10,7 @@ export async function downloadGroupReportDOCX(requestBody: any, groupNumber: num
         report: 'דוח תובנות קבוצתי חברת OPPORTUNITY',
         radarChart: 'פרופיל ניהולי',
         archetypeChart: 'התפלגות סגנונות מנהיגות',
-        wocaPie: 'התפלגות אזורי תודעה ארגונית',
-        wocaBar: 'עוצמת אזורי תודעה ארגונית לפי ציון',
-        wocaMatrix: 'מטריצת אזורי תודעה ארגונית'
+        wocaPie: 'התפלגות אזורי תודעה ארגונית'
       }
     };
     
