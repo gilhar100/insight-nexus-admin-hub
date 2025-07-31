@@ -364,15 +364,6 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
               </div>
             </div>
             
-            {/* Bar chart on bottom */}
-            <div className="section">
-              <h3 style={{ marginBottom: '8px' }}>חוזק אזורים</h3>
-              <div className="image-container">
-                {pdfImages['woca-bar'] && (
-                  <img src={pdfImages['woca-bar']} alt="WOCA Bar" className="full-image" />
-                )}
-              </div>
-            </div>
           </div>
 
           {/* Page 4: WOCA Legend */}
