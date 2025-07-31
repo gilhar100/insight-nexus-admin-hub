@@ -282,14 +282,20 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
 
             <div className="legend-box">
               <h3 style={{ textAlign: 'center', marginBottom: '12px', color: '#1f2937' }}>
-                מימדי SALIMA
+                🧭 ממדי SALIMA
               </h3>
-              <p><strong>אסטרטגיה:</strong> ראיה רחבה וחשיבה מערכתית</p>
-              <p><strong>למידה:</strong> פתיחות להתפתחות ולמידה</p>
-              <p><strong>השראה:</strong> הנעת אנשים ואנרגיה חיובית</p>
-              <p><strong>אדפטיביות:</strong> גמישות והתאמה לשינויים</p>
-              <p><strong>אותנטיות:</strong> כנות והתנהלות בהתאם לערכים</p>
-              <p><strong>משמעות:</strong> חיבור עמוק לתכלית העבודה</p>
+              <p><strong>1. אסטרטגיה (S)</strong></p>
+              <p>ראייה מערכתית, תכנון לטווח ארוך ויכולת להוביל חזון.</p>
+              <p><strong>2. אדפטיביות (A)</strong></p>
+              <p>גמישות מחשבתית ורגשית ותגובה יעילה למצבים משתנים.</p>
+              <p><strong>3. למידה (L)</strong></p>
+              <p>פתיחות לרעיונות חדשים, חשיבה ביקורתית ולמידה מתמשכת.</p>
+              <p><strong>4. השראה (I)</strong></p>
+              <p>הנעה רגשית דרך דוגמה אישית וחזון שמעורר משמעות.</p>
+              <p><strong>5. משמעות (M)</strong></p>
+              <p>חיבור עמוק לערכים, תכלית ותחושת שליחות אישית וארגונית.</p>
+              <p><strong>6. אותנטיות (A2)</strong></p>
+              <p>כנות, שקיפות והתנהלות אנושית המחוברת לערכים פנימיים.</p>
             </div>
 
             {/* WOCA Summary integrated into first page */}
@@ -336,14 +342,16 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
                 )}
               </div>
               
-              <div className="archetype-box">
-                <p><strong>המנהל הסקרן:</strong> סקרנות והתפתחות</p>
-              </div>
-              <div className="archetype-box">
-                <p><strong>המנהל המעצים:</strong> חיבור ומשמעות</p>
-              </div>
-              <div className="archetype-box">
-                <p><strong>מנהל ההזדמנות:</strong> חזון ותגובה מהירה</p>
+              <div className="legend-box">
+                <h3 style={{ textAlign: 'center', marginBottom: '12px', color: '#1f2937' }}>
+                  📊 סגנונות מנהיגות (ארכיטיפים SALIMA)
+                </h3>
+                <p><strong>1. מנהל ההזדמנות (S + A)</strong></p>
+                <p>רואה רחוק ופועל בגמישות. מוביל שינוי תוך הסתגלות מהירה והבנת ההקשר.</p>
+                <p><strong>2. המנהל הסקרן (L + I)</strong></p>
+                <p>לומד כל הזמן, מלהיב אחרים וסוחף דרך רעיונות ודוגמה אישית.</p>
+                <p><strong>3. המנהל המעצים (M + A2)</strong></p>
+                <p>מוביל מתוך ערכים, יוצר חיבור אישי ותחושת משמעות בעבודה המשותפת.</p>
               </div>
             </div>
           </div>
@@ -365,24 +373,18 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
             </div>
             
             {/* WOCA Legend moved here */}
-            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-              <h3 style={{ color: '#1f2937', marginBottom: '15px' }}>הסבר על אזורי WOCA</h3>
-            </div>
-            
-            <div className="zone-box">
-              <p><strong style={{ color: '#00CC88' }}>אזור הזדמנות:</strong> השפעה גבוהה ועניין גבוה – אידיאלי לפעולה</p>
-            </div>
-            
-            <div className="zone-box">
-              <p><strong style={{ color: '#FFE135' }}>אזור נוחות:</strong> עניין גבוה אך השפעה נמוכה – צריך לחזק השפעה</p>
-            </div>
-            
-            <div className="zone-box">
-              <p><strong style={{ color: '#FF8C00' }}>אזור אדישות:</strong> השפעה גבוהה אך עניין נמוך – דרוש חיבור רגשי</p>
-            </div>
-            
-            <div className="zone-box">
-              <p><strong style={{ color: '#1E88E5' }}>אזור מלחמה:</strong> עניין והשפעה נמוכים – דרושה התערבות משמעותית</p>
+            <div className="legend-box">
+              <h3 style={{ textAlign: 'center', marginBottom: '12px', color: '#1f2937' }}>
+                🎯 אזורי WOCA
+              </h3>
+              <p><strong>1. אזור ההזדמנות (WIN/WIN)</strong></p>
+              <p>שיח פתוח, הקשבה ויוזמה. תחושת שליחות, השפעה, שיתוף פעולה וצמיחה משותפת.</p>
+              <p><strong>2. אזור הנוחות (LOSE/LOSE)</strong></p>
+              <p>הימנעות מקונפליקטים, קיפאון מחשבתי וחשש מיוזמות. שמירה על הקיים במחיר שחיקה.</p>
+              <p><strong>3. אזור האדישות (LOSE/LOSE)</strong></p>
+              <p>נתק רגשי, חוסר עניין וחוסר תחושת השפעה. תחושת סטגנציה ויעדר מנהיגות.</p>
+              <p><strong>4. אזור המלחמה (WIN/LOSE)</strong></p>
+              <p>דינמיקה של שליטה, חשדנות ומאבק. הישרדות טקטית על חשבון הקשבה, אמון ויציבות.</p>
             </div>
             
           </div>
