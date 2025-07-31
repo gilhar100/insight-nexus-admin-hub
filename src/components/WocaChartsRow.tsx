@@ -25,44 +25,44 @@ export const WocaChartsRow: React.FC<WocaChartsRowProps> = ({
   console.log('WocaChartsRow groupCategoryScores:', workshopData?.groupCategoryScores);
 
   return (
-    <div className="space-y-6 bg-white" dir="rtl">
+    <div className="space-y-6" dir="rtl">
       {/* First Row - Large Pie Chart */}
-      <Card className="bg-white border-gray-200">
-        <CardHeader className="bg-white">
-          <CardTitle className={`flex items-center justify-center text-center ${isPresenterMode ? 'text-xl' : 'text-lg'} text-gray-900`}>
+      <Card>
+        <CardHeader>
+          <CardTitle className={`flex items-center justify-center text-center ${isPresenterMode ? 'text-xl' : 'text-lg'}`} style={{ color: '#000000' }}>
             <PieChart className="h-5 w-5 ml-2" />
             התפלגות משתתפים לפי אזורים
           </CardTitle>
           {!isPresenterMode && (
-            <CardDescription className="text-center text-base text-gray-700">
+            <CardDescription className="text-center text-base" style={{ color: '#000000' }}>
               חלוקת המשתתפים בין אזורי WOCA השונים
             </CardDescription>
           )}
         </CardHeader>
-        <CardContent className="bg-white">
+        <CardContent>
           <ZoneDistributionChart zoneDistribution={zoneDistribution} />
         </CardContent>
       </Card>
 
       {/* Second Row - Horizontal Bar Chart */}
-      <Card className="bg-white border-gray-200">
-        <CardHeader className="bg-white">
-          <CardTitle className={`flex items-center text-right ${isPresenterMode ? 'text-xl' : 'text-lg'} text-gray-900`}>
+      <Card>
+        <CardHeader>
+          <CardTitle className={`flex items-center text-right ${isPresenterMode ? 'text-xl' : 'text-lg'}`} style={{ color: '#000000' }}>
             <BarChart3 className="h-5 w-5 ml-2" />
             עוצמת אזורי WOCA בקבוצה
           </CardTitle>
           {!isPresenterMode && (
-            <CardDescription className="text-right text-base text-gray-700">
+            <CardDescription className="text-right text-base" style={{ color: '#000000' }}>
               השוואה ויזואלית של עוצמת האזורים השונים
             </CardDescription>
           )}
         </CardHeader>
-        <CardContent className="bg-white">
+        <CardContent>
           {workshopData?.groupCategoryScores ? (
             <WocaGroupBarChart groupCategoryScores={workshopData.groupCategoryScores} />
           ) : (
-            <div className="text-center p-8 bg-white">
-              <p className="text-gray-600">טוען נתוני קבוצה...</p>
+            <div className="text-center p-8">
+              <p className="text-gray-500">טוען נתוני קבוצה...</p>
             </div>
           )}
         </CardContent>

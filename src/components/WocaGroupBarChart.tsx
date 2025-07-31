@@ -27,8 +27,8 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
 
   // Apply exponential scaling to emphasize differences (visual only)
   const applyScaling = (value: number) => {
-    if (typeof value !== 'number' || isNaN(value) || value <= 0) return 100; // Minimum height for visibility
-    return Math.max(100, Math.pow(value, 3.8) * 25); // Better scaling with higher minimum
+    if (typeof value !== 'number' || isNaN(value) || value <= 0) return 1; // Minimum value for visibility
+    return Math.pow(value, 4.2) * 8; // Much higher exponent for dramatic differences
   };
 
   // Prepare data in the specified order with Hebrew labels and matching colors
@@ -77,7 +77,7 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
   };
 
   const getBarOpacity = (zoneKey: string) => {
-    return zoneKey === strongestZone.zoneKey ? 1 : 0.8;
+    return zoneKey === strongestZone.zoneKey ? 1 : 0.5;
   };
 
   const getBarStyle = (zoneKey: string) => {
@@ -92,19 +92,19 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
 
   return (
     <>
-      <div className="w-full space-y-4 bg-white" dir="rtl">
+      <div className="w-full space-y-4" dir="rtl">
         {/* Title and Subtitle */}
         <div className="text-center space-y-2">
-          <h3 className="text-xl font-bold text-gray-900">
+          <h3 className="text-xl font-bold text-gray-800">
             עוצמת אזורי תודעה ארגונית לפי ציון
           </h3>
-          <p className="text-sm text-gray-700 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-sm text-gray-600 max-w-2xl mx-auto leading-relaxed">
             הגרף הזה מייצג את עוצמת אזורי התודעה השונים על פי הממוצע הקבוצתי - לא על פי שיוך קבוצתי לאזור תודעה
           </p>
         </div>
 
         {/* Chart */}
-        <div className="w-full h-[700px] animate-fade-in relative bg-white">
+        <div className="w-full h-[700px] animate-fade-in relative">
           <style>{`
             @keyframes scale-in {
               0% {
@@ -124,27 +124,27 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={data}
-              margin={{ top: 50, right: 40, left: 40, bottom: 100 }}
-              barCategoryGap="8%"
+              margin={{ top: 30, right: 20, left: 20, bottom: 80 }}
+              barCategoryGap="4%"
             >
               <XAxis 
                 dataKey="zone" 
-                axisLine={{ stroke: '#374151', strokeWidth: 1 }}
-                tickLine={{ stroke: '#374151', strokeWidth: 1 }}
+                axisLine={false}
+                tickLine={false}
                 tick={{ 
-                  fontSize: 18, 
-                  fill: '#1f2937', 
+                  fontSize: 16, 
+                  fill: '#000000', 
                   fontWeight: 'bold',
                   textAnchor: 'middle'
                 }}
-                height={100}
+                height={80}
                 interval={0}
               />
               <YAxis hide />
               <Bar 
                 dataKey="value" 
                 radius={[8, 8, 0, 0]}
-                maxBarSize={120}
+                maxBarSize={100}
                 onClick={handleBarClick}
               >
                 {data.map((entry, index) => (
@@ -152,8 +152,6 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
                     key={`cell-${index}`} 
                     fill={entry.color}
                     fillOpacity={getBarOpacity(entry.zoneKey)}
-                    stroke="#ffffff"
-                    strokeWidth={2}
                     className="bar-animation"
                     style={{
                       animation: `scale-in 0.8s ease-out ${index * 0.15}s both`,
@@ -169,7 +167,7 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
 
         {/* Warning Note */}
         <div className="text-center">
-          <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3 max-w-2xl mx-auto">
+          <p className="text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-3 max-w-2xl mx-auto">
             ⚠️ <strong>הערה:</strong> גרף זה מייצג ציונים ממוצעים, לא התפלגות אזורי תודעה בין המשתתפים
           </p>
         </div>

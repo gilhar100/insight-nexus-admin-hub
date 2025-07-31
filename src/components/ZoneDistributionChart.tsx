@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { ChartContainer } from '@/components/ui/chart';
@@ -62,7 +61,7 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
     if (value === 0) return null;
     
     const RADIAN = Math.PI / 180;
-    const radius = innerRadius + (outerRadius - innerRadius) * 1.8;
+    const radius = innerRadius + (outerRadius - innerRadius) * 1.4;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
     const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0';
@@ -71,15 +70,12 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
       <text
         x={x}
         y={y}
-        fill="#1f2937"
+        fill="#000000"
         textAnchor={x > cx ? 'start' : 'end'}
         dominantBaseline="central"
-        fontSize={20}
-        fontWeight="bold"
-        style={{ 
-          direction: 'rtl',
-          textShadow: '1px 1px 2px rgba(255,255,255,0.8)'
-        }}
+        fontSize={16}
+        fontWeight="600"
+        style={{ direction: 'rtl' }}
       >
         {`${value} (${percentage}%)`}
       </text>
@@ -89,12 +85,12 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
   const CustomLegend = (props: any) => {
     const { payload } = props;
     return (
-      <div className="flex justify-center mt-8" dir="rtl">
-        <div className="flex flex-wrap gap-8 justify-center">
+      <div className="flex justify-center mt-6" dir="rtl">
+        <div className="flex flex-wrap gap-6 justify-center">
           {payload.map((entry: any, index: number) => (
             <div 
               key={index} 
-              className="flex items-center cursor-pointer hover:bg-gray-100 p-3 rounded transition-colors"
+              className="flex items-center cursor-pointer hover:bg-gray-100 p-2 rounded transition-colors"
               onClick={() => {
                 const zoneData = data.find(d => d.name === entry.value);
                 if (zoneData) {
@@ -103,10 +99,10 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
               }}
             >
               <div
-                className="w-6 h-6 rounded-full ml-3 border-2 border-white shadow-sm"
+                className="w-4 h-4 rounded-full ml-3"
                 style={{ backgroundColor: entry.color }}
               />
-              <span className="text-xl font-bold text-gray-900">
+              <span className="text-lg font-semibold" style={{ color: '#000000' }}>
                 {entry.value}
               </span>
             </div>
@@ -118,17 +114,17 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
 
   if (total === 0) {
     return (
-      <div className="flex justify-center items-center h-[500px] bg-white">
-        <span className="text-xl text-gray-600">אין נתונים להצגה</span>
+      <div className="flex justify-center items-center h-[500px]" style={{ color: '#000000' }}>
+        <span className="text-xl">אין נתונים להצגה</span>
       </div>
     );
   }
 
   return (
     <>
-      <div className="flex justify-center items-center w-full bg-white" dir="rtl">
+      <div className="flex justify-center items-center w-full" dir="rtl">
         <div className="max-w-4xl w-full mx-auto">
-          <ChartContainer config={chartConfig} className="h-[600px] w-full">
+          <ChartContainer config={chartConfig} className="h-[500px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -137,7 +133,7 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
                   cy="50%"
                   labelLine={false}
                   label={renderCustomLabel}
-                  outerRadius={180}
+                  outerRadius={150}
                   fill="#8884d8"
                   dataKey="value"
                   onClick={handleCellClick}
@@ -148,8 +144,6 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
                       key={`cell-${index}`} 
                       fill={entry.color}
                       style={{ cursor: 'pointer' }}
-                      stroke="#ffffff"
-                      strokeWidth={3}
                     />
                   ))}
                 </Pie>
@@ -160,14 +154,13 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
                   ]}
                   contentStyle={{ 
                     backgroundColor: 'white', 
-                    border: '1px solid #d1d5db', 
-                    borderRadius: '8px',
-                    color: '#1f2937',
+                    border: '1px solid #ccc', 
+                    borderRadius: '4px',
+                    color: '#000000',
                     fontSize: '16px',
-                    direction: 'rtl',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                    direction: 'rtl'
                   }}
-                  labelStyle={{ color: '#1f2937', fontSize: '16px', fontWeight: 'bold' }}
+                  labelStyle={{ color: '#000000', fontSize: '16px' }}
                 />
                 <Legend content={<CustomLegend />} />
               </PieChart>

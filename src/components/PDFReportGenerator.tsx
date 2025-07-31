@@ -21,7 +21,6 @@ export const PDFReportGenerator: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [pdfImages, setPdfImages] = useState<Record<string, string>>({});
   const [showPDFLayout, setShowPDFLayout] = useState(false);
-  const [loadingStep, setLoadingStep] = useState<string>('');
   
   const chartsContainerRef = useRef<HTMLDivElement>(null);
   const pdfLayoutRef = useRef<HTMLDivElement>(null);
@@ -55,59 +54,27 @@ export const PDFReportGenerator: React.FC = () => {
     }
 
     console.log(`📸 Capturing chart: ${elementId}`);
-    setLoadingStep(`מכין תרשים: ${elementId}...`);
     
-    // Force a longer wait for SVG charts to fully render
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    
-    // Force redraw of SVG elements
-    const svgElements = element.querySelectorAll('svg');
-    svgElements.forEach(svg => {
-      svg.style.overflow = 'visible';
-      svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    });
+    // Wait a bit for the chart to fully render
+    await new Promise(resolve => setTimeout(resolve, 500));
     
     const canvas = await html2canvas(element, {
       backgroundColor: '#ffffff',
-      scale: 6, // Increased scale for better quality
+      scale: 2,
       useCORS: true,
       allowTaint: true,
-      foreignObjectRendering: false,
       height: element.offsetHeight,
       width: element.offsetWidth,
-      logging: false, // Disable logging to reduce console noise
-      onclone: (clonedDoc) => {
-        const clonedElement = clonedDoc.getElementById(elementId);
-        if (clonedElement) {
-          const textElements = clonedElement.querySelectorAll('text');
-          textElements.forEach(text => {
-            text.style.visibility = 'visible';
-            text.style.opacity = '1';
-            text.style.fontSize = text.style.fontSize || '16px';
-            text.style.fontWeight = text.style.fontWeight || 'bold';
-          });
-          
-          const pathElements = clonedElement.querySelectorAll('path');
-          pathElements.forEach(path => {
-            if (path.getAttribute('fill') !== 'none') {
-              path.style.opacity = '1';
-            }
-          });
-        }
-      }
     });
 
-    const base64Image = canvas.toDataURL('image/png', 1.0);
+    const base64Image = canvas.toDataURL('image/png');
     
     // Verify the image is not blank
     if (base64Image === 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==') {
       throw new Error(`Captured image for ${elementId} is blank`);
     }
     
-    // Check image size
-    const imageSizeKB = Math.round((base64Image.length * 3/4) / 1024);
-    console.log(`✅ Successfully captured ${elementId} (${imageSizeKB} KB)`);
-    
+    console.log(`✅ Successfully captured ${elementId}`);
     return base64Image;
   };
 
@@ -119,7 +86,6 @@ export const PDFReportGenerator: React.FC = () => {
 
     setIsLoading(true);
     setError(null);
-    setLoadingStep('מתחיל יצירת PDF...');
     
     try {
       console.log('🚀 Starting PDF export for group:', groupNumber);
@@ -127,34 +93,27 @@ export const PDFReportGenerator: React.FC = () => {
       // Capture all required charts
       const chartImages: Record<string, string> = {};
       
-      // Capture SALIMA charts
+      // Capture SALIMA radar chart
       if (groupData) {
-        setLoadingStep('מכין תרשימי SALIMA...');
         chartImages['radar-chart'] = await captureChartAsImage('radar-chart');
         chartImages['archetype-chart'] = await captureChartAsImage('archetype-chart');
       }
       
       // Capture WOCA charts
       if (workshopData) {
-        setLoadingStep('מכין תרשימי WOCA...');
         chartImages['woca-bar'] = await captureChartAsImage('woca-bar');
         chartImages['woca-pie'] = await captureChartAsImage('woca-pie');
+        chartImages['woca-matrix'] = await captureChartAsImage('woca-matrix');
       }
       
       console.log('📊 All charts captured successfully:', Object.keys(chartImages));
-      
-      // Calculate total image size
-      const totalImageSize = Object.values(chartImages)
-        .reduce((total, image) => total + Math.round((image.length * 3/4) / 1024), 0);
-      console.log('📊 Total image size:', totalImageSize, 'KB');
       
       // Store images and show PDF layout
       setPdfImages(chartImages);
       setShowPDFLayout(true);
       
-      setLoadingStep('מכין עמוד PDF...');
       // Wait for PDF layout to render
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Get the PDF layout HTML
       const pdfElement = document.getElementById('pdf-export-root');
@@ -163,29 +122,18 @@ export const PDFReportGenerator: React.FC = () => {
       }
       
       const pdfHtml = pdfElement.outerHTML;
-      const htmlSizeKB = Math.round(pdfHtml.length / 1024);
-      console.log('📄 PDF HTML generated - Size:', htmlSizeKB, 'KB');
+      console.log('📄 PDF HTML generated, length:', pdfHtml.length);
       
       // Generate filename
       const filename = `Group_Report_${groupNumber || 'Unknown'}.pdf`;
       
-      setLoadingStep('שולח לשרת ליצירת PDF...');
       // Download the PDF
       await downloadGroupReportPDF(pdfHtml, filename);
       
-      setLoadingStep('הושלם בהצלחה!');
       console.log('✅ PDF export completed successfully!');
-      
-      // Clear loading step after success
-      setTimeout(() => {
-        setLoadingStep('');
-      }, 2000);
-      
     } catch (err) {
       console.error('❌ PDF Export Error:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      setError(`Failed to generate PDF: ${errorMessage}`);
-      setLoadingStep('');
+      setError(`Failed to generate PDF: ${err instanceof Error ? err.message : 'Unknown error'}`);
     } finally {
       setIsLoading(false);
     }
@@ -266,14 +214,6 @@ export const PDFReportGenerator: React.FC = () => {
         </Alert>
       )}
 
-      {loadingStep && (
-        <Alert>
-          <AlertDescription className="text-center">
-            {loadingStep}
-          </AlertDescription>
-        </Alert>
-      )}
-
       {(groupData || workshopData) && (
         <div className="text-center">
           <Button 
@@ -286,18 +226,18 @@ export const PDFReportGenerator: React.FC = () => {
         </div>
       )}
 
-      {/* Hidden charts container for capturing - larger sizes for better PDF quality */}
+      {/* Hidden charts container for capturing */}
       <div 
         ref={chartsContainerRef}
-        className="fixed -top-[15000px] left-0 bg-white"
-        style={{ width: '1400px', height: 'auto' }}
+        className="fixed -top-[10000px] left-0 bg-white"
+        style={{ width: '800px', height: 'auto' }}
       >
         {groupData && (
           <>
-            <div id="radar-chart" className="w-full bg-white p-12" style={{ height: '800px' }}>
+            <div id="radar-chart" className="w-full h-96 bg-white p-4">
               <SalimaGroupRadarChart averages={groupData.averages} />
             </div>
-            <div id="archetype-chart" className="w-full bg-white p-12" style={{ height: '800px' }}>
+            <div id="archetype-chart" className="w-full h-96 bg-white p-4">
               <SalimaArchetypeDistributionChart participants={groupData.participants} />
             </div>
           </>
@@ -305,10 +245,10 @@ export const PDFReportGenerator: React.FC = () => {
         
         {workshopData && pdfLayoutData?.wocaAnalysis && (
           <>
-            <div id="woca-bar" className="w-full bg-white p-12" style={{ height: '1000px' }}>
+            <div id="woca-bar" className="w-full h-96 bg-white p-4">
               <WocaGroupBarChart groupCategoryScores={pdfLayoutData.wocaAnalysis.groupCategoryScores} />
             </div>
-            <div id="woca-pie" className="w-full bg-white p-12" style={{ height: '1000px' }}>
+            <div id="woca-pie" className="w-full h-96 bg-white p-4">
               <ZoneDistributionChart 
                 zoneDistribution={{
                   opportunity: pdfLayoutData.wocaAnalysis.groupZoneCounts.opportunity,
@@ -317,6 +257,9 @@ export const PDFReportGenerator: React.FC = () => {
                   war: pdfLayoutData.wocaAnalysis.groupZoneCounts.war,
                 }}
               />
+            </div>
+            <div id="woca-matrix" className="w-full h-96 bg-white p-4">
+              <WocaCategoryRadarChart categoryScores={pdfLayoutData.wocaAnalysis.groupCategoryScores} />
             </div>
           </>
         )}

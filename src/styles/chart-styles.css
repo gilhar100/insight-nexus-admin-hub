@@ -1,36 +1,45 @@
 
-/* Chart specific styles */
-.recharts-wrapper {
-  direction: ltr !important;
+/* Pie chart label positioning improvements */
+.recharts-pie-label-line {
+  stroke-width: 2;
+  stroke: #64748b;
 }
 
-.recharts-surface {
-  overflow: visible;
+.recharts-pie-label-text {
+  font-weight: 700;
+  text-anchor: start;
+  font-size: 14px;
+}
+
+/* Chart improvements for all modes */
+.recharts-wrapper {
+  margin: 0 auto;
 }
 
 .recharts-legend-wrapper {
-  direction: rtl;
+  font-size: 1rem !important;
+  font-weight: bold !important;
+  margin-top: 1rem !important;
 }
 
-.recharts-cartesian-axis-tick-value {
-  font-size: 12px;
+.recharts-cartesian-axis-tick text {
+  font-size: 12px !important;
+  font-weight: bold !important;
+  fill: #1e293b !important;
+}
+
+.recharts-polar-angle-axis-tick text {
+  font-size: 12px !important;
+  font-weight: bold !important;
+  fill: #1e293b !important;
+}
+
+.recharts-pie-label-text {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  fill: #1e293b !important;
 }
 
 .recharts-tooltip-wrapper {
-  direction: rtl;
-}
-
-/* Custom chart colors and styling */
-.chart-container {
-  background: white;
-  border-radius: 8px;
-  padding: 16px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-}
-
-/* Responsive chart sizing */
-@media (max-width: 768px) {
-  .recharts-wrapper {
-    font-size: 10px;
-  }
+  font-size: 0.875rem !important;
 }
