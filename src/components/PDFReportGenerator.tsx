@@ -103,7 +103,6 @@ export const PDFReportGenerator: React.FC = () => {
       if (workshopData) {
         chartImages['woca-bar'] = await captureChartAsImage('woca-bar');
         chartImages['woca-pie'] = await captureChartAsImage('woca-pie');
-        chartImages['woca-matrix'] = await captureChartAsImage('woca-matrix');
       }
       
       console.log('📊 All charts captured successfully:', Object.keys(chartImages));
@@ -248,9 +247,6 @@ export const PDFReportGenerator: React.FC = () => {
                   war: pdfLayoutData.wocaAnalysis.groupZoneCounts.war,
                 }}
               />
-            </div>
-            <div id="woca-matrix" className="w-full h-96 bg-white p-4">
-              <WocaCategoryRadarChart categoryScores={pdfLayoutData.wocaAnalysis.groupCategoryScores} />
             </div>
           </>
         )}
