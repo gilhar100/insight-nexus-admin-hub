@@ -227,7 +227,7 @@ export const PDFReportGenerator: React.FC = () => {
             <div id="radar-chart" className="w-full bg-white p-8" style={{ height: '600px' }}>
               <SalimaGroupRadarChart averages={groupData.averages} />
             </div>
-            <div id="archetype-chart" className="w-full bg-white p-8" style={{ height: '700px' }}>
+            <div id="archetype-chart" className="w-full bg-white p-8" style={{ height: '900px' }}>
               <SalimaArchetypeDistributionChart participants={groupData.participants} />
             </div>
           </>
