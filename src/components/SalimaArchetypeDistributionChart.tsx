@@ -286,29 +286,6 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
         </ResponsiveContainer>
       </ChartContainer>
 
-      {/* Archetype descriptions placed below the chart */}
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-3">
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded" style={{ backgroundColor: '#9C27B0' }}></div>
-            <p><strong>מנהל ההזדמנות (S + A)</strong></p>
-          </div>
-          <p className="text-sm text-gray-700 mr-6">רואה רחוק ופועל בגמישות. מוביל שינוי תוך הסתגלות מהירה והבנת ההקשר.</p>
-          
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded" style={{ backgroundColor: '#FF9800' }}></div>
-            <p><strong>המנהל הסקרן (L + I)</strong></p>
-          </div>
-          <p className="text-sm text-gray-700 mr-6">לומד כל הזמן, מלהיב אחרים וסוחף דרך רעיונות ודוגמה אישית.</p>
-          
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded" style={{ backgroundColor: '#4CAF50' }}></div>
-            <p><strong>המנהל המעצים (M + A2)</strong></p>
-          </div>
-          <p className="text-sm text-gray-700 mr-6">מוביל מתוך ערכים, יוצר חיבור אישי ותחושת משמעות בעבודה המשותפת.</p>
-        </div>
-      </div>
-
     </div>
   );
 };

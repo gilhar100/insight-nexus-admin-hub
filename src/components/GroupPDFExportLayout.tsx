@@ -346,11 +346,11 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
                 <h3 style={{ textAlign: 'center', marginBottom: '12px', color: '#1f2937' }}>
                   📊 סגנונות מנהיגות (ארכיטיפים SALIMA)
                 </h3>
-                <p><strong>1. מנהל ההזדמנות (S + A)</strong></p>
+                <p><strong>מנהל ההזדמנות (S + A)</strong></p>
                 <p>רואה רחוק ופועל בגמישות. מוביל שינוי תוך הסתגלות מהירה והבנת ההקשר.</p>
-                <p><strong>2. המנהל הסקרן (L + I)</strong></p>
+                <p><strong>המנהל הסקרן (L + I)</strong></p>
                 <p>לומד כל הזמן, מלהיב אחרים וסוחף דרך רעיונות ודוגמה אישית.</p>
-                <p><strong>3. המנהל המעצים (M + A2)</strong></p>
+                <p><strong>המנהל המעצים (M + A2)</strong></p>
                 <p>מוביל מתוך ערכים, יוצר חיבור אישי ותחושת משמעות בעבודה המשותפת.</p>
               </div>
             </div>
