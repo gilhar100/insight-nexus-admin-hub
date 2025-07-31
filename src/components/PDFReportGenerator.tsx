@@ -115,20 +115,11 @@ export const PDFReportGenerator: React.FC = () => {
       // Wait for PDF layout to render
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Get the PDF layout HTML
-      const pdfElement = document.getElementById('pdf-export-root');
-      if (!pdfElement) {
-        throw new Error('PDF export element not found');
-      }
-      
-      const pdfHtml = pdfElement.outerHTML;
-      console.log('📄 PDF HTML generated, length:', pdfHtml.length);
-      
       // Generate filename
       const filename = `Group_Report_${groupNumber || 'Unknown'}.pdf`;
       
-      // Download the PDF
-      await downloadGroupReportPDF(pdfHtml, filename);
+      // Download the PDF using element ID
+      await downloadGroupReportPDF('pdf-export-root', filename);
       
       console.log('✅ PDF export completed successfully!');
     } catch (err) {

@@ -1,51 +1,62 @@
 
-export async function downloadGroupReportPDF(html: string, filename = "Group_Report.pdf") {
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+
+export async function downloadGroupReportPDF(elementId: string, filename = "Group_Report.pdf") {
   try {
-    console.log('🚀 Sending PDF generation request to backend...');
+    console.log('🚀 Starting client-side PDF generation...');
     
-    const response = await fetch("https://d777ae11-e9fa-4f0c-af8f-c3e7efff8ab2-00-335a5t4423dpw.pike.replit.dev/generate-pdf", {
-      method: "POST",
-      headers: { 
-        "Content-Type": "application/json",
-        "Accept": "application/pdf"
-      },
-      body: JSON.stringify({ html, filename })
+    // Get the element to convert to PDF
+    const element = document.getElementById(elementId);
+    if (!element) {
+      throw new Error(`Element with id "${elementId}" not found`);
+    }
+
+    console.log('📸 Capturing element as canvas...');
+    
+    // Capture the element as canvas with high quality
+    const canvas = await html2canvas(element, {
+      backgroundColor: '#ffffff',
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      logging: false,
+      height: element.scrollHeight,
+      width: element.scrollWidth,
     });
 
-    if (!response.ok) {
-      throw new Error(`PDF generation failed: ${response.status} ${response.statusText}`);
+    console.log('📄 Converting canvas to PDF...');
+    
+    // Calculate dimensions for A4 page
+    const imgWidth = 210; // A4 width in mm
+    const pageHeight = 295; // A4 height in mm
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    let heightLeft = imgHeight;
+
+    // Create PDF document
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    let position = 0;
+
+    // Add first page
+    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+
+    // Add additional pages if content is longer than one page
+    while (heightLeft >= 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
     }
 
-    console.log('✅ PDF generated successfully, downloading...');
+    console.log('💾 Downloading PDF...');
     
-    // Create blob from response
-    const blob = await response.blob();
+    // Download the PDF
+    pdf.save(filename);
     
-    // Verify the blob is not empty
-    if (blob.size === 0) {
-      throw new Error("Received empty PDF file");
-    }
-    
-    // Create temporary URL for the blob
-    const url = window.URL.createObjectURL(blob);
-    
-    // Create temporary anchor element
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    a.style.display = "none";
-    
-    // Add to DOM, click, and remove
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    
-    // Clean up the temporary URL
-    window.URL.revokeObjectURL(url);
-    
-    console.log('📄 PDF download completed successfully!');
+    console.log('✅ PDF download completed successfully!');
   } catch (error) {
-    console.error('❌ PDF Download Error:', error);
+    console.error('❌ PDF Generation Error:', error);
     throw error;
   }
 }
