@@ -220,22 +220,22 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
         </div>
       </div>
 
-      <ChartContainer config={chartConfig} className="h-96" dir="rtl">
+      <ChartContainer config={chartConfig} className="h-96 w-full" dir="rtl">
         <ResponsiveContainer width="100%" height="100%">
           {chartType === 'bar' ? (
             <BarChart 
               data={chartData} 
-              margin={{ top: 40, right: 30, left: 20, bottom: 60 }}
+              margin={{ top: 40, right: 10, left: 10, bottom: 80 }}
               barCategoryGap={barCategoryGap}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.1)" />
               <XAxis 
                 dataKey="archetype" 
-                tick={{ fontSize: 12, fontWeight: 'bold', fill: '#1f2937' }} 
+                tick={{ fontSize: 14, fontWeight: 'bold', fill: '#1f2937' }} 
                 textAnchor="middle" 
                 interval={0}
-                angle={archetypeCount > 2 ? -15 : 0}
-                height={60}
+                angle={0}
+                height={80}
                 axisLine={{ stroke: 'rgba(0,0,0,0.2)' }}
                 tickLine={{ stroke: 'rgba(0,0,0,0.2)' }}
               />
