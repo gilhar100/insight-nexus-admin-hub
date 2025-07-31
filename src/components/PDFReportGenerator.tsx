@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -54,20 +55,49 @@ export const PDFReportGenerator: React.FC = () => {
 
     console.log(`📸 Capturing chart: ${elementId}`);
     
-    // Wait longer for charts to fully render
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    // Force a longer wait for SVG charts to fully render
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    
+    // Force redraw of SVG elements
+    const svgElements = element.querySelectorAll('svg');
+    svgElements.forEach(svg => {
+      svg.style.overflow = 'visible';
+      svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    });
     
     const canvas = await html2canvas(element, {
       backgroundColor: '#ffffff',
-      scale: 3, // Increased scale for better quality
+      scale: 4, // Increased scale for better quality
       useCORS: true,
       allowTaint: true,
+      foreignObjectRendering: false, // Better for SVG rendering
       height: element.offsetHeight,
       width: element.offsetWidth,
-      logging: false, // Disable logging for cleaner output
+      logging: true, // Enable logging for debugging
+      onclone: (clonedDoc) => {
+        // Ensure all text elements are visible in the clone
+        const clonedElement = clonedDoc.getElementById(elementId);
+        if (clonedElement) {
+          const textElements = clonedElement.querySelectorAll('text');
+          textElements.forEach(text => {
+            text.style.visibility = 'visible';
+            text.style.opacity = '1';
+            text.style.fontSize = text.style.fontSize || '16px';
+            text.style.fontWeight = text.style.fontWeight || 'bold';
+          });
+          
+          // Ensure SVG paths are visible
+          const pathElements = clonedElement.querySelectorAll('path');
+          pathElements.forEach(path => {
+            if (path.getAttribute('fill') !== 'none') {
+              path.style.opacity = '1';
+            }
+          });
+        }
+      }
     });
 
-    const base64Image = canvas.toDataURL('image/png', 1.0); // Maximum quality
+    const base64Image = canvas.toDataURL('image/png', 1.0);
     
     // Verify the image is not blank
     if (base64Image === 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==') {
@@ -225,18 +255,18 @@ export const PDFReportGenerator: React.FC = () => {
         </div>
       )}
 
-      {/* Hidden charts container for capturing */}
+      {/* Hidden charts container for capturing - larger sizes for better PDF quality */}
       <div 
         ref={chartsContainerRef}
-        className="fixed -top-[10000px] left-0 bg-white"
-        style={{ width: '1000px', height: 'auto' }}
+        className="fixed -top-[15000px] left-0 bg-white"
+        style={{ width: '1200px', height: 'auto' }}
       >
         {groupData && (
           <>
-            <div id="radar-chart" className="w-full bg-white p-6" style={{ height: '500px' }}>
+            <div id="radar-chart" className="w-full bg-white p-8" style={{ height: '600px' }}>
               <SalimaGroupRadarChart averages={groupData.averages} />
             </div>
-            <div id="archetype-chart" className="w-full bg-white p-6" style={{ height: '500px' }}>
+            <div id="archetype-chart" className="w-full bg-white p-8" style={{ height: '600px' }}>
               <SalimaArchetypeDistributionChart participants={groupData.participants} />
             </div>
           </>
@@ -244,10 +274,10 @@ export const PDFReportGenerator: React.FC = () => {
         
         {workshopData && pdfLayoutData?.wocaAnalysis && (
           <>
-            <div id="woca-bar" className="w-full bg-white p-6" style={{ height: '600px' }}>
+            <div id="woca-bar" className="w-full bg-white p-8" style={{ height: '800px' }}>
               <WocaGroupBarChart groupCategoryScores={pdfLayoutData.wocaAnalysis.groupCategoryScores} />
             </div>
-            <div id="woca-pie" className="w-full bg-white p-6" style={{ height: '600px' }}>
+            <div id="woca-pie" className="w-full bg-white p-8" style={{ height: '800px' }}>
               <ZoneDistributionChart 
                 zoneDistribution={{
                   opportunity: pdfLayoutData.wocaAnalysis.groupZoneCounts.opportunity,

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { ChartContainer } from '@/components/ui/chart';
@@ -61,7 +62,7 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
     if (value === 0) return null;
     
     const RADIAN = Math.PI / 180;
-    const radius = innerRadius + (outerRadius - innerRadius) * 1.4;
+    const radius = innerRadius + (outerRadius - innerRadius) * 1.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
     const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0.0';
@@ -73,8 +74,8 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
         fill="#000000"
         textAnchor={x > cx ? 'start' : 'end'}
         dominantBaseline="central"
-        fontSize={16}
-        fontWeight="600"
+        fontSize={18}
+        fontWeight="bold"
         style={{ direction: 'rtl' }}
       >
         {`${value} (${percentage}%)`}
@@ -85,12 +86,12 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
   const CustomLegend = (props: any) => {
     const { payload } = props;
     return (
-      <div className="flex justify-center mt-6" dir="rtl">
-        <div className="flex flex-wrap gap-6 justify-center">
+      <div className="flex justify-center mt-8" dir="rtl">
+        <div className="flex flex-wrap gap-8 justify-center">
           {payload.map((entry: any, index: number) => (
             <div 
               key={index} 
-              className="flex items-center cursor-pointer hover:bg-gray-100 p-2 rounded transition-colors"
+              className="flex items-center cursor-pointer hover:bg-gray-100 p-3 rounded transition-colors"
               onClick={() => {
                 const zoneData = data.find(d => d.name === entry.value);
                 if (zoneData) {
@@ -99,10 +100,10 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
               }}
             >
               <div
-                className="w-4 h-4 rounded-full ml-3"
+                className="w-5 h-5 rounded-full ml-3"
                 style={{ backgroundColor: entry.color }}
               />
-              <span className="text-lg font-semibold" style={{ color: '#000000' }}>
+              <span className="text-xl font-bold" style={{ color: '#000000' }}>
                 {entry.value}
               </span>
             </div>
@@ -124,7 +125,7 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
     <>
       <div className="flex justify-center items-center w-full" dir="rtl">
         <div className="max-w-4xl w-full mx-auto">
-          <ChartContainer config={chartConfig} className="h-[500px] w-full">
+          <ChartContainer config={chartConfig} className="h-[600px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
@@ -133,7 +134,7 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
                   cy="50%"
                   labelLine={false}
                   label={renderCustomLabel}
-                  outerRadius={150}
+                  outerRadius={180}
                   fill="#8884d8"
                   dataKey="value"
                   onClick={handleCellClick}
@@ -144,6 +145,8 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
                       key={`cell-${index}`} 
                       fill={entry.color}
                       style={{ cursor: 'pointer' }}
+                      stroke="#ffffff"
+                      strokeWidth={2}
                     />
                   ))}
                 </Pie>
@@ -157,10 +160,10 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
                     border: '1px solid #ccc', 
                     borderRadius: '4px',
                     color: '#000000',
-                    fontSize: '16px',
+                    fontSize: '18px',
                     direction: 'rtl'
                   }}
-                  labelStyle={{ color: '#000000', fontSize: '16px' }}
+                  labelStyle={{ color: '#000000', fontSize: '18px' }}
                 />
                 <Legend content={<CustomLegend />} />
               </PieChart>

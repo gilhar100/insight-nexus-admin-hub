@@ -27,8 +27,8 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
 
   // Apply exponential scaling to emphasize differences (visual only)
   const applyScaling = (value: number) => {
-    if (typeof value !== 'number' || isNaN(value) || value <= 0) return 1; // Minimum value for visibility
-    return Math.pow(value, 4.2) * 8; // Much higher exponent for dramatic differences
+    if (typeof value !== 'number' || isNaN(value) || value <= 0) return 50; // Minimum height for visibility in PDF
+    return Math.max(50, Math.pow(value, 4.2) * 15); // Ensure minimum height and increased multiplier
   };
 
   // Prepare data in the specified order with Hebrew labels and matching colors
@@ -77,7 +77,7 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
   };
 
   const getBarOpacity = (zoneKey: string) => {
-    return zoneKey === strongestZone.zoneKey ? 1 : 0.5;
+    return zoneKey === strongestZone.zoneKey ? 1 : 0.7;
   };
 
   const getBarStyle = (zoneKey: string) => {
@@ -124,27 +124,27 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={data}
-              margin={{ top: 30, right: 20, left: 20, bottom: 80 }}
-              barCategoryGap="4%"
+              margin={{ top: 50, right: 40, left: 40, bottom: 100 }}
+              barCategoryGap="8%"
             >
               <XAxis 
                 dataKey="zone" 
                 axisLine={false}
                 tickLine={false}
                 tick={{ 
-                  fontSize: 16, 
+                  fontSize: 18, 
                   fill: '#000000', 
                   fontWeight: 'bold',
                   textAnchor: 'middle'
                 }}
-                height={80}
+                height={100}
                 interval={0}
               />
               <YAxis hide />
               <Bar 
                 dataKey="value" 
                 radius={[8, 8, 0, 0]}
-                maxBarSize={100}
+                maxBarSize={120}
                 onClick={handleBarClick}
               >
                 {data.map((entry, index) => (
