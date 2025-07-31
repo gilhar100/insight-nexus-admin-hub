@@ -26,9 +26,9 @@ export const SalimaGroupBarChart: React.FC<SalimaGroupBarChartProps> = ({ data }
   }));
 
   return (
-    <ChartContainer config={chartConfig} className="h-80" dir="rtl">
+    <ChartContainer config={chartConfig} className="h-80 w-full" dir="rtl">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+        <BarChart data={chartData} margin={{ top: 10, right: 10, left: 10, bottom: 10 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis 
             dataKey="dimension" 
