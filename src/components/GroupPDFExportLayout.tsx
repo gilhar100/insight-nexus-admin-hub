@@ -340,38 +340,28 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
             </div>
           </div>
 
-          {/* Page 3: WOCA Charts - Multiple charts on one page */}
+          {/* Page 3: WOCA Charts - Stacked layout */}
           <div className="page">
             <div className="header">
               <h2>תרשימי WOCA</h2>
             </div>
             
-            {/* Two column layout for pie and bar charts */}
-            <div className="two-column">
-              <div className="column">
-                <h3 style={{ marginBottom: '8px' }}>חלוקת אזורים</h3>
-                <div className="image-container">
-                  {pdfImages['woca-pie'] && (
-                    <img src={pdfImages['woca-pie']} alt="WOCA Pie" className="compact-image" />
-                  )}
-                </div>
-              </div>
-              
-              <div className="column">
-                <h3 style={{ marginBottom: '8px' }}>חוזק אזורים</h3>
-                <div className="image-container">
-                  {pdfImages['woca-bar'] && (
-                    <img src={pdfImages['woca-bar']} alt="WOCA Bar" className="compact-image" />
-                  )}
-                </div>
+            {/* Pie chart on top */}
+            <div className="section">
+              <h3 style={{ marginBottom: '8px' }}>חלוקת אזורים</h3>
+              <div className="image-container">
+                {pdfImages['woca-pie'] && (
+                  <img src={pdfImages['woca-pie']} alt="WOCA Pie" className="full-image" />
+                )}
               </div>
             </div>
             
+            {/* Bar chart on bottom */}
             <div className="section">
-              <h3 style={{ marginBottom: '8px' }}>מטריצת WOCA</h3>
+              <h3 style={{ marginBottom: '8px' }}>חוזק אזורים</h3>
               <div className="image-container">
-                {pdfImages['woca-matrix'] && (
-                  <img src={pdfImages['woca-matrix']} alt="WOCA Matrix" className="compact-image" />
+                {pdfImages['woca-bar'] && (
+                  <img src={pdfImages['woca-bar']} alt="WOCA Bar" className="full-image" />
                 )}
               </div>
             </div>
