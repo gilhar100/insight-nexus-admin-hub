@@ -312,32 +312,30 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
             </div>
             
             <div className="section">
-              <h3 style={{ marginBottom: '8px' }}>תרשים רדאר קבוצתי</h3>
+              <h3 style={{ marginBottom: '5px' }}>תרשים רדאר קבוצתי</h3>
               <div className="image-container">
                 {pdfImages['radar-chart'] && (
-                  <img src={pdfImages['radar-chart']} alt="Radar Chart" className="compact-image" style={{ maxHeight: '280px' }} />
+                  <img src={pdfImages['radar-chart']} alt="Radar Chart" className="compact-image" style={{ maxHeight: '220px' }} />
                 )}
               </div>
             </div>
             
-            <div style={{ marginBottom: '40px' }}></div>
-            
-            <div className="section">
-              <h3 style={{ marginBottom: '8px' }}>התפלגות סגנונות מנהיגות</h3>
+            <div className="section" style={{ marginTop: '15px' }}>
+              <h3 style={{ marginBottom: '5px' }}>התפלגות סגנונות מנהיגות</h3>
               <div className="image-container">
                 {pdfImages['archetype-chart'] && (
-                  <img src={pdfImages['archetype-chart']} alt="Archetype Chart" className="compact-image" style={{ maxHeight: '300px' }} />
+                  <img src={pdfImages['archetype-chart']} alt="Archetype Chart" className="compact-image" style={{ maxHeight: '240px' }} />
                 )}
               </div>
               
-              <div style={{ marginTop: '20px' }}>
-                <div className="archetype-box">
+              <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'space-between', gap: '10px' }}>
+                <div className="archetype-box" style={{ flex: '1', padding: '8px', fontSize: '11px' }}>
                   <p><strong>המנהל הסקרן:</strong> סקרנות והתפתחות</p>
                 </div>
-                <div className="archetype-box">
+                <div className="archetype-box" style={{ flex: '1', padding: '8px', fontSize: '11px' }}>
                   <p><strong>המנהל המעצים:</strong> חיבור ומשמעות</p>
                 </div>
-                <div className="archetype-box">
+                <div className="archetype-box" style={{ flex: '1', padding: '8px', fontSize: '11px' }}>
                   <p><strong>מנהל ההזדמנות:</strong> חזון ותגובה מהירה</p>
                 </div>
               </div>
@@ -351,21 +349,21 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
             </div>
             
             {/* Pie chart on top */}
-            <div className="section">
-              <h3 style={{ marginBottom: '8px' }}>חלוקת אזורים</h3>
+            <div className="section" style={{ marginBottom: '15px' }}>
+              <h3 style={{ marginBottom: '5px' }}>חלוקת אזורים</h3>
               <div className="image-container">
                 {pdfImages['woca-pie'] && (
-                  <img src={pdfImages['woca-pie']} alt="WOCA Pie" className="compact-image" style={{ maxHeight: '320px' }} />
+                  <img src={pdfImages['woca-pie']} alt="WOCA Pie" className="compact-image" style={{ maxHeight: '280px' }} />
                 )}
               </div>
             </div>
             
             {/* Bar chart on bottom */}
             <div className="section">
-              <h3 style={{ marginBottom: '8px' }}>חוזק אזורים</h3>
+              <h3 style={{ marginBottom: '5px' }}>חוזק אזורים</h3>
               <div className="image-container">
                 {pdfImages['woca-bar'] && (
-                  <img src={pdfImages['woca-bar']} alt="WOCA Bar" className="compact-image" style={{ maxHeight: '320px' }} />
+                  <img src={pdfImages['woca-bar']} alt="WOCA Bar" className="compact-image" style={{ maxHeight: '280px' }} />
                 )}
               </div>
             </div>
