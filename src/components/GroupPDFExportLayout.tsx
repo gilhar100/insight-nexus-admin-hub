@@ -95,6 +95,8 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
             .section {
               margin-bottom: 20px;
               text-align: center;
+              page-break-inside: avoid;
+              break-inside: avoid;
             }
             .compact-section {
               margin-bottom: 15px;
@@ -105,6 +107,8 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
               text-align: center;
               margin: 10px 0;
               width: 100%;
+              page-break-inside: avoid;
+              break-inside: avoid;
             }
             .compact-image {
               max-width: 90%;
@@ -150,10 +154,14 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
               padding: 16px;
               margin-bottom: 12px;
               text-align: center;
+              page-break-inside: avoid;
+              break-inside: avoid;
             }
             .overview-row {
               margin-bottom: 25px;
               text-align: center;
+              page-break-inside: avoid;
+              break-inside: avoid;
             }
             .score-display {
               font-size: 28px;
