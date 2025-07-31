@@ -6,10 +6,12 @@
   min-height: 100vh;
 }
 
+/* General text color overrides - but preserve WOCA zone colors */
 .presenter-mode * {
   color: white !important;
 }
 
+/* Background overrides */
 .presenter-mode .bg-white {
   background: #2a2a2a !important;
 }
@@ -22,6 +24,7 @@
   background: #333 !important;
 }
 
+/* Text color overrides */
 .presenter-mode .text-gray-800,
 .presenter-mode .text-gray-900 {
   color: white !important;
@@ -32,12 +35,91 @@
   color: #ccc !important;
 }
 
+/* Border overrides */
 .presenter-mode .border-gray-200,
 .presenter-mode .border-gray-300 {
   border-color: #444 !important;
 }
 
+/* Shadow overrides */
 .presenter-mode .shadow-sm,
 .presenter-mode .shadow {
   box-shadow: 0 1px 3px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+/* WOCA Zone Color Preservation - Keep original colors in presenter mode */
+.presenter-mode .bg-opportunity,
+.presenter-mode [style*="#009E73"],
+.presenter-mode [style*="#10B981"] {
+  background: #009E73 !important;
+}
+
+.presenter-mode .bg-comfort,
+.presenter-mode [style*="#F0E442"],
+.presenter-mode [style*="#3B82F6"] {
+  background: #F0E442 !important;
+}
+
+.presenter-mode .bg-apathy,
+.presenter-mode [style*="#E69F00"],
+.presenter-mode [style*="#F59E0B"] {
+  background: #E69F00 !important;
+}
+
+.presenter-mode .bg-war,
+.presenter-mode [style*="#0072B2"],
+.presenter-mode [style*="#EF4444"] {
+  background: #0072B2 !important;
+}
+
+/* Chart text readability - ensure chart labels remain visible */
+.presenter-mode .recharts-text {
+  fill: white !important;
+}
+
+.presenter-mode .recharts-cartesian-axis-tick-value {
+  fill: white !important;
+}
+
+.presenter-mode .recharts-legend-item-text {
+  color: white !important;
+}
+
+/* Pie chart labels - keep them readable */
+.presenter-mode text[fill="#1f2937"] {
+  fill: white !important;
+}
+
+/* Bar chart axis labels */
+.presenter-mode .recharts-cartesian-axis text {
+  fill: white !important;
+}
+
+/* Preserve WOCA zone colors in SVG elements */
+.presenter-mode svg [fill="#009E73"] {
+  fill: #009E73 !important;
+}
+
+.presenter-mode svg [fill="#F0E442"] {
+  fill: #F0E442 !important;
+}
+
+.presenter-mode svg [fill="#E69F00"] {
+  fill: #E69F00 !important;
+}
+
+.presenter-mode svg [fill="#0072B2"] {
+  fill: #0072B2 !important;
+}
+
+/* Tooltip backgrounds */
+.presenter-mode .recharts-tooltip-wrapper {
+  background: #2a2a2a !important;
+  color: white !important;
+}
+
+.presenter-mode .recharts-default-tooltip {
+  background: #2a2a2a !important;
+  border: 1px solid #444 !important;
+  color: white !important;
 }
