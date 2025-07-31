@@ -27,8 +27,8 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
 
   // Apply exponential scaling to emphasize differences (visual only)
   const applyScaling = (value: number) => {
-    if (typeof value !== 'number' || isNaN(value) || value <= 0) return 50; // Minimum height for visibility in PDF
-    return Math.max(50, Math.pow(value, 4.2) * 15); // Ensure minimum height and increased multiplier
+    if (typeof value !== 'number' || isNaN(value) || value <= 0) return 100; // Minimum height for visibility
+    return Math.max(100, Math.pow(value, 3.8) * 25); // Better scaling with higher minimum
   };
 
   // Prepare data in the specified order with Hebrew labels and matching colors
@@ -77,7 +77,7 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
   };
 
   const getBarOpacity = (zoneKey: string) => {
-    return zoneKey === strongestZone.zoneKey ? 1 : 0.7;
+    return zoneKey === strongestZone.zoneKey ? 1 : 0.8;
   };
 
   const getBarStyle = (zoneKey: string) => {
@@ -92,19 +92,19 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
 
   return (
     <>
-      <div className="w-full space-y-4" dir="rtl">
+      <div className="w-full space-y-4 bg-white" dir="rtl">
         {/* Title and Subtitle */}
         <div className="text-center space-y-2">
-          <h3 className="text-xl font-bold text-gray-800">
+          <h3 className="text-xl font-bold text-gray-900">
             עוצמת אזורי תודעה ארגונית לפי ציון
           </h3>
-          <p className="text-sm text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-sm text-gray-700 max-w-2xl mx-auto leading-relaxed">
             הגרף הזה מייצג את עוצמת אזורי התודעה השונים על פי הממוצע הקבוצתי - לא על פי שיוך קבוצתי לאזור תודעה
           </p>
         </div>
 
         {/* Chart */}
-        <div className="w-full h-[700px] animate-fade-in relative">
+        <div className="w-full h-[700px] animate-fade-in relative bg-white">
           <style>{`
             @keyframes scale-in {
               0% {
@@ -129,11 +129,11 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
             >
               <XAxis 
                 dataKey="zone" 
-                axisLine={false}
-                tickLine={false}
+                axisLine={{ stroke: '#374151', strokeWidth: 1 }}
+                tickLine={{ stroke: '#374151', strokeWidth: 1 }}
                 tick={{ 
                   fontSize: 18, 
-                  fill: '#000000', 
+                  fill: '#1f2937', 
                   fontWeight: 'bold',
                   textAnchor: 'middle'
                 }}
@@ -152,6 +152,8 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
                     key={`cell-${index}`} 
                     fill={entry.color}
                     fillOpacity={getBarOpacity(entry.zoneKey)}
+                    stroke="#ffffff"
+                    strokeWidth={2}
                     className="bar-animation"
                     style={{
                       animation: `scale-in 0.8s ease-out ${index * 0.15}s both`,
@@ -167,7 +169,7 @@ export const WocaGroupBarChart: React.FC<WocaGroupBarChartProps> = ({ groupCateg
 
         {/* Warning Note */}
         <div className="text-center">
-          <p className="text-sm text-amber-600 bg-amber-50 border border-amber-200 rounded-lg p-3 max-w-2xl mx-auto">
+          <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3 max-w-2xl mx-auto">
             ⚠️ <strong>הערה:</strong> גרף זה מייצג ציונים ממוצעים, לא התפלגות אזורי תודעה בין המשתתפים
           </p>
         </div>
