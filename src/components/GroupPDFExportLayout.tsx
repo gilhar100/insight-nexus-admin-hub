@@ -312,19 +312,19 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
             </div>
             
             <div className="section">
-              <h3 style={{ marginBottom: '12px' }}>תרשים רדאר קבוצתי</h3>
+              <h3 style={{ marginBottom: '8px' }}>תרשים רדאר קבוצתי</h3>
               <div className="image-container">
                 {pdfImages['radar-chart'] && (
-                  <img src={pdfImages['radar-chart']} alt="Radar Chart" className="full-image" />
+                  <img src={pdfImages['radar-chart']} alt="Radar Chart" className="compact-image" style={{ maxHeight: '280px' }} />
                 )}
               </div>
             </div>
             
             <div className="section">
-              <h3 style={{ marginBottom: '12px' }}>התפלגות סגנונות מנהיגות</h3>
+              <h3 style={{ marginBottom: '8px' }}>התפלגות סגנונות מנהיגות</h3>
               <div className="image-container">
                 {pdfImages['archetype-chart'] && (
-                  <img src={pdfImages['archetype-chart']} alt="Archetype Chart" className="full-image" />
+                  <img src={pdfImages['archetype-chart']} alt="Archetype Chart" className="compact-image" style={{ maxHeight: '350px' }} />
                 )}
               </div>
               
@@ -351,7 +351,7 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
               <h3 style={{ marginBottom: '8px' }}>חלוקת אזורים</h3>
               <div className="image-container">
                 {pdfImages['woca-pie'] && (
-                  <img src={pdfImages['woca-pie']} alt="WOCA Pie" className="full-image" />
+                  <img src={pdfImages['woca-pie']} alt="WOCA Pie" className="compact-image" style={{ maxHeight: '320px' }} />
                 )}
               </div>
             </div>
@@ -361,7 +361,7 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
               <h3 style={{ marginBottom: '8px' }}>חוזק אזורים</h3>
               <div className="image-container">
                 {pdfImages['woca-bar'] && (
-                  <img src={pdfImages['woca-bar']} alt="WOCA Bar" className="full-image" />
+                  <img src={pdfImages['woca-bar']} alt="WOCA Bar" className="compact-image" style={{ maxHeight: '320px' }} />
                 )}
               </div>
             </div>
