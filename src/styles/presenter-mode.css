@@ -6,12 +6,7 @@
   min-height: 100vh;
 }
 
-/* General text color overrides - but preserve WOCA zone colors */
-.presenter-mode * {
-  color: white !important;
-}
-
-/* Background overrides */
+/* Background overrides - but preserve WOCA zone colors */
 .presenter-mode .bg-white {
   background: #2a2a2a !important;
 }
@@ -24,14 +19,14 @@
   background: #333 !important;
 }
 
-/* Text color overrides */
-.presenter-mode .text-gray-800,
-.presenter-mode .text-gray-900 {
+/* Text color overrides - but preserve WOCA zone content */
+.presenter-mode .text-gray-800:not(.woca-preserve),
+.presenter-mode .text-gray-900:not(.woca-preserve) {
   color: white !important;
 }
 
-.presenter-mode .text-gray-600,
-.presenter-mode .text-gray-700 {
+.presenter-mode .text-gray-600:not(.woca-preserve),
+.presenter-mode .text-gray-700:not(.woca-preserve) {
   color: #ccc !important;
 }
 
@@ -47,33 +42,37 @@
   box-shadow: 0 1px 3px 0 rgba(255, 255, 255, 0.1) !important;
 }
 
-/* WOCA Zone Color Preservation - Keep original colors in presenter mode */
+/* WOCA Zone Color Preservation - Keep original bright colors */
 .presenter-mode .bg-opportunity,
 .presenter-mode [style*="#009E73"],
 .presenter-mode [style*="#10B981"] {
   background: #009E73 !important;
+  color: white !important;
 }
 
 .presenter-mode .bg-comfort,
 .presenter-mode [style*="#F0E442"],
 .presenter-mode [style*="#3B82F6"] {
   background: #F0E442 !important;
+  color: black !important;
 }
 
 .presenter-mode .bg-apathy,
 .presenter-mode [style*="#E69F00"],
 .presenter-mode [style*="#F59E0B"] {
   background: #E69F00 !important;
+  color: black !important;
 }
 
 .presenter-mode .bg-war,
 .presenter-mode [style*="#0072B2"],
 .presenter-mode [style*="#EF4444"] {
   background: #0072B2 !important;
+  color: white !important;
 }
 
-/* Chart text readability - ensure chart labels remain visible */
-.presenter-mode .recharts-text {
+/* Chart text readability - ensure chart labels remain visible but don't override WOCA colors */
+.presenter-mode .recharts-text:not([fill="#009E73"]):not([fill="#F0E442"]):not([fill="#E69F00"]):not([fill="#0072B2"]) {
   fill: white !important;
 }
 
@@ -85,17 +84,12 @@
   color: white !important;
 }
 
-/* Pie chart labels - keep them readable */
-.presenter-mode text[fill="#1f2937"] {
-  fill: white !important;
-}
-
 /* Bar chart axis labels */
 .presenter-mode .recharts-cartesian-axis text {
   fill: white !important;
 }
 
-/* Preserve WOCA zone colors in SVG elements */
+/* Preserve WOCA zone colors in SVG elements - these should remain bright and visible */
 .presenter-mode svg [fill="#009E73"] {
   fill: #009E73 !important;
 }
@@ -122,4 +116,26 @@
   background: #2a2a2a !important;
   border: 1px solid #444 !important;
   color: white !important;
+}
+
+/* Override the global text color rule for WOCA chart elements */
+.presenter-mode .recharts-wrapper * {
+  color: inherit !important;
+}
+
+/* Ensure pie chart labels are readable */
+.presenter-mode .recharts-pie-label-text {
+  fill: black !important;
+  font-weight: bold !important;
+  text-shadow: 1px 1px 2px rgba(255,255,255,0.8) !important;
+}
+
+/* Don't override colors in WOCA charts specifically */
+.presenter-mode [class*="woca"] * {
+  color: inherit !important;
+}
+
+/* Card backgrounds should be dark but preserve chart colors */
+.presenter-mode .bg-white .recharts-wrapper {
+  background: transparent !important;
 }
