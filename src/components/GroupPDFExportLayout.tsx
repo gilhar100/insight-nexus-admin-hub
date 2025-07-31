@@ -105,10 +105,11 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
           )}
         </div>
         
-        {/* WOCA Bar Chart */}
+        {/* ✅ FIXED: WOCA Bar Chart with ID */}
         <div style={{ textAlign: 'center' }}>
           {pdfImages['woca-bar'] && (
             <img 
+              id="woca-bar"
               src={pdfImages['woca-bar']} 
               alt="WOCA Bar Chart" 
               style={{ 
