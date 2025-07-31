@@ -86,12 +86,40 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
 
       {/* Page 4: WOCA Charts */}
       <div style={{ width: '794px', margin: '0 auto', padding: '40px', pageBreakAfter: 'always' }}>
-        <h2 style={{ textAlign: 'center', marginBottom: '30px' }}>תרשימי WOCA</h2>
-        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          {pdfImages['woca-pie'] && <img src={pdfImages['woca-pie']} alt="WOCA Pie" style={{ maxWidth: '85%', border: '1px solid #ccc', borderRadius: '8px' }} />}
+        <h2 style={{ textAlign: 'center', marginBottom: '40px' }}>תרשימי WOCA</h2>
+        
+        {/* WOCA Pie Chart */}
+        <div style={{ textAlign: 'center', marginBottom: '60px' }}>
+          {pdfImages['woca-pie'] && (
+            <img 
+              src={pdfImages['woca-pie']} 
+              alt="WOCA Pie Chart" 
+              style={{ 
+                maxWidth: '90%', 
+                height: 'auto',
+                border: '1px solid #ccc', 
+                borderRadius: '8px',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              }} 
+            />
+          )}
         </div>
+        
+        {/* WOCA Bar Chart */}
         <div style={{ textAlign: 'center' }}>
-          {pdfImages['woca-bar'] && <img src={pdfImages['woca-bar']} alt="WOCA Bar" style={{ maxWidth: '85%', border: '1px solid #ccc', borderRadius: '8px' }} />}
+          {pdfImages['woca-bar'] && (
+            <img 
+              src={pdfImages['woca-bar']} 
+              alt="WOCA Bar Chart" 
+              style={{ 
+                maxWidth: '90%', 
+                height: 'auto',
+                border: '1px solid #ccc', 
+                borderRadius: '8px',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+              }} 
+            />
+          )}
         </div>
       </div>
 

@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -55,19 +54,20 @@ export const PDFReportGenerator: React.FC = () => {
 
     console.log(`📸 Capturing chart: ${elementId}`);
     
-    // Wait a bit for the chart to fully render
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // Wait longer for charts to fully render
+    await new Promise(resolve => setTimeout(resolve, 1500));
     
     const canvas = await html2canvas(element, {
       backgroundColor: '#ffffff',
-      scale: 2,
+      scale: 3, // Increased scale for better quality
       useCORS: true,
       allowTaint: true,
       height: element.offsetHeight,
       width: element.offsetWidth,
+      logging: false, // Disable logging for cleaner output
     });
 
-    const base64Image = canvas.toDataURL('image/png');
+    const base64Image = canvas.toDataURL('image/png', 1.0); // Maximum quality
     
     // Verify the image is not blank
     if (base64Image === 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==') {
@@ -103,7 +103,6 @@ export const PDFReportGenerator: React.FC = () => {
       if (workshopData) {
         chartImages['woca-bar'] = await captureChartAsImage('woca-bar');
         chartImages['woca-pie'] = await captureChartAsImage('woca-pie');
-        chartImages['woca-matrix'] = await captureChartAsImage('woca-matrix');
       }
       
       console.log('📊 All charts captured successfully:', Object.keys(chartImages));
@@ -230,14 +229,14 @@ export const PDFReportGenerator: React.FC = () => {
       <div 
         ref={chartsContainerRef}
         className="fixed -top-[10000px] left-0 bg-white"
-        style={{ width: '800px', height: 'auto' }}
+        style={{ width: '1000px', height: 'auto' }}
       >
         {groupData && (
           <>
-            <div id="radar-chart" className="w-full h-96 bg-white p-4">
+            <div id="radar-chart" className="w-full bg-white p-6" style={{ height: '500px' }}>
               <SalimaGroupRadarChart averages={groupData.averages} />
             </div>
-            <div id="archetype-chart" className="w-full h-96 bg-white p-4">
+            <div id="archetype-chart" className="w-full bg-white p-6" style={{ height: '500px' }}>
               <SalimaArchetypeDistributionChart participants={groupData.participants} />
             </div>
           </>
@@ -245,10 +244,10 @@ export const PDFReportGenerator: React.FC = () => {
         
         {workshopData && pdfLayoutData?.wocaAnalysis && (
           <>
-            <div id="woca-bar" className="w-full h-96 bg-white p-4">
+            <div id="woca-bar" className="w-full bg-white p-6" style={{ height: '600px' }}>
               <WocaGroupBarChart groupCategoryScores={pdfLayoutData.wocaAnalysis.groupCategoryScores} />
             </div>
-            <div id="woca-pie" className="w-full h-96 bg-white p-4">
+            <div id="woca-pie" className="w-full bg-white p-6" style={{ height: '600px' }}>
               <ZoneDistributionChart 
                 zoneDistribution={{
                   opportunity: pdfLayoutData.wocaAnalysis.groupZoneCounts.opportunity,
@@ -257,9 +256,6 @@ export const PDFReportGenerator: React.FC = () => {
                   war: pdfLayoutData.wocaAnalysis.groupZoneCounts.war,
                 }}
               />
-            </div>
-            <div id="woca-matrix" className="w-full h-96 bg-white p-4">
-              <WocaCategoryRadarChart categoryScores={pdfLayoutData.wocaAnalysis.groupCategoryScores} />
             </div>
           </>
         )}
