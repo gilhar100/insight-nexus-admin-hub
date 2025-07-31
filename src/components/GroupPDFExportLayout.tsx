@@ -320,22 +320,26 @@ export const GroupPDFExportLayout: React.FC<GroupPDFExportLayoutProps> = ({
               </div>
             </div>
             
+            <div style={{ marginBottom: '40px' }}></div>
+            
             <div className="section">
               <h3 style={{ marginBottom: '8px' }}>התפלגות סגנונות מנהיגות</h3>
               <div className="image-container">
                 {pdfImages['archetype-chart'] && (
-                  <img src={pdfImages['archetype-chart']} alt="Archetype Chart" className="compact-image" style={{ maxHeight: '350px' }} />
+                  <img src={pdfImages['archetype-chart']} alt="Archetype Chart" className="compact-image" style={{ maxHeight: '300px' }} />
                 )}
               </div>
               
-              <div className="archetype-box">
-                <p><strong>המנהל הסקרן:</strong> סקרנות והתפתחות</p>
-              </div>
-              <div className="archetype-box">
-                <p><strong>המנהל המעצים:</strong> חיבור ומשמעות</p>
-              </div>
-              <div className="archetype-box">
-                <p><strong>מנהל ההזדמנות:</strong> חזון ותגובה מהירה</p>
+              <div style={{ marginTop: '20px' }}>
+                <div className="archetype-box">
+                  <p><strong>המנהל הסקרן:</strong> סקרנות והתפתחות</p>
+                </div>
+                <div className="archetype-box">
+                  <p><strong>המנהל המעצים:</strong> חיבור ומשמעות</p>
+                </div>
+                <div className="archetype-box">
+                  <p><strong>מנהל ההזדמנות:</strong> חזון ותגובה מהירה</p>
+                </div>
               </div>
             </div>
           </div>
