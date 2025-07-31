@@ -286,24 +286,6 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
         </ResponsiveContainer>
       </ChartContainer>
 
-      {dominantArchetype && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-right">
-          <h4 className="font-semibold text-blue-800 mb-2">התפלגות סגנונות מנהיגות</h4>
-          <p className="text-blue-700">
-            הארכיטיפ הדומיננטי בקבוצה הוא <strong>{dominantArchetype.archetype}</strong> עם {dominantArchetype.count} משתתפים ({dominantArchetype.percentage}% מהמשתתפים עם ארכיטיפ מוגדר).
-          </p>
-          <p className="text-blue-600 text-sm mt-2">
-            {dominantArchetype.archetype === 'מנהל ההזדמנות' && 'קבוצה זו מאופיינת במנהיגות חדשנית הרואה הזדמנויות בכל מקום ופועלת ליצירת שינוי חיובי.'}
-            {dominantArchetype.archetype === 'המנהל הסקרן' && 'קבוצה זו מאופיינת במנהיגות חקרנית הרואה בלמידה מתמשכת ובפיתוח אישי כמפתח להצלחה.'}
-            {dominantArchetype.archetype === 'המנהל המעצים' && 'קבוצה זו מאופיינת במנהיגות מעצימה הרואה בפיתוח האחרים ובמתן כלים כמפתח להצלחה ארגונית.'}
-          </p>
-          {participantsWithArchetypesCount < totalParticipants && (
-            <p className="text-blue-500 text-xs mt-2">
-              * הנתונים מבוססים על {participantsWithArchetypesCount} מתוך {totalParticipants} משתתפים בקבוצה
-            </p>
-          )}
-        </div>
-      )}
     </div>
   );
 };
