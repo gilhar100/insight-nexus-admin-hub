@@ -220,14 +220,14 @@ export const PDFReportGenerator: React.FC = () => {
       <div 
         ref={chartsContainerRef}
         className="fixed -top-[10000px] left-0 bg-white"
-        style={{ width: '800px', height: 'auto' }}
+        style={{ width: '1000px', height: 'auto' }}
       >
         {groupData && (
           <>
-            <div id="radar-chart" className="w-full h-96 bg-white p-4">
+            <div id="radar-chart" className="w-full bg-white p-8" style={{ height: '600px' }}>
               <SalimaGroupRadarChart averages={groupData.averages} />
             </div>
-            <div id="archetype-chart" className="w-full h-96 bg-white p-4">
+            <div id="archetype-chart" className="w-full bg-white p-8" style={{ height: '700px' }}>
               <SalimaArchetypeDistributionChart participants={groupData.participants} />
             </div>
           </>
@@ -235,10 +235,10 @@ export const PDFReportGenerator: React.FC = () => {
         
         {workshopData && pdfLayoutData?.wocaAnalysis && (
           <>
-            <div id="woca-bar" className="w-full h-96 bg-white p-4">
+            <div id="woca-bar" className="w-full bg-white p-8" style={{ height: '600px' }}>
               <WocaGroupBarChart groupCategoryScores={pdfLayoutData.wocaAnalysis.groupCategoryScores} />
             </div>
-            <div id="woca-pie" className="w-full h-96 bg-white p-4">
+            <div id="woca-pie" className="w-full bg-white p-8" style={{ height: '600px' }}>
               <ZoneDistributionChart 
                 zoneDistribution={{
                   opportunity: pdfLayoutData.wocaAnalysis.groupZoneCounts.opportunity,

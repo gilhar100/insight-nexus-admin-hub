@@ -288,7 +288,7 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
 
       {dominantArchetype && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-right">
-          <h4 className="font-semibold text-blue-800 mb-2">סיכום התפלגות הארכיטיפים</h4>
+          <h4 className="font-semibold text-blue-800 mb-2">התפלגות סגנונות מנהיגות</h4>
           <p className="text-blue-700">
             הארכיטיפ הדומיננטי בקבוצה הוא <strong>{dominantArchetype.archetype}</strong> עם {dominantArchetype.count} משתתפים ({dominantArchetype.percentage}% מהמשתתפים עם ארכיטיפ מוגדר).
           </p>
