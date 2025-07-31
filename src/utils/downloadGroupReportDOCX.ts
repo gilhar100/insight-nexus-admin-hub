@@ -8,8 +8,9 @@ export async function downloadGroupReportDOCX(requestBody: any, groupNumber: num
       ...requestBody,
       titles: {
         report: 'דוח תובנות קבוצתי חברת OPPORTUNITY',
-        radarChart: 'פרופיל ניהולי',
-        archetypeChart: 'התפלגות סגנונות מנהיגות',
+        radarChart: 'פרופיל מנהיגות',
+        archetypeChart: 'התפלגות סגנונות ניהול',
+        wocaBar: 'התפלגות עוצמת אזורי תודעה ארגונית',
         wocaPie: 'התפלגות אזורי תודעה ארגונית'
       }
     };
