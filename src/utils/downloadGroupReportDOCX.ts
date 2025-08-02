@@ -1,4 +1,3 @@
-
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, PageBreak, ImageRun } from 'docx';
 import { saveAs } from 'file-saver';
 
@@ -78,10 +77,9 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
         children: [
           new ImageRun({
             data: radarImageBuffer,
-            transformation: {
-              width: 300,
-              height: 300,
-            },
+            type: 'png',
+            width: 300,
+            height: 300,
           }),
         ],
       })
@@ -101,10 +99,9 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
         children: [
           new ImageRun({
             data: archetypeImageBuffer,
-            transformation: {
-              width: 300,
-              height: 300,
-            },
+            type: 'png',
+            width: 300,
+            height: 300,
           }),
         ],
       })
@@ -307,10 +304,9 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
         children: [
           new ImageRun({
             data: wocaBarImageBuffer,
-            transformation: {
-              width: 300,
-              height: 300,
-            },
+            type: 'png',
+            width: 300,
+            height: 300,
           }),
         ],
       })
@@ -325,10 +321,9 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
         children: [
           new ImageRun({
             data: wocaPieImageBuffer,
-            transformation: {
-              width: 300,
-              height: 300,
-            },
+            type: 'png',
+            width: 300,
+            height: 300,
           }),
         ],
       })
