@@ -13,6 +13,7 @@ import { WocaCategoryRadarChart } from '@/components/WocaCategoryRadarChart';
 import { GroupPDFExportLayout } from '@/components/GroupPDFExportLayout';
 import { analyzeWorkshopWoca } from '@/utils/wocaAnalysis';
 import { downloadGroupReportPDF } from '@/utils/downloadGroupReportPDF';
+import { downloadGroupReportDOCX } from '@/utils/downloadGroupReportDOCX';
 import html2canvas from 'html2canvas';
 
 export const PDFReportGenerator: React.FC = () => {
@@ -141,8 +142,7 @@ export const PDFReportGenerator: React.FC = () => {
     try {
       console.log('🚀 Starting DOCX export for group:', groupNumber);
       
-      // For now, we'll export as PDF with .docx in the filename
-      // This is a simple workaround until we find a better DOCX library
+      // Capture all required charts
       const chartImages: Record<string, string> = {};
       
       // Capture SALIMA radar chart
@@ -159,20 +159,30 @@ export const PDFReportGenerator: React.FC = () => {
       
       console.log('📊 All charts captured successfully:', Object.keys(chartImages));
       
-      // Store images and show PDF layout
-      setPdfImages(chartImages);
-      setShowPDFLayout(true);
+      // Prepare data for DOCX generation
+      if (!pdfLayoutData) {
+        throw new Error('No data available for DOCX generation');
+      }
       
-      // Wait for PDF layout to render
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const docxData = {
+        groupNumber: pdfLayoutData.groupNumber,
+        participantCount: pdfLayoutData.participantCount,
+        salimaScore: pdfLayoutData.salimaScore,
+        strongestDimension: pdfLayoutData.strongestDimension,
+        weakestDimension: pdfLayoutData.weakestDimension,
+        wocaZoneLabel: pdfLayoutData.wocaZoneLabel,
+        wocaScore: pdfLayoutData.wocaScore,
+        wocaParticipantCount: pdfLayoutData.wocaParticipantCount,
+        chartImages,
+      };
       
-      // Generate filename with .pdf extension (temporary workaround)
-      const filename = `Group_Report_${groupNumber || 'Unknown'}_DOCX_Format.pdf`;
+      // Generate filename
+      const filename = `Group_Report_${groupNumber || 'Unknown'}.docx`;
       
-      // Download using PDF method for now
-      await downloadGroupReportPDF('pdf-export-root', filename);
+      // Download the actual DOCX
+      await downloadGroupReportDOCX(docxData, filename);
       
-      console.log('✅ DOCX-style export completed successfully!');
+      console.log('✅ DOCX export completed successfully!');
     } catch (err) {
       console.error('❌ DOCX Export Error:', err);
       setError(`Failed to generate DOCX: ${err instanceof Error ? err.message : 'Unknown error'}`);
@@ -271,7 +281,7 @@ export const PDFReportGenerator: React.FC = () => {
             className="text-lg px-8 py-4"
             variant="outline"
           >
-            {isLoading ? '🔄 מכין דוח...' : '📝 הורד כ-PDF (פורמט DOCX)'}
+            {isLoading ? '🔄 מכין דוח...' : '📝 הורד דוח DOCX'}
           </Button>
         </div>
       )}
