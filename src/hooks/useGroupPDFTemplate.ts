@@ -1,7 +1,9 @@
+
 import { useState, useEffect } from 'react';
 import { useGroupData } from '@/hooks/useGroupData';
 import { useWorkshopData } from '@/hooks/useWorkshopData';
 import { analyzeWorkshopWoca } from '@/utils/wocaAnalysis';
+import { getHebrewZoneName } from '@/utils/wocaZoneMapping';
 
 export interface PDFTemplateData {
   groupNumber: number;
@@ -43,13 +45,16 @@ export const useGroupPDFTemplate = (groupNumber: number | null) => {
         { name: '', score: 5 }
       );
 
+    // Convert English zone name to Hebrew
+    const hebrewZoneLabel = getHebrewZoneName(wocaAnalysis.groupDominantZoneByCount || 'opportunity');
+
     setTemplateData({
       groupNumber: groupData.group_number,
       participantCount: groupData.participant_count,
       salimaScore: groupData.averages.overall,
       strongestDimension,
       weakestDimension,
-      wocaZoneLabel: wocaAnalysis.groupDominantZoneByCount || 'לא זוהה',
+      wocaZoneLabel: hebrewZoneLabel,
       wocaScore: workshopData.average_score,
       wocaParticipantCount: workshopData.participant_count,
       wocaAnalysis,

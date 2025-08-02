@@ -1,4 +1,5 @@
-import { Document, Packer, Paragraph, TextRun, ImageRun, HeadingLevel, AlignmentType } from 'docx';
+
+import { Document, Packer, Paragraph, TextRun, ImageRun, HeadingLevel, AlignmentType, PageBreak } from 'docx';
 import { saveAs } from 'file-saver';
 
 interface DOCXExportData {
@@ -28,58 +29,32 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
     
     const sections = [];
     
-    // Title page
+    // Page 1: Title page
     sections.push(
       new Paragraph({
-        text: 'דוח קבוצתי מקיף',
+        text: `דוח תובנות קבוצתי - קבוצה ${data.groupNumber}`,
         heading: HeadingLevel.TITLE,
         alignment: AlignmentType.CENTER,
-      }),
-      new Paragraph({
-        children: [
-          new TextRun({
-            text: `קבוצה מספר: ${data.groupNumber}`,
-            bold: true,
-            size: 28,
-          }),
-        ],
-        alignment: AlignmentType.CENTER,
-      }),
-      new Paragraph({
-        text: '',
         spacing: { after: 400 },
+      }),
+      new Paragraph({
+        text: 'שאלון מנהיגות',
+        heading: HeadingLevel.HEADING_1,
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 800 },
+      }),
+      new Paragraph({
+        children: [new PageBreak()],
       }),
     );
 
-    // SALIMA Section
+    // Page 2: SALIMA Section
     sections.push(
       new Paragraph({
-        text: 'תוצאות SALIMA',
+        text: 'ממדי SALIMA ותובנות מנהיגות',
         heading: HeadingLevel.HEADING_1,
-      }),
-      new Paragraph({
-        children: [
-          new TextRun({ text: `משתתפים: `, bold: true }),
-          new TextRun({ text: `${data.participantCount}` }),
-        ],
-      }),
-      new Paragraph({
-        children: [
-          new TextRun({ text: `ציון כללי: `, bold: true }),
-          new TextRun({ text: `${data.salimaScore.toFixed(2)}` }),
-        ],
-      }),
-      new Paragraph({
-        children: [
-          new TextRun({ text: `הממד החזק ביותר: `, bold: true }),
-          new TextRun({ text: `${data.strongestDimension.name} (${data.strongestDimension.score.toFixed(2)})` }),
-        ],
-      }),
-      new Paragraph({
-        children: [
-          new TextRun({ text: `הממד החלש ביותר: `, bold: true }),
-          new TextRun({ text: `${data.weakestDimension.name} (${data.weakestDimension.score.toFixed(2)})` }),
-        ],
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 400 },
       }),
     );
 
@@ -87,21 +62,18 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
     if (data.chartImages['radar-chart']) {
       sections.push(
         new Paragraph({
-          text: 'תרשים רדאר SALIMA',
-          heading: HeadingLevel.HEADING_2,
-        }),
-        new Paragraph({
           children: [
             new ImageRun({
               data: base64ToArrayBuffer(data.chartImages['radar-chart']),
               transformation: {
-                width: 500,
-                height: 375,
+                width: 400,
+                height: 300,
               },
               type: 'png',
             }),
           ],
           alignment: AlignmentType.CENTER,
+          spacing: { after: 200 },
         }),
       );
     }
@@ -109,48 +81,99 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
     if (data.chartImages['archetype-chart']) {
       sections.push(
         new Paragraph({
-          text: 'התפלגות ארכיטיפים',
+          text: 'סגנון מנהיגות',
           heading: HeadingLevel.HEADING_2,
+          alignment: AlignmentType.CENTER,
         }),
         new Paragraph({
           children: [
             new ImageRun({
               data: base64ToArrayBuffer(data.chartImages['archetype-chart']),
               transformation: {
-                width: 500,
-                height: 675,
+                width: 400,
+                height: 500,
               },
               type: 'png',
             }),
           ],
           alignment: AlignmentType.CENTER,
+          spacing: { after: 400 },
         }),
       );
     }
 
-    // WOCA Section
+    // SALIMA Dimensions
     sections.push(
       new Paragraph({
-        text: 'תוצאות WOCA',
+        text: '🧭 ממדי SALIMA',
+        heading: HeadingLevel.HEADING_2,
+        spacing: { after: 200 },
+      }),
+      new Paragraph({
+        children: [
+          new TextRun({ text: 'אסטרטגיה (S)', bold: true }),
+          new TextRun({ text: ' - ראייה מערכתית, תכנון לטווח ארוך ויכולת להוביל חזון.' }),
+        ],
+        spacing: { after: 100 },
+      }),
+      new Paragraph({
+        children: [
+          new TextRun({ text: 'אדפטיביות (A)', bold: true }),
+          new TextRun({ text: ' - גמישות מחשבתית ורגשית ותגובה יעילה למצבים משתנים.' }),
+        ],
+        spacing: { after: 100 },
+      }),
+      new Paragraph({
+        children: [
+          new TextRun({ text: 'למידה (L)', bold: true }),
+          new TextRun({ text: ' - פתיחות לרעיונות חדשים, חשיבה ביקורתית ולמידה מתמשכת.' }),
+        ],
+        spacing: { after: 100 },
+      }),
+      new Paragraph({
+        children: [
+          new TextRun({ text: 'השראה (I)', bold: true }),
+          new TextRun({ text: ' - הנעה רגשית דרך דוגמה אישית וחזון שמעורר משמעות.' }),
+        ],
+        spacing: { after: 100 },
+      }),
+      new Paragraph({
+        children: [
+          new TextRun({ text: 'משמעות (M)', bold: true }),
+          new TextRun({ text: ' - חיבור עמוק לערכים, תכלית ותחושת שליחות אישית וארגונית.' }),
+        ],
+        spacing: { after: 100 },
+      }),
+      new Paragraph({
+        children: [
+          new TextRun({ text: 'אותנטיות (A2)', bold: true }),
+          new TextRun({ text: ' - כנות, שקיפות והתנהלות אנושית המחוברת לערכים פנימיים.' }),
+        ],
+        spacing: { after: 400 },
+      }),
+      new Paragraph({
+        children: [new PageBreak()],
+      }),
+    );
+
+    // Page 3: WOCA Section
+    sections.push(
+      new Paragraph({
+        text: 'שאלון תודעה ארגונית',
         heading: HeadingLevel.HEADING_1,
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 400 },
       }),
       new Paragraph({
         children: [
-          new TextRun({ text: `משתתפים: `, bold: true }),
-          new TextRun({ text: `${data.wocaParticipantCount}` }),
+          new TextRun({
+            text: data.wocaZoneLabel,
+            bold: true,
+            size: 32,
+          }),
         ],
-      }),
-      new Paragraph({
-        children: [
-          new TextRun({ text: `ציון ממוצע: `, bold: true }),
-          new TextRun({ text: `${data.wocaScore.toFixed(2)}` }),
-        ],
-      }),
-      new Paragraph({
-        children: [
-          new TextRun({ text: `אזור דומיננטי: `, bold: true }),
-          new TextRun({ text: data.wocaZoneLabel }),
-        ],
+        alignment: AlignmentType.CENTER,
+        spacing: { after: 400 },
       }),
     );
 
@@ -158,21 +181,18 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
     if (data.chartImages['woca-bar']) {
       sections.push(
         new Paragraph({
-          text: 'תרשים עמודות WOCA',
-          heading: HeadingLevel.HEADING_2,
-        }),
-        new Paragraph({
           children: [
             new ImageRun({
               data: base64ToArrayBuffer(data.chartImages['woca-bar']),
               transformation: {
-                width: 500,
-                height: 375,
+                width: 400,
+                height: 300,
               },
               type: 'png',
             }),
           ],
           alignment: AlignmentType.CENTER,
+          spacing: { after: 200 },
         }),
       );
     }
@@ -180,30 +200,74 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
     if (data.chartImages['woca-pie']) {
       sections.push(
         new Paragraph({
-          text: 'התפלגות אזורים',
-          heading: HeadingLevel.HEADING_2,
-        }),
-        new Paragraph({
           children: [
             new ImageRun({
               data: base64ToArrayBuffer(data.chartImages['woca-pie']),
               transformation: {
-                width: 500,
-                height: 375,
+                width: 400,
+                height: 300,
               },
               type: 'png',
             }),
           ],
           alignment: AlignmentType.CENTER,
+          spacing: { after: 400 },
         }),
       );
     }
 
-    // Create document
+    // WOCA Zones Description
+    sections.push(
+      new Paragraph({
+        text: 'אזורי WOCA',
+        heading: HeadingLevel.HEADING_2,
+        spacing: { after: 200 },
+      }),
+      new Paragraph({
+        children: [
+          new TextRun({ text: 'אזור ההזדמנות (WIN/WIN)', bold: true }),
+          new TextRun({ text: ' - שיח פתוח, הקשבה ויוזמה. תחושת שליחות, השפעה, שיתוף פעולה וצמיחה משותפת.' }),
+        ],
+        spacing: { after: 100 },
+      }),
+      new Paragraph({
+        children: [
+          new TextRun({ text: 'אזור הנוחות (LOSE/LOSE)', bold: true }),
+          new TextRun({ text: ' - הימנעות מקונפליקטים, קיפאון מחשבתי וחשש מיוזמות. שמירה על הקיים במחיר שחיקה.' }),
+        ],
+        spacing: { after: 100 },
+      }),
+      new Paragraph({
+        children: [
+          new TextRun({ text: 'אזור האדישות (LOSE/LOSE)', bold: true }),
+          new TextRun({ text: ' - נתק רגשי, חוסר עניין וחוסר תחושת השפעה. תחושת סטגנציה ויעדר מנהיגות.' }),
+        ],
+        spacing: { after: 100 },
+      }),
+      new Paragraph({
+        children: [
+          new TextRun({ text: 'אזור המלחמה (WIN/LOSE)', bold: true }),
+          new TextRun({ text: ' - דינמיקה של שליטה, חשדנות ומאבק. הישרדות טקטית על חשבון הקשבה, אמון ויציבות.' }),
+        ],
+        spacing: { after: 100 },
+      }),
+    );
+
+    // Create document with landscape orientation
     const doc = new Document({
       sections: [
         {
-          properties: {},
+          properties: {
+            page: {
+              orientation: 'landscape',
+              margin: {
+                top: 720,
+                right: 720,
+                bottom: 720,
+                left: 720,
+              },
+            },
+          },
           children: sections,
         },
       ],
