@@ -1,3 +1,4 @@
+
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, PageBreak, ImageRun } from 'docx';
 import { saveAs } from 'file-saver';
 
@@ -414,11 +415,11 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
         properties: {
           page: {
             size: {
-              width: 11906, // A4 landscape width in twentieths of a point
-              height: 8418,  // A4 landscape height in twentieths of a point
+              width: 11906,
+              height: 8418,
             },
             margin: {
-              top: 720,    // 0.5 inch in twentieths of a point
+              top: 720,
               right: 720,
               bottom: 720,
               left: 720,
