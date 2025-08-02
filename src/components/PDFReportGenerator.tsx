@@ -13,6 +13,7 @@ import { WocaCategoryRadarChart } from '@/components/WocaCategoryRadarChart';
 import { GroupPDFExportLayout } from '@/components/GroupPDFExportLayout';
 import { analyzeWorkshopWoca } from '@/utils/wocaAnalysis';
 import { downloadGroupReportPDF } from '@/utils/downloadGroupReportPDF';
+import { downloadGroupReportDOCX } from '@/utils/downloadGroupReportDOCX';
 import html2canvas from 'html2canvas';
 
 export const PDFReportGenerator: React.FC = () => {
@@ -129,6 +130,57 @@ export const PDFReportGenerator: React.FC = () => {
     }
   };
 
+  const exportGroupDOCX = async () => {
+    if (!groupData && !workshopData) {
+      setError('No data available for export');
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      console.log('🚀 Starting DOCX export for group:', groupNumber);
+      
+      // Capture all required charts
+      const chartImages: Record<string, string> = {};
+      
+      // Capture SALIMA radar chart
+      if (groupData) {
+        chartImages['radar-chart'] = await captureChartAsImage('radar-chart');
+        chartImages['archetype-chart'] = await captureChartAsImage('archetype-chart');
+      }
+      
+      // Capture WOCA charts
+      if (workshopData) {
+        chartImages['woca-bar'] = await captureChartAsImage('woca-bar');
+        chartImages['woca-pie'] = await captureChartAsImage('woca-pie');
+      }
+      
+      console.log('📊 All charts captured successfully:', Object.keys(chartImages));
+      
+      // Store images and show PDF layout
+      setPdfImages(chartImages);
+      setShowPDFLayout(true);
+      
+      // Wait for PDF layout to render
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Generate filename
+      const filename = `Group_Report_${groupNumber || 'Unknown'}.docx`;
+      
+      // Download the DOCX using element ID
+      await downloadGroupReportDOCX('pdf-export-root', filename);
+      
+      console.log('✅ DOCX export completed successfully!');
+    } catch (err) {
+      console.error('❌ DOCX Export Error:', err);
+      setError(`Failed to generate DOCX: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Calculate required data for PDF layout
   const getPDFLayoutData = () => {
     if (!groupData || !workshopData) return null;
@@ -205,13 +257,21 @@ export const PDFReportGenerator: React.FC = () => {
       )}
 
       {(groupData || workshopData) && (
-        <div className="text-center">
+        <div className="text-center space-x-4">
           <Button 
             onClick={exportGroupPDF}
             disabled={isLoading}
             className="text-lg px-8 py-4"
           >
-            {isLoading ? '🔄 מכין דוח...' : '📄 הורד דוח קבוצתי (SALIMA + WOCA)'}
+            {isLoading ? '🔄 מכין דוח...' : '📄 הורד דוח PDF'}
+          </Button>
+          <Button 
+            onClick={exportGroupDOCX}
+            disabled={isLoading}
+            className="text-lg px-8 py-4"
+            variant="outline"
+          >
+            {isLoading ? '🔄 מכין דוח...' : '📝 הורד דוח DOCX'}
           </Button>
         </div>
       )}
