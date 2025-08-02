@@ -1,4 +1,3 @@
-
 import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, PageBreak, ImageRun } from 'docx';
 import { saveAs } from 'file-saver';
 
@@ -82,6 +81,7 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
               width: 300,
               height: 300,
             },
+            type: 'png',
           }),
         ],
       })
@@ -105,6 +105,7 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
               width: 300,
               height: 300,
             },
+            type: 'png',
           }),
         ],
       })
@@ -311,6 +312,7 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
               width: 300,
               height: 300,
             },
+            type: 'png',
           }),
         ],
       })
@@ -329,6 +331,7 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
               width: 300,
               height: 300,
             },
+            type: 'png',
           }),
         ],
       })
