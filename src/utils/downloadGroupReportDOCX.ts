@@ -1,5 +1,5 @@
 
-import { Document, Packer, Paragraph, TextRun, ImageRun, HeadingLevel, AlignmentType, PageBreak } from 'docx';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, PageBreak, ImageRun } from 'docx';
 import { saveAs } from 'file-saver';
 
 interface DOCXExportData {
@@ -14,304 +14,427 @@ interface DOCXExportData {
   chartImages: Record<string, string>;
 }
 
-const base64ToArrayBuffer = (base64: string): ArrayBuffer => {
-  const binaryString = atob(base64.split(',')[1]);
+const convertBase64ToBuffer = (base64: string): Uint8Array => {
+  const base64Data = base64.split(',')[1];
+  const binaryString = atob(base64Data);
   const bytes = new Uint8Array(binaryString.length);
   for (let i = 0; i < binaryString.length; i++) {
     bytes[i] = binaryString.charCodeAt(i);
   }
-  return bytes.buffer;
+  return bytes;
 };
 
 export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: string) => {
-  try {
-    console.log('🚀 Starting DOCX generation...');
-    
-    // Page 1: Title Page
-    const page1Sections = [
+  const {
+    groupNumber,
+    participantCount,
+    salimaScore,
+    strongestDimension,
+    weakestDimension,
+    wocaZoneLabel,
+    wocaScore,
+    wocaParticipantCount,
+    chartImages,
+  } = data;
+
+  // Create document sections
+  const children = [];
+
+  // Page 1: Title Page
+  children.push(
+    new Paragraph({
+      text: `דוח תובנות קבוצתי - קבוצה ${groupNumber}`,
+      heading: HeadingLevel.TITLE,
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 400 },
+    }),
+    new Paragraph({
+      text: 'שאלון מנהיגות',
+      heading: HeadingLevel.HEADING_1,
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 800 },
+    }),
+    new Paragraph({
+      children: [new PageBreak()],
+    })
+  );
+
+  // Page 2: SALIMA Content
+  children.push(
+    new Paragraph({
+      text: 'ממדי SALIMA ותובנות מנהיגות',
+      heading: HeadingLevel.HEADING_1,
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 400 },
+    })
+  );
+
+  // Add SALIMA charts if available
+  if (chartImages['radar-chart']) {
+    const radarImageBuffer = convertBase64ToBuffer(chartImages['radar-chart']);
+    children.push(
       new Paragraph({
-        text: `דוח תובנות קבוצתי - קבוצה ${data.groupNumber}`,
-        heading: HeadingLevel.TITLE,
         alignment: AlignmentType.CENTER,
-        spacing: { after: 600 },
-      }),
-      new Paragraph({
-        text: 'שאלון מנהיגות',
-        heading: HeadingLevel.HEADING_1,
-        alignment: AlignmentType.CENTER,
-        spacing: { after: 400 },
-      }),
-      new Paragraph({
-        children: [new PageBreak()],
-      }),
-    ];
-
-    // Page 2: SALIMA Section
-    const page2Sections = [
-      new Paragraph({
-        text: 'ממדי SALIMA ותובנות מנהיגות',
-        heading: HeadingLevel.HEADING_1,
-        alignment: AlignmentType.CENTER,
-        spacing: { after: 400 },
-        rightToLeft: true,
-      }),
-    ];
-
-    // Add SALIMA charts if available
-    if (data.chartImages['radar-chart']) {
-      page2Sections.push(
-        new Paragraph({
-          children: [
-            new ImageRun({
-              data: base64ToArrayBuffer(data.chartImages['radar-chart']),
-              transformation: {
-                width: 400,
-                height: 300,
-              },
-              type: 'png',
-            }),
-          ],
-          alignment: AlignmentType.CENTER,
-          spacing: { after: 300 },
-        }),
-      );
-    }
-
-    if (data.chartImages['archetype-chart']) {
-      page2Sections.push(
-        new Paragraph({
-          text: 'סגנון מנהיגות',
-          heading: HeadingLevel.HEADING_2,
-          alignment: AlignmentType.CENTER,
-          rightToLeft: true,
-          spacing: { after: 200 },
-        }),
-        new Paragraph({
-          children: [
-            new ImageRun({
-              data: base64ToArrayBuffer(data.chartImages['archetype-chart']),
-              transformation: {
-                width: 400,
-                height: 300,
-              },
-              type: 'png',
-            }),
-          ],
-          alignment: AlignmentType.CENTER,
-          spacing: { after: 300 },
-        }),
-      );
-    }
-
-    // SALIMA Dimensions
-    page2Sections.push(
-      new Paragraph({
-        text: '🧭 ממדי SALIMA',
-        heading: HeadingLevel.HEADING_2,
-        rightToLeft: true,
-        spacing: { after: 200 },
-      }),
-      new Paragraph({
         children: [
-          new TextRun({ text: 'אסטרטגיה (S)', bold: true }),
-          new TextRun({ text: ' - ראייה מערכתית, תכנון לטווח ארוך ויכולת להוביל חזון.' }),
-        ],
-        rightToLeft: true,
-        spacing: { after: 100 },
-      }),
-      new Paragraph({
-        children: [
-          new TextRun({ text: 'אדפטיביות (A)', bold: true }),
-          new TextRun({ text: ' - גמישות מחשבתית ורגשית ותגובה יעילה למצבים משתנים.' }),
-        ],
-        rightToLeft: true,
-        spacing: { after: 100 },
-      }),
-      new Paragraph({
-        children: [
-          new TextRun({ text: 'למידה (L)', bold: true }),
-          new TextRun({ text: ' - פתיחות לרעיונות חדשים, חשיבה ביקורתית ולמידה מתמשכת.' }),
-        ],
-        rightToLeft: true,
-        spacing: { after: 100 },
-      }),
-      new Paragraph({
-        children: [
-          new TextRun({ text: 'השראה (I)', bold: true }),
-          new TextRun({ text: ' - הנעה רגשית דרך דוגמה אישית וחזון שמעורר משמעות.' }),
-        ],
-        rightToLeft: true,
-        spacing: { after: 100 },
-      }),
-      new Paragraph({
-        children: [
-          new TextRun({ text: 'משמעות (M)', bold: true }),
-          new TextRun({ text: ' - חיבור עמוק לערכים, תכלית ותחושת שליחות אישית וארגונית.' }),
-        ],
-        rightToLeft: true,
-        spacing: { after: 100 },
-      }),
-      new Paragraph({
-        children: [
-          new TextRun({ text: 'אותנטיות (A2)', bold: true }),
-          new TextRun({ text: ' - כנות, שקיפות והתנהלות אנושית המחוברת לערכים פנימיים.' }),
-        ],
-        rightToLeft: true,
-        spacing: { after: 200 },
-      }),
-      new Paragraph({
-        text: 'סגנונות מנהיגות',
-        heading: HeadingLevel.HEADING_2,
-        rightToLeft: true,
-        spacing: { after: 200 },
-      }),
-      new Paragraph({
-        children: [
-          new TextRun({ text: 'מנהל ההזדמנות (S + A)', bold: true }),
-          new TextRun({ text: ' - רואה רחוק ופועל בגמישות. מוביל שינוי תוך הסתגלות מהירה והבנת ההקשר.' }),
-        ],
-        rightToLeft: true,
-        spacing: { after: 100 },
-      }),
-      new Paragraph({
-        children: [
-          new TextRun({ text: 'המנהל הסקרן (L + I)', bold: true }),
-          new TextRun({ text: ' - לומד כל הזמן, מלהיב אחרים וסוחף דרך רעיונות ודוגמה אישית.' }),
-        ],
-        rightToLeft: true,
-        spacing: { after: 100 },
-      }),
-      new Paragraph({
-        children: [
-          new TextRun({ text: 'המנהל המעצים (M + A2)', bold: true }),
-          new TextRun({ text: ' - מוביל מתוך ערכים, יוצר חיבור אישי ותחושת משמעות בעבודה המשותפת.' }),
-        ],
-        rightToLeft: true,
-        spacing: { after: 200 },
-      }),
-      new Paragraph({
-        children: [new PageBreak()],
-      }),
-    );
-
-    // Page 3: WOCA Section
-    const page3Sections = [
-      new Paragraph({
-        text: 'שאלון תודעה ארגונית',
-        heading: HeadingLevel.HEADING_1,
-        alignment: AlignmentType.CENTER,
-        rightToLeft: true,
-        spacing: { after: 300 },
-      }),
-      new Paragraph({
-        children: [
-          new TextRun({
-            text: data.wocaZoneLabel,
-            bold: true,
-            size: 32,
+          new ImageRun({
+            data: radarImageBuffer,
+            transformation: {
+              width: 300,
+              height: 300,
+            },
           }),
         ],
-        alignment: AlignmentType.CENTER,
-        rightToLeft: true,
-        spacing: { after: 400 },
-      }),
-    ];
-
-    // Add WOCA charts if available
-    if (data.chartImages['woca-pie']) {
-      page3Sections.push(
-        new Paragraph({
-          children: [
-            new ImageRun({
-              data: base64ToArrayBuffer(data.chartImages['woca-pie']),
-              transformation: {
-                width: 400,
-                height: 300,
-              },
-              type: 'png',
-            }),
-          ],
-          alignment: AlignmentType.CENTER,
-          spacing: { after: 300 },
-        }),
-      );
-    }
-
-    // WOCA Zones Description
-    page3Sections.push(
-      new Paragraph({
-        text: 'אזורי WOCA',
-        heading: HeadingLevel.HEADING_2,
-        rightToLeft: true,
-        spacing: { after: 200 },
-      }),
-      new Paragraph({
-        children: [
-          new TextRun({ text: 'אזור ההזדמנות (WIN/WIN)', bold: true }),
-          new TextRun({ text: ' - שיח פתוח, הקשבה ויוזמה. תחושת שליחות, השפעה, שיתוף פעולה וצמיחה משותפת.' }),
-        ],
-        rightToLeft: true,
-        spacing: { after: 100 },
-      }),
-      new Paragraph({
-        children: [
-          new TextRun({ text: 'אזור הנוחות (LOSE/LOSE)', bold: true }),
-          new TextRun({ text: ' - הימנעות מקונפליקטים, קיפאון מחשבתי וחשש מיוזמות. שמירה על הקיים במחיר שחיקה.' }),
-        ],
-        rightToLeft: true,
-        spacing: { after: 100 },
-      }),
-      new Paragraph({
-        children: [
-          new TextRun({ text: 'אזור האדישות (LOSE/LOSE)', bold: true }),
-          new TextRun({ text: ' - נתק רגשי, חוסר עניין וחוסר תחושת השפעה. תחושת סטגנציה ויעדר מנהיגות.' }),
-        ],
-        rightToLeft: true,
-        spacing: { after: 100 },
-      }),
-      new Paragraph({
-        children: [
-          new TextRun({ text: 'אזור המלחמה (WIN/LOSE)', bold: true }),
-          new TextRun({ text: ' - דינמיקה של שליטה, חשדנות ומאבק. הישרדות טקטית על חשבון הקשבה, אמון ויציבות.' }),
-        ],
-        rightToLeft: true,
-        spacing: { after: 100 },
-      }),
+      })
     );
+  }
 
-    // Combine all sections
-    const allSections = [...page1Sections, ...page2Sections, ...page3Sections];
+  if (chartImages['archetype-chart']) {
+    const archetypeImageBuffer = convertBase64ToBuffer(chartImages['archetype-chart']);
+    children.push(
+      new Paragraph({
+        text: 'סגנון מנהיגות',
+        alignment: AlignmentType.CENTER,
+        spacing: { before: 200, after: 200 },
+      }),
+      new Paragraph({
+        alignment: AlignmentType.CENTER,
+        children: [
+          new ImageRun({
+            data: archetypeImageBuffer,
+            transformation: {
+              width: 300,
+              height: 300,
+            },
+          }),
+        ],
+      })
+    );
+  }
 
-    // Create document with landscape orientation (width > height)
-    const doc = new Document({
-      sections: [
-        {
-          properties: {
-            page: {
-              size: {
-                width: 15840, // 11 inches in twips (landscape width)
-                height: 12240, // 8.5 inches in twips (landscape height)
-              },
-              margin: {
-                top: 720,
-                right: 720,
-                bottom: 720,
-                left: 720,
-              },
+  // SALIMA Dimensions descriptions
+  children.push(
+    new Paragraph({
+      text: '🧭 ממדי SALIMA',
+      alignment: AlignmentType.RIGHT,
+      spacing: { before: 400, after: 200 },
+    })
+  );
+
+  children.push(
+    new Paragraph({
+      text: 'אסטרטגיה (S)',
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 100 },
+    })
+  );
+
+  children.push(
+    new Paragraph({
+      text: 'ראייה מערכתית, תכנון לטווח ארוך ויכולת להוביל חזון.',
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 200 },
+    })
+  );
+
+  children.push(
+    new Paragraph({
+      text: 'אדפטיביות (A)',
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 100 },
+    })
+  );
+
+  children.push(
+    new Paragraph({
+      text: 'גמישות מחשבתית ורגשית ותגובה יעילה למצבים משתנים.',
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 200 },
+    })
+  );
+
+  children.push(
+    new Paragraph({
+      text: 'למידה (L)',
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 100 },
+    })
+  );
+
+  children.push(
+    new Paragraph({
+      text: 'פתיחות לרעיונות חדשים, חשיבה ביקורתית ולמידה מתמשכת.',
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 200 },
+    })
+  );
+
+  children.push(
+    new Paragraph({
+      text: 'השראה (I)',
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 100 },
+    })
+  );
+
+  children.push(
+    new Paragraph({
+      text: 'הנעה רגשית דרך דוגמה אישית וחזון שמעורר משמעות.',
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 200 },
+    })
+  );
+
+  children.push(
+    new Paragraph({
+      text: 'משמעות (M)',
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 100 },
+    })
+  );
+
+  children.push(
+    new Paragraph({
+      text: 'חיבור עמוק לערכים, תכלית ותחושת שליחות אישית וארגונית.',
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 200 },
+    })
+  );
+
+  children.push(
+    new Paragraph({
+      text: 'אותנטיות (A2)',
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 100 },
+    })
+  );
+
+  children.push(
+    new Paragraph({
+      text: 'כנות, שקיפות והתנהלות אנושית המחוברת לערכים פנימיים.',
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 400 },
+    })
+  );
+
+  // Leadership Styles
+  children.push(
+    new Paragraph({
+      text: 'סגנונות מנהיגות',
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 200 },
+    })
+  );
+
+  children.push(
+    new Paragraph({
+      text: 'מנהל ההזדמנות (S + A)',
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 100 },
+    })
+  );
+
+  children.push(
+    new Paragraph({
+      text: 'רואה רחוק ופועל בגמישות. מוביל שינוי תוך הסתגלות מהירה והבנת ההקשר.',
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 200 },
+    })
+  );
+
+  children.push(
+    new Paragraph({
+      text: 'המנהל הסקרן (L + I)',
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 100 },
+    })
+  );
+
+  children.push(
+    new Paragraph({
+      text: 'לומד כל הזמן, מלהיב אחרים וסוחף דרך רעיונות ודוגמה אישית.',
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 200 },
+    })
+  );
+
+  children.push(
+    new Paragraph({
+      text: 'המנהל המעצים (M + A2)',
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 100 },
+    })
+  );
+
+  children.push(
+    new Paragraph({
+      text: 'מוביל מתוך ערכים, יוצר חיבור אישי ותחושת משמעות בעבודה המשותפת.',
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 400 },
+    })
+  );
+
+  // Page break to WOCA
+  children.push(
+    new Paragraph({
+      children: [new PageBreak()],
+    })
+  );
+
+  // Page 3: WOCA Content
+  children.push(
+    new Paragraph({
+      text: 'שאלון תודעה ארגונית',
+      heading: HeadingLevel.HEADING_1,
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 400 },
+    })
+  );
+
+  children.push(
+    new Paragraph({
+      text: wocaZoneLabel,
+      alignment: AlignmentType.CENTER,
+      spacing: { after: 400 },
+    })
+  );
+
+  // Add WOCA charts if available
+  if (chartImages['woca-bar']) {
+    const wocaBarImageBuffer = convertBase64ToBuffer(chartImages['woca-bar']);
+    children.push(
+      new Paragraph({
+        alignment: AlignmentType.CENTER,
+        children: [
+          new ImageRun({
+            data: wocaBarImageBuffer,
+            transformation: {
+              width: 300,
+              height: 300,
+            },
+          }),
+        ],
+      })
+    );
+  }
+
+  if (chartImages['woca-pie']) {
+    const wocaPieImageBuffer = convertBase64ToBuffer(chartImages['woca-pie']);
+    children.push(
+      new Paragraph({
+        alignment: AlignmentType.CENTER,
+        children: [
+          new ImageRun({
+            data: wocaPieImageBuffer,
+            transformation: {
+              width: 300,
+              height: 300,
+            },
+          }),
+        ],
+      })
+    );
+  }
+
+  // WOCA Zones descriptions
+  children.push(
+    new Paragraph({
+      text: 'אזורי WOCA',
+      alignment: AlignmentType.RIGHT,
+      spacing: { before: 400, after: 200 },
+    })
+  );
+
+  children.push(
+    new Paragraph({
+      text: 'אזור ההזדמנות (WIN/WIN)',
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 100 },
+    })
+  );
+
+  children.push(
+    new Paragraph({
+      text: 'שיח פתוח, הקשבה ויוזמה. תחושת שליחות, השפעה, שיתוף פעולה וצמיחה משותפת.',
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 200 },
+    })
+  );
+
+  children.push(
+    new Paragraph({
+      text: 'אזור הנוחות (LOSE/LOSE)',
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 100 },
+    })
+  );
+
+  children.push(
+    new Paragraph({
+      text: 'הימנעות מקונפליקטים, קיפאון מחשבתי וחשש מיוזמות. שמירה על הקיים במחיר שחיקה.',
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 200 },
+    })
+  );
+
+  children.push(
+    new Paragraph({
+      text: 'אזור האדישות (LOSE/LOSE)',
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 100 },
+    })
+  );
+
+  children.push(
+    new Paragraph({
+      text: 'נתק רגשי, חוסר עניין וחוסר תחושת השפעה. תחושת סטגנציה ויעדר מנהיגות.',
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 200 },
+    })
+  );
+
+  children.push(
+    new Paragraph({
+      text: 'אזור המלחמה (WIN/LOSE)',
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 100 },
+    })
+  );
+
+  children.push(
+    new Paragraph({
+      text: 'דינמיקה של שליטה, חשדנות ומאבק. הישרדות טקטית על חשבון הקשבה, אמון ויציבות.',
+      alignment: AlignmentType.RIGHT,
+      spacing: { after: 200 },
+    })
+  );
+
+  // Create the document
+  const doc = new Document({
+    sections: [
+      {
+        properties: {
+          page: {
+            size: {
+              width: 11906, // A4 landscape width in twentieths of a point
+              height: 8418,  // A4 landscape height in twentieths of a point
+            },
+            margin: {
+              top: 720,    // 0.5 inch in twentieths of a point
+              right: 720,
+              bottom: 720,
+              left: 720,
             },
           },
-          children: allSections,
         },
-      ],
-    });
+        children,
+      },
+    ],
+  });
 
-    // Generate and download
-    const blob = await Packer.toBlob(doc);
-    saveAs(blob, filename);
-    
-    console.log('✅ DOCX generation completed successfully!');
-  } catch (error) {
-    console.error('❌ DOCX Generation Error:', error);
-    throw error;
-  }
+  // Generate and download
+  const buffer = await Packer.toBuffer(doc);
+  const blob = new Blob([buffer], { 
+    type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
+  });
+  saveAs(blob, filename);
 };

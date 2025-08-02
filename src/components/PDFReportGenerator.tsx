@@ -5,6 +5,7 @@ import { usePDFExport } from '@/hooks/usePDFExport';
 import { PDFExportControls } from '@/components/PDFExportControls';
 import { GroupPDFTemplate } from '@/components/GroupPDFTemplate';
 import { PDFChartsRenderer } from '@/components/PDFChartsRenderer';
+import { exportGroupInsightsCSV } from '@/utils/exportGroupCSV';
 
 export const PDFReportGenerator: React.FC = () => {
   const [groupNumber, setGroupNumber] = useState<number | null>(null);
@@ -43,6 +44,11 @@ export const PDFReportGenerator: React.FC = () => {
     await exportDOCX(templateData, !!groupData, !!workshopData);
   };
 
+  const handleExportCSV = () => {
+    if (!templateData) return;
+    exportGroupInsightsCSV(templateData, groupData, workshopData);
+  };
+
   return (
     <div className="space-y-6 p-6">
       <PDFExportControls
@@ -50,6 +56,7 @@ export const PDFReportGenerator: React.FC = () => {
         onLoadGroup={loadGroupData}
         onExportPDF={handleExportPDF}
         onExportDOCX={handleExportDOCX}
+        onExportCSV={handleExportCSV}
         isLoading={isLoading}
         isExporting={isExporting}
         hasData={!!(groupData || workshopData)}
