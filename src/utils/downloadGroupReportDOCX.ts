@@ -77,9 +77,10 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
         children: [
           new ImageRun({
             data: radarImageBuffer,
-            type: 'png',
-            width: 300,
-            height: 300,
+            transformation: {
+              width: 300,
+              height: 300,
+            },
           }),
         ],
       })
@@ -99,9 +100,10 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
         children: [
           new ImageRun({
             data: archetypeImageBuffer,
-            type: 'png',
-            width: 300,
-            height: 300,
+            transformation: {
+              width: 300,
+              height: 300,
+            },
           }),
         ],
       })
@@ -304,9 +306,10 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
         children: [
           new ImageRun({
             data: wocaBarImageBuffer,
-            type: 'png',
-            width: 300,
-            height: 300,
+            transformation: {
+              width: 300,
+              height: 300,
+            },
           }),
         ],
       })
@@ -321,9 +324,10 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
         children: [
           new ImageRun({
             data: wocaPieImageBuffer,
-            type: 'png',
-            width: 300,
-            height: 300,
+            transformation: {
+              width: 300,
+              height: 300,
+            },
           }),
         ],
       })
