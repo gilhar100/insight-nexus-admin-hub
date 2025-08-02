@@ -54,6 +54,15 @@ export const PDFExportControls: React.FC<PDFExportControlsProps> = ({
     }
   };
 
+  const handleExportCSV = () => {
+    try {
+      setExportError(null);
+      onExportCSV();
+    } catch (err) {
+      setExportError(`Failed to generate CSV: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center">
@@ -105,12 +114,12 @@ export const PDFExportControls: React.FC<PDFExportControlsProps> = ({
             {isExporting ? '🔄 מכין דוח...' : '📝 הורד דוח DOCX'}
           </Button>
           <Button 
-            onClick={onExportCSV}
+            onClick={handleExportCSV}
             disabled={isExporting}
             className="text-lg px-8 py-4"
             variant="secondary"
           >
-            📄 ייצוא CSV
+            📊 ייצוא CSV
           </Button>
         </div>
       )}
