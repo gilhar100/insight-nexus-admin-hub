@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +8,6 @@ interface PDFExportControlsProps {
   onLoadGroup: () => void;
   onExportPDF: () => Promise<void>;
   onExportDOCX: () => Promise<void>;
-  onExportCSV: () => void;
   isLoading: boolean;
   isExporting: boolean;
   hasData: boolean;
@@ -21,7 +19,6 @@ export const PDFExportControls: React.FC<PDFExportControlsProps> = ({
   onLoadGroup,
   onExportPDF,
   onExportDOCX,
-  onExportCSV,
   isLoading,
   isExporting,
   hasData,
@@ -51,15 +48,6 @@ export const PDFExportControls: React.FC<PDFExportControlsProps> = ({
       await onExportDOCX();
     } catch (err) {
       setExportError(`Failed to generate DOCX: ${err instanceof Error ? err.message : 'Unknown error'}`);
-    }
-  };
-
-  const handleExportCSV = () => {
-    try {
-      setExportError(null);
-      onExportCSV();
-    } catch (err) {
-      setExportError(`Failed to generate CSV: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   };
 
@@ -112,14 +100,6 @@ export const PDFExportControls: React.FC<PDFExportControlsProps> = ({
             variant="outline"
           >
             {isExporting ? '🔄 מכין דוח...' : '📝 הורד דוח DOCX'}
-          </Button>
-          <Button 
-            onClick={handleExportCSV}
-            disabled={isExporting}
-            className="text-lg px-8 py-4"
-            variant="secondary"
-          >
-            📊 ייצוא CSV
           </Button>
         </div>
       )}
