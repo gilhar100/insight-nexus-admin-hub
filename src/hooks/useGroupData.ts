@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-interface GroupData {
+export interface GroupData {
   group_number: number;
   participant_count: number;
   averages: {
