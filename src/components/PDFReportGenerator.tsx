@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,9 +8,6 @@ import { useWorkshopData } from '@/hooks/useWorkshopData';
 import { SalimaGroupRadarChart } from '@/components/SalimaGroupRadarChart';
 import { ArchetypeDistributionChart } from '@/components/ArchetypeDistributionChart';
 import { WocaGroupBarChart } from '@/components/WocaGroupBarChart';
-import { WocaCategoryRadarChart } from '@/components/WocaCategoryRadarChart';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 
 interface SalimaGroupData {
   group_number: number;
@@ -51,7 +49,6 @@ export const PDFReportGenerator: React.FC = () => {
   const [groupNumber, setGroupNumber] = useState<number | null>(null);
   const [salimaData, setSalimaData] = useState<SalimaGroupData | null>(null);
   const [wocaData, setWocaData] = useState<WocaGroupData | null>(null);
-  const [pdfImages, setPdfImages] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -91,139 +88,6 @@ export const PDFReportGenerator: React.FC = () => {
     }
   }, [workshopData]);
 
-  const waitForChartRender = async (element: HTMLElement, maxWait: number = 3000) => {
-    return new Promise<void>((resolve) => {
-      let waited = 0;
-      const checkInterval = 100;
-      
-      const checkRender = () => {
-        // Check if Recharts SVG elements are present and have content
-        const svgElements = element.querySelectorAll('svg');
-        const hasValidSvg = svgElements.length > 0 && 
-          Array.from(svgElements).some(svg => svg.children.length > 0);
-        
-        if (hasValidSvg || waited >= maxWait) {
-          resolve();
-        } else {
-          waited += checkInterval;
-          setTimeout(checkRender, checkInterval);
-        }
-      };
-      
-      checkRender();
-    });
-  };
-
-  const captureChartElement = async (element: HTMLElement, id: string): Promise<string | null> => {
-    try {
-      console.log(`📸 Starting capture for ${id}`);
-      
-      // Make element visible and properly positioned
-      const originalStyles = {
-        position: element.style.position,
-        top: element.style.top,
-        left: element.style.left,
-        zIndex: element.style.zIndex,
-        visibility: element.style.visibility,
-        display: element.style.display
-      };
-
-      // Position element visibly but off-screen
-      element.style.position = 'fixed';
-      element.style.top = '0px';
-      element.style.left = '0px';
-      element.style.zIndex = '9999';
-      element.style.visibility = 'visible';
-      element.style.display = 'block';
-
-      // Wait for chart to render
-      await waitForChartRender(element);
-      
-      // Additional wait for stability
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      console.log(`📸 Capturing ${id} with html2canvas`);
-      
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff',
-        logging: false,
-        width: 800,
-        height: 600,
-        windowWidth: 1200,
-        windowHeight: 800,
-        removeContainer: false,
-        imageTimeout: 10000,
-        onclone: (clonedDoc) => {
-          // Ensure all SVG elements are properly rendered in the clone
-          const svgElements = clonedDoc.querySelectorAll('svg');
-          svgElements.forEach(svg => {
-            svg.style.backgroundColor = '#ffffff';
-          });
-        }
-      });
-
-      // Restore original styles
-      Object.assign(element.style, originalStyles);
-
-      // Validate canvas
-      if (!canvas || canvas.width === 0 || canvas.height === 0) {
-        console.error(`❌ Invalid canvas for ${id}: ${canvas?.width}x${canvas?.height}`);
-        return null;
-      }
-
-      // Convert to PNG and validate
-      const dataUrl = canvas.toDataURL('image/png', 1.0);
-      
-      if (!dataUrl || dataUrl.length < 1000 || !dataUrl.startsWith('data:image/png;base64,')) {
-        console.error(`❌ Invalid PNG data for ${id}: length=${dataUrl?.length}`);
-        return null;
-      }
-
-      // Additional validation: try to create an image to verify PNG is valid
-      const testImg = new Image();
-      const isValidPng = await new Promise<boolean>((resolve) => {
-        testImg.onload = () => resolve(true);
-        testImg.onerror = () => resolve(false);
-        testImg.src = dataUrl;
-      });
-
-      if (!isValidPng) {
-        console.error(`❌ PNG validation failed for ${id}`);
-        return null;
-      }
-
-      console.log(`✅ Successfully captured ${id}: ${dataUrl.length} chars`);
-      return dataUrl;
-      
-    } catch (err) {
-      console.error(`❌ Error capturing ${id}:`, err);
-      return null;
-    }
-  };
-
-  const captureAllVisualizations = async () => {
-    const elements = document.querySelectorAll('.pdf-capture');
-    const capturedImages: Record<string, string> = {};
-
-    console.log('📸 Starting chart capture, found elements:', elements.length);
-
-    for (const el of elements) {
-      const id = el.id;
-      if (!id) continue;
-
-      const imageData = await captureChartElement(el as HTMLElement, id);
-      if (imageData) {
-        capturedImages[id] = imageData;
-      }
-    }
-
-    console.log('📸 Chart capture complete. Successfully captured:', Object.keys(capturedImages));
-    return capturedImages;
-  };
-
   const getDimensionInsights = (averages: SalimaGroupData['averages']) => {
     const dimensions = [
       { key: 'strategy', name: 'אסטרטגיה (S)', score: averages.strategy },
@@ -252,71 +116,35 @@ export const PDFReportGenerator: React.FC = () => {
     try {
       console.log('🚀 Starting PDF export for group:', groupNumber);
       
-      // Use a simpler approach - generate PDF directly from visible content
-      const input = document.getElementById('pdf-export-root');
-      if (!input) {
-        throw new Error('PDF export root element not found');
+      // Get the report wrapper element
+      const reportElement = document.getElementById('group-report-wrapper');
+      if (!reportElement) {
+        throw new Error('Report wrapper not found. Make sure the report is fully loaded.');
       }
 
-      // Show the PDF content temporarily
-      input.style.display = 'block';
-      input.style.position = 'absolute';
-      input.style.top = '0px';
-      input.style.left = '0px';
-      input.style.zIndex = '9999';
-      input.style.backgroundColor = '#ffffff';
-
-      // Wait for content to render
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      console.log('🖼️ Generating PDF canvas...');
-      const canvas = await html2canvas(input, {
-        scale: 1.2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff',
-        logging: false,
-        scrollY: 0,
-        windowWidth: 1200,
-        windowHeight: 1600,
-        removeContainer: false
+      // Extract the HTML content
+      const html = reportElement.outerHTML;
+      
+      console.log('📤 Sending HTML to PDF service...');
+      
+      // Send to PDF generation service
+      const response = await fetch("https://salima-pdf-backend.onrender.com/generate-pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ html }),
       });
 
-      // Hide the content again
-      input.style.display = 'none';
-
-      if (!canvas || canvas.width === 0 || canvas.height === 0) {
-        throw new Error('Failed to generate PDF canvas');
+      if (!response.ok) {
+        throw new Error(`PDF generation failed: ${response.status} ${response.statusText}`);
       }
 
-      console.log('📄 Creating PDF document...');
-      const imgData = canvas.toDataURL('image/jpeg', 0.85);
+      // Get PDF blob and download
+      const blob = await response.blob();
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `group_${Date.now()}_report.pdf`;
+      link.click();
       
-      if (!imgData || imgData.length < 1000) {
-        throw new Error('Failed to generate valid PDF image data');
-      }
-
-      const pdf = new jsPDF('p', 'pt', 'a4');
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const imgHeight = (canvas.height * pageWidth) / canvas.width;
-
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      // Use JPEG format instead of PNG to avoid corruption issues
-      pdf.addImage(imgData, 'JPEG', 0, position, pageWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'JPEG', 0, position, pageWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
-
-      console.log('💾 Saving PDF...');
-      pdf.save(`Group_Report_${groupNumber}.pdf`);
       console.log('✅ PDF export completed successfully!');
       
     } catch (err) {
@@ -334,7 +162,7 @@ export const PDFReportGenerator: React.FC = () => {
     const insights = salimaData ? getDimensionInsights(salimaData.averages) : null;
 
     return (
-      <div id="pdf-export-root" style={{ display: 'none' }}>
+      <div id="group-report-wrapper" style={{ display: 'none', position: 'absolute', top: '-9999px', left: '-9999px' }}>
         {/* Page 1: SALIMA Overview */}
         {salimaData && (
           <div
@@ -582,11 +410,10 @@ export const PDFReportGenerator: React.FC = () => {
             disabled={isLoading}
             className="text-lg px-8 py-4"
           >
-            📄 הורד דוח קבוצתי (SALIMA + WOCA)
+            📄 ייצוא PDF
           </Button>
         </div>
       )}
-
 
       {renderPDFLayout()}
 
