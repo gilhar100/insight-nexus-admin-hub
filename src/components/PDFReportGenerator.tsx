@@ -125,7 +125,7 @@ export const PDFReportGenerator: React.FC = () => {
     }
   };
 
-  /* ---------- export ---------- */
+  /* ---------- export functions ---------- */
 
   const exportGroupPDF = async () => {
     if (!salimaData && !wocaData) return setError('אין נתונים לייצוא');
@@ -175,6 +175,59 @@ export const PDFReportGenerator: React.FC = () => {
     }
   };
 
+  const exportGroupDOCX = async () => {
+    if (!salimaData && !wocaData) return setError('אין נתונים לייצוא');
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const wrapper = document.getElementById('group-report-wrapper');
+      if (!wrapper) throw new Error('ה‑wrapper לא נמצא');
+
+      /* bring wrapper on‑screen (off‑viewport) so charts size properly */
+      const oldCSS = wrapper.style.cssText;
+      wrapper.style.cssText =
+        'position:absolute;top:-9999px;left:-9999px;width:794px;visibility:visible;pointer-events:none;';
+
+      await waitUntilChartsRender(wrapper);
+      await replaceChartsWithImages();
+
+      const cleanHTML = wrapper.outerHTML
+        .replace(/data-[^=]*="[^"]*"/g, "")
+        .replace(/\s{2,}/g, " ")
+        .trim();
+
+      const res = await fetch("https://salima-pdf-backend.onrender.com/generate-docx", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ html: cleanHTML })
+      });
+
+      wrapper.style.cssText = oldCSS; // restore
+
+      if (!res.ok) throw new Error(`שגיאה ביצירת DOCX (${res.status})`);
+      const blob = await res.blob();
+      if (!blob.size) throw new Error('קובץ DOCX ריק הוחזר');
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `group_${Date.now()}_report.docx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (e: any) {
+      console.error('❌ DOCX export error:', e);
+      setError(e.message || 'שגיאה ביצוא DOCX');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   /* ---------- data load ---------- */
 
   const loadGroupData = () => {
@@ -204,7 +257,7 @@ export const PDFReportGenerator: React.FC = () => {
     <div className="space-y-6 p-6">
       {/* UI Panel */}
       <div className="bg-white rounded-lg shadow-sm border p-6 space-y-4">
-        <h2 className="text-2xl font-bold">יצירת דוח PDF קבוצתי</h2>
+        <h2 className="text-2xl font-bold">יצירת דוח קבוצתי</h2>
         <Input
           type="number"
           value={groupNumber ?? ''}
@@ -218,6 +271,9 @@ export const PDFReportGenerator: React.FC = () => {
           </Button>
           <Button onClick={exportGroupPDF} disabled={isLoading || (!salimaData && !wocaData)}>
             {isLoading ? 'יוצר PDF…' : 'ייצא ל‑PDF'}
+          </Button>
+          <Button onClick={exportGroupDOCX} disabled={isLoading || (!salimaData && !wocaData)} variant="outline">
+            {isLoading ? 'יוצר DOCX…' : 'ייצא ל‑DOCX'}
           </Button>
         </div>
         {error && (
