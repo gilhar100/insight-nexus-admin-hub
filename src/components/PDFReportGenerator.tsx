@@ -291,10 +291,10 @@ export const PDFReportGenerator: React.FC = () => {
               
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
                 <div className="chart-snapshot" id="salima-radar">
-                  <SalimaGroupRadarChart groupData={salimaData} />
+                  <SalimaGroupRadarChart averages={salimaData.averages} />
                 </div>
                 <div className="chart-snapshot" id="archetype-chart">
-                  <ArchetypeDistributionChart participants={salimaData.participants} />
+                  <ArchetypeDistributionChart groupNumber={salimaData.group_number} />
                 </div>
               </div>
 
