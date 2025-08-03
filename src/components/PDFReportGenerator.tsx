@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +7,7 @@ import { useWorkshopData } from '@/hooks/useWorkshopData';
 import { SalimaGroupRadarChart } from '@/components/SalimaGroupRadarChart';
 import { ArchetypeDistributionChart } from '@/components/ArchetypeDistributionChart';
 import { WocaGroupBarChart } from '@/components/WocaGroupBarChart';
+import { WocaRadarChart } from '@/components/WocaRadarChart';
 
 interface SalimaGroupData {
   group_number: number;
@@ -91,10 +91,10 @@ export const PDFReportGenerator: React.FC = () => {
   const getDimensionInsights = (averages: SalimaGroupData['averages']) => {
     const dimensions = [
       { key: 'strategy', name: 'אסטרטגיה (S)', score: averages.strategy },
-      { key: 'authenticity', name: 'אותנטיות (A2)', score: averages.authenticity },
       { key: 'learning', name: 'למידה (L)', score: averages.learning },
       { key: 'inspiration', name: 'השראה (I)', score: averages.inspiration },
       { key: 'meaning', name: 'משמעות (M)', score: averages.meaning },
+      { key: 'authenticity', name: 'אותנטיות (A2)', score: averages.authenticity },
       { key: 'adaptability', name: 'אדפטיביות (A)', score: averages.adaptability }
     ];
     
@@ -177,7 +177,47 @@ export const PDFReportGenerator: React.FC = () => {
 
     return (
       <div id="group-report-wrapper" style={{ display: 'none', position: 'absolute', top: '-9999px', left: '-9999px' }}>
-        {/* Page 1: SALIMA Overview */}
+        {/* Page 1: Title Page */}
+        <div
+          style={{
+            width: '794px',
+            height: '1123px',
+            padding: '48px',
+            direction: 'rtl',
+            fontFamily: 'Arial, sans-serif',
+            pageBreakAfter: 'always',
+            backgroundColor: '#fff',
+            boxSizing: 'border-box',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            textAlign: 'center'
+          }}
+        >
+          <h1 style={{ 
+            fontSize: '44px', 
+            color: '#1e40af', 
+            marginBottom: '32px', 
+            fontWeight: 'bold',
+            lineHeight: '1.2'
+          }}>
+            דוח תובנות קבוצתי - קבוצה {groupNumber}
+          </h1>
+          <h2 style={{ 
+            fontSize: '28px', 
+            color: '#374151', 
+            marginBottom: '40px',
+            fontWeight: 'normal'
+          }}>
+            שאלון מנהיגות
+          </h2>
+          <p style={{ fontSize: '18px', color: '#6b7280', marginTop: '40px' }}>
+            {currentDate} | {(salimaData?.participant_count || 0) + (wocaData?.participant_count || 0)} משתתפים
+          </p>
+        </div>
+
+        {/* Page 2: SALIMA Visualizations + Explanations */}
         {salimaData && (
           <div
             style={{
@@ -191,127 +231,95 @@ export const PDFReportGenerator: React.FC = () => {
               boxSizing: 'border-box'
             }}
           >
-            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-              <h1 style={{ fontSize: '32px', color: '#1f2937', marginBottom: '16px' }}>
-                דוח קבוצתי - SALIMA
-              </h1>
-              <p style={{ fontSize: '18px', color: '#6b7280' }}>
-                קבוצה {groupNumber} | {currentDate} | {salimaData.participant_count} משתתפים
-              </p>
-            </div>
-
-            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-              <h2 style={{ fontSize: '24px', color: '#2563eb', marginBottom: '16px' }}>
-                ציון מנהיגות קבוצתי
-              </h2>
-              <div style={{ fontSize: '72px', color: '#2563eb', fontWeight: 'bold' }}>
-                {salimaData.averages.overall.toFixed(2)}
-              </div>
-            </div>
-
-            {insights && (
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '40px' }}>
-                <div style={{
-                  width: '47%',
-                  border: '2px solid #10b981',
-                  borderRadius: '16px',
-                  padding: '24px',
-                  backgroundColor: '#ecfdf5',
-                  textAlign: 'center'
+            {/* Charts Section - Top Half */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '40px', height: '450px' }}>
+              {/* Radar Chart */}
+              <div style={{ width: '47%', textAlign: 'center' }}>
+                <h3 style={{ fontSize: '20px', color: '#1f2937', marginBottom: '16px' }}>
+                  פרופיל קבוצתי SALIMA
+                </h3>
+                <div style={{ 
+                  width: '100%', 
+                  height: '380px', 
+                  border: '1px solid #e5e7eb',
+                  backgroundColor: '#f9fafb',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
                 }}>
-                  <div style={{ fontSize: '20px', color: '#047857', fontWeight: 'bold', marginBottom: '8px' }}>
-                    הממד החזק ביותר
-                  </div>
-                  <div style={{ fontSize: '48px', color: '#047857', fontWeight: 'bold', marginBottom: '8px' }}>
-                    {insights.strongest.score.toFixed(1)}
-                  </div>
-                  <div style={{ fontSize: '16px', color: '#047857' }}>
-                    {insights.strongest.name}
-                  </div>
-                </div>
-
-                <div style={{
-                  width: '47%',
-                  border: '2px solid #f59e0b',
-                  borderRadius: '16px',
-                  padding: '24px',
-                  backgroundColor: '#fffbeb',
-                  textAlign: 'center'
-                }}>
-                  <div style={{ fontSize: '20px', color: '#d97706', fontWeight: 'bold', marginBottom: '8px' }}>
-                    ממד לפיתוח
-                  </div>
-                  <div style={{ fontSize: '48px', color: '#d97706', fontWeight: 'bold', marginBottom: '8px' }}>
-                    {insights.weakest.score.toFixed(1)}
-                  </div>
-                  <div style={{ fontSize: '16px', color: '#d97706' }}>
-                    {insights.weakest.name}
-                  </div>
+                  <SalimaGroupRadarChart averages={salimaData.averages} />
                 </div>
               </div>
-            )}
 
-            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-              <h3 style={{ fontSize: '20px', color: '#1f2937', marginBottom: '16px' }}>
-                פרופיל קבוצתי ייחודי
-              </h3>
-              <div style={{ 
-                width: '100%', 
-                height: '400px', 
-                border: '1px solid #e5e7eb',
-                backgroundColor: '#f9fafb',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <SalimaGroupRadarChart averages={salimaData.averages} />
+              {/* Archetype Chart */}
+              <div style={{ width: '47%', textAlign: 'center' }}>
+                <h3 style={{ fontSize: '20px', color: '#1f2937', marginBottom: '16px' }}>
+                  סגנון מנהיגות
+                </h3>
+                <div style={{ 
+                  width: '100%', 
+                  height: '380px', 
+                  border: '1px solid #e5e7eb',
+                  backgroundColor: '#f9fafb',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <ArchetypeDistributionChart 
+                    groupNumber={salimaData.group_number} 
+                    isPresenterMode={false} 
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Explanations Section - Bottom Half */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', lineHeight: '1.6' }}>
+              {/* Left Column: SALIMA Dimensions */}
+              <div style={{ width: '47%' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '16px', color: '#1f2937' }}>
+                  ממדי SALIMA
+                </h3>
+                <div style={{ marginBottom: '12px' }}>
+                  <strong>אסטרטגיה (S):</strong> ראייה מערכתית, תכנון לטווח ארוך ויכולת להוביל חזון.
+                </div>
+                <div style={{ marginBottom: '12px' }}>
+                  <strong>אדפטיביות (A):</strong> גמישות מחשבתית ורגשית ותגובה יעילה למצבים משתנים.
+                </div>
+                <div style={{ marginBottom: '12px' }}>
+                  <strong>למידה (L):</strong> פתיחות לרעיונות חדשים, חשיבה ביקורתית ולמידה מתמשכת.
+                </div>
+                <div style={{ marginBottom: '12px' }}>
+                  <strong>השראה (I):</strong> הנעה רגשית דרך דוגמה אישית וחזון שמעורר משמעות.
+                </div>
+                <div style={{ marginBottom: '12px' }}>
+                  <strong>משמעות (M):</strong> חיבור עמוק לערכים, תכלית ותחושת שליחות אישית וארגונית.
+                </div>
+                <div style={{ marginBottom: '12px' }}>
+                  <strong>אותנטיות (A2):</strong> כנות, שקיפות והתנהלות אנושית המחוברת לערכים פנימיים.
+                </div>
+              </div>
+
+              {/* Right Column: Leadership Styles */}
+              <div style={{ width: '47%' }}>
+                <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '16px', color: '#1f2937' }}>
+                  סגנונות מנהיגות
+                </h3>
+                <div style={{ marginBottom: '12px' }}>
+                  <strong>מנהל ההזדמנות (S + A):</strong> רואה רחוק ופועל בגמישות, מזהה הזדמנויות ומתאים את עצמו למציאות משתנה.
+                </div>
+                <div style={{ marginBottom: '12px' }}>
+                  <strong>המנהל הסקרן (L + I):</strong> לומד כל הזמן, מלהיב אחרים בחיפוש אחר ידע וחדשנות.
+                </div>
+                <div style={{ marginBottom: '12px' }}>
+                  <strong>המנהל המעצים (M + A2):</strong> מוביל מתוך ערכים, יוצר חיבור אמיתי ומעצים אחרים דרך כנות ומשמעות.
+                </div>
               </div>
             </div>
           </div>
         )}
 
-        {/* Page 2: Archetype Chart */}
-        {salimaData && (
-          <div
-            style={{
-              width: '794px',
-              height: '1123px',
-              padding: '48px',
-              direction: 'rtl',
-              fontFamily: 'Arial, sans-serif',
-              pageBreakAfter: 'always',
-              backgroundColor: '#fff',
-              boxSizing: 'border-box'
-            }}
-          >
-            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-              <h2 style={{ fontSize: '28px', color: '#1f2937', marginBottom: '24px' }}>
-                התפלגות סגנון מנהיגות
-              </h2>
-              <div style={{ 
-                width: '100%', 
-                maxHeight: '450px', 
-                objectFit: 'contain',
-                display: 'block',
-                margin: '24px auto'
-              }}>
-                <ArchetypeDistributionChart 
-                  groupNumber={salimaData.group_number} 
-                  isPresenterMode={false} 
-                />
-              </div>
-            </div>
-
-            <div style={{ marginTop: '32px', padding: '0 32px', fontSize: '16px', lineHeight: '1.7' }}>
-              <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px' }}>הסבר על סגנונות המנהיגות</h3>
-              <p style={{ marginBottom: '12px' }}><strong>המנהל הסקרן:</strong> מנהל שמוביל דרך סקרנות, חיפוש מתמיד אחר ידע, והשראה.</p>
-              <p style={{ marginBottom: '12px' }}><strong>המנהל המעצים:</strong> מנהל שפועל מתוך כנות, הקשבה ותחושת שליחות.</p>
-              <p style={{ marginBottom: '12px' }}><strong>מנהל ההזדמנות:</strong> מנהל שחושב קדימה, מזהה מגמות, ופועל בזריזות.</p>
-            </div>
-          </div>
-        )}
-
-        {/* Page 3: WOCA Summary */}
+        {/* Page 3: WOCA Insights */}
         {wocaData && (
           <div
             style={{
@@ -320,54 +328,84 @@ export const PDFReportGenerator: React.FC = () => {
               padding: '48px',
               direction: 'rtl',
               fontFamily: 'Arial, sans-serif',
-              pageBreakAfter: 'always',
               backgroundColor: '#fff',
               boxSizing: 'border-box'
             }}
           >
-            {/* Title Section */}
+            {/* Title */}
             <div style={{ textAlign: 'center', marginBottom: '32px' }}>
               <h2 style={{ fontSize: '32px', color: '#1f2937', marginBottom: '16px' }}>
-                ניתוח WOCA - אזורי שינוי
+                שאלון תודעה ארגונית
               </h2>
-              <p style={{ fontSize: '16px', color: '#6b7280', marginBottom: '0' }}>
-                {wocaData.participant_count} משתתפים | ציון ממוצע: {wocaData.average_score.toFixed(2)}
-              </p>
             </div>
 
-            {/* Chart Section */}
-            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-              <div style={{ 
-                width: '100%', 
-                maxHeight: '350px', 
-                objectFit: 'contain',
-                margin: '0 auto',
-                display: 'block'
-              }}>
-                <WocaGroupBarChart 
-                  groupCategoryScores={wocaData.groupCategoryScores!}
-                />
+            {/* Zone Label Box */}
+            <div style={{
+              textAlign: 'center',
+              marginBottom: '32px',
+              padding: '16px',
+              backgroundColor: '#ecfdf5',
+              border: '2px solid #10b981',
+              borderRadius: '16px'
+            }}>
+              <h3 style={{ fontSize: '24px', color: '#047857', fontWeight: 'bold', margin: '0' }}>
+                אזור ההזדמנות
+              </h3>
+            </div>
+
+            {/* Charts Section */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '40px', height: '300px' }}>
+              {/* Bar Chart */}
+              <div style={{ width: '47%', textAlign: 'center' }}>
+                <div style={{ 
+                  width: '100%', 
+                  height: '100%', 
+                  border: '1px solid #e5e7eb',
+                  backgroundColor: '#f9fafb',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <WocaGroupBarChart 
+                    groupCategoryScores={wocaData.groupCategoryScores!}
+                  />
+                </div>
+              </div>
+
+              {/* Zone Distribution Chart */}
+              <div style={{ width: '47%', textAlign: 'center' }}>
+                <div style={{ 
+                  width: '100%', 
+                  height: '100%', 
+                  border: '1px solid #e5e7eb',
+                  backgroundColor: '#f9fafb',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <WocaRadarChart participants={wocaData.participants} />
+                </div>
               </div>
             </div>
 
-            {/* Explanation Section */}
-            <div style={{ padding: '0 32px', fontSize: '16px', lineHeight: '1.6' }}>
-              <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '20px' }}>הסבר על אזורי השינוי</h3>
-              <p style={{ marginBottom: '12px' }}><strong>הזדמנות:</strong> אזור בו קיים פוטנציאל גבוה לשינוי חיובי.</p>
-              <p style={{ marginBottom: '12px' }}><strong>נוחות:</strong> אזור יציב שמספק ביטחון אך עלול להגביל צמיחה.</p>
-              <p style={{ marginBottom: '12px' }}><strong>אדישות:</strong> אזור של חוסר מעורבות הדורש התערבות.</p>
-              <p style={{ marginBottom: '20px' }}><strong>מלחמה:</strong> אזור של התנגדות פעילה לשינוי.</p>
-
-              <div style={{ 
-                backgroundColor: '#fff8e1', 
-                border: '1px solid #fbc02d', 
-                padding: '16px', 
-                marginTop: '24px', 
-                fontSize: '14px', 
-                textAlign: 'center',
-                borderRadius: '8px'
-              }}>
-                ⚠️ הערה: גרף זה מציג ציונים ממוצעים, לא התפלגות אזורי תודעה בין המשתתפים
+            {/* Zone Legend */}
+            <div style={{ fontSize: '16px', lineHeight: '1.6', marginTop: '20px' }}>
+              <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px', textAlign: 'center' }}>
+                הסבר על אזורי התודעה
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div>
+                  <strong>🌕 אזור ההזדמנות (WIN/WIN):</strong> שיח פתוח, יוזמה משותפת, צמיחה וחדשנות.
+                </div>
+                <div>
+                  <strong>🌤 אזור הנוחות (LOSE/LOSE):</strong> הימנעות משינוי, שחיקה ושמירה על הסטטוס קוו.
+                </div>
+                <div>
+                  <strong>🌑 אזור האדישות (LOSE/LOSE):</strong> נתק רגשי, חוסר מעורבות ואבדן כיוון.
+                </div>
+                <div>
+                  <strong>🔥 אזור המלחמה (WIN/LOSE):</strong> שליטה, חשדנות והתנגדות פעילה לשינוי.
+                </div>
               </div>
             </div>
           </div>
