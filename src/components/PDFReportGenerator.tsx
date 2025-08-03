@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +8,7 @@ import { SalimaGroupRadarChart } from '@/components/SalimaGroupRadarChart';
 import { ArchetypeDistributionChart } from '@/components/ArchetypeDistributionChart';
 import { WocaGroupBarChart } from '@/components/WocaGroupBarChart';
 import { WocaRadarChart } from '@/components/WocaRadarChart';
+import html2canvas from 'html2canvas';
 
 interface SalimaGroupData {
   group_number: number;
@@ -125,19 +125,57 @@ export const PDFReportGenerator: React.FC = () => {
       }
 
       console.log('📋 Found wrapper element:', wrapper);
-      console.log('📏 Wrapper dimensions:', {
-        width: wrapper.offsetWidth,
-        height: wrapper.offsetHeight,
-        display: window.getComputedStyle(wrapper).display,
-        visibility: window.getComputedStyle(wrapper).visibility
-      });
 
       // Temporarily make the element visible for capture
       const originalStyle = wrapper.style.cssText;
       wrapper.style.cssText = 'position: absolute; top: 0; left: 0; width: 794px; visibility: visible; display: block; z-index: -1;';
       
       // Wait a moment for any dynamic content to render
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Convert all charts to images
+      console.log('📊 Converting charts to images...');
+      const charts = wrapper.querySelectorAll('.chart-snapshot');
+      console.log(`🎯 Found ${charts.length} charts to convert`);
+
+      if (charts.length === 0) {
+        console.warn('⚠️ No charts found with .chart-snapshot class');
+      }
+
+      for (let i = 0; i < charts.length; i++) {
+        const chart = charts[i] as HTMLElement;
+        const chartId = chart.getAttribute('data-chart-id') || `chart-${i}`;
+        
+        try {
+          console.log(`📸 Capturing chart: ${chartId}`);
+          
+          const canvas = await html2canvas(chart, {
+            backgroundColor: '#ffffff',
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            width: chart.offsetWidth,
+            height: chart.offsetHeight
+          });
+          
+          const img = document.createElement('img');
+          img.src = canvas.toDataURL('image/png', 1.0);
+          img.style.width = '100%';
+          img.style.height = 'auto';
+          img.style.maxWidth = chart.offsetWidth + 'px';
+          img.style.maxHeight = chart.offsetHeight + 'px';
+          img.setAttribute('alt', `Chart: ${chartId}`);
+          
+          chart.replaceWith(img);
+          console.log(`✅ Successfully converted chart: ${chartId}`);
+          
+        } catch (chartError) {
+          console.error(`❌ Failed to convert chart ${chartId}:`, chartError);
+          // Continue with other charts even if one fails
+        }
+      }
+
+      console.log('🎨 All charts converted to images');
 
       const fullHTML = `
         <html dir="rtl" lang="he">
@@ -146,6 +184,7 @@ export const PDFReportGenerator: React.FC = () => {
             <style>
               body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
               * { box-sizing: border-box; }
+              img { max-width: 100%; height: auto; }
             </style>
           </head>
           <body>
@@ -273,15 +312,19 @@ export const PDFReportGenerator: React.FC = () => {
                 <h3 style={{ fontSize: '20px', color: '#1f2937', marginBottom: '16px' }}>
                   פרופיל קבוצתי SALIMA
                 </h3>
-                <div style={{ 
-                  width: '100%', 
-                  height: '380px', 
-                  border: '1px solid #e5e7eb',
-                  backgroundColor: '#f9fafb',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
+                <div 
+                  className="chart-snapshot" 
+                  data-chart-id="salima-radar"
+                  style={{ 
+                    width: '100%', 
+                    height: '380px', 
+                    border: '1px solid #e5e7eb',
+                    backgroundColor: '#f9fafb',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
                   <SalimaGroupRadarChart averages={salimaData.averages} />
                 </div>
               </div>
@@ -291,15 +334,19 @@ export const PDFReportGenerator: React.FC = () => {
                 <h3 style={{ fontSize: '20px', color: '#1f2937', marginBottom: '16px' }}>
                   סגנון מנהיגות
                 </h3>
-                <div style={{ 
-                  width: '100%', 
-                  height: '380px', 
-                  border: '1px solid #e5e7eb',
-                  backgroundColor: '#f9fafb',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
+                <div 
+                  className="chart-snapshot" 
+                  data-chart-id="archetype-chart"
+                  style={{ 
+                    width: '100%', 
+                    height: '380px', 
+                    border: '1px solid #e5e7eb',
+                    backgroundColor: '#f9fafb',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
                   <ArchetypeDistributionChart 
                     groupNumber={salimaData.group_number} 
                     isPresenterMode={false} 
@@ -392,15 +439,19 @@ export const PDFReportGenerator: React.FC = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '40px', height: '300px' }}>
               {/* Bar Chart */}
               <div style={{ width: '47%', textAlign: 'center' }}>
-                <div style={{ 
-                  width: '100%', 
-                  height: '100%', 
-                  border: '1px solid #e5e7eb',
-                  backgroundColor: '#f9fafb',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
+                <div 
+                  className="chart-snapshot" 
+                  data-chart-id="woca-bar"
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    border: '1px solid #e5e7eb',
+                    backgroundColor: '#f9fafb',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
                   <WocaGroupBarChart 
                     groupCategoryScores={wocaData.groupCategoryScores!}
                   />
@@ -409,15 +460,19 @@ export const PDFReportGenerator: React.FC = () => {
 
               {/* Zone Distribution Chart */}
               <div style={{ width: '47%', textAlign: 'center' }}>
-                <div style={{ 
-                  width: '100%', 
-                  height: '100%', 
-                  border: '1px solid #e5e7eb',
-                  backgroundColor: '#f9fafb',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
+                <div 
+                  className="chart-snapshot" 
+                  data-chart-id="woca-radar"
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    border: '1px solid #e5e7eb',
+                    backgroundColor: '#f9fafb',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
                   <WocaRadarChart participants={wocaData.participants} />
                 </div>
               </div>
