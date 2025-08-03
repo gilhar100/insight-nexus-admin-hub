@@ -220,22 +220,22 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
         </div>
       </div>
 
-      <ChartContainer config={chartConfig} className="h-[600px] w-full" dir="rtl">
+      <ChartContainer config={chartConfig} className="h-96" dir="rtl">
         <ResponsiveContainer width="100%" height="100%">
           {chartType === 'bar' ? (
             <BarChart 
               data={chartData} 
-              margin={{ top: 20, right: 10, left: 10, bottom: 60 }}
+              margin={{ top: 40, right: 30, left: 20, bottom: 60 }}
               barCategoryGap={barCategoryGap}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.1)" />
               <XAxis 
                 dataKey="archetype" 
-                tick={{ fontSize: 14, fontWeight: 'bold', fill: '#1f2937' }} 
+                tick={{ fontSize: 12, fontWeight: 'bold', fill: '#1f2937' }} 
                 textAnchor="middle" 
                 interval={0}
-                angle={0}
-                height={80}
+                angle={archetypeCount > 2 ? -15 : 0}
+                height={60}
                 axisLine={{ stroke: 'rgba(0,0,0,0.2)' }}
                 tickLine={{ stroke: 'rgba(0,0,0,0.2)' }}
               />
@@ -286,6 +286,24 @@ export const SalimaArchetypeDistributionChart: React.FC<SalimaArchetypeDistribut
         </ResponsiveContainer>
       </ChartContainer>
 
+      {dominantArchetype && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-right">
+          <h4 className="font-semibold text-blue-800 mb-2">סיכום התפלגות הארכיטיפים</h4>
+          <p className="text-blue-700">
+            הארכיטיפ הדומיננטי בקבוצה הוא <strong>{dominantArchetype.archetype}</strong> עם {dominantArchetype.count} משתתפים ({dominantArchetype.percentage}% מהמשתתפים עם ארכיטיפ מוגדר).
+          </p>
+          <p className="text-blue-600 text-sm mt-2">
+            {dominantArchetype.archetype === 'מנהל ההזדמנות' && 'קבוצה זו מאופיינת במנהיגות חדשנית הרואה הזדמנויות בכל מקום ופועלת ליצירת שינוי חיובי.'}
+            {dominantArchetype.archetype === 'המנהל הסקרן' && 'קבוצה זו מאופיינת במנהיגות חקרנית הרואה בלמידה מתמשכת ובפיתוח אישי כמפתח להצלחה.'}
+            {dominantArchetype.archetype === 'המנהל המעצים' && 'קבוצה זו מאופיינת במנהיגות מעצימה הרואה בפיתוח האחרים ובמתן כלים כמפתח להצלחה ארגונית.'}
+          </p>
+          {participantsWithArchetypesCount < totalParticipants && (
+            <p className="text-blue-500 text-xs mt-2">
+              * הנתונים מבוססים על {participantsWithArchetypesCount} מתוך {totalParticipants} משתתפים בקבוצה
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 };
