@@ -182,9 +182,29 @@ export const PDFReportGenerator: React.FC = () => {
           <head>
             <meta charset="UTF-8">
             <style>
-              body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-              * { box-sizing: border-box; }
-              img { max-width: 100%; height: auto; }
+              html, body {
+                width: 794px;
+                height: auto;
+                margin: 0;
+                padding: 0;
+                font-family: Arial, sans-serif;
+                background: white;
+              }
+              * {
+                box-sizing: border-box;
+              }
+              img {
+                max-width: 100%;
+                height: auto;
+                display: block;
+              }
+              .page {
+                page-break-after: always;
+                width: 794px;
+                height: 1123px;
+                padding: 48px;
+                background: white;
+              }
             </style>
           </head>
           <body>
@@ -253,6 +273,7 @@ export const PDFReportGenerator: React.FC = () => {
       }}>
         {/* Page 1: Title Page */}
         <div
+          className="page"
           style={{
             width: '794px',
             height: '1123px',
@@ -294,6 +315,7 @@ export const PDFReportGenerator: React.FC = () => {
         {/* Page 2: SALIMA Visualizations + Explanations */}
         {salimaData && (
           <div
+            className="page"
             style={{
               width: '794px',
               height: '1123px',
@@ -404,6 +426,7 @@ export const PDFReportGenerator: React.FC = () => {
         {/* Page 3: WOCA Insights */}
         {wocaData && (
           <div
+            className="page"
             style={{
               width: '794px',
               height: '1123px',
