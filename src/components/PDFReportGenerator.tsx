@@ -177,6 +177,14 @@ export const PDFReportGenerator: React.FC = () => {
 
       console.log('🎨 All charts converted to images');
 
+      // Log the wrapper content before building HTML
+      console.log('📋 Wrapper content after chart conversion:', wrapper.innerHTML.substring(0, 500) + '...');
+      console.log('📐 Wrapper dimensions:', {
+        width: wrapper.offsetWidth,
+        height: wrapper.offsetHeight,
+        children: wrapper.children.length
+      });
+
       const fullHTML = `
         <html dir="rtl" lang="he">
           <head>
@@ -215,6 +223,10 @@ export const PDFReportGenerator: React.FC = () => {
 
       console.log('📤 Sending HTML to PDF service...');
       console.log('📄 HTML length:', fullHTML.length);
+      
+      // Log a sample of the HTML to verify content
+      console.log('📄 HTML sample (first 1000 chars):', fullHTML.substring(0, 1000));
+      console.log('📄 HTML sample (last 500 chars):', fullHTML.substring(fullHTML.length - 500));
 
       const response = await fetch("https://salima-pdf-backend.onrender.com/generate-pdf", {
         method: "POST",
