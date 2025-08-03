@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -118,9 +119,25 @@ export const PDFReportGenerator: React.FC = () => {
       
       const wrapper = document.getElementById("group-report-wrapper");
       if (!wrapper) {
-        alert("Group report wrapper not found");
+        console.error('❌ Group report wrapper not found in DOM');
+        setError("Group report wrapper not found");
         return;
       }
+
+      console.log('📋 Found wrapper element:', wrapper);
+      console.log('📏 Wrapper dimensions:', {
+        width: wrapper.offsetWidth,
+        height: wrapper.offsetHeight,
+        display: window.getComputedStyle(wrapper).display,
+        visibility: window.getComputedStyle(wrapper).visibility
+      });
+
+      // Temporarily make the element visible for capture
+      const originalStyle = wrapper.style.cssText;
+      wrapper.style.cssText = 'position: absolute; top: 0; left: 0; width: 794px; visibility: visible; display: block; z-index: -1;';
+      
+      // Wait a moment for any dynamic content to render
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       const fullHTML = `
         <html dir="rtl" lang="he">
@@ -138,28 +155,40 @@ export const PDFReportGenerator: React.FC = () => {
       `;
 
       console.log('📤 Sending HTML to PDF service...');
+      console.log('📄 HTML length:', fullHTML.length);
 
-      fetch("https://salima-pdf-backend.onrender.com/generate-pdf", {
+      const response = await fetch("https://salima-pdf-backend.onrender.com/generate-pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ html: fullHTML })
-      })
-        .then(res => {
-          if (!res.ok) throw new Error("Failed to generate PDF");
-          return res.blob();
-        })
-        .then(blob => {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = `group_${Date.now()}_report.pdf`;
-          a.click();
-          console.log('✅ PDF export completed successfully!');
-        })
-        .catch(err => {
-          console.error("PDF export failed:", err);
-          setError("הפקת הדוח נכשלה. נסה שוב");
-        });
+      });
+
+      // Restore original styles
+      wrapper.style.cssText = originalStyle;
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ PDF service error:', response.status, errorText);
+        throw new Error(`PDF service returned ${response.status}: ${errorText}`);
+      }
+
+      const blob = await response.blob();
+      console.log('📦 Received PDF blob:', blob.size, 'bytes');
+      
+      if (blob.size === 0) {
+        throw new Error('Received empty PDF file');
+      }
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `group_${Date.now()}_report.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      console.log('✅ PDF export completed successfully!');
       
     } catch (err) {
       console.error('❌ PDF Export Error:', err);
@@ -173,10 +202,16 @@ export const PDFReportGenerator: React.FC = () => {
     if (!salimaData && !wocaData) return null;
 
     const currentDate = new Date().toLocaleDateString('he-IL');
-    const insights = salimaData ? getDimensionInsights(salimaData.averages) : null;
 
     return (
-      <div id="group-report-wrapper" style={{ display: 'none', position: 'absolute', top: '-9999px', left: '-9999px' }}>
+      <div id="group-report-wrapper" style={{ 
+        position: 'absolute', 
+        top: '-9999px', 
+        left: '-9999px',
+        width: '794px',
+        backgroundColor: '#fff',
+        fontFamily: 'Arial, sans-serif'
+      }}>
         {/* Page 1: Title Page */}
         <div
           style={{
