@@ -190,6 +190,15 @@ export const PDFReportGenerator: React.FC = () => {
         children: wrapper.children.length
       });
 
+      // Clean up React development attributes from the HTML
+      const cleanHTML = wrapper.outerHTML
+        .replace(/data-lov-[^=]*="[^"]*"\s*/g, '')
+        .replace(/data-component-[^=]*="[^"]*"\s*/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      console.log('🧹 Cleaned HTML length:', cleanHTML.length);
+
       const fullHTML = `
         <html dir="rtl" lang="he">
           <head>
@@ -221,7 +230,7 @@ export const PDFReportGenerator: React.FC = () => {
             </style>
           </head>
           <body>
-            ${wrapper.outerHTML}
+            ${cleanHTML}
           </body>
         </html>
       `;
