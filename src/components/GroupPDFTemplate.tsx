@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { GroupPDFExportLayout } from './GroupPDFExportLayout';
 import { PDFTemplateData } from '@/hooks/useGroupPDFTemplate';
@@ -16,7 +17,7 @@ export const GroupPDFTemplate: React.FC<GroupPDFTemplateProps> = ({
   if (!visible) return null;
 
   return (
-    <div id="pdf-template-root" className="fixed -top-[10000px] left-0">
+    <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none" style={{ zIndex: -1 }}>
       <GroupPDFExportLayout
         pdfImages={chartImages}
         groupNumber={templateData.groupNumber}

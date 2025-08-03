@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { downloadGroupReportPDF } from '@/utils/downloadGroupReportPDF';
 import { downloadGroupReportDOCX } from '@/utils/downloadGroupReportDOCX';
@@ -16,23 +17,14 @@ export const usePDFExport = () => {
     try {
       console.log('🚀 Starting PDF export for group:', templateData.groupNumber);
       
-      const chartIds: string[] = [];
-      if (hasGroupData) {
-        chartIds.push('radar-chart', 'archetype-chart');
-      }
-      if (hasWorkshopData) {
-        chartIds.push('woca-bar', 'woca-pie');
-      }
-      
-      const chartImages = await captureMultipleCharts(chartIds);
-      setCapturedImages(chartImages);
+      // Show template for rendering
       setShowTemplate(true);
       
       // Wait for template to render
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const filename = `Group_Report_${templateData.groupNumber}.pdf`;
-      await downloadGroupReportPDF('pdf-template-root', filename);
+      const filename = `group_${Date.now()}_report.pdf`;
+      await downloadGroupReportPDF('group-report-wrapper', filename);
       
       console.log('✅ PDF export completed successfully!');
     } catch (err) {
