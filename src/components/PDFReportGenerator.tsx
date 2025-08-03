@@ -106,7 +106,12 @@ export const PDFReportGenerator: React.FC = () => {
   };
 
   const exportGroupPDF = async () => {
+    console.log('🔥 EXPORT FUNCTION CALLED!');
+    console.log('📊 SALIMA Data:', salimaData);
+    console.log('📊 WOCA Data:', wocaData);
+    
     if (!salimaData && !wocaData) {
+      console.log('❌ NO DATA AVAILABLE');
       setError('No data available for export');
       return;
     }
