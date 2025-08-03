@@ -116,36 +116,50 @@ export const PDFReportGenerator: React.FC = () => {
     try {
       console.log('🚀 Starting PDF export for group:', groupNumber);
       
-      // Get the report wrapper element
-      const reportElement = document.getElementById('group-report-wrapper');
-      if (!reportElement) {
-        throw new Error('Report wrapper not found. Make sure the report is fully loaded.');
+      const wrapper = document.getElementById("group-report-wrapper");
+      if (!wrapper) {
+        alert("Group report wrapper not found");
+        return;
       }
 
-      // Extract the HTML content
-      const html = reportElement.outerHTML;
-      
+      const fullHTML = `
+        <html dir="rtl" lang="he">
+          <head>
+            <meta charset="UTF-8">
+            <style>
+              body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+              * { box-sizing: border-box; }
+            </style>
+          </head>
+          <body>
+            ${wrapper.outerHTML}
+          </body>
+        </html>
+      `;
+
       console.log('📤 Sending HTML to PDF service...');
-      
-      // Send to PDF generation service
-      const response = await fetch("https://salima-pdf-backend.onrender.com/generate-pdf", {
+
+      fetch("https://salima-pdf-backend.onrender.com/generate-pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ html }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`PDF generation failed: ${response.status} ${response.statusText}`);
-      }
-
-      // Get PDF blob and download
-      const blob = await response.blob();
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = `group_${Date.now()}_report.pdf`;
-      link.click();
-      
-      console.log('✅ PDF export completed successfully!');
+        body: JSON.stringify({ html: fullHTML })
+      })
+        .then(res => {
+          if (!res.ok) throw new Error("Failed to generate PDF");
+          return res.blob();
+        })
+        .then(blob => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `group_${Date.now()}_report.pdf`;
+          a.click();
+          console.log('✅ PDF export completed successfully!');
+        })
+        .catch(err => {
+          console.error("PDF export failed:", err);
+          setError("הפקת הדוח נכשלה. נסה שוב");
+        });
       
     } catch (err) {
       console.error('❌ PDF Export Error:', err);
