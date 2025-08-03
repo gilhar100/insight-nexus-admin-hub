@@ -53,7 +53,6 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
         heading: HeadingLevel.HEADING_1,
         alignment: AlignmentType.CENTER,
         spacing: { after: 400 },
-        rightToLeft: true,
       }),
     ];
 
@@ -83,7 +82,6 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
           text: 'סגנון מנהיגות',
           heading: HeadingLevel.HEADING_2,
           alignment: AlignmentType.CENTER,
-          rightToLeft: true,
           spacing: { after: 200 },
         }),
         new Paragraph({
@@ -108,7 +106,6 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
       new Paragraph({
         text: '🧭 ממדי SALIMA',
         heading: HeadingLevel.HEADING_2,
-        rightToLeft: true,
         spacing: { after: 200 },
       }),
       new Paragraph({
@@ -116,7 +113,6 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
           new TextRun({ text: 'אסטרטגיה (S)', bold: true }),
           new TextRun({ text: ' - ראייה מערכתית, תכנון לטווח ארוך ויכולת להוביל חזון.' }),
         ],
-        rightToLeft: true,
         spacing: { after: 100 },
       }),
       new Paragraph({
@@ -124,7 +120,6 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
           new TextRun({ text: 'אדפטיביות (A)', bold: true }),
           new TextRun({ text: ' - גמישות מחשבתית ורגשית ותגובה יעילה למצבים משתנים.' }),
         ],
-        rightToLeft: true,
         spacing: { after: 100 },
       }),
       new Paragraph({
@@ -132,7 +127,6 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
           new TextRun({ text: 'למידה (L)', bold: true }),
           new TextRun({ text: ' - פתיחות לרעיונות חדשים, חשיבה ביקורתית ולמידה מתמשכת.' }),
         ],
-        rightToLeft: true,
         spacing: { after: 100 },
       }),
       new Paragraph({
@@ -140,7 +134,6 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
           new TextRun({ text: 'השראה (I)', bold: true }),
           new TextRun({ text: ' - הנעה רגשית דרך דוגמה אישית וחזון שמעורר משמעות.' }),
         ],
-        rightToLeft: true,
         spacing: { after: 100 },
       }),
       new Paragraph({
@@ -148,7 +141,6 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
           new TextRun({ text: 'משמעות (M)', bold: true }),
           new TextRun({ text: ' - חיבור עמוק לערכים, תכלית ותחושת שליחות אישית וארגונית.' }),
         ],
-        rightToLeft: true,
         spacing: { after: 100 },
       }),
       new Paragraph({
@@ -156,13 +148,11 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
           new TextRun({ text: 'אותנטיות (A2)', bold: true }),
           new TextRun({ text: ' - כנות, שקיפות והתנהלות אנושית המחוברת לערכים פנימיים.' }),
         ],
-        rightToLeft: true,
         spacing: { after: 200 },
       }),
       new Paragraph({
         text: 'סגנונות מנהיגות',
         heading: HeadingLevel.HEADING_2,
-        rightToLeft: true,
         spacing: { after: 200 },
       }),
       new Paragraph({
@@ -170,7 +160,6 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
           new TextRun({ text: 'מנהל ההזדמנות (S + A)', bold: true }),
           new TextRun({ text: ' - רואה רחוק ופועל בגמישות. מוביל שינוי תוך הסתגלות מהירה והבנת ההקשר.' }),
         ],
-        rightToLeft: true,
         spacing: { after: 100 },
       }),
       new Paragraph({
@@ -178,7 +167,6 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
           new TextRun({ text: 'המנהל הסקרן (L + I)', bold: true }),
           new TextRun({ text: ' - לומד כל הזמן, מלהיב אחרים וסוחף דרך רעיונות ודוגמה אישית.' }),
         ],
-        rightToLeft: true,
         spacing: { after: 100 },
       }),
       new Paragraph({
@@ -186,7 +174,6 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
           new TextRun({ text: 'המנהל המעצים (M + A2)', bold: true }),
           new TextRun({ text: ' - מוביל מתוך ערכים, יוצר חיבור אישי ותחושת משמעות בעבודה המשותפת.' }),
         ],
-        rightToLeft: true,
         spacing: { after: 200 },
       }),
       new Paragraph({
@@ -200,7 +187,6 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
         text: 'שאלון תודעה ארגונית',
         heading: HeadingLevel.HEADING_1,
         alignment: AlignmentType.CENTER,
-        rightToLeft: true,
         spacing: { after: 300 },
       }),
       new Paragraph({
@@ -212,7 +198,6 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
           }),
         ],
         alignment: AlignmentType.CENTER,
-        rightToLeft: true,
         spacing: { after: 400 },
       }),
     ];
@@ -242,7 +227,6 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
       new Paragraph({
         text: 'אזורי WOCA',
         heading: HeadingLevel.HEADING_2,
-        rightToLeft: true,
         spacing: { after: 200 },
       }),
       new Paragraph({
@@ -250,7 +234,6 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
           new TextRun({ text: 'אזור ההזדמנות (WIN/WIN)', bold: true }),
           new TextRun({ text: ' - שיח פתוח, הקשבה ויוזמה. תחושת שליחות, השפעה, שיתוף פעולה וצמיחה משותפת.' }),
         ],
-        rightToLeft: true,
         spacing: { after: 100 },
       }),
       new Paragraph({
@@ -258,7 +241,6 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
           new TextRun({ text: 'אזור הנוחות (LOSE/LOSE)', bold: true }),
           new TextRun({ text: ' - הימנעות מקונפליקטים, קיפאון מחשבתי וחשש מיוזמות. שמירה על הקיים במחיר שחיקה.' }),
         ],
-        rightToLeft: true,
         spacing: { after: 100 },
       }),
       new Paragraph({
@@ -266,7 +248,6 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
           new TextRun({ text: 'אזור האדישות (LOSE/LOSE)', bold: true }),
           new TextRun({ text: ' - נתק רגשי, חוסר עניין וחוסר תחושת השפעה. תחושת סטגנציה ויעדר מנהיגות.' }),
         ],
-        rightToLeft: true,
         spacing: { after: 100 },
       }),
       new Paragraph({
@@ -274,7 +255,6 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
           new TextRun({ text: 'אזור המלחמה (WIN/LOSE)', bold: true }),
           new TextRun({ text: ' - דינמיקה של שליטה, חשדנות ומאבק. הישרדות טקטית על חשבון הקשבה, אמון ויציבות.' }),
         ],
-        rightToLeft: true,
         spacing: { after: 100 },
       }),
     );
@@ -291,6 +271,7 @@ export const downloadGroupReportDOCX = async (data: DOCXExportData, filename: st
               size: {
                 width: 15840, // 11 inches in twips (landscape width)
                 height: 12240, // 8.5 inches in twips (landscape height)
+                orientation: 'landscape',
               },
               margin: {
                 top: 720,
