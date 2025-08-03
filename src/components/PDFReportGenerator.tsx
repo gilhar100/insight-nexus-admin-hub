@@ -8,8 +8,9 @@ import { SalimaGroupRadarChart } from '@/components/SalimaGroupRadarChart';
 import { ArchetypeDistributionChart } from '@/components/ArchetypeDistributionChart';
 import { WocaGroupBarChart } from '@/components/WocaGroupBarChart';
 import { WocaRadarChart } from '@/components/WocaRadarChart';
+import html2canvas from 'html2canvas';
 
-/* ---------- types ---------- */
+/* -------------------  types ------------------- */
 
 interface SalimaGroupData {
   group_number: number;
@@ -47,48 +48,81 @@ interface WocaGroupData {
   };
 }
 
-/* ---------- component ---------- */
+/* -------------------  component ------------------- */
 
 export const PDFReportGenerator: React.FC = () => {
+  /* ---------- state ---------- */
   const [groupNumber, setGroupNumber] = useState<number | null>(null);
   const [salimaData, setSalimaData] = useState<SalimaGroupData | null>(null);
   const [wocaData, setWocaData] = useState<WocaGroupData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  /* ---------- hooks ---------- */
   const { data: groupData } = useGroupData(groupNumber || 0);
   const { workshopData } = useWorkshopData(groupNumber || 0);
 
-  React.useEffect(() => void setSalimaData(groupData as any), [groupData]);
-  React.useEffect(() => void setWocaData(workshopData as any), [workshopData]);
+  React.useEffect(() => setSalimaData(groupData as any), [groupData]);
+  React.useEffect(() => setWocaData(workshopData as any), [workshopData]);
 
-  /* ---------- helper: convert charts ---------- */
+  /* ---------- helpers ---------- */
 
-  const replaceChartsWithImg = () => {
-    const charts = document.querySelectorAll<HTMLDivElement>('#group-report-wrapper .chart-snapshot');
+  const stripReactAttrs = (html: string) =>
+    html.replace(/data-[^=]*="[^"]*"/g, '').replace(/\s{2,}/g, ' ').trim();
 
-    charts.forEach((holder) => {
-      const canvas = holder.querySelector('canvas');
-      const svg = holder.querySelector('svg');
+  /** wait until every internal canvas/svg has non‑zero size */
+  const waitUntilChartsRender = async (wrapper: HTMLElement) => {
+    const holders = Array.from(wrapper.querySelectorAll<HTMLElement>('.chart-snapshot'));
+    let attempts = 0;
+    return new Promise<void>((resolve) => {
+      const tick = () => {
+        const ready = holders.every((h) => {
+          const el = h.querySelector('canvas,svg') as HTMLElement | null;
+          return el && el.offsetWidth > 0 && el.offsetHeight > 0;
+        });
+        if (ready || attempts > 40) return resolve(); // ~4s max
+        attempts += 1;
+        requestAnimationFrame(tick);
+      };
+      tick();
+    });
+  };
 
+  /** replace each chart snapshot with a base‑64 <img> */
+  const replaceChartsWithImages = async () => {
+    const holders = document.querySelectorAll<HTMLDivElement>('#group-report-wrapper .chart-snapshot');
+
+    for (const holder of holders) {
+      const canvasEl = holder.querySelector('canvas') as HTMLCanvasElement | null;
+      const svgEl = holder.querySelector('svg') as SVGElement | null;
       let dataURL = '';
 
-      if (canvas) {
-        dataURL = (canvas as HTMLCanvasElement).toDataURL('image/png', 1.0);
-      } else if (svg) {
-        const cloned = svg.cloneNode(true) as SVGElement;
-        const svgTxt = new XMLSerializer().serializeToString(cloned);
-        dataURL = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgTxt)));
+      if (canvasEl && canvasEl.width && canvasEl.height) {
+        dataURL = canvasEl.toDataURL('image/png', 1.0);
+      } else if (svgEl) {
+        svgEl.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+        const txt = new XMLSerializer().serializeToString(svgEl);
+        dataURL = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(txt)));
+      } else {
+        // fallback: html2canvas capture of the whole holder
+        const canvas = await html2canvas(holder, {
+          backgroundColor: '#ffffff',
+          scale: 2,
+          useCORS: true,
+        });
+        dataURL = canvas.toDataURL('image/png', 1.0);
       }
 
       if (dataURL) {
         const img = new Image();
         img.src = dataURL;
+        img.setAttribute('width', String(holder.offsetWidth || 400));
+        img.setAttribute('height', String(holder.offsetHeight || 300));
         img.style.width = '100%';
         img.style.height = 'auto';
         holder.replaceWith(img);
       }
-    });
+    }
   };
 
   /* ---------- export ---------- */
@@ -101,80 +135,109 @@ export const PDFReportGenerator: React.FC = () => {
 
     try {
       const wrapper = document.getElementById('group-report-wrapper');
-      if (!wrapper) throw new Error('ה-wrapper לא נמצא');
+      if (!wrapper) throw new Error('ה‑wrapper לא נמצא');
 
-      /* 1️⃣  temporarily SHOW the wrapper so charts can size themselves */
-      const oldCss = wrapper.style.cssText;
+      /* bring wrapper on‑screen (off‑viewport) so charts size properly */
+      const oldCSS = wrapper.style.cssText;
       wrapper.style.cssText =
-        'position:fixed;top:0;left:0;width:794px;opacity:0;pointer-events:none;z-index:-1;';
+        'position:absolute;top:-9999px;left:-9999px;width:794px;visibility:visible;pointer-events:none;';
 
-      // allow one frame + resize event
-      await new Promise((r) => requestAnimationFrame(r));
-      window.dispatchEvent(new Event('resize'));
-      await new Promise((r) => setTimeout(r, 300));
+      await waitUntilChartsRender(wrapper);
+      await replaceChartsWithImages();
 
-      /* 2️⃣  swap every chart with a <img src="data:…"> */
-      replaceChartsWithImg();
+      const htmlFragment = stripReactAttrs(wrapper.outerHTML);
 
-      /* 3️⃣  clean html */
-      const cleanHTML = wrapper.outerHTML
-        .replace(/data-[^=]*="[^"]*"/g, '')
-        .replace(/\s{2,}/g, ' ')
-        .trim();
-
-      /* 4️⃣  send to backend (backend wraps once) */
       const res = await fetch('https://salima-pdf-backend.onrender.com/generate-pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ html: cleanHTML }),
+        body: JSON.stringify({ html: htmlFragment }),
       });
 
-      wrapper.style.cssText = oldCss; // restore
+      wrapper.style.cssText = oldCSS; // restore
 
-      if (!res.ok) throw new Error('שגיאה בשירות PDF');
-
+      if (!res.ok) throw new Error(`שגיאה ביצירת PDF (${res.status})`);
       const blob = await res.blob();
+      if (!blob.size) throw new Error('קובץ PDF ריק הוחזר');
+
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = `group_${Date.now()}_report.pdf`;
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
+      a.remove();
       URL.revokeObjectURL(url);
     } catch (e: any) {
-      setError(e.message || 'שגיאה לא ידועה');
       console.error(e);
+      setError(e.message || 'שגיאה לא ידועה');
     } finally {
       setIsLoading(false);
     }
   };
 
-  /* ---------- layout (unchanged) ---------- */
-  /* keep your existing renderPDFLayout() here – only the outer style changed */
+  /* ---------- data load ---------- */
 
-  const renderPDFLayout = () => (
-    <div
-      id="group-report-wrapper"
-      style={{
-        position: 'fixed',       // instead of -9999px
-        top: 0,
-        left: 0,
-        width: 794,
-        opacity: 0,              // invisible but takes space
-        pointerEvents: 'none',
-        zIndex: -1,
-        background: '#fff',
-        fontFamily: 'Arial, sans-serif',
-      }}
-    >
-      {/* … All your existing page markup … */}
-    </div>
-  );
+  const loadGroupData = () => {
+    if (!groupNumber) return setError('אנא הזן מספר קבוצה');
+    setError(null);
+    // hooks auto‑fetch – trigger by updating state only
+  };
+
+  /* ---------- PDF layout (unchanged) ---------- */
+
+  const renderPDFLayout = () => {
+    if (!salimaData && !wocaData) return null;
+    return (
+      <div
+        id="group-report-wrapper"
+        style={{ position: 'absolute', top: '-9999px', left: '-9999px', width: '794px' }}
+      >
+        {/* --- your existing page markup unchanged --- */}
+        {/* ... keep the pages exactly as in your original code ... */}
+      </div>
+    );
+  };
+
+  /* ---------- render controls ---------- */
 
   return (
     <div className="space-y-6 p-6">
-      {/* controls + errors (unchanged) */}
+      {/* UI Panel */}
+      <div className="bg-white rounded-lg shadow-sm border p-6 space-y-4">
+        <h2 className="text-2xl font-bold">יצירת דוח PDF קבוצתי</h2>
+        <Input
+          type="number"
+          value={groupNumber ?? ''}
+          onChange={(e) => setGroupNumber(e.target.value ? parseInt(e.target.value, 10) : null)}
+          placeholder="מספר קבוצה"
+          className="max-w-xs"
+        />
+        <div className="flex gap-4">
+          <Button onClick={loadGroupData} disabled={!groupNumber || isLoading}>
+            טען נתונים
+          </Button>
+          <Button onClick={exportGroupPDF} disabled={isLoading || (!salimaData && !wocaData)}>
+            {isLoading ? 'יוצר PDF…' : 'ייצא ל‑PDF'}
+          </Button>
+        </div>
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        {(salimaData || wocaData) && (
+          <div className="p-4 bg-green-50 rounded-lg">
+            <p className="text-green-800">
+              נתונים נטענו:
+              {salimaData && ` SALIMA (${salimaData.participant_count})`}
+              {salimaData && wocaData && ', '}
+              {wocaData && ` WOCA (${wocaData.participant_count})`}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* hidden printable layout */}
       {renderPDFLayout()}
     </div>
   );
