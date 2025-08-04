@@ -3,7 +3,6 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Download } from 'lucide-react';
 import { EnhancedSalimaRadarChart } from '@/components/EnhancedSalimaRadarChart';
-import { SalimaIntensityBar } from '@/components/SalimaIntensityBar';
 import { DataSourceToggle, DataSourceType } from '@/components/DataSourceToggle';
 import { exportSalimaReport, exportSalimaReportCSV } from '@/utils/exportUtils';
 import { useToast } from '@/hooks/use-toast';
@@ -100,6 +99,14 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
     { dimension: 'משמעות', score: currentDimensions.meaning, color: '#8B5CF6' },
     { dimension: 'אותנטיות', score: currentDimensions.authenticity, color: '#EC4899' }
   ];
+
+  // Find strongest and weakest dimensions
+  const strongestDimension = radarChartData.reduce((max, dim) => 
+    dim.score > max.score ? dim : max
+  );
+  const weakestDimension = radarChartData.reduce((min, dim) => 
+    dim.score < min.score ? dim : min
+  );
 
   // Helper function to parse insights and return both paragraphs
   const parseInsights = (insightText: string | undefined) => {
@@ -207,7 +214,7 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
           </div>
         </div>
 
-        {/* Vertical Bar Chart instead of Radar */}
+        {/* Vertical Bar Chart */}
         <div className="card">
           <div className="card-header text-center">
             <div className={`flex items-center justify-center text-right card-title${isPresenterMode ? " text-3xl" : ""}`}>
@@ -216,15 +223,15 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
             </div>
           </div>
           <div className="card-content">
-            <div className="h-[400px] w-full" dir="rtl">
+            <div className="h-[500px] w-full" dir="rtl">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={radarChartData} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+                <BarChart data={radarChartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
                   <XAxis 
                     dataKey="dimension" 
-                    tick={{ fontSize: 12, fontWeight: 'bold' }}
-                    angle={-45}
-                    textAnchor="end"
-                    height={80}
+                    tick={{ fontSize: 14, fontWeight: 'bold' }}
+                    textAnchor="middle"
+                    angle={0}
+                    height={40}
                   />
                   <YAxis 
                     domain={[0, 5]}
@@ -241,23 +248,46 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
           </div>
         </div>
 
-        {/* Individual Intensity Bars */}
+        {/* Strongest Dimension */}
         <div className="card">
           <div className="card-header text-center">
-            <div className={`flex items-center justify-center text-right card-title${isPresenterMode ? " text-3xl" : ""}`}>
-              <span className="ml-2"><svg className={isPresenterMode ? "h-10 w-10" : "h-6 w-6"} style={{display: "inline-block"}} viewBox="0 0 24 24"><path fill="currentColor" d="M5 10c-1.656 0-3 1.343-3 3 0 1.656 1.344 3 3 3h2v-6H5zm2 9V8c0-1.104.896-2 2-2h6v2H9v11H7zm8-2h2c1.657 0 3-1.344 3-3 0-1.657-1.343-3-3-3v6z"/></svg></span>
-              עוצמת הממדים - {getDataSourceLabel()}
+            <div className={`card-title text-green-600${isPresenterMode ? " text-3xl" : ""}`}>
+              הממד החזק ביותר
             </div>
           </div>
           <div className="card-content">
-            <div className="w-full">
-              {radarChartData.map((dimension, index) => (
-                <SalimaIntensityBar
-                  key={index}
-                  dimension={dimension.dimension}
-                  score={dimension.score}
-                />
-              ))}
+            <div className="text-center space-y-4">
+              <div className={`text-6xl font-bold${isPresenterMode ? ' text-8xl' : ''}`} style={{ color: strongestDimension.color }}>
+                {strongestDimension.score.toFixed(1)}
+              </div>
+              <div className={`text-2xl font-semibold${isPresenterMode ? ' text-4xl' : ''}`} style={{ color: strongestDimension.color }}>
+                {strongestDimension.dimension}
+              </div>
+              <div className={`text-gray-600${isPresenterMode ? ' text-xl' : ''}`}>
+                נקודת החוזק הבולטת שלך
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Weakest Dimension */}
+        <div className="card">
+          <div className="card-header text-center">
+            <div className={`card-title text-orange-600${isPresenterMode ? " text-3xl" : ""}`}>
+              הממד החלש ביותר
+            </div>
+          </div>
+          <div className="card-content">
+            <div className="text-center space-y-4">
+              <div className={`text-6xl font-bold${isPresenterMode ? ' text-8xl' : ''}`} style={{ color: weakestDimension.color }}>
+                {weakestDimension.score.toFixed(1)}
+              </div>
+              <div className={`text-2xl font-semibold${isPresenterMode ? ' text-4xl' : ''}`} style={{ color: weakestDimension.color }}>
+                {weakestDimension.dimension}
+              </div>
+              <div className={`text-gray-600${isPresenterMode ? ' text-xl' : ''}`}>
+                תחום עיקרי לפיתוח
+              </div>
             </div>
           </div>
         </div>
