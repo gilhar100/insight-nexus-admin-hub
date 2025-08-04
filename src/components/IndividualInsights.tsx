@@ -50,7 +50,8 @@ export const IndividualInsights: React.FC = () => {
     data: respondentData,
     isLoading: isDataLoading,
     error: dataError,
-    fetchEnhancedRespondentData
+    fetchEnhancedRespondentData,
+    clearData
   } = useEnhancedRespondentData();
 
   const { toast } = useToast();
@@ -81,6 +82,11 @@ export const IndividualInsights: React.FC = () => {
     setSearchQuery('');
     setActiveDataSource('self');
     
+    // Clear individual respondent data
+    if (clearData) {
+      clearData();
+    }
+    
     console.log('Selected group:', groupNumber);
   };
 
@@ -99,6 +105,12 @@ export const IndividualInsights: React.FC = () => {
       });
       return;
     }
+    
+    // Clear group data when analyzing individual results
+    setSelectedGroup(null);
+    setGroupSearchQuery('');
+    setGroupData(null);
+    
     await fetchEnhancedRespondentData(selectedRespondent, selectedSource);
   };
 
@@ -196,16 +208,16 @@ export const IndividualInsights: React.FC = () => {
         />
       )}
 
-      {/* Group Results Section - Only show when group is selected */}
-      {groupData && (
+      {/* Group Results Section - Only show when group is selected and no individual data */}
+      {groupData && !respondentData && (
         <GroupResults
           groupData={groupData}
           isPresenterMode={isPresenterMode}
         />
       )}
 
-      {/* Individual Results Section - Only show when respondent data exists */}
-      {respondentData && (
+      {/* Individual Results Section - Only show when respondent data exists and no group data */}
+      {respondentData && !groupData && (
         <IndividualResults
           respondentData={respondentData}
           isPresenterMode={isPresenterMode}
