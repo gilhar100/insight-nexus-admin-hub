@@ -45,6 +45,11 @@ export const useEnhancedRespondentData = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const clearData = () => {
+    setData(null);
+    setError(null);
+  };
+
   const fetchEnhancedRespondentData = async (respondentId: string, source: string) => {
     setIsLoading(true);
     setError(null);
@@ -135,5 +140,5 @@ export const useEnhancedRespondentData = () => {
     }
   };
 
-  return { data, isLoading, error, fetchEnhancedRespondentData };
+  return { data, isLoading, error, fetchEnhancedRespondentData, clearData };
 };

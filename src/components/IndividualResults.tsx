@@ -223,15 +223,15 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
             </div>
           </div>
           <div className="card-content">
-            <div className="h-[500px] w-full" dir="rtl">
+            <div className="h-[600px] w-full" dir="rtl">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={radarChartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                <BarChart data={radarChartData} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
                   <XAxis 
                     dataKey="dimension" 
                     tick={{ fontSize: 14, fontWeight: 'bold' }}
                     textAnchor="middle"
                     angle={0}
-                    height={40}
+                    height={80}
                   />
                   <YAxis 
                     domain={[0, 5]}
@@ -248,51 +248,7 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
           </div>
         </div>
 
-        {/* Strongest Dimension */}
-        <div className="card">
-          <div className="card-header text-center">
-            <div className={`card-title text-green-600${isPresenterMode ? " text-3xl" : ""}`}>
-              הממד החזק ביותר
-            </div>
-          </div>
-          <div className="card-content">
-            <div className="text-center space-y-4">
-              <div className={`text-6xl font-bold${isPresenterMode ? ' text-8xl' : ''}`} style={{ color: strongestDimension.color }}>
-                {strongestDimension.score.toFixed(1)}
-              </div>
-              <div className={`text-2xl font-semibold${isPresenterMode ? ' text-4xl' : ''}`} style={{ color: strongestDimension.color }}>
-                {strongestDimension.dimension}
-              </div>
-              <div className={`text-gray-600${isPresenterMode ? ' text-xl' : ''}`}>
-                נקודת החוזק הבולטת שלך
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Weakest Dimension */}
-        <div className="card">
-          <div className="card-header text-center">
-            <div className={`card-title text-orange-600${isPresenterMode ? " text-3xl" : ""}`}>
-              הממד החלש ביותר
-            </div>
-          </div>
-          <div className="card-content">
-            <div className="text-center space-y-4">
-              <div className={`text-6xl font-bold${isPresenterMode ? ' text-8xl' : ''}`} style={{ color: weakestDimension.color }}>
-                {weakestDimension.score.toFixed(1)}
-              </div>
-              <div className={`text-2xl font-semibold${isPresenterMode ? ' text-4xl' : ''}`} style={{ color: weakestDimension.color }}>
-                {weakestDimension.dimension}
-              </div>
-              <div className={`text-gray-600${isPresenterMode ? ' text-xl' : ''}`}>
-                תחום עיקרי לפיתוח
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Individual AI-Generated Insights */}
+        {/* Individual Summary Stats - Like Group Insights */}
         <div className="card" style={{gridColumn: isPresenterMode ? "span 2" : undefined}}>
           <div className="card-header text-center">
             <div className={`card-title${isPresenterMode ? " text-3xl" : ""}`}>סיכום הניתוח</div>
@@ -304,8 +260,16 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
             <div className={`grid grid-cols-1 md:grid-cols-2 gap-8${isPresenterMode ? ' gap-12' : ''}`}>
               <div className="bg-green-50 p-6 rounded-lg border border-green-200">
                 <h4 className={`font-semibold text-green-800 mb-4 text-right ${isPresenterMode ? 'text-2xl' : ''}`}>
-                  ממדים בעלי הציון הגבוה ביותר
+                  הממד החזק ביותר: {strongestDimension.dimension}
                 </h4>
+                <div className="text-center mb-4">
+                  <div className={`text-4xl font-bold${isPresenterMode ? ' text-6xl' : ''}`} style={{ color: strongestDimension.color }}>
+                    {strongestDimension.score.toFixed(1)}
+                  </div>
+                  <div className={`text-gray-600${isPresenterMode ? ' text-xl' : ''}`}>
+                    נקודת החוזק הבולטת שלך
+                  </div>
+                </div>
                 <ul className={`text-sm text-green-700 space-y-2 ${isPresenterMode ? 'text-lg space-y-3' : ''}`}>
                   {radarChartData
                     .sort((a, b) => b.score - a.score)
@@ -317,8 +281,16 @@ export const IndividualResults: React.FC<IndividualResultsProps> = ({
               </div>
               <div className="bg-amber-50 p-6 rounded-lg border border-amber-200">
                 <h4 className={`font-semibold text-amber-800 mb-4 text-right ${isPresenterMode ? 'text-2xl' : ''}`}>
-                  תחומים לפיתוח
+                  הממד החלש ביותר: {weakestDimension.dimension}
                 </h4>
+                <div className="text-center mb-4">
+                  <div className={`text-4xl font-bold${isPresenterMode ? ' text-6xl' : ''}`} style={{ color: weakestDimension.color }}>
+                    {weakestDimension.score.toFixed(1)}
+                  </div>
+                  <div className={`text-gray-600${isPresenterMode ? ' text-xl' : ''}`}>
+                    תחום עיקרי לפיתוח
+                  </div>
+                </div>
                 <ul className={`text-sm text-amber-700 space-y-2 ${isPresenterMode ? 'text-lg space-y-3' : ''}`}>
                   {radarChartData
                     .sort((a, b) => a.score - b.score)
