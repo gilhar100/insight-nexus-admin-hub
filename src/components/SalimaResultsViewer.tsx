@@ -57,6 +57,9 @@ const SalimaResultsViewer: React.FC<ResultsViewerProps> = ({
         {/* Header */}
         <ResultsHeader surveyId={surveyId || ""} />
         
+        {/* Dominant Archetype */}
+        <ResultsDominantArchetype dominantArchetype={insights.dominant_archetype} />
+        
         {/* Score Display */}
         <ResultsScoreDisplay results={results} />
         
