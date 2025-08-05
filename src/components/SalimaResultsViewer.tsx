@@ -1,3 +1,4 @@
+
 import ResultsHeader from "@/components/results/ResultsHeader";
 import ResultsScoreDisplay from "@/components/results/ResultsScoreDisplay";
 import ResultsSummaryCards from "@/components/results/ResultsSummaryCards";
@@ -26,6 +27,7 @@ interface GPTResults {
     משמעות: string;
     אותנטיות: string;
   };
+  extra?: string;
 }
 
 interface ResultsViewerProps {

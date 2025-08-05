@@ -4,17 +4,28 @@ interface ResultsActionsProps {
 }
 
 const ResultsActions: React.FC<ResultsActionsProps> = ({ surveyId }) => {
+  const handleRefresh = () => {
+    alert("Refreshing insights… (you can wire this later)");
+  };
+
+  const handleDownload = () => {
+    alert("Downloading PDF… (you can implement this later)");
+  };
+
   return (
-    <div className="bg-white rounded-lg p-6 shadow-sm">
-      <h3 className="text-lg font-semibold mb-4">פעולות</h3>
-      <div className="flex gap-4 justify-center">
-        <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-          הורד דוח PDF
-        </button>
-        <button className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors">
-          שתף תוצאות
-        </button>
-      </div>
+    <div className="flex justify-center gap-4 mt-6">
+      <button
+        onClick={handleRefresh}
+        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+      >
+        רענן תובנות
+      </button>
+      <button
+        onClick={handleDownload}
+        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+      >
+        הורד דוח PDF
+      </button>
     </div>
   );
 };
