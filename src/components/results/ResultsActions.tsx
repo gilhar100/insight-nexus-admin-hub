@@ -1,30 +1,34 @@
 
+import { Download, RotateCcw } from 'lucide-react';
+
 interface ResultsActionsProps {
   surveyId: string | null;
 }
 
 const ResultsActions: React.FC<ResultsActionsProps> = ({ surveyId }) => {
   const handleRefresh = () => {
-    alert("Refreshing insights… (you can wire this later)");
+    alert("רענון תובנות... (ניתן לחבר מאוחר יותר)");
   };
 
   const handleDownload = () => {
-    alert("Downloading PDF… (you can implement this later)");
+    alert("הורדת PDF... (ניתן למימוש מאוחר יותר)");
   };
 
   return (
-    <div className="flex justify-center gap-4 mt-6">
+    <div className="flex justify-center gap-4">
       <button
         onClick={handleRefresh}
-        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        className="flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
       >
-        רענן תובנות
+        <RotateCcw size={18} />
+        חזור לעמוד הבית
       </button>
       <button
         onClick={handleDownload}
-        className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+        className="flex items-center gap-2 px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-medium"
       >
-        הורד דוח PDF
+        <Download size={18} />
+        הורד דוח אישי (PDF)
       </button>
     </div>
   );

@@ -52,24 +52,35 @@ const SalimaResultsViewer: React.FC<ResultsViewerProps> = ({
   onRefreshInsights = () => {},
 }) => {
   return (
-    <div className="flex flex-col gap-4 p-4 sm:p-6 lg:p-10 bg-sky-50 min-h-screen">
-      <ResultsHeader surveyId={surveyId || ""} />
-      <ResultsScoreDisplay results={results} />
-      <ResultsSummaryCards results={results} />
-      <ResultsCharts result={results} />
-      <ResultsDominantArchetype dominantArchetype={insights.dominant_archetype} />
-      <ResultsAnalysis
-        result={results}
-        insights={insights}
-        gptResults={gptResults}
-        isLoadingInsights={isLoadingInsights}
-        insightsAvailable={insightsAvailable}
-        onRefreshInsights={onRefreshInsights}
-        answers={answers}
-        surveyId={surveyId}
-      />
-      <ResultsGptInsights gptResults={gptResults} />
-      <ResultsActions surveyId={surveyId} />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="container mx-auto px-4 py-8 space-y-8">
+        {/* Header */}
+        <ResultsHeader surveyId={surveyId || ""} />
+        
+        {/* Score Display */}
+        <ResultsScoreDisplay results={results} />
+        
+        {/* Summary Cards */}
+        <ResultsSummaryCards results={results} />
+        
+        {/* Charts Section */}
+        <ResultsCharts result={results} />
+        
+        {/* Personal Insights */}
+        <ResultsAnalysis
+          result={results}
+          insights={insights}
+          gptResults={gptResults}
+          isLoadingInsights={isLoadingInsights}
+          insightsAvailable={insightsAvailable}
+          onRefreshInsights={onRefreshInsights}
+          answers={answers}
+          surveyId={surveyId}
+        />
+        
+        {/* Action Buttons */}
+        <ResultsActions surveyId={surveyId} />
+      </div>
     </div>
   );
 };
