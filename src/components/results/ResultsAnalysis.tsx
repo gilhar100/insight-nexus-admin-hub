@@ -30,30 +30,48 @@ interface ResultsAnalysisProps {
   surveyId: string | null;
 }
 
+const DIMENSION_KEYS = [
+  { key: "strategy", label: "אסטרטגיה" },
+  { key: "adaptive", label: "אדפטיביות" },
+  { key: "learning", label: "לומד" },
+  { key: "inspiration", label: "השראה" },
+  { key: "meaning", label: "משמעות" },
+  { key: "authentic", label: "אותנטיות" },
+];
+
 const ResultsAnalysis: React.FC<ResultsAnalysisProps> = ({
-  result,
   insights,
   gptResults,
   isLoadingInsights = false,
-  insightsAvailable = true,
-  onRefreshInsights = () => {},
-  answers,
-  surveyId
 }) => {
-  return (
-    <div className="bg-white rounded-lg p-6 shadow-sm">
-      <h3 className="text-lg font-semibold mb-4">ניתוח תוצאות</h3>
-      {isLoadingInsights ? (
+  if (isLoadingInsights) {
+    return (
+      <div className="bg-white rounded-lg p-6 shadow-sm">
+        <h3 className="text-lg font-semibold mb-4">ניתוח תוצאות</h3>
         <div className="text-center py-4">
           <div className="text-gray-600">טוען תובנות...</div>
         </div>
-      ) : (
-        <div className="space-y-4">
-          <div className="text-gray-700">
-            ניתוח מפורט של התוצאות יוצג כאן
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white p-4 rounded-xl shadow space-y-4">
+      <h2 className="text-lg font-semibold text-gray-800 mb-2">ניתוח אישי לפי ממדים</h2>
+      {DIMENSION_KEYS.map(({ key, label }) => {
+        const text =
+          gptResults?.insights?.[label] ||
+          insights[`insight_${key}` as keyof typeof insights];
+
+        if (!text) return null;
+
+        return (
+          <div key={key}>
+            <h3 className="text-md font-bold text-gray-700 mb-1">{label}</h3>
+            <p className="text-gray-700 leading-relaxed whitespace-pre-line">{text}</p>
           </div>
-        </div>
-      )}
+        );
+      })}
     </div>
   );
 };
