@@ -1,35 +1,17 @@
 
-interface GPTResults {
-  insights: {
-    אסטרטגיה: string;
-    אדפטיביות: string;
-    לומד: string;
-    השראה: string;
-    משמעות: string;
-    אותנטיות: string;
-  };
-}
-
 interface ResultsGptInsightsProps {
-  gptResults: GPTResults | null;
+  gptResults: {
+    extra?: string;
+  } | null;
 }
 
 const ResultsGptInsights: React.FC<ResultsGptInsightsProps> = ({ gptResults }) => {
-  if (!gptResults) {
-    return null;
-  }
+  if (!gptResults?.extra) return null;
 
   return (
-    <div className="bg-white rounded-lg p-6 shadow-sm">
-      <h3 className="text-lg font-semibold mb-4">תובנות AI</h3>
-      <div className="grid gap-4">
-        {Object.entries(gptResults.insights).map(([dimension, insight]) => (
-          <div key={dimension} className="border-b pb-3 last:border-b-0">
-            <h4 className="font-semibold text-blue-600 mb-2">{dimension}</h4>
-            <p className="text-gray-700">{insight}</p>
-          </div>
-        ))}
-      </div>
+    <div className="bg-white p-4 rounded-xl shadow space-y-2">
+      <h2 className="text-lg font-semibold text-gray-800">הרחבות מבוססות AI</h2>
+      <p className="text-gray-700 whitespace-pre-line">{gptResults.extra}</p>
     </div>
   );
 };
