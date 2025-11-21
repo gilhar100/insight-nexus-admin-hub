@@ -4,6 +4,7 @@ export interface WorkshopParticipant {
   full_name: string;
   email: string;
   overall_score: number | null;
+  analyzed_score?: string | null;
   question_responses?: any;
   organization: string | null;
   profession: string | null;
