@@ -17,6 +17,8 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
   const [selectedZone, setSelectedZone] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  console.log('🥧 ZoneDistributionChart - Input zoneDistribution:', zoneDistribution);
+
   const data = [
     {
       name: 'הזדמנות',
@@ -45,6 +47,9 @@ export const ZoneDistributionChart: React.FC<ZoneDistributionChartProps> = ({ zo
   ];
 
   const total = data.reduce((sum, item) => sum + item.value, 0);
+  
+  console.log('🥧 ZoneDistributionChart - Chart data:', data);
+  console.log('🥧 ZoneDistributionChart - Total participants:', total);
 
   const chartConfig = {
     value: {
