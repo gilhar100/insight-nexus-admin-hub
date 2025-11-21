@@ -78,14 +78,33 @@ export const GroupWorkshopInsights: React.FC = () => {
   const hasMinimumData = workshopData && workshopData.participants.length >= 3;
 
   const getZoneDistribution = () => {
-    if (!wocaAnalysis?.groupZoneCounts) return { opportunity: 0, comfort: 0, apathy: 0, war: 0 };
-    
-    return {
-      opportunity: wocaAnalysis.groupZoneCounts.opportunity,
-      comfort: wocaAnalysis.groupZoneCounts.comfort,
-      apathy: wocaAnalysis.groupZoneCounts.apathy,
-      war: wocaAnalysis.groupZoneCounts.war
-    };
+    // Use analyzed_score from Supabase (Opportunity/War/etc.) instead of recalculated zones
+    if (!workshopData) {
+      return { opportunity: 0, comfort: 0, apathy: 0, war: 0 };
+    }
+
+    const counts = { opportunity: 0, comfort: 0, apathy: 0, war: 0 };
+
+    workshopData.participants.forEach((p: any) => {
+      const raw = p.analyzed_score as string | null | undefined;
+      if (!raw) return;
+
+      const zone = raw.toLowerCase();
+
+      if (zone.includes('opportunity')) {
+        counts.opportunity++;
+      } else if (zone.includes('comfort')) {
+        counts.comfort++;
+      } else if (zone.includes('apathy')) {
+        counts.apathy++;
+      } else if (zone.includes('war')) {
+        counts.war++;
+      }
+    });
+
+    console.log('🥧 WOCA zone distribution from analyzed_score:', counts, 'participants:', workshopData.participants.length);
+
+    return counts;
   };
 
   const renderContent = () => (
