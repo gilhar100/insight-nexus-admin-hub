@@ -274,13 +274,13 @@ export const analyzeWorkshopWoca = (participants: any[], workshopId: number): Wo
     const analyzedScore = participant.analyzed_score;
     if (analyzedScore) {
       const zoneName = analyzedScore.toLowerCase();
-      if (zoneName === 'war' || zoneName === 'מלחמה') {
+      if (zoneName.includes('war') || zoneName.includes('מלחמה')) {
         groupZoneCounts.war++;
-      } else if (zoneName === 'opportunity' || zoneName === 'הזדמנות') {
+      } else if (zoneName.includes('opportunity') || zoneName.includes('הזדמנות')) {
         groupZoneCounts.opportunity++;
-      } else if (zoneName === 'comfort' || zoneName === 'נוחות') {
+      } else if (zoneName.includes('comfort') || zoneName.includes('נוחות')) {
         groupZoneCounts.comfort++;
-      } else if (zoneName === 'apathy' || zoneName === 'אדישות') {
+      } else if (zoneName.includes('apathy') || zoneName.includes('אדישות')) {
         groupZoneCounts.apathy++;
       }
     }

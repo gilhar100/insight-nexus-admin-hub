@@ -23,6 +23,7 @@ export const transformParticipantData = (item: any): WorkshopParticipant => {
     full_name: item.full_name,
     email: item.email,
     overall_score: item.overall_score,
+    analyzed_score: item.analyzed_score || null,
     question_responses: questionResponses,
     organization: item.organization,
     profession: item.profession,
