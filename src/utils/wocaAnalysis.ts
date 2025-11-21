@@ -266,17 +266,27 @@ export const analyzeWorkshopWoca = (participants: any[], workshopId: number): Wo
   
   console.log('Group category scores:', groupCategoryScores);
   
-  // Calculate frequency-based zone analysis
+  // Calculate frequency-based zone analysis from analyzed_score in database
   const groupZoneCounts: WocaZoneCounts = { war: 0, opportunity: 0, comfort: 0, apathy: 0 };
   
-  // Count how many participants fall into each zone
-  participantAnalyses.forEach(participant => {
-    if (participant.dominantZone && !participant.isTie) {
-      groupZoneCounts[participant.dominantZone as keyof WocaZoneCounts]++;
+  // Count how many participants fall into each zone based on analyzed_score field
+  participants.forEach(participant => {
+    const analyzedScore = participant.analyzed_score;
+    if (analyzedScore) {
+      const zoneName = analyzedScore.toLowerCase();
+      if (zoneName === 'war' || zoneName === 'מלחמה') {
+        groupZoneCounts.war++;
+      } else if (zoneName === 'opportunity' || zoneName === 'הזדמנות') {
+        groupZoneCounts.opportunity++;
+      } else if (zoneName === 'comfort' || zoneName === 'נוחות') {
+        groupZoneCounts.comfort++;
+      } else if (zoneName === 'apathy' || zoneName === 'אדישות') {
+        groupZoneCounts.apathy++;
+      }
     }
   });
   
-  console.log('Group zone counts:', groupZoneCounts);
+  console.log('Group zone counts from analyzed_score:', groupZoneCounts);
   
   // Determine group's dominant zone by participant count (NEW APPROACH)
   const { 
