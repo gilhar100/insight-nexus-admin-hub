@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -1349,6 +1349,7 @@ export type Database = {
       woca_responses: {
         Row: {
           age: string | null
+          analyzed_score: string | null
           answers: number[] | null
           apathy_score: number | null
           comfort_score: number | null
@@ -1409,6 +1410,7 @@ export type Database = {
         }
         Insert: {
           age?: string | null
+          analyzed_score?: string | null
           answers?: number[] | null
           apathy_score?: number | null
           comfort_score?: number | null
@@ -1469,6 +1471,7 @@ export type Database = {
         }
         Update: {
           age?: string | null
+          analyzed_score?: string | null
           answers?: number[] | null
           apathy_score?: number | null
           comfort_score?: number | null
