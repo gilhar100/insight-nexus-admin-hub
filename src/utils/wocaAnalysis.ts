@@ -272,17 +272,11 @@ export const analyzeWorkshopWoca = (participants: any[], workshopId: number): Wo
   // Count how many participants fall into each zone
   participantAnalyses.forEach(participant => {
     if (participant.dominantZone && !participant.isTie) {
-      // Clear dominant zone – count once
       groupZoneCounts[participant.dominantZone as keyof WocaZoneCounts]++;
-    } else if (participant.isTie && participant.tiedCategories.length > 0) {
-      // Tie between zones – count this participant in ALL tied zones so they are represented in the distribution
-      participant.tiedCategories.forEach(category => {
-        groupZoneCounts[category as keyof WocaZoneCounts]++;
-      });
     }
   });
   
-  console.log('Group zone counts (including ties):', groupZoneCounts);
+  console.log('Group zone counts:', groupZoneCounts);
   
   // Determine group's dominant zone by participant count (NEW APPROACH)
   const { 

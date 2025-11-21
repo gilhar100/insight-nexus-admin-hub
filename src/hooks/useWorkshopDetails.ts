@@ -20,7 +20,6 @@ const transformWocaParticipantData = (item: any): WorkshopParticipant => {
     full_name: item.full_name || 'Anonymous',
     email: item.email || '',
     overall_score: item.overall_score || null,
-    analyzed_score: item.analyzed_score || null,
     question_responses: questionResponses,
     organization: item.organization,
     profession: item.profession,
