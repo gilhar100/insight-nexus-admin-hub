@@ -60,6 +60,9 @@ const SalimaResultsViewer: React.FC<ResultsViewerProps> = ({
         {/* Score Display */}
         <ResultsScoreDisplay results={results} />
         
+        {/* Dominant Archetype */}
+        <ResultsDominantArchetype dominantArchetype={insights.dominant_archetype} />
+        
         {/* Summary Cards */}
         <ResultsSummaryCards results={results} />
         
