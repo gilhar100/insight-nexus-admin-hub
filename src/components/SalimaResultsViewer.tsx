@@ -4,6 +4,7 @@ import ResultsScoreDisplay from "@/components/results/ResultsScoreDisplay";
 import ResultsSummaryCards from "@/components/results/ResultsSummaryCards";
 import ResultsCharts from "@/components/results/ResultsCharts";
 import ResultsDominantArchetype from "@/components/results/ResultsDominantArchetype";
+import DimensionScaleDisplay from "@/components/results/DimensionScaleDisplay";
 import ResultsAnalysis from "@/components/results/ResultsAnalysis";
 import ResultsGptInsights from "@/components/results/ResultsGptInsights";
 import ResultsActions from "@/components/results/ResultsActions";
@@ -62,6 +63,9 @@ const SalimaResultsViewer: React.FC<ResultsViewerProps> = ({
         
         {/* Dominant Archetype */}
         <ResultsDominantArchetype dominantArchetype={insights.dominant_archetype} />
+        
+        {/* Dimension Scale Display */}
+        <DimensionScaleDisplay dimensions={results.dimensions} />
         
         {/* Summary Cards */}
         <ResultsSummaryCards results={results} />
