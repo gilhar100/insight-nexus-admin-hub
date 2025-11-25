@@ -4,6 +4,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { archetypeExplanations } from '@/utils/archetypeDescriptions';
 
 interface ArchetypeData {
   archetype: string;
@@ -39,21 +40,6 @@ const getArchetypeColor = (archetype: string): string => {
     return "#4CAF50"; // Green for Empowering Leader
   }
   return "#6B7280"; // Default gray for unknown archetypes
-};
-
-const archetypeExplanations: Record<string, { title: string; description: string }> = {
-  "המנהל הסקרן": {
-    title: "המנהל הסקרן",
-    description: "מנהל שמוביל דרך סקרנות, חיפוש מתמיד אחר ידע, והשראה. הוא שואל שאלות, משתף תובנות, ומדליק את הסביבה באנרגיה של למידה וצמיחה. מנהיגות עבורו היא מסע של גילוי — לא רק מטרה."
-  },
-  "המנהל המעצים": {
-    title: "המנהל המעצים", 
-    description: "מנהל שפועל מתוך כנות, הקשבה ותחושת שליחות. הוא יוצר חיבור רגשי עם האנשים סביבו, נותן מקום לערכים וזהות, ומעודד כל אחד להרגיש חלק ממשהו גדול יותר. הוא בונה אמון ושותפות אמיתית."
-  },
-  "מנהל ההזדמנות": {
-    title: "מנהל ההזדמנות",
-    description: "מנהל שמזהה מגמות, חושב קדימה, ופועל בזריזות גם בתנאים משתנים. הוא לא נבהל מאי-ודאות, אלא רואה בה קרקע ליוזמה. משלב חשיבה מערכתית עם גמישות וביטחון בהחלטות."
-  }
 };
 
 export const ArchetypeDistributionChart: React.FC<ArchetypeDistributionChartProps> = ({
